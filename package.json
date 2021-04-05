@@ -1,0 +1,19 @@
+{
+  "name": "rubicon",
+  "version": "0.0.1",
+  "description": "Launcher for TES4:Oblivion and game builds based on it",
+  "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EdMSL/rubicon.git"
+  },
+  "author": "Eduard Trayt <eduard2011rus@gmail.com> (https://github.com/EdMSL)",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "electron": "12.0.2"
+  }
+}
