@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "jsx": "react",
+    "lib": [ "dom", "es6" ],
+    "module": "ES2015",
+    "moduleResolution": "node",
+    "noEmit": false,
+    "noImplicitAny": false,
+    "outDir": "./app/build/",
+    "sourceMap": true,
+    "target": "es6",
+    "paths": {
+    }
+  },
+  "include": [
+    "src/**/*",
+    "./config/webpack.base.config.js",
+    "./config/webpack.build.config.js",
+    "./config/webpack.dev.config.js"
+  ],
+  "exclude": ["node_modules", "./app/build/**/*"]
+}
