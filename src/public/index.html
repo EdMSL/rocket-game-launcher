@@ -9,13 +9,7 @@
   %>
 </head>
 <body>
-  <h1>Hello World!</h1>
-  <p>
-      We are using Node.js <span id="node-version"></span>,
-      Chromium <span id="chrome-version"></span>,
-      and Electron <span id="electron-version"></span>.
-  </p>
-
+  <div id="root"></div>
   <% if (htmlWebpackPlugin.options.inject === false)
     { %> <script src="renderer.js"></script> <% }
   %>

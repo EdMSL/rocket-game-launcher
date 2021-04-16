@@ -22,6 +22,7 @@ const configuration = merge([
     },
     resolve: {
       alias: {
+        $containers: path.resolve(__dirname, `${PATHS.src}/renderer/containers/`),
       },
       fallback: {
         'path': false,

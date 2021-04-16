@@ -18,7 +18,7 @@ const buildWebpackConfig = (env) => {
       mode: 'production',
       entry: MAIN
         ? path.resolve(`${baseWebpackConfig.externals.paths.src}/main/main.ts`)
-        : path.resolve(`${baseWebpackConfig.externals.paths.src}/renderer/renderer.ts`),
+        : path.resolve(`${baseWebpackConfig.externals.paths.src}/renderer/renderer.tsx`),
       output: {
         path: `${baseWebpackConfig.externals.paths.dist}`,
         filename: MAIN ? 'index.js' : 'renderer.js',
