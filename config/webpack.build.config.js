@@ -9,22 +9,28 @@ const plugins = [
   CssExtractPlugin(),
 ];
 
-const buildWebpackConfig = merge([
-  baseWebpackConfig,
-  {
-    mode: 'production',
-    entry: path.resolve(`${baseWebpackConfig.externals.paths.src}/main.ts`),
-    output: {
-      path: `${baseWebpackConfig.externals.paths.dist}`,
-      filename:'index.js',
+const buildWebpackConfig = (env) => {
+  const MAIN = !!(env && env.main);
+
+  return merge([
+    baseWebpackConfig,
+    {
+      mode: 'production',
+      entry: MAIN
+        ? path.resolve(`${baseWebpackConfig.externals.paths.src}/main/main.ts`)
+        : path.resolve(`${baseWebpackConfig.externals.paths.src}/renderer/renderer.ts`),
+      output: {
+        path: `${baseWebpackConfig.externals.paths.dist}`,
+        filename: MAIN ? 'index.js' : 'renderer.js',
+      },
+      target: MAIN ? 'electron-main' : 'electron-renderer',
+      optimization: {
+        minimize: true,
+      },
+      plugins,
     },
-    target: 'electron-main',
-    optimization: {
-      minimize: true,
-    },
-    plugins,
-  },
-  css('production', `${baseWebpackConfig.externals.paths.src}/styles/resources`),
-]);
+    css('production', `${baseWebpackConfig.externals.paths.src}/renderer/styles/resources`),
+  ]);
+};
 
 module.exports = buildWebpackConfig;

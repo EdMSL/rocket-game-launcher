@@ -10,9 +10,13 @@
   "author": "Eduard Trayt <eduard2011rus@gmail.com> (https://github.com/EdMSL)",
   "license": "MIT",
   "scripts": {
-    "start": "cross-env electron ./app/build",
-    "build": "rm -rf ./app/build/* && cross-env NODE_ENV=production webpack --env production --config=./config/webpack.build.config.js --progress",
-    "dev": "cross-env webpack serve --config ./config/webpack.dev.config.js",
+    "start": "npm run dev:main && npm-run-all --parallel dev:renderer dev:server",
+    "dev:server": "cross-env electron ./app/build",
+    "dev:main": "cross-env webpack --env main --config ./config/webpack.dev.config.js",
+    "dev:renderer": "cross-env NODE_ENV=development webpack serve --config ./config/webpack.dev.config.js",
+    "build": "rm -rf ./app/build/* && npm run build:main && npm run build:renderer",
+    "build:main": "cross-env NODE_ENV=production webpack --env main --config=./config/webpack.build.config.js --progress",
+    "build:renderer": "cross-env NODE_ENV=production webpack --config=./config/webpack.build.config.js --progress",
     "stylelint": "stylelint src/**/*.scss --config ./.stylelintrc-full.js --syntax scss --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -25,6 +29,8 @@
     "eslint": "7.23.0",
     "html-webpack-plugin": "5.3.1",
     "mini-css-extract-plugin": "1.4.0",
+    "npm-run-all": "4.1.5",
+    "sass": "1.32.8",
     "sass-loader": "11.0.1",
     "sass-resources-loader": "2.1.1",
     "style-loader": "2.0.0",
@@ -41,5 +47,8 @@
     "webpack-cli": "4.6.0",
     "webpack-dev-server": "3.11.2",
     "webpack-merge": "5.7.3"
+  },
+  "dependencies": {
+    "axios": "^0.21.1"
   }
 }

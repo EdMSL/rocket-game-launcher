@@ -16,29 +16,12 @@ module.exports = {
     mocha: true,
   },
   extends: [
-    "airbnb",
-    "airbnb/hooks",
     "plugin:@typescript-eslint/recommended",
   ],
   plugins: [
-    "react",
-    "jsx-a11y",
-    "import",
-    "react-hooks",
     "@typescript-eslint",
   ],
   settings: {
-    "import/resolver": {
-      webpack: {
-        config: "./config/webpack.base.config.js",
-      }
-    },
-    "import/parsers": {
-      "@typescript-eslint/parser": [".ts", ".tsx", ".d.ts"],
-    },
-    react: {
-      version: "detect",
-    },
   },
   rules: {
     "arrow-body-style": [1, "as-needed", {
@@ -124,40 +107,7 @@ module.exports = {
     "space-infix-ops": 1,
     "spaced-comment": 0,
 
-    "import/extensions": [2, "always", { "js": "never", "ts": "never", "tsx": "never" }],
-    "import/newline-after-import": 0,
-    "import/no-cycle": [2, { maxDepth: 1 }],
-    "import/no-extraneous-dependencies": 0,
-    "import/order": [1, {
-      groups: [
-        [
-          "builtin",
-          "external",
-          "internal"
-        ],
-      ],
-      "newlines-between": "always",
-    }],
-    "import/prefer-default-export": 0,
-
-    "react/jsx-closing-bracket-location": 1,
-    "react/jsx-closing-tag-location": 1,
-    "react/jsx-indent": [1, 2],
-    "react/jsx-indent-props": [1, 2],
-    "react/jsx-filename-extension": [1, {
-      extensions: [".tsx", ".jsx"],
-    }],
-    "react/jsx-fragments": 0, // use React.Fragment or <>
-    "react/jsx-tag-spacing": 1,
-    "react/prefer-stateless-function": 0,
-    "react/prop-types": 0,
-    "react/self-closing-comp": 1,
-
     "@typescript-eslint/member-delimiter-style": 0,
-    "@typescript-eslint/interface-name-prefix": [2, {
-      prefixWithI: "always",
-      allowUnderscorePrefix: false,
-    }],
     "@typescript-eslint/no-magic-numbers": [1, {
       ignore: [-1, 0, 1, 2],
       ignoreArrayIndexes: true,

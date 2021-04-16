@@ -4,7 +4,7 @@ const regExps = require('../regExps');
 
 const { cssModules } = regExps;
 
-module.exports = function (mode, resourcesPath) {
+module.exports = function(mode, resourcesPath) {
   function getLoaders(cssOptions) {
     return [
       {
@@ -53,7 +53,7 @@ module.exports = function (mode, resourcesPath) {
               localIdentName: '[local]___[hash:base64:5]',
             },
           }),
-        }
+        },
       ],
     },
   };

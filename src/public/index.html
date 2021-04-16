@@ -15,5 +15,9 @@
       Chromium <span id="chrome-version"></span>,
       and Electron <span id="electron-version"></span>.
   </p>
+
+  <% if (htmlWebpackPlugin.options.inject === false)
+    { %> <script src="renderer.js"></script> <% }
+  %>
 </body>
 </html>

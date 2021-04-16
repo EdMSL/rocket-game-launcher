@@ -6,7 +6,7 @@
     "esModuleInterop": true,
     "jsx": "react",
     "lib": [ "dom", "es6" ],
-    "module": "ES2015",
+    "module": "commonjs",
     "moduleResolution": "node",
     "noEmit": false,
     "noImplicitAny": false,
@@ -20,7 +20,8 @@
     "src/**/*",
     "./config/webpack.base.config.js",
     "./config/webpack.build.config.js",
-    "./config/webpack.dev.config.js"
+    "./config/webpack.dev.config.js",
+    "./.eslintrc.js"
   ],
   "exclude": ["node_modules", "./app/build/**/*"]
 }
