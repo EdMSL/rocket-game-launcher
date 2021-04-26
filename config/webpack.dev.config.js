@@ -20,7 +20,7 @@ const devWebpackConfig = (env) => {
         filename: MAIN ? 'index.js' : 'renderer.js',
         publicPath: 'http://localhost:8085/build/',
       },
-      target: MAIN ? 'electron12.0-main' : 'web',
+      target: MAIN ? 'electron12.0-main' : 'electron-renderer',
       devtool: 'cheap-module-source-map',
       optimization: {},
       devServer: (!MAIN) ? {

@@ -14,7 +14,12 @@
     "sourceMap": true,
     "target": "es6",
     "paths": {
-      "$containers/*": [ "src/renderer/containers/*" ]
+      "$constants/*": [ "src/constants/*" ],
+      "$containers/*": [ "src/renderer/containers/*" ],
+      "$store/*": [ "src/redux/store/*" ],
+      "$actions/*": [ "src/redux/actions/*" ],
+      "$reducers/*": [ "src/redux/reducers/*" ],
+      "$types/*": [ "src/redux/types/*" ]
     }
   },
   "include": [

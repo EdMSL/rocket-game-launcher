@@ -22,9 +22,16 @@ const configuration = merge([
     },
     resolve: {
       alias: {
+        $constants: path.resolve(__dirname, `${PATHS.src}/constants/`),
         $containers: path.resolve(__dirname, `${PATHS.src}/renderer/containers/`),
+        $store: path.resolve(__dirname, `${PATHS.src}/redux/store/`),
+        $actions: path.resolve(__dirname, `${PATHS.src}/redux/actions/`),
+        $reducers: path.resolve(__dirname, `${PATHS.src}/redux/reducers/`),
+        $types: path.resolve(__dirname, `${PATHS.src}/redux/types/`),
       },
       fallback: {
+        'assert': false,
+        'fs': false,
         'path': false,
       },
       extensions: ['.ts', '.tsx', '.js'],
