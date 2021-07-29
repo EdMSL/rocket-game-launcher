@@ -10,12 +10,12 @@ import { Routes } from '$constants/routes';
 
 const styles = require('./styles.module.scss').default;
 
-export const App = () => {
+export const App = (): JSX.Element => {
   console.log('text');
 
   return (
     <main>
-      {/* <Switch>
+      <Switch>
         <Route
           exact
           path={Routes.MAIN_SCREEN}
@@ -25,14 +25,9 @@ export const App = () => {
           path={Routes.SETTINGS_SCREEN}
           component={SettingsScreen}
         />
-      </Switch> */}
+      </Switch>
       <div>
-        <h1 className={styles.title}>Hello World!</h1>
-        <p>
-            We are using Node.js <span id="node-version"></span>,
-            Chromium <span id="chrome-version"></span>,
-            and Electron <span id="electron-version"></span>.
-        </p>
+        <h1 className={styles.title}>Hello World!!!</h1>
       </div>
     </main>
   );

@@ -16,7 +16,6 @@ export const configureStore = (
   scope = 'main',
 ): Store<ReturnType<ReturnType<typeof getRootReducer>>> => {
   const router = routerMiddleware(history);
-  console.log(initialState);
 
   let middleware = [];
 
