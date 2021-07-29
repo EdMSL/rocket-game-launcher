@@ -1,0 +1,3 @@
+export const USER_SETTINGS_TYPES = {
+  SET_RESOLUTION: 'SET_RESOLUTION',
+};

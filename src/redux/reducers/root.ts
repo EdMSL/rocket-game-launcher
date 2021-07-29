@@ -1,24 +1,29 @@
 import { combineReducers } from 'redux';
 import { createMemoryHistory } from 'history';
 import { connectRouter } from 'connected-react-router';
-import { settingsReducer } from './settings';
+import { gameSettingsReducer } from './gameSettings';
+import { userSettingsReducer } from './userSettings';
 
 interface IReducers {
-  settings: typeof settingsReducer,
-  router?: any,
+  gameSettings: typeof gameSettingsReducer,
+  userSettings: typeof userSettingsReducer,
+  router?: typeof routerReducer,
 }
 
 export const history = createMemoryHistory();
 
+const routerReducer = connectRouter(history);
+
 export const getRootReducer = (scope = 'main') => {
   let reducers: IReducers = {
-    settings: settingsReducer,
+    gameSettings: gameSettingsReducer,
+    userSettings: userSettingsReducer,
   };
 
   if (scope === 'renderer') {
     reducers = {
       ...reducers,
-      router: connectRouter(history),
+      router: routerReducer,
     };
   }
 

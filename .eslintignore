@@ -1,7 +1,7 @@
-# Ignore built files except build/index.js
 build/*
 /.vscode
 node_modules
+reduxDevToolsExtension
 # config/webpack.base.config.js
 # config/webpack.build.config.js
 # config/webpack.dev.config.js

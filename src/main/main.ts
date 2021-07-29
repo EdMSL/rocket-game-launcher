@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { createWaitForWebpackDevServer } from './components/waitDevServer';
-import { createStorage } from './components/createStorage';
+import { createStorage } from './components/storage';
 
 require('@electron/remote/main').initialize();
 
@@ -27,9 +27,9 @@ function createWindow() {
 
   const session = win.webContents.session;
 
-  if (fs.existsSync(path.resolve('./ReduxDevToolsExtension'))) {
+  if (fs.existsSync(path.resolve('extensions/reduxDevToolsExtension'))) {
     session.loadExtension(
-      path.resolve('./ReduxDevToolsExtension'),
+      path.resolve('extensions/reduxDevToolsExtension'),
     );
   }
 }
