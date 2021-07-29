@@ -5,22 +5,28 @@ import { IUserSettingsRootState } from '$reducers/userSettings';
 import { defaultLauncherResolution } from '$constants/defaultParameters';
 
 interface IStorage {
-  userSettings: IUserSettingsRootState,
+  settings: {
+    userSettings: IUserSettingsRootState,
+  }
 }
 
 const storage = new Storage<IStorage>({
   defaults: {
-    userSettings: {
-      resolution: defaultLauncherResolution,
+    settings: {
+      userSettings: {
+        resolution: defaultLauncherResolution,
+      },
     },
   },
 });
 
-const saveToStorageParams = ['settings'];
-console.log(storage.path);
+const saveToStorageParams = ['userSettings'];
 
 export const createStorage = (): void => {
-  global['state'] = storage.get('settings');
+  const storageSettings = storage.get('settings');
+  console.log(storageSettings);
+
+  global['state'] = storageSettings;
 
   const store = configureStore(global['state'], 'main');
 

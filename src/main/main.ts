@@ -1,38 +1,9 @@
 import { app, dialog, BrowserWindow } from 'electron';
-import fs from 'fs';
-import path from 'path';
 
-import { createWaitForWebpackDevServer } from './components/waitDevServer';
 import { createStorage } from './components/storage';
+import { createWindow } from './components/window';
 
 require('@electron/remote/main').initialize();
-
-function createWindow() {
-  const win = new BrowserWindow({
-    width: 1024,
-    height: 768,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      enableRemoteModule: true,
-    },
-  });
-
-  if (process.env.NODE_ENV === 'production') {
-    win.loadFile('./index.html');
-  } else {
-    const waitForWebpackDevServer = createWaitForWebpackDevServer(win);
-    waitForWebpackDevServer();
-  }
-
-  const session = win.webContents.session;
-
-  if (fs.existsSync(path.resolve('extensions/reduxDevToolsExtension'))) {
-    session.loadExtension(
-      path.resolve('extensions/reduxDevToolsExtension'),
-    );
-  }
-}
 
 const start = async() => {
   createStorage();
