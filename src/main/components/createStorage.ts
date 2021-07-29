@@ -3,26 +3,26 @@ import Storage from 'electron-store';
 import { configureStore } from '$store/store';
 
 interface IStorage {
-  settings: any,
+  settings: {
+    resolution: string,
+  }
 }
 
 const storage = new Storage<IStorage>({
-  name: 'userSettings',
+  defaults: {
+    settings: {
+      resolution: '1024x768',
+    },
+  },
 });
+
 const saveToStorageParams = ['settings'];
+console.log(storage.path);
 
 export const createStorage = (): void => {
-  global['state'] = storage.get('state');
+  global['state'] = storage.get('settings');
 
   const store = configureStore(global['state'], 'main');
-
-
-  // store.subscribe(async() => {
-  //   global['state'] = store.getState();
-  //   // persist store changes
-  //   // TODO: should this be blocking / wait? _.throttle?
-  //   await storage.set('state', global['state']);
-  // });
 
   store.subscribe(() => {
     const currentState = store.getState();
@@ -40,7 +40,3 @@ export const createStorage = (): void => {
     storage.set(newStorageData);
   });
 };
-
-// module.exports = {
-//   createStorage,
-// };

@@ -7,56 +7,18 @@ import { createStore, applyMiddleware, compose } from 'redux';
 // import { routerMiddleware } from 'react-router-redux';
 import { routerMiddleware } from 'connected-react-router';
 import { getRootReducer, history } from '../reducers/root';
-// import {
-//   forwardToMain,
-//   forwardToRenderer,
-//   triggerAlias,
-//   replayActionMain,
-//   replayActionRenderer,
-// } from 'electron-redux';
-
-// const {
-//   forwardToMain,
-//   forwardToRenderer,
-//   triggerAlias,
-//   replayActionMain,
-//   replayActionRenderer,
-// } = require('electron-redux');
-
 import {
-  forwardToMain as ForwardToMain,
-  forwardToRenderer as ForwardToRenderer,
-  triggerAlias as TriggerAlias,
-  replayActionMain as ReplayActionMain,
-  replayActionRenderer as ReplayActionRenderer,
-} from 'electron-redux';
-
-declare global {
-  interface window {
-    require: (module: 'electron-redux') => {
-      forwardToMain: typeof ForwardToMain,
-      forwardToRenderer: typeof ForwardToRenderer,
-      triggerAlias: typeof TriggerAlias,
-      replayActionMain: typeof ReplayActionMain,
-      replayActionRenderer: typeof ReplayActionRenderer,
-    };
-  }
-}
-
-const { forwardToMain,
+  forwardToMain,
   forwardToRenderer,
   triggerAlias,
   replayActionMain,
-  replayActionRenderer, } = require('electron-redux');
+  replayActionRenderer,
+} from 'electron-redux';
 
 export const configureStore = (initialState, scope = 'main') => {
   const router = routerMiddleware(history);
 
   let middleware = [];
-
-  if (!process.env.NODE_ENV) {
-    // middleware.push(logger);
-  }
 
   if (scope === 'renderer') {
     middleware = [
@@ -86,6 +48,7 @@ export const configureStore = (initialState, scope = 'main') => {
   /* eslint-enable @typescript-eslint/no-explicit-any */
 
   const rootReducer = getRootReducer(scope);
+
   const store = createStore(rootReducer, initialState, composeEnhancers(...enhanced));
 
   if (scope === 'main') {

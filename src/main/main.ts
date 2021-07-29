@@ -1,11 +1,8 @@
 import { app, dialog, BrowserWindow } from 'electron';
-// const { app, dialog, BrowserWindow } = require('electron');
 import fs from 'fs';
 import path from 'path';
 
 import { createWaitForWebpackDevServer } from './components/waitDevServer';
-// const { createWaitForWebpackDevServer } = require('./components/waitDevServer');
-// import { configureStore } from '$store/store';
 import { createStorage } from './components/createStorage';
 
 require('@electron/remote/main').initialize();
@@ -39,16 +36,6 @@ function createWindow() {
 
 const start = async() => {
   createStorage();
-
-  // global['state'] = await storage.get('state');
-  // const store = configureStore(global.state, 'main');
-
-  // store.subscribe(async () => {
-  //   global.state = store.getState();
-  //   // persist store changes
-  //   // TODO: should this be blocking / wait? _.throttle?
-  //   await storage.set('state', global.state);
-  // });
 
   createWindow();
 };

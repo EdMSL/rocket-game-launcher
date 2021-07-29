@@ -4,7 +4,8 @@ import { connectRouter } from 'connected-react-router';
 import { settingsReducer } from './settings';
 
 interface IReducers {
-  [x: string]: any,
+  settings: typeof settingsReducer,
+  router?: any,
 }
 
 export const history = createMemoryHistory();
