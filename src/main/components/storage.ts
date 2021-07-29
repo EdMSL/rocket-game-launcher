@@ -7,7 +7,7 @@ import { defaultLauncherResolution } from '$constants/defaultParameters';
 interface IStorage {
   settings: {
     userSettings: IUserSettingsRootState,
-  }
+  },
 }
 
 const storage = new Storage<IStorage>({
@@ -24,7 +24,6 @@ const saveToStorageParams = ['userSettings'];
 
 export const createStorage = (): void => {
   const storageSettings = storage.get('settings');
-  console.log(storageSettings);
 
   global['state'] = storageSettings;
 

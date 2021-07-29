@@ -31,11 +31,10 @@ export const createWindow = (): void => {
     waitForWebpackDevServer();
   }
 
-  const session = mainWindow.webContents.session;
   const pathToExtension = path.resolve('extensions/reduxDevTools');
 
-  if (fs.existsSync(pathToExtension)) {
-    session.loadExtension(pathToExtension);
+  if (process.env.NODE_ENV === 'development' && fs.existsSync(pathToExtension)) {
+    mainWindow.webContents.session.loadExtension(pathToExtension);
   }
 
   mainWindow.once('ready-to-show', () => {

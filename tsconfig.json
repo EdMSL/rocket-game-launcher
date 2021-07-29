@@ -19,7 +19,8 @@
       "$store/*": [ "src/redux/store/*" ],
       "$actions/*": [ "src/redux/actions/*" ],
       "$reducers/*": [ "src/redux/reducers/*" ],
-      "$types/*": [ "src/redux/types/*" ]
+      "$types/*": [ "src/redux/types/*" ],
+      "$utils/*": [ "src/utils/*" ]
     }
   },
   "include": [

@@ -1,4 +1,4 @@
 export const Routes = {
   MAIN_SCREEN: '/',
-  SETTINGS_SCREEN: '/settings',
+  GAME_SETTINGS_SCREEN: '/settings',
 };

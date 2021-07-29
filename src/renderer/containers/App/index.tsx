@@ -5,7 +5,7 @@ import {
 } from 'react-router-dom';
 
 import { MainScreen } from '$containers/MainScreen';
-import { SettingsScreen } from '$containers/SettingsScreen';
+import { GameSettingsScreen } from '$containers/GameSettingsScreen';
 import { Routes } from '$constants/routes';
 
 const styles = require('./styles.module.scss').default;
@@ -22,8 +22,8 @@ export const App = (): JSX.Element => {
           component={MainScreen}
         />
         <Route
-          path={Routes.SETTINGS_SCREEN}
-          component={SettingsScreen}
+          path={Routes.GAME_SETTINGS_SCREEN}
+          component={GameSettingsScreen}
         />
       </Switch>
       <div>

@@ -28,6 +28,7 @@ const configuration = merge([
         $actions: path.resolve(__dirname, `${PATHS.src}/redux/actions/`),
         $reducers: path.resolve(__dirname, `${PATHS.src}/redux/reducers/`),
         $types: path.resolve(__dirname, `${PATHS.src}/redux/types/`),
+        $utils: path.resolve(__dirname, `${PATHS.src}/utils/`),
       },
       fallback: {
         'assert': false,

@@ -2,8 +2,11 @@ import { app, dialog, BrowserWindow } from 'electron';
 
 import { createStorage } from './components/storage';
 import { createWindow } from './components/window';
+import { createLogFile } from '$utils/log';
 
 require('@electron/remote/main').initialize();
+
+createLogFile();
 
 const start = async() => {
   createStorage();
