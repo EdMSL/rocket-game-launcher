@@ -32,11 +32,10 @@ export const createWindow = (): void => {
   }
 
   const session = mainWindow.webContents.session;
+  const pathToExtension = path.resolve('extensions/reduxDevTools');
 
-  if (fs.existsSync(path.resolve('extensions/reduxDevToolsExtension'))) {
-    session.loadExtension(
-      path.resolve('extensions/reduxDevToolsExtension'),
-    );
+  if (fs.existsSync(pathToExtension)) {
+    session.loadExtension(pathToExtension);
   }
 
   mainWindow.once('ready-to-show', () => {

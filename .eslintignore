@@ -1,7 +1,7 @@
 build/*
 /.vscode
 node_modules
-reduxDevToolsExtension
+reduxDevTools
 # config/webpack.base.config.js
 # config/webpack.build.config.js
 # config/webpack.dev.config.js

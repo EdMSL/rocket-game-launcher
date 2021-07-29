@@ -1,10 +1,6 @@
-import { createStore, applyMiddleware, compose } from 'redux';
-// import { persistState } from 'redux-devtools';
-// import thunk from 'redux-thunk';
-// import promise from 'redux-promise';
-// import createLogger from 'redux-logger';
-// import { hashHistory } from 'react-router';
-// import { routerMiddleware } from 'react-router-redux';
+import {
+  createStore, applyMiddleware, compose, Store,
+} from 'redux';
 import { routerMiddleware } from 'connected-react-router';
 import { getRootReducer, history } from '../reducers/root';
 import {
@@ -15,8 +11,12 @@ import {
   replayActionRenderer,
 } from 'electron-redux';
 
-export const configureStore = (initialState, scope = 'main') => {
+export const configureStore = (
+  initialState,
+  scope = 'main',
+): Store<ReturnType<ReturnType<typeof getRootReducer>>> => {
   const router = routerMiddleware(history);
+  console.log(initialState);
 
   let middleware = [];
 
