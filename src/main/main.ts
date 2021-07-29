@@ -1,8 +1,9 @@
-import { app, dialog, BrowserWindow } from 'electron';
+import { app, BrowserWindow } from 'electron';
 
 import { createStorage } from './components/storage';
 import { createWindow } from './components/window';
-import { createLogFile } from '$utils/log';
+import { createLogFile, writeToLogFileSync } from '$utils/log';
+import { showErrorBox } from '$utils/errors';
 
 require('@electron/remote/main').initialize();
 
@@ -12,12 +13,14 @@ const start = async() => {
   createStorage();
 
   createWindow();
+
+  writeToLogFileSync('Application ready.');
 };
 
 app.on('ready', () => {
   start()
-    .catch((err) => {
-      dialog.showErrorBox('There\'s been an error', err.message);
+    .catch((error) => {
+      showErrorBox(error, 'Can\'t load application');
     });
 });
 
