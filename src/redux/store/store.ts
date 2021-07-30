@@ -1,5 +1,5 @@
 import {
-  createStore, applyMiddleware, compose, Store, Middleware
+  createStore, applyMiddleware, compose, Store, Middleware,
 } from 'redux';
 import { routerMiddleware } from 'connected-react-router';
 import {

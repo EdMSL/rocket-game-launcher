@@ -4,6 +4,8 @@ import { configureStore } from '$store/store';
 import { IUserSettingsRootState } from '$reducers/userSettings';
 import { defaultLauncherResolution } from '$constants/defaultParameters';
 import { writeToLogFileSync } from '$utils/log';
+import { readJSONFileSync } from '$utils/files';
+import { configPath } from '$constants/paths';
 
 interface IStorage {
   settings: {
@@ -17,6 +19,8 @@ const saveToStorageParams = ['userSettings'];
   * Функция для создания файла настроек пользователя и хранилища Redux
 */
 export const createStorage = (): void => {
+  const configurationData = readJSONFileSync(configPath);
+
   const storage = new Storage<IStorage>({
     defaults: {
       settings: {
@@ -29,7 +33,14 @@ export const createStorage = (): void => {
 
   const storageSettings = storage.get('settings');
 
-  global['state'] = storageSettings;
+  const newStore = {
+    ...storageSettings,
+    system: {
+      ...configurationData,
+    },
+  };
+
+  global['state'] = newStore;
 
   const store = configureStore(global['state'], 'main');
 

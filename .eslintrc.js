@@ -30,6 +30,7 @@ module.exports = {
   ],
   settings: {
     "import/resolver": {
+      node: {},
       webpack: {
         config: "./config/webpack.base.config.js",
       },
