@@ -1,0 +1,3 @@
+export const SYSTEM_TYPES = {
+  SET_IS_FIRST_LAUNCH: 'SET_IS_FIRST_LAUNCH',
+};

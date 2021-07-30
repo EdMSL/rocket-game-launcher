@@ -19,8 +19,8 @@ const start = async() => {
 
 app.on('ready', () => {
   start()
-    .catch((error) => {
-      showErrorBox(error, 'Can\'t load application');
+    .catch((error: Error) => {
+      showErrorBox(error.message, 'Can\'t load application');
     });
 });
 

@@ -1,5 +1,5 @@
 import {
-  createStore, applyMiddleware, compose, Store,
+  createStore, applyMiddleware, compose, Store, Middleware
 } from 'redux';
 import { routerMiddleware } from 'connected-react-router';
 import {
@@ -20,7 +20,7 @@ export const configureStore = (
   const router = routerMiddleware(history);
   const sagaMiddleware = createSagaMiddleware();
 
-  let middleware: any = [sagaMiddleware];
+  let middleware: Middleware[] = [sagaMiddleware];
 
   if (scope === 'renderer') {
     middleware = [

@@ -13,6 +13,9 @@ interface IStorage {
 
 const saveToStorageParams = ['userSettings'];
 
+/**
+  * Функция для создания файла настроек пользователя и хранилища Redux
+*/
 export const createStorage = (): void => {
   const storage = new Storage<IStorage>({
     defaults: {
