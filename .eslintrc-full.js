@@ -16,19 +16,20 @@ module.exports = {
     mocha: true,
   },
   extends: [
-    "airbnb",
-    "airbnb/hooks",
+    "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+    "plugin:react/recommended",
   ],
   plugins: [
-    "react",
-    "jsx-a11y",
-    "import",
-    "react-hooks",
     "@typescript-eslint",
+    "import",
+    "react",
   ],
   settings: {
     "import/resolver": {
+      node: {},
       webpack: {
         config: "./config/webpack.base.config.js",
       }
@@ -83,10 +84,17 @@ module.exports = {
       "default": "array-simple",
       "readonly": "array-simple",
     }],
-    "@typescript-eslint/interface-name-prefix": [2, {
-      "prefixWithI": "always",
-      "allowUnderscorePrefix": false,
-    }],
+    "@typescript-eslint/naming-convention": [
+      2,
+      {
+        "selector": "interface",
+        "format": ["PascalCase"],
+        "custom": {
+          "regex": "^I[A-Z]",
+          "match": true
+        }
+      }
+    ],
     "@typescript-eslint/member-delimiter-style": [2, {
       "multiline": {
           "delimiter": "comma",

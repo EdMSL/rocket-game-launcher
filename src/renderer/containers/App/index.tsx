@@ -10,10 +10,7 @@ import { Routes } from '$constants/routes';
 
 const styles = require('./styles.module.scss').default;
 
-export const App = (): JSX.Element => {
-  console.log('text');
-
-  return (
+export const App = (): JSX.Element => (
     <main>
       <Switch>
         <Route
@@ -30,5 +27,4 @@ export const App = (): JSX.Element => {
         <h1 className={styles.title}>Hello World!!!</h1>
       </div>
     </main>
-  );
-};
+);

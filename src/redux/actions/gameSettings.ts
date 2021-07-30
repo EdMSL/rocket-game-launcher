@@ -1,5 +1,5 @@
 import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
-import { IGameSettingsRootState } from '$reducers/gameSettings';
+import { IGameSettingsRootState } from '$reducers/gameSettings'; //eslint-disable-line import/no-cycle, max-len
 
 interface IActionReturnType<T> {
   type: string,

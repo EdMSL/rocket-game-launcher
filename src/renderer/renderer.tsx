@@ -3,11 +3,12 @@ import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { HashRouter } from 'react-router-dom';
 import { ConnectedRouter } from 'connected-react-router';
-import { history } from '$reducers/root';
-const remote = require('@electron/remote');
 
 import { App } from '$containers/App';
 import { configureStore } from '$store/store';
+import { history } from '$reducers/root';
+
+const remote = require('@electron/remote');
 
 import './styles/main.scss';
 

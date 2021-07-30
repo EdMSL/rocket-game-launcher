@@ -2,7 +2,6 @@ import {
   createStore, applyMiddleware, compose, Store,
 } from 'redux';
 import { routerMiddleware } from 'connected-react-router';
-import { getRootReducer, history } from '../reducers/root';
 import {
   forwardToMain,
   forwardToRenderer,
@@ -10,6 +9,8 @@ import {
   replayActionMain,
   replayActionRenderer,
 } from 'electron-redux';
+
+import { getRootReducer, history } from '$reducers/root';
 
 export const configureStore = (
   initialState,

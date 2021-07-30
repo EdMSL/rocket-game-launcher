@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import { createMemoryHistory } from 'history';
 import { connectRouter } from 'connected-react-router';
+
 import { gameSettingsReducer } from './gameSettings';
 import { userSettingsReducer } from './userSettings';
 

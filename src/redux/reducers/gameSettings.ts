@@ -1,7 +1,7 @@
 import { createReducer } from 'reduxsauce';
 
 import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
-import * as GAME_SETTINGS_ACTIONS from '$actions/gameSettings';
+import * as GAME_SETTINGS_ACTIONS from '$actions/gameSettings'; //eslint-disable-line import/no-cycle, max-len
 
 interface ISettingsGroup {
   name: string,

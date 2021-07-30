@@ -1,7 +1,7 @@
 import { createReducer } from 'reduxsauce';
 
 import { USER_SETTINGS_TYPES } from '$types/userSettings';
-import * as USER_SETTINGS_ACTIONS from '$actions/userSettings';
+import * as USER_SETTINGS_ACTIONS from '$actions/userSettings'; //eslint-disable-line import/no-cycle, max-len
 import { defaultLauncherResolution } from '$constants/defaultParameters';
 
 interface IResolution {

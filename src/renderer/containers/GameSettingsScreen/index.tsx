@@ -1,6 +1,7 @@
-import { Routes } from '$constants/routes';
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+
+import { Routes } from '$constants/routes';
 
 interface IProps {
   props?: any,

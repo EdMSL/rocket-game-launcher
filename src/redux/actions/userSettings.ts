@@ -1,5 +1,5 @@
 import { USER_SETTINGS_TYPES } from '$types/userSettings';
-import { IUserSettingsRootState } from '$reducers/userSettings';
+import { IUserSettingsRootState } from '$reducers/userSettings'; //eslint-disable-line import/no-cycle, max-len
 
 interface IActionReturnType<T> {
   type: string,
