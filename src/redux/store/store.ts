@@ -9,6 +9,7 @@ import {
   replayActionMain,
   replayActionRenderer,
 } from 'electron-redux';
+import createSagaMiddleware from 'redux-saga';
 
 import { getRootReducer, history } from '$reducers/root';
 
@@ -17,8 +18,9 @@ export const configureStore = (
   scope = 'main',
 ): Store<ReturnType<ReturnType<typeof getRootReducer>>> => {
   const router = routerMiddleware(history);
+  const sagaMiddleware = createSagaMiddleware();
 
-  let middleware = [];
+  let middleware: any = [sagaMiddleware];
 
   if (scope === 'renderer') {
     middleware = [
@@ -50,6 +52,8 @@ export const configureStore = (
   const rootReducer = getRootReducer(scope);
 
   const store = createStore(rootReducer, initialState, composeEnhancers(...enhanced));
+
+  // sagaMiddleware.run(mainSaga);
 
   if (scope === 'main') {
     replayActionMain(store);
