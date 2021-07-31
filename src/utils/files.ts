@@ -1,7 +1,8 @@
 import fs from 'fs';
 
-import { writeToLogFile } from './log';
-import { parseJSON } from './strings';
+import { LOG_MESSAGE_TYPE, writeToLogFileSync } from '$utils/log';
+import { parseJSON } from '$utils/strings';
+import { ReadError, NotFoundError, ErrorTypes } from '$utils/errors';
 
 /**
  * Синхронно считать данные из файла.
@@ -17,19 +18,21 @@ export const readFileDataSync = (
     if (fs.existsSync(pathToFile)) {
       return fs.readFileSync(pathToFile, encoding);
     } else {
-      writeToLogFile(`Can't read file ${pathToFile}. File not found.`, true);
-
-      return null;
+      throw new NotFoundError('File not found');
     }
   } catch (error) {
-    writeToLogFile(`Can't read file ${pathToFile}.\n${error.message}`, true);
-
-    return null;
+    throw new ReadError(`Can't read file. ${error.message}`, error);
   }
 };
 
-export const readJSONFileSync = (pathToFile: string) => {
-  const JSONstring = readFileDataSync(pathToFile);
+export const readJSONFileSync = <T>(pathToFile: string): T => {
+  try {
+    const JSONstring = readFileDataSync(pathToFile);
 
-  return parseJSON(JSONstring);
+    return parseJSON<T>(JSONstring);
+  } catch (error) {
+    writeToLogFileSync(`${error.message}. File: ${pathToFile}`, LOG_MESSAGE_TYPE.ERROR);
+
+    throw error;
+  }
 };

@@ -1,5 +1,3 @@
-import { writeToLogFileSync } from '$utils/log';
-
 export const getPathNameFromLocationPath = (path: string): string => path.slice(1);
 
 /**
@@ -7,13 +5,14 @@ export const getPathNameFromLocationPath = (path: string): string => path.slice(
  * @param jsonString Строка для преобразования.
  * @returns Объект с параметрами из JSON. Если возникает ошибка, то возвращается null.
 */
-///TODO: Типизировать функцию так, чтобы получать нужный объект.
-export const parseJSON = (jsonString: string): Record<string, unknown>|null => {
+export const parseJSON = <T>(jsonString: string): T => {
   try {
     return JSON.parse(jsonString);
   } catch (error) {
-    writeToLogFileSync(error, true);
-
-    return null;
+    if (error instanceof SyntaxError) {
+      throw new Error(`JSON parse error. ${error.message}`);
+    } else {
+      throw error;
+    }
   }
 };

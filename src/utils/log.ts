@@ -3,6 +3,12 @@ import path from 'path';
 
 import { showErrorBox } from '$utils/errors';
 
+export const LOG_MESSAGE_TYPE = {
+  INFO: 'INFO',
+  WARNING: 'WARNING',
+  ERROR: 'ERROR',
+};
+
 export const launcherLogPath = path.resolve('./launcher.log');
 
 /**
@@ -19,12 +25,12 @@ export const createLogFile = (path = launcherLogPath): void => {
 
 /**
   * Синхронно записать информацию в файл лога.
-  * @param data Строка для записи в лог.
-  * @param isError Определяет тип сообщения, ошибка или информация.
+  * @param message Строка для записи в лог.
+  * @param messageType Определяет тип сообщения, ошибка, предупреждение или информация.
 */
-export const writeToLogFileSync = (data: string, isError = false): void => {
+export const writeToLogFileSync = (message: string, messageType = LOG_MESSAGE_TYPE.INFO): void => {
   try {
-    fs.appendFileSync(launcherLogPath, `\n${isError ? 'ERROR:' : 'INFO:'} ${data}`);
+    fs.appendFileSync(launcherLogPath, `\n${messageType}: ${message}`);
   } catch (error) {
     showErrorBox(error.message, 'Can\'t write to log file.');
   }
@@ -32,11 +38,11 @@ export const writeToLogFileSync = (data: string, isError = false): void => {
 
 /**
   * Асинхронно записать информацию в файл лога.
-  * @param data Строка для записи в лог.
-  * @param isError Определяет тип сообщения, ошибка или информация.
+  * @param message Строка для записи в лог.
+  * @param messageType Определяет тип сообщения, ошибка, предупреждение или информация.
 */
-export const writeToLogFile = (data: string, isError = false): void => {
-  fs.appendFile(launcherLogPath, `\n${isError ? 'ERROR:' : 'INFO:'} ${data}`, (error) => {
+export const writeToLogFile = (message: string, messageType = LOG_MESSAGE_TYPE.INFO): void => {
+  fs.appendFile(launcherLogPath, `\n${messageType}: ${message}`, (error) => {
     if (error) {
       showErrorBox(error.message, 'Can\'t write to log file.');
     }
