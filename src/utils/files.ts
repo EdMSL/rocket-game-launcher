@@ -16,8 +16,6 @@ export const readFileDataSync = (
 ): string|null => {
   try {
     if (fs.existsSync(pathToFile)) {
-      console.log(pathToFile);
-
       return fs.readFileSync(pathToFile, encoding);
     } else {
       throw new NotFoundError('File not found');

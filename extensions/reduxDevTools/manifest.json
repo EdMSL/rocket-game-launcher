@@ -42,8 +42,6 @@
     "page": "options.html"
   },
   "permissions": [
-    "notifications",
-    "contextMenus",
     "storage",
     "file:///*",
     "http://*/*",
