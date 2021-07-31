@@ -4,6 +4,7 @@ Thumbs.db
 *.ini
 *.log*
 *.txt*
+!src/tests/**/*.txt*
 
 # Файлы редактора
 .idea

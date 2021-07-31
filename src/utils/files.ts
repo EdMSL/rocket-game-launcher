@@ -10,12 +10,14 @@ import { ReadError, NotFoundError } from '$utils/errors';
  * @param encoding Кодировка считываемого файла. По-умолчанию `'utf8'`.
  * @returns Строка с данными из файла.
 */
-const readFileDataSync = (
+export const readFileDataSync = (
   pathToFile: string,
   encoding: BufferEncoding = 'utf-8',
 ): string|null => {
   try {
     if (fs.existsSync(pathToFile)) {
+      console.log(pathToFile);
+
       return fs.readFileSync(pathToFile, encoding);
     } else {
       throw new NotFoundError('File not found');

@@ -1,0 +1,2 @@
+File in Windows 1251 encoding.
+Русский текст.
