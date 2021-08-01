@@ -2,7 +2,7 @@ import fs, { promises as fsPromises } from 'fs';
 
 import { LOG_MESSAGE_TYPE, writeToLogFile, writeToLogFileSync } from '$utils/log';
 import { parseJSON } from '$utils/strings';
-import { ReadError, NotFoundError } from '$utils/errors';
+import { ReadWriteError, getReadWriteError } from '$utils/errors';
 
 /**
  * Синхронно считать данные из файла.
@@ -10,18 +10,18 @@ import { ReadError, NotFoundError } from '$utils/errors';
  * @param encoding Кодировка считываемого файла. По-умолчанию `'utf8'`.
  * @returns Строка с данными из файла.
 */
+///TODO: Добавить проверку на тип файла: текстовый или нет
+///TODO: Добавить пакет для работы с файлами в другой кодировке
 export const readFileDataSync = (
   pathToFile: string,
   encoding: BufferEncoding = 'utf-8',
-): string|null => {
+): string => {
   try {
-    if (fs.existsSync(pathToFile)) {
-      return fs.readFileSync(pathToFile, encoding);
-    } else {
-      throw new NotFoundError('File not found');
-    }
+    return fs.readFileSync(pathToFile, encoding);
   } catch (error) {
-    throw new ReadError(`Can't read file. ${error.message}`, error);
+    const readWriteError = getReadWriteError(error);
+
+    throw new ReadWriteError(`Can't read file. ${readWriteError.message}`, readWriteError);
   }
 };
 
@@ -36,7 +36,7 @@ export const readJSONFileSync = <T>(pathToFile: string): T => {
 
     return parseJSON<T>(JSONstring);
   } catch (error) {
-    writeToLogFileSync(`Message: ${error.message}. File: ${pathToFile}.`, LOG_MESSAGE_TYPE.ERROR);
+    writeToLogFileSync(`Message: ${error.message}. Path: ${pathToFile}.`, LOG_MESSAGE_TYPE.ERROR);
 
     throw error;
   }
@@ -49,14 +49,15 @@ export const readJSONFileSync = <T>(pathToFile: string): T => {
  * @param encoding Кодировка записываемого файла. По-умолчанию `'utf8'`.
  * @returns Promise
 */
-const writeFileData = (
+export const writeFileData = (
   pathToFile: string,
   data: string|Buffer,
   encoding: BufferEncoding = 'utf-8',
 ): Promise<void> => fsPromises.writeFile(pathToFile, data, encoding)
-  .then()
   .catch((error) => {
-    throw new Error(`Can't write to file. ${error.message}`);
+    const readWriteError = getReadWriteError(error);
+
+    throw new ReadWriteError(`Can't write to file. ${readWriteError.message}`, readWriteError);
   });
 
 /**
@@ -71,7 +72,7 @@ export const writeJSONFile = (
 ): Promise<void> => writeFileData(pathToFile, JSON.stringify(data))
   .catch((error) => {
     writeToLogFile(
-      `Message: ${error.message}. File: ${pathToFile}`,
+      `Message: ${error.message}. Path: ${pathToFile}`,
       LOG_MESSAGE_TYPE.ERROR,
     );
 

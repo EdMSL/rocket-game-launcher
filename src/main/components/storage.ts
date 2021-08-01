@@ -7,7 +7,7 @@ import { LOG_MESSAGE_TYPE, writeToLogFile, writeToLogFileSync } from '$utils/log
 import { readJSONFileSync, writeJSONFile } from '$utils/files';
 import { configPath } from '$constants/paths';
 import { ISystemRootState } from '$reducers/system';
-import { ErrorTypes, ReadError } from '$utils/errors';
+import { ERROR_TYPE, ReadWriteError } from '$utils/errors';
 
 interface IStorage {
   settings: {
@@ -17,25 +17,19 @@ interface IStorage {
 
 const saveToStorageParams = ['userSettings'];
 
-/**
-  * Функция для создания файла настроек пользователя и хранилища Redux.
-*/
-export const createStorage = (): void => {
-  let configurationData: ISystemRootState;
-
+const getConfigurationData = () => {
+  // Считываем данные из файла конфигурации лаунчера. Эти данные затем передаются в стейт Redux.
+  // Если файл не найден, то создаем новый с дефолтными настройками.
   try {
-    configurationData = readJSONFileSync<ISystemRootState>(configPath);
+    return readJSONFileSync<ISystemRootState>(configPath);
   } catch (error) {
-    if (error instanceof ReadError) {
-      if (error.cause.name === ErrorTypes.NotFoundError) {
+    if (error instanceof ReadWriteError) {
+      if (error.cause.name === ERROR_TYPE.NotFoundError) {
         writeToLogFileSync(
           'Launcher config file not found. Load default values. A new config file will be created ', //eslint-disable-line max-len
           LOG_MESSAGE_TYPE.WARNING,
         );
 
-        configurationData = defaultLauncherConfig;
-
-        // Асинхронно создаем и записываем новый config.json.
         writeJSONFile(configPath, defaultLauncherConfig)
           .then(() => {
             writeToLogFile('New config file config.json successfully created.');
@@ -43,6 +37,8 @@ export const createStorage = (): void => {
           .catch(() => {
             writeToLogFile('New config file config.json not created.', LOG_MESSAGE_TYPE.WARNING);
           });
+
+        return defaultLauncherConfig;
       } else {
         throw new Error('Found problems with config.json. See log for more details.');
       }
@@ -50,8 +46,16 @@ export const createStorage = (): void => {
       throw new Error('Found problems with config.json. See log for more details.');
     }
   }
+};
 
-  // Хранилаще пользовательских настроек.
+/**
+  * Функция для создания файла настроек пользователя и хранилища Redux.
+*/
+export const createStorage = (): void => {
+  const configurationData = getConfigurationData();
+
+  // Создаем хранилаще пользовательских настроек (настройки темы и т.п.).
+  // Хранилище располагается в файле config.json в папке AppData/ (app.getPath('userData')).
   const storage = new Storage<IStorage>({
     defaults: {
       settings: {
