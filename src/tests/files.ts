@@ -32,12 +32,17 @@ describe('#Files', function() {
     });
 
     it('Should return invalid path error message', () => {
-      assert.throw(() => { readFileDataSync(null); }, /Invalid path received/);
-      assert.throw(() => { readFileDataSync(undefined); }, /Invalid path received/);
+      assert.throw(() => { readFileDataSync(1 as unknown as string); }, /Invalid data in path received/);
+      assert.throw(() => { readFileDataSync(null); }, /Invalid data in path received/);
+      assert.throw(() => { readFileDataSync(undefined); }, /Invalid data in path received/);
     });
 
     it('Should return permission error message', () => {
       assert.throw(() => { readFileDataSync(`${process.cwd()}/folderName/writeOnly.md`); }, /Permission denied/);
+    });
+
+    it('Should return directory in path error', async() => {
+      assert.throw(() => { readFileDataSync(`${process.cwd()}/folderName/`); }, /Got path to directory, not file/);
     });
 
     // Используем реальный файл, поскольку в нем другая кодировка и mock загружает уже неправильный текст
@@ -56,6 +61,9 @@ describe('#Files', function() {
     it('Should write correct data', async() => {
       await writeFileData(`${process.cwd()}/writeFolder/test.txt`, 'Data for write');
       assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/test.txt`, 'utf8'), 'Data for write');
+
+      await writeFileData(`${process.cwd()}/writeFolder/new.txt`, 'New data for file');
+      assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/new.txt`, 'utf8'), 'New data for file');
     });
 
     it('Should return permission error message', async() => {
@@ -66,6 +74,22 @@ describe('#Files', function() {
           errorMsg = error.message;
         });
       assert.match(errorMsg, /Permission denied/);
+
+      await writeFileData(`${process.cwd()}/readOnlyDir/readOnly.txt`, 'Data for write')
+        .catch((error) => {
+          errorMsg = error.message;
+        });
+      assert.match(errorMsg, /Permission denied/);
+    });
+
+    it('Should return directory in path error', async() => {
+      let errorMsg;
+
+      await writeFileData(`${process.cwd()}/writeFolder`, 'Data for write')
+        .catch((error) => {
+          errorMsg = error.message;
+        });
+      assert.match(errorMsg, /Got path to directory, not file/);
     });
 
     it('Should correct write to JSON file', async() => {

@@ -28,5 +28,8 @@ export const createMockFilesForWrite = (): void => {
         mode: 0o444,
       }),
     },
+    'readOnlyDir': mock.directory({
+      mode: 0o444,
+    }),
   });
 };

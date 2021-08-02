@@ -4,13 +4,15 @@ export const ERROR_TYPE = {
   SyntaxError: 'SyntaxError',
   NotFoundError: 'NotFoundError',
   PermissionError: 'PermissionError',
+  InvalidArgumentError: 'InvalidArgumentError',
   ReadWriteError: 'ReadWriteError',
 };
 
 export const ERROR_CODE = {
   access: 'EACCES',
   notFound: 'ENOENT',
-  invalidArg: 'ERR_INVALID_ARG_TYPE',
+  directory: 'EISDIR',
+  argType: 'ERR_INVALID_ARG_TYPE',
 };
 
 /**
@@ -40,6 +42,17 @@ export class PermissionError extends Error {
   }
 }
 
+export class InvalidArgumentError extends Error {
+  public code: string;
+
+  constructor(message: string) {
+    super(message);
+    this.message = `An invalid argument was received. ${message}`;
+    this.name = ERROR_TYPE.InvalidArgumentError;
+    this.code = ERROR_CODE.argType;
+  }
+}
+
 export class ReadWriteError extends Error {
   public cause: Error;
 
@@ -55,12 +68,16 @@ export class ReadWriteError extends Error {
  * @returns Объект Error
 */
 export const getReadWriteError = (error: NodeJS.ErrnoException): Error => {
+  console.log(error.code);
+
   if (error?.code === ERROR_CODE.access) {
     return new PermissionError('Permission denied');
   } else if (error?.code === ERROR_CODE.notFound) {
     return new NotFoundError('File not found');
-  } else if (error?.code === ERROR_CODE.invalidArg) {
-    return new Error('Invalid path received');
+  } else if (error?.code === ERROR_CODE.directory) {
+    return new Error('Got path to directory, not file');
+  } else if (error?.code === ERROR_CODE.argType) {
+    return new Error('Invalid data in path received');
   } else {
     return new Error(error.message);
   }

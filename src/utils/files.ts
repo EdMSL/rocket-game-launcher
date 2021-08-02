@@ -2,7 +2,9 @@ import fs, { promises as fsPromises } from 'fs';
 
 import { LOG_MESSAGE_TYPE, writeToLogFile, writeToLogFileSync } from '$utils/log';
 import { parseJSON } from '$utils/strings';
-import { ReadWriteError, getReadWriteError } from '$utils/errors';
+import {
+  ReadWriteError, getReadWriteError, InvalidArgumentError,
+} from '$utils/errors';
 
 /**
  * Синхронно считать данные из файла.
@@ -17,6 +19,12 @@ export const readFileDataSync = (
   encoding: BufferEncoding = 'utf-8',
 ): string => {
   try {
+    if (typeof pathToFile === 'number') {
+      throw new InvalidArgumentError(
+        'The argument in path must not be a number',
+      );
+    }
+
     return fs.readFileSync(pathToFile, encoding);
   } catch (error) {
     const readWriteError = getReadWriteError(error);
@@ -36,7 +44,10 @@ export const readJSONFileSync = <T>(pathToFile: string): T => {
 
     return parseJSON<T>(JSONstring);
   } catch (error) {
-    writeToLogFileSync(`Message: ${error.message}. Path: ${pathToFile}.`, LOG_MESSAGE_TYPE.ERROR);
+    writeToLogFileSync(
+      `Message: ${error.message}. Path: ${pathToFile}.`,
+      LOG_MESSAGE_TYPE.ERROR,
+    );
 
     throw error;
   }
@@ -57,7 +68,7 @@ export const writeFileData = (
   .catch((error) => {
     const readWriteError = getReadWriteError(error);
 
-    throw new ReadWriteError(`Can't write to file. ${readWriteError.message}`, readWriteError);
+    throw new ReadWriteError(`Can't write file. ${readWriteError.message}`, readWriteError);
   });
 
 /**
