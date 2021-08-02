@@ -108,7 +108,7 @@ module.exports = {
     "no-multi-spaces": [1, {
       ignoreEOLComments: false,
     }],
-    "no-multiple-empty-lines": 0,
+    "no-multiple-empty-lines": [1, { max: 1 }],
     "no-plusplus": 1,
     "no-spaced-func": 1,
     "no-trailing-spaces": 0,
