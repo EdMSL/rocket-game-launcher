@@ -184,6 +184,11 @@ module.exports = {
     "react/prefer-stateless-function": 0,
     "react/prop-types": 0,
 
+    "@typescript-eslint/consistent-type-definitions": [1, "interface"],
+    "@typescript-eslint/consistent-type-imports": [1, {
+      prefer: 'no-type-imports',
+      disallowTypeAnnotations: true,
+    }],
     "@typescript-eslint/member-delimiter-style": 0,
     "@typescript-eslint/naming-convention": [
       2,

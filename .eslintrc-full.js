@@ -84,6 +84,11 @@ module.exports = {
       "default": "array-simple",
       "readonly": "array-simple",
     }],
+    "@typescript-eslint/consistent-type-definitions": [2, "interface"],
+    "@typescript-eslint/consistent-type-imports": [2, {
+      prefer: 'no-type-imports',
+      disallowTypeAnnotations: true,
+    }],
     "@typescript-eslint/naming-convention": [
       2,
       {
