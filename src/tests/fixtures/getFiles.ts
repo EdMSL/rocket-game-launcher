@@ -24,7 +24,7 @@ export const createMockFilesForWrite = (): void => {
       'test.txt': '',
       'test.json': '{"some": "content"}',
       'readOnly.txt': mock.file({
-        content: 'Read only!',
+        content: 'some content',
         mode: 0o444,
       }),
     },

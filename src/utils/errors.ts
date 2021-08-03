@@ -9,9 +9,9 @@ export const ERROR_MESSAGE = {
 };
 
 export const ERROR_TYPE = {
-  SyntaxError: 'SyntaxError',
+  syntax: 'SyntaxError',
   NotFoundError: 'NotFoundError',
-  PermissionError: 'PermissionError',
+  AccessError: 'AccessError',
   InvalidArgumentError: 'InvalidArgumentError',
   ReadWriteError: 'ReadWriteError',
 };
@@ -36,28 +36,13 @@ export interface IReadWriteError extends Error {
   cause: Error,
 }
 
-export class NotFoundError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = ERROR_TYPE.NotFoundError;
-  }
-}
-
-export class PermissionError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = ERROR_TYPE.PermissionError;
-  }
-}
-
-export class InvalidArgumentError extends Error {
+export class CustomError extends Error {
   public code: string;
 
-  constructor(message: string) {
+  constructor(message: string, name = 'Error', code?: string){
     super(message);
-    this.message = `An invalid argument was received. ${message}`;
-    this.name = ERROR_TYPE.InvalidArgumentError;
-    this.code = ERROR_CODE.argType;
+    this.name = name;
+    this.code = code;
   }
 }
 
@@ -77,14 +62,14 @@ export class ReadWriteError extends Error {
 */
 export const getReadWriteError = (error: NodeJS.ErrnoException): Error => {
   if (error?.code === ERROR_CODE.access) {
-    return new PermissionError(ERROR_MESSAGE.access);
+    return new CustomError(ERROR_MESSAGE.access, ERROR_TYPE.AccessError);
   } else if (error?.code === ERROR_CODE.notFound) {
-    return new NotFoundError(ERROR_MESSAGE.notFound);
+    return new CustomError(ERROR_MESSAGE.notFound, ERROR_TYPE.AccessError);
   } else if (error?.code === ERROR_CODE.directory) {
-    return new Error(ERROR_MESSAGE.directory);
+    return new CustomError(ERROR_MESSAGE.directory, ERROR_TYPE.AccessError);
   } else if (error?.code === ERROR_CODE.argType) {
-    return new Error(ERROR_MESSAGE.argType);
+    return new CustomError(ERROR_MESSAGE.argType, ERROR_TYPE.AccessError);
   } else {
-    return new Error(error.message);
+    return error;
   }
 };

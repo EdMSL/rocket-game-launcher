@@ -3,7 +3,7 @@ import fs, { promises as fsPromises } from 'fs';
 import { LOG_MESSAGE_TYPE, writeToLogFile, writeToLogFileSync } from '$utils/log';
 import { parseJSON } from '$utils/strings';
 import {
-  ReadWriteError, getReadWriteError, InvalidArgumentError,
+  ReadWriteError, getReadWriteError, CustomError, ERROR_CODE, ERROR_TYPE,
 } from '$utils/errors';
 
 /**
@@ -20,8 +20,10 @@ export const readFileDataSync = (
 ): string => {
   try {
     if (typeof pathToFile === 'number') {
-      throw new InvalidArgumentError(
+      throw new CustomError(
         'The argument in path must not be a number',
+        ERROR_TYPE.InvalidArgumentError,
+        ERROR_CODE.argType,
       );
     }
 

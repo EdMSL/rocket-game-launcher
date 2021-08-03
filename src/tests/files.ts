@@ -81,8 +81,13 @@ describe('#Files', function() {
       await writeFileData(`${process.cwd()}/writeFolder/test.txt`, 'Data for write');
       assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/test.txt`, 'utf8'), 'Data for write');
 
-      await writeFileData(`${process.cwd()}/writeFolder/new.txt`, 'New data for file');
-      assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/new.txt`, 'utf8'), 'New data for file');
+      await writeFileData(`${process.cwd()}/writeFolder/new.txt`, 'New data for new file');
+      assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/new.txt`, 'utf8'), 'New data for new file');
+    });
+
+    it('Should correct write to JSON file', async() => {
+      await writeJSONFile(`${process.cwd()}/writeFolder/test.json`, { data: 'Some data' });
+      assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/test.json`, 'utf8'), '{"data":"Some data"}');
     });
 
     it('Should return permission error message', async() => {
@@ -94,7 +99,7 @@ describe('#Files', function() {
         });
       assert.match(errorMsg, errorAccessRegExp);
 
-      await writeFileData(`${process.cwd()}/readOnlyDir/readOnly.txt`, 'Data for write')
+      await writeJSONFile(`${process.cwd()}/readOnlyDir/new.json`, { data: 'Some data' })
         .catch((error) => {
           errorMsg = error.message;
         });
@@ -109,11 +114,28 @@ describe('#Files', function() {
           errorMsg = error.message;
         });
       assert.match(errorMsg, errorDirectoryRegExp);
+
+      await writeJSONFile(`${process.cwd()}/writeFolder`, { data: 'Some data' })
+        .catch((error) => {
+          errorMsg = error.message;
+        });
+      assert.match(errorMsg, errorDirectoryRegExp);
     });
 
-    it('Should correct write to JSON file', async() => {
-      await writeJSONFile(`${process.cwd()}/writeFolder/test.json`, { data: 'Some data' });
-      assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/test.json`, 'utf8'), '{"data":"Some data"}');
+    it(('Should return invalid path error'), async() => {
+      let errorMsg;
+
+      await writeFileData(1 as unknown as string, 'Data for write')
+        .catch((error) => {
+          errorMsg = error.message;
+        });
+      assert.match(errorMsg, errorArgTypeRegExp);
+
+      await writeJSONFile(1 as unknown as string, { data: 'Some data' })
+        .catch((error) => {
+          errorMsg = error.message;
+        });
+      assert.match(errorMsg, errorArgTypeRegExp);
     });
   });
 });
