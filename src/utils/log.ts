@@ -19,7 +19,7 @@ export const createLogFile = (path = launcherLogPath): void => {
   try {
     fs.writeFileSync(path, '------Log file------');
   } catch (error) {
-    showErrorBox(error.message, 'Can\'t create log file.');
+    showErrorBox(error.message, "Can't create log file.");
   }
 };
 
@@ -32,7 +32,7 @@ export const writeToLogFileSync = (message: string, messageType = LOG_MESSAGE_TY
   try {
     fs.appendFileSync(launcherLogPath, `\n${messageType}: ${message}`);
   } catch (error) {
-    showErrorBox(error.message, 'Can\'t write to log file.');
+    showErrorBox(error.message, "Can't write to log file.");
   }
 };
 
@@ -44,7 +44,7 @@ export const writeToLogFileSync = (message: string, messageType = LOG_MESSAGE_TY
 export const writeToLogFile = (message: string, messageType = LOG_MESSAGE_TYPE.INFO): void => {
   fs.appendFile(launcherLogPath, `\n${messageType}: ${message}`, (error) => {
     if (error) {
-      showErrorBox(error.message, 'Can\'t write to log file.');
+      showErrorBox(error.message, "Can't write to log file.");
     }
   });
 };

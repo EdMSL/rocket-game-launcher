@@ -18,8 +18,9 @@
     "build:main": "cross-env NODE_ENV=production webpack --env main --config=./config/webpack.build.config.js --progress",
     "build:renderer": "cross-env NODE_ENV=production webpack --config=./config/webpack.build.config.js --progress",
     "stylelint": "stylelint src/**/*.scss --config ./.stylelintrc-full.js --syntax scss --fix",
-    "eslint": "eslint --config ./.eslintrc-full.js src --ext .ts,.tsx,.js,.jsx --fix",
-    "eslint1": "eslint --print-config path::./.eslintrc.js",
+    "eslint": "eslint --config ./.eslintrc.js src --ext .ts,.tsx,.js,.jsx --fix",
+    "tslint": "tsc --project tsconfig.json",
+    "lint": "npm run eslint && npm run tslint",
     "test": "mocha --no-package --config ./.mocharc.js"
   },
   "devDependencies": {

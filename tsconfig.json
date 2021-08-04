@@ -5,7 +5,10 @@
     "baseUrl": ".",
     "esModuleInterop": true,
     "jsx": "react",
-    "lib": [ "dom", "es6" ],
+    "lib": [
+      "dom",
+      "es6"
+    ],
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmit": false,
@@ -14,13 +17,27 @@
     "sourceMap": true,
     "target": "es6",
     "paths": {
-      "$constants/*": [ "src/constants/*" ],
-      "$containers/*": [ "src/renderer/containers/*" ],
-      "$store/*": [ "src/redux/store/*" ],
-      "$actions/*": [ "src/redux/actions/*" ],
-      "$reducers/*": [ "src/redux/reducers/*" ],
-      "$types/*": [ "src/redux/types/*" ],
-      "$utils/*": [ "src/utils/*" ]
+      "$constants/*": [
+        "src/constants/*"
+      ],
+      "$containers/*": [
+        "src/renderer/containers/*"
+      ],
+      "$store/*": [
+        "src/redux/store/*"
+      ],
+      "$actions/*": [
+        "src/redux/actions/*"
+      ],
+      "$reducers/*": [
+        "src/redux/reducers/*"
+      ],
+      "$types/*": [
+        "src/redux/types/*"
+      ],
+      "$utils/*": [
+        "src/utils/*"
+      ]
     }
   },
   "include": [
@@ -30,5 +47,8 @@
     "./config/webpack.dev.config.js",
     "./.eslintrc.js"
   ],
-  "exclude": ["node_modules", "./app/build/**/*"]
+  "exclude": [
+    "node_modules",
+    "./app/build/**/*"
+  ]
 }

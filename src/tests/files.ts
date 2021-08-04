@@ -4,10 +4,7 @@ import mock from 'mock-fs';
 import { assert } from 'chai';
 
 import {
-  readFileDataSync,
-  readJSONFileSync,
-  writeFileData,
-  writeJSONFile,
+  readFileDataSync, readJSONFileSync, writeFileData, writeJSONFile,
 } from '$utils/files';
 import { ERROR_MESSAGE, ReadWriteError } from '$utils/errors';
 import { createMockFiles, createMockFilesForWrite } from './fixtures/getFiles';
@@ -65,7 +62,7 @@ describe('#Files', function() {
     });
 
     it('Should return correct object', () => {
-      assert.deepEqual(readJSONFileSync(`${process.cwd()}/folderName/test.json`), { test: 'I\'am a test string!' });
+      assert.deepEqual(readJSONFileSync(`${process.cwd()}/folderName/test.json`), { test: "I'am a test string!" });
     });
 
     // Используем реальный файл, поскольку в нем другая кодировка и mock загружает уже неправильный текст
@@ -87,11 +84,11 @@ describe('#Files', function() {
 
     it('Should correct write to JSON file', async() => {
       await writeJSONFile(`${process.cwd()}/writeFolder/test.json`, { data: 'Some data' });
-      assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/test.json`, 'utf8'), '{"data":"Some data"}');
+      assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/test.json`, 'utf8'), "{'data':'Some data'}");
     });
 
     it('Should return permission error message', async() => {
-      let errorMsg;
+      let errorMsg = '';
 
       await writeFileData(`${process.cwd()}/writeFolder/readOnly.txt`, 'Data for write')
         .catch((error) => {
@@ -107,7 +104,7 @@ describe('#Files', function() {
     });
 
     it('Should return directory in path error', async() => {
-      let errorMsg;
+      let errorMsg = '';
 
       await writeFileData(`${process.cwd()}/writeFolder`, 'Data for write')
         .catch((error) => {
@@ -122,8 +119,8 @@ describe('#Files', function() {
       assert.match(errorMsg, errorDirectoryRegExp);
     });
 
-    it(('Should return invalid path error'), async() => {
-      let errorMsg;
+    it('Should return invalid path error', async() => {
+      let errorMsg = '';
 
       await writeFileData(1 as unknown as string, 'Data for write')
         .catch((error) => {
@@ -132,6 +129,18 @@ describe('#Files', function() {
       assert.match(errorMsg, errorArgTypeRegExp);
 
       await writeJSONFile(1 as unknown as string, { data: 'Some data' })
+        .catch((error) => {
+          errorMsg = error.message;
+        });
+      assert.match(errorMsg, errorArgTypeRegExp);
+
+      await writeFileData(undefined as unknown as string, 'Data for write')
+        .catch((error) => {
+          errorMsg = error.message;
+        });
+      assert.match(errorMsg, errorArgTypeRegExp);
+
+      await writeJSONFile(undefined as unknown as string, { data: 'Some data' })
         .catch((error) => {
           errorMsg = error.message;
         });
