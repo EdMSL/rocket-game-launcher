@@ -1,5 +1,6 @@
 import { createReducer } from 'reduxsauce';
 
+import { IActionHandler } from '$constants/interfaces';
 import { USER_SETTINGS_TYPES } from '$types/userSettings';
 import * as USER_SETTINGS_ACTIONS from '$actions/userSettings'; //eslint-disable-line import/no-cycle, max-len
 import { defaultLauncherResolution } from '$constants/defaultParameters';
@@ -13,15 +14,10 @@ export type IUserSettingsRootState = Readonly<{
   resolution: IResolution,
 }>;
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-type UnsafeReturnType<T> = T extends (...args: any[]) => infer R ? R : any;
-/* eslint-enable @typescript-eslint/no-explicit-any */
-
-interface IActionHandler<T> {
-  (state: IUserSettingsRootState, payload: UnsafeReturnType<T>): IUserSettingsRootState,
-}
-
-const setLauncherResolution: IActionHandler<typeof USER_SETTINGS_ACTIONS.setLauncherResolution> = (
+const setLauncherResolution: IActionHandler<
+  IUserSettingsRootState,
+  typeof USER_SETTINGS_ACTIONS.setLauncherResolution
+> = (
   state,
   { payload: resolution },
 ) => ({

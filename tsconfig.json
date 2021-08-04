@@ -15,6 +15,7 @@
     "noImplicitAny": false,
     "outDir": "./app/build/",
     "sourceMap": true,
+    "strict": true,
     "target": "es6",
     "paths": {
       "$constants/*": [

@@ -14,7 +14,7 @@ const errorNotFoundRegExp = new RegExp(ERROR_MESSAGE.notFound);
 const errorArgTypeRegExp = new RegExp(ERROR_MESSAGE.argType);
 const errorDirectoryRegExp = new RegExp(ERROR_MESSAGE.directory);
 
-/* eslint-disable max-len */
+/* eslint-disable max-len, @typescript-eslint/ban-ts-comment */
 describe('#Files', function() {
   describe('Read files', function() {
     before(createMockFiles);
@@ -38,11 +38,17 @@ describe('#Files', function() {
     });
 
     it('Should return invalid path error message', () => {
-      assert.throw(() => { readFileDataSync(1 as unknown as string); }, errorArgTypeRegExp);
+      // @ts-ignore
+      assert.throw(() => { readFileDataSync(1); }, errorArgTypeRegExp);
+      // @ts-ignore
       assert.throw(() => { readFileDataSync(null); }, errorArgTypeRegExp);
+      // @ts-ignore
       assert.throw(() => { readFileDataSync(undefined); }, errorArgTypeRegExp);
-      assert.throw(() => { readJSONFileSync(1 as unknown as string); }, errorArgTypeRegExp);
+      // @ts-ignore
+      assert.throw(() => { readJSONFileSync(1); }, errorArgTypeRegExp);
+      // @ts-ignore
       assert.throw(() => { readJSONFileSync(null); }, errorArgTypeRegExp);
+      // @ts-ignore
       assert.throw(() => { readJSONFileSync(undefined); }, errorArgTypeRegExp);
     });
 
@@ -121,26 +127,26 @@ describe('#Files', function() {
 
     it('Should return invalid path error', async() => {
       let errorMsg = '';
-
-      await writeFileData(1 as unknown as string, 'Data for write')
+      // @ts-ignore
+      await writeFileData(1, 'Data for write')
         .catch((error) => {
           errorMsg = error.message;
         });
       assert.match(errorMsg, errorArgTypeRegExp);
-
-      await writeJSONFile(1 as unknown as string, { data: 'Some data' })
+      // @ts-ignore
+      await writeJSONFile(1, { data: 'Some data' })
         .catch((error) => {
           errorMsg = error.message;
         });
       assert.match(errorMsg, errorArgTypeRegExp);
-
-      await writeFileData(undefined as unknown as string, 'Data for write')
+      // @ts-ignore
+      await writeFileData(undefined, 'Data for write')
         .catch((error) => {
           errorMsg = error.message;
         });
       assert.match(errorMsg, errorArgTypeRegExp);
-
-      await writeJSONFile(undefined as unknown as string, { data: 'Some data' })
+      // @ts-ignore
+      await writeJSONFile(undefined, { data: 'Some data' })
         .catch((error) => {
           errorMsg = error.message;
         });
