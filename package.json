@@ -20,7 +20,7 @@
     "stylelint": "stylelint src/**/*.scss --config ./.stylelintrc-full.js --syntax scss --fix",
     "eslint": "eslint --config ./.eslintrc.js src --ext .ts,.tsx,.js,.jsx --fix",
     "tslint": "tsc --project tsconfig.json",
-    "lint": "npm run eslint && npm run tslint",
+    "lint": "npm run stylelint && npm run eslint && npm run tslint",
     "test": "mocha --no-package --config ./.mocharc.js"
   },
   "devDependencies": {
