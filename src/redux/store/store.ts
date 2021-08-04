@@ -16,6 +16,7 @@ import { getRootReducer, history } from '$reducers/root';
 export const configureStore = (
   initialState,
   scope = 'main',
+  ///FIXME Выглядит не особо изящно, попробовать переделать
 ): Store<ReturnType<ReturnType<typeof getRootReducer>>> => {
   const router = routerMiddleware(history);
   const sagaMiddleware = createSagaMiddleware();

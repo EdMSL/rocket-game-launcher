@@ -30,6 +30,9 @@
       "$actions/*": [
         "src/redux/actions/*"
       ],
+      "$handlers/*": [
+        "src/redux/handlers/*"
+      ],
       "$reducers/*": [
         "src/redux/reducers/*"
       ],

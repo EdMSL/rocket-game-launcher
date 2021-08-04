@@ -26,6 +26,7 @@ const configuration = merge([
         $containers: path.resolve(__dirname, `${PATHS.src}/renderer/containers/`),
         $store: path.resolve(__dirname, `${PATHS.src}/redux/store/`),
         $actions: path.resolve(__dirname, `${PATHS.src}/redux/actions/`),
+        $handlers: path.resolve(__dirname, `${PATHS.src}/redux/handlers/`),
         $reducers: path.resolve(__dirname, `${PATHS.src}/redux/reducers/`),
         $types: path.resolve(__dirname, `${PATHS.src}/redux/types/`),
         $utils: path.resolve(__dirname, `${PATHS.src}/utils/`),
