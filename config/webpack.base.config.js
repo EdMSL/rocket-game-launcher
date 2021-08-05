@@ -23,6 +23,7 @@ const configuration = merge([
     resolve: {
       alias: {
         $constants: path.resolve(__dirname, `${PATHS.src}/constants/`),
+        $components: path.resolve(__dirname, `${PATHS.src}/renderer/components/`),
         $containers: path.resolve(__dirname, `${PATHS.src}/renderer/containers/`),
         $store: path.resolve(__dirname, `${PATHS.src}/redux/store/`),
         $actions: path.resolve(__dirname, `${PATHS.src}/redux/actions/`),

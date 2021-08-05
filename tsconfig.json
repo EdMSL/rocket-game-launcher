@@ -21,6 +21,9 @@
       "$constants/*": [
         "src/constants/*"
       ],
+      "$components/*": [
+        "src/renderer/components/*"
+      ],
       "$containers/*": [
         "src/renderer/containers/*"
       ],
