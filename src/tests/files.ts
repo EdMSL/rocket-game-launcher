@@ -15,11 +15,11 @@ const errorArgTypeRegExp = new RegExp(ERROR_MESSAGE.argType);
 const errorDirectoryRegExp = new RegExp(ERROR_MESSAGE.directory);
 
 /* eslint-disable max-len, @typescript-eslint/ban-ts-comment */
-describe('#Files', function() {
-  describe('Read files', function() {
+describe('#Files', () => {
+  describe('Read files', () => {
     before(createMockFiles);
 
-    it('Should return correct string', function() {
+    it('Should return correct string', () => {
       assert.equal(readFileDataSync(`${process.cwd()}/folderName/index.md`), '# Hello world!');
     });
 
@@ -57,12 +57,12 @@ describe('#Files', function() {
       assert.throw(() => { readJSONFileSync(`${process.cwd()}/folderName/writeOnly.md`); }, errorAccessRegExp);
     });
 
-    it('Should return directory in path error', async() => {
+    it('Should return directory in path error', async () => {
       assert.throw(() => { readFileDataSync(`${process.cwd()}/folderName/`); }, errorDirectoryRegExp);
       assert.throw(() => { readJSONFileSync(`${process.cwd()}/folderName/`); }, errorDirectoryRegExp);
     });
 
-    it('Should return parse error', async() => {
+    it('Should return parse error', async () => {
       assert.throw(() => { readJSONFileSync(`${process.cwd()}/folderName/index.md`); }, Error);
       assert.throw(() => { readJSONFileSync(`${process.cwd()}/folderName/index.md`); }, /JSON parse error/);
     });
@@ -77,10 +77,10 @@ describe('#Files', function() {
     });
   });
 
-  describe('Write files', function() {
+  describe('Write files', () => {
     beforeEach(createMockFilesForWrite);
 
-    it('Should write correct data', async() => {
+    it('Should write correct data', async () => {
       await writeFileData(`${process.cwd()}/writeFolder/test.txt`, 'Data for write');
       assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/test.txt`, 'utf8'), 'Data for write');
 
@@ -88,12 +88,12 @@ describe('#Files', function() {
       assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/new.txt`, 'utf8'), 'New data for new file');
     });
 
-    it('Should correct write to JSON file', async() => {
+    it('Should correct write to JSON file', async () => {
       await writeJSONFile(`${process.cwd()}/writeFolder/test.json`, { data: 'Some data' });
-      assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/test.json`, 'utf8'), "{'data':'Some data'}");
+      assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/test.json`, 'utf8'), '{"data":"Some data"}');
     });
 
-    it('Should return permission error message', async() => {
+    it('Should return permission error message', async () => {
       let errorMsg = '';
 
       await writeFileData(`${process.cwd()}/writeFolder/readOnly.txt`, 'Data for write')
@@ -109,7 +109,7 @@ describe('#Files', function() {
       assert.match(errorMsg, errorAccessRegExp);
     });
 
-    it('Should return directory in path error', async() => {
+    it('Should return directory in path error', async () => {
       let errorMsg = '';
 
       await writeFileData(`${process.cwd()}/writeFolder`, 'Data for write')
@@ -125,7 +125,7 @@ describe('#Files', function() {
       assert.match(errorMsg, errorDirectoryRegExp);
     });
 
-    it('Should return invalid path error', async() => {
+    it('Should return invalid path error', async () => {
       let errorMsg = '';
       // @ts-ignore
       await writeFileData(1, 'Data for write')

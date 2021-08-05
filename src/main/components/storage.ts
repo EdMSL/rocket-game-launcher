@@ -3,7 +3,11 @@ import Storage from 'electron-store';
 import { configureStore } from '$store/store';
 import { IUserSettingsRootState } from '$reducers/userSettings';
 import { defaultLauncherConfig, defaultLauncherResolution } from '$constants/defaultParameters';
-import { LOG_MESSAGE_TYPE, writeToLogFile, writeToLogFileSync } from '$utils/log';
+import {
+  LOG_MESSAGE_TYPE,
+  writeToLogFile,
+  writeToLogFileSync,
+} from '$utils/log';
 import { readJSONFileSync, writeJSONFile } from '$utils/files';
 import { configPath } from '$constants/paths';
 import { ISystemRootState } from '$reducers/system';
@@ -39,15 +43,14 @@ const getConfigurationData = () => {
           });
 
         return defaultLauncherConfig;
-      } else {
-        throw new Error('Found problems with config.json. See log for more details.');
       }
-    } else {
+
       throw new Error('Found problems with config.json. See log for more details.');
     }
+
+    throw new Error('Found problems with config.json. See log for more details.');
   }
 };
-
 /**
   * Функция для создания файла настроек пользователя и хранилища Redux.
 */

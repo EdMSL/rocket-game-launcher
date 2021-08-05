@@ -1,4 +1,8 @@
-import { IError, ISuccess, ILauncherResolution } from '$constants/interfaces';
+import {
+  IError,
+  ISuccess,
+  ILauncherResolution,
+} from '$constants/interfaces';
 import { ISystemRootState } from '$reducers/system';
 
 export const SUCCESS_STATUS: ISuccess = 'success';

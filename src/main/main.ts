@@ -9,7 +9,7 @@ require('@electron/remote/main').initialize();
 
 createLogFile();
 
-const start = async() => {
+const start = async () => {
   createStorage();
 
   createWindow();

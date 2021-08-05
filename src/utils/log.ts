@@ -13,11 +13,11 @@ export const launcherLogPath = path.resolve('./launcher.log');
 
 /**
   * Создать файл лога.
-  * @param path Путь до файла.
+  * @param pathToLogFile Путь до файла.
 */
-export const createLogFile = (path = launcherLogPath): void => {
+export const createLogFile = (pathToLogFile = launcherLogPath): void => {
   try {
-    fs.writeFileSync(path, '------Log file------');
+    fs.writeFileSync(pathToLogFile, '------Log file------');
   } catch (error) {
     showErrorBox(error.message, "Can't create log file.");
   }

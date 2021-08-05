@@ -35,12 +35,13 @@ export const showErrorBox = (message: string, title = ERROR_MESSAGE.default): vo
 
 export interface IReadWriteError extends Error {
   cause: Error,
+  cause1: Error,
 }
 
 export class CustomError extends Error {
   public code?: string;
 
-  constructor(message: string, name = 'Error', code?: string){
+  constructor(message: string, name = 'Error', code?: string) {
     super(message);
     this.name = name;
     this.code = code;
@@ -64,13 +65,19 @@ export class ReadWriteError extends Error {
 export const getReadWriteError = (error: NodeJS.ErrnoException): Error => {
   if (error.code === ERROR_CODE.access) {
     return new CustomError(ERROR_MESSAGE.access, ERROR_NAME.access);
-  } else if (error.code === ERROR_CODE.notFound) {
-    return new CustomError(ERROR_MESSAGE.notFound, ERROR_NAME.notFound);
-  } else if (error.code === ERROR_CODE.directory) {
-    return new CustomError(ERROR_MESSAGE.directory, ERROR_NAME.directory);
-  } else if (error.code === ERROR_CODE.argType) {
-    return new CustomError(ERROR_MESSAGE.argType, ERROR_NAME.argType);
-  } else {
-    return error;
   }
+
+  if (error.code === ERROR_CODE.notFound) {
+    return new CustomError(ERROR_MESSAGE.notFound, ERROR_NAME.notFound);
+  }
+
+  if (error.code === ERROR_CODE.directory) {
+    return new CustomError(ERROR_MESSAGE.directory, ERROR_NAME.directory);
+  }
+
+  if (error.code === ERROR_CODE.argType) {
+    return new CustomError(ERROR_MESSAGE.argType, ERROR_NAME.argType);
+  }
+
+  return error;
 };

@@ -8,13 +8,13 @@ interface IProps {
 }
 
 export const MainScreen: React.FC<IProps> = (props) => (
-    <div>
-      <p>Main Screen</p>
-      <NavLink
-        exact
-        to={Routes.GAME_SETTINGS_SCREEN}
-      >
-        Настройки
-      </NavLink>
-    </div>
+  <div>
+    <p>Main Screen</p>
+    <NavLink
+      exact
+      to={Routes.GAME_SETTINGS_SCREEN}
+    >
+      Настройки
+    </NavLink>
+  </div>
 );

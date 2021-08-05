@@ -1,9 +1,17 @@
 import fs, { promises as fsPromises } from 'fs';
 
-import { LOG_MESSAGE_TYPE, writeToLogFile, writeToLogFileSync } from '$utils/log';
+import {
+  LOG_MESSAGE_TYPE,
+  writeToLogFile,
+  writeToLogFileSync,
+} from '$utils/log';
 import { parseJSON } from '$utils/strings';
 import {
-  ReadWriteError, getReadWriteError, CustomError, ERROR_CODE, ERROR_NAME,
+  ReadWriteError,
+  getReadWriteError,
+  CustomError,
+  ERROR_CODE,
+  ERROR_NAME,
 } from '$utils/errors';
 
 /**

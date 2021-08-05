@@ -1,4 +1,4 @@
-/* eslint-disable quotes, @typescript-eslint/no-magic-numbers */
+/* eslint-disable quotes, @typescript-eslint/no-magic-numbers, max-len */
 module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -17,11 +17,7 @@ module.exports = {
     mocha: true,
   },
   extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:import/recommended',
-    'plugin:import/typescript',
-    'plugin:react/recommended',
+    'airbnb-typescript',
   ],
   plugins: [
     '@typescript-eslint',
@@ -30,7 +26,9 @@ module.exports = {
   ],
   settings: {
     'import/resolver': {
-      node: {},
+      node: {
+        extensions: ['.js', '.jsx', '.json', '.ts', '.tsx', '.d.ts'],
+      },
       webpack: {
         config: './config/webpack.base.config.js',
       },
@@ -38,14 +36,12 @@ module.exports = {
     'import/parsers': {
       '@typescript-eslint/parser': ['.ts', '.tsx', '.d.ts'],
     },
-    react: {
+    'react': {
       version: 'detect',
     },
   },
+  /* Стилистические правила переключены на выдачу предупреждения, а не ошибки, как это сделано в исходном конфиге */
   rules: {
-    'arrow-body-style': [1, 'as-needed', {
-      requireReturnForObjectLiteral: false,
-    }],
     'arrow-parens': [1, 'always'],
     'arrow-spacing': [1, {
       before: true,
@@ -76,35 +72,19 @@ module.exports = {
     'key-spacing': [1, { beforeColon: false, afterColon: true }],
     'linebreak-style': 0,
     'max-len': [1, 100],
-    'no-constant-condition': 0, //disabled in favor @typescript-eslint/no-unnecessary-condition rule
-    'no-extra-semi': 1,
+    'max-classes-per-file': 0,
+    'no-else-return': [1, { allowElseIf: true }],
     'no-multi-spaces': [1, {
       ignoreEOLComments: false,
     }],
     'no-multiple-empty-lines': [1, { max: 1 }],
     'no-plusplus': [1, { 'allowForLoopAfterthoughts': true }],
-    'no-trailing-spaces': 0,
+    'no-trailing-spaces': 1,
+    'quote-props': [1, 'as-needed', { unnecessary: false }],
     'object-curly-newline': [1, {
-      ObjectExpression: {
-        minProperties: 3,
-        multiline: true,
-        consistent: true,
-      },
-      ObjectPattern: {
-        minProperties: 3,
-        multiline: true,
-        consistent: true,
-      },
-      ImportDeclaration: {
-        minProperties: 4,
-        multiline: true,
-        consistent: true,
-      },
-      ExportDeclaration: {
-        minProperties: 3,
-        multiline: true,
-        consistent: true,
-      },
+      minProperties: 3,
+      multiline: true,
+      consistent: true,
     }],
     'object-property-newline': [1, {
       allowAllPropertiesOnSameLine: true,
@@ -120,15 +100,9 @@ module.exports = {
       before: false,
       after: true,
     }],
-    semi: [1, 'always'],
-    'space-before-function-paren': [1, 'never'],
     'space-in-parens': [1, 'never'],
-    'space-infix-ops': 1,
     'spaced-comment': 0,
 
-    'import/extensions': [2, 'always', {
-      'js': 'never', 'ts': 'never', 'tsx': 'never',
-    }],
     'import/no-cycle': [2, { ignoreExternal: true }],
     'import/no-extraneous-dependencies': 0,
     'import/order': [1, {
@@ -141,10 +115,9 @@ module.exports = {
       ],
       'newlines-between': 'always',
     }],
+    'import/prefer-default-export': 0,
 
-    'react/jsx-filename-extension': [1, {
-      'extensions': ['.tsx', '.jsx'],
-    }],
+    'react/jsx-indent': 1,
     'react/jsx-fragments': [1, 'element'],
     'react/jsx-max-props-per-line': [2, {
       'maximum': 1,
@@ -154,17 +127,28 @@ module.exports = {
     'react/prop-types': 0,
 
     '@typescript-eslint/brace-style': [1, '1tbs', { 'allowSingleLine': true }],
-    '@typescript-eslint/keyword-spacing': [1],
     '@typescript-eslint/comma-dangle': [1, 'always-multiline'],
+    '@typescript-eslint/no-extra-semi': 1,
     '@typescript-eslint/comma-spacing': 1,
     '@typescript-eslint/consistent-type-definitions': [1, 'interface'],
     '@typescript-eslint/consistent-type-imports': [1, {
       prefer: 'no-type-imports',
       disallowTypeAnnotations: true,
     }],
-    '@typescript-eslint/default-param-last': [2],
+    '@typescript-eslint/dot-notation': [1, { allowKeywords: true }],
     '@typescript-eslint/func-call-spacing': [1, 'never'],
-    '@typescript-eslint/member-delimiter-style': 0,
+    '@typescript-eslint/indent': 0,
+    '@typescript-eslint/keyword-spacing': [1],
+    '@typescript-eslint/member-delimiter-style': [1, {
+      multiline: {
+        delimiter: 'comma',
+        requireLast: true,
+      },
+      singleline: {
+        delimiter: 'comma',
+        requireLast: true,
+      },
+    }],
     '@typescript-eslint/naming-convention': [2, {
       'selector': 'interface',
       'format': ['PascalCase'],
@@ -174,8 +158,13 @@ module.exports = {
       },
     },
     ],
-    '@typescript-eslint/dot-notation': [1],
-    '@typescript-eslint/no-extra-parens': [1],
+    '@typescript-eslint/no-extra-parens': [1, 'all', {
+      conditionalAssign: true,
+      nestedBinaryExpressions: false,
+      returnAssign: false,
+      ignoreJSX: 'all',
+      enforceForArrowConditionals: false,
+    }],
     '@typescript-eslint/no-magic-numbers': [1, {
       ignore: [-1, 0, 1, 2],
       ignoreArrayIndexes: true,
@@ -184,9 +173,17 @@ module.exports = {
       ignoreNumericLiteralTypes: false,
       ignoreEnums: false,
     }],
-    // '@typescript-eslint/no-unnecessary-condition': [1],
-    '@typescript-eslint/no-var-requires': 0,
+    '@typescript-eslint/no-shadow': 1,
+    '@typescript-eslint/no-unused-vars': [1],
     '@typescript-eslint/quotes': [1, 'single', { avoidEscape: true }],
     '@typescript-eslint/object-curly-spacing': [1, 'always'],
+    '@typescript-eslint/semi': [1, 'always'],
+    '@typescript-eslint/space-before-function-paren': 1,
+    '@typescript-eslint/space-infix-ops': [1, { int32Hint: false }],
+    '@typescript-eslint/type-annotation-spacing': [1, {
+      before: false,
+      after: true,
+      overrides: { 'arrow': { before: true, after: true } },
+    }],
   },
 };
