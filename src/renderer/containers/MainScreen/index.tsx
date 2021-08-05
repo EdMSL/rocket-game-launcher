@@ -11,7 +11,7 @@ interface IProps {
 
 export const MainScreen: React.FC<IProps> = (props) => {
   const onPlayGameBtnClick = useCallback(() => {
-    runApplication('C:\\Windows\\System32\\notepad.exe', 'notepad');
+    runApplication('D:\\Oblivion\\Oblivion.exe', 'Oblivion');
   }, []);
 
   return (

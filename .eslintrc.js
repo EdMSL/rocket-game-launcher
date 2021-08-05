@@ -103,6 +103,9 @@ module.exports = {
     'space-in-parens': [1, 'never'],
     'spaced-comment': 0,
 
+    'import/extensions': [2, 'always', {
+      'js': 'never', 'ts': 'never', 'tsx': 'never',
+    }],
     'import/no-cycle': [2, { ignoreExternal: true }],
     'import/no-extraneous-dependencies': 0,
     'import/order': [1, {
@@ -128,7 +131,6 @@ module.exports = {
 
     '@typescript-eslint/brace-style': [1, '1tbs', { 'allowSingleLine': true }],
     '@typescript-eslint/comma-dangle': [1, 'always-multiline'],
-    '@typescript-eslint/no-extra-semi': 1,
     '@typescript-eslint/comma-spacing': 1,
     '@typescript-eslint/consistent-type-definitions': [1, 'interface'],
     '@typescript-eslint/consistent-type-imports': [1, {
@@ -159,12 +161,13 @@ module.exports = {
     },
     ],
     '@typescript-eslint/no-extra-parens': [1, 'all', {
-      conditionalAssign: true,
+      conditionalAssign: false,
       nestedBinaryExpressions: false,
       returnAssign: false,
-      ignoreJSX: 'all',
+      ignoreJSX: 'multi-line',
       enforceForArrowConditionals: false,
     }],
+    '@typescript-eslint/no-extra-semi': 1,
     '@typescript-eslint/no-magic-numbers': [1, {
       ignore: [-1, 0, 1, 2],
       ignoreArrayIndexes: true,

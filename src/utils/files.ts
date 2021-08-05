@@ -1,4 +1,5 @@
 import fs, { promises as fsPromises } from 'fs';
+import iconv from 'iconv-lite';
 
 import {
   LOG_MESSAGE_TYPE,
@@ -99,3 +100,9 @@ export const writeJSONFile = (
 
     throw error;
   });
+
+export const iconvDecode = (encoding: string, str = '') => iconv.decode(
+  Buffer.from(str, 'binary'),
+  encoding,
+);
+
