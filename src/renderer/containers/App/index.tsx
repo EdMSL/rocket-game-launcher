@@ -11,7 +11,7 @@ import { Routes } from '$constants/routes';
 const styles = require('./styles.module.scss').default;
 
 export const App = (): JSX.Element => (
-  <main>
+  <main className="app">
     <Switch>
       <Route
         exact

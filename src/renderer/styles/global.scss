@@ -1,0 +1,26 @@
+html {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+body {
+  @include reset-indents;
+}
+
+*,
+*::after,
+*::before {
+  box-sizing: inherit;
+}
+
+.app {
+  @include main-text;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  padding-top: 20px;
+  overflow: hidden;
+
+  background-color: $bg-color;
+}

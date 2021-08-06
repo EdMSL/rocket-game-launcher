@@ -1,7 +1,7 @@
 .button {
   @include reset-indents;
   font: inherit;
-  color: var(--text-secondary);
+  color: $text-secondary;
   text-decoration: none;
 
   background-color: transparent;
