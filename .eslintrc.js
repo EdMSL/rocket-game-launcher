@@ -138,6 +138,7 @@ module.exports = {
       disallowTypeAnnotations: true,
     }],
     '@typescript-eslint/dot-notation': [1, { allowKeywords: true }],
+    '@typescript-eslint/explicit-function-return-type': [1],
     '@typescript-eslint/func-call-spacing': [1, 'never'],
     '@typescript-eslint/indent': 0,
     '@typescript-eslint/keyword-spacing': [1],

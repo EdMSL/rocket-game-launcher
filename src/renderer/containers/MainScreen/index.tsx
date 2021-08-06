@@ -3,7 +3,8 @@ import { NavLink } from 'react-router-dom';
 
 import { Routes } from '$constants/routes';
 import { Button } from '$components/UI/Button';
-import { runApplication } from '$utils/process';
+import { runApplication, openFolder } from '$utils/process';
+import { GAME_DIR } from '$constants/paths';
 
 interface IProps {
   props?: any,
@@ -14,6 +15,10 @@ export const MainScreen: React.FC<IProps> = (props) => {
     runApplication('D:\\Oblivion\\Oblivion.exe', 'Oblivion');
   }, []);
 
+  const onGameFolderBtnClick = useCallback(() => {
+    openFolder(GAME_DIR);
+  }, []);
+
   return (
     <div>
       <p>Main Screen</p>
@@ -22,6 +27,12 @@ export const MainScreen: React.FC<IProps> = (props) => {
         onClick={onPlayGameBtnClick}
       >
         Start
+      </Button>
+      <Button
+        className="main-btn"
+        onClick={onGameFolderBtnClick}
+      >
+        Open game folder
       </Button>
       <NavLink
         exact

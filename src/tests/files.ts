@@ -10,9 +10,9 @@ import { ERROR_MESSAGE, ReadWriteError } from '$utils/errors';
 import { createMockFiles, createMockFilesForWrite } from './fixtures/getFiles';
 
 const errorAccessRegExp = new RegExp(ERROR_MESSAGE.access);
-const errorNotFoundRegExp = new RegExp(ERROR_MESSAGE.notFound);
+const errorNotFoundRegExp = new RegExp(ERROR_MESSAGE.fileNotFound);
 const errorArgTypeRegExp = new RegExp(ERROR_MESSAGE.argType);
-const errorDirectoryRegExp = new RegExp(ERROR_MESSAGE.directory);
+const errorDirectoryRegExp = new RegExp(ERROR_MESSAGE.pathToDirectory);
 
 /* eslint-disable max-len, @typescript-eslint/ban-ts-comment */
 describe('#Files', () => {

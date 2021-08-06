@@ -3,8 +3,10 @@ import { dialog } from 'electron';
 export const ERROR_MESSAGE = {
   default: "There's been an error",
   access: 'Permission denied',
-  notFound: 'File not found',
-  directory: 'Got path to directory, not file',
+  fileNotFound: 'File not found',
+  directoryNotFound: 'No such directory',
+  pathToDirectory: 'Got path to directory, not file',
+  pathToFile: 'Got path to file, not directory',
   argType: 'Invalid data in path received',
 };
 
@@ -13,14 +15,14 @@ export const ERROR_NAME = {
   notFound: 'NotFoundError',
   access: 'AccessError',
   argType: 'InvalidArgumentError',
-  directory: 'DirectoryError',
+  pathToDirectory: 'DirectoryError',
   readWrite: 'ReadWriteError',
 };
 
 export const ERROR_CODE = {
   access: 'EACCES',
   notFound: 'ENOENT',
-  directory: 'EISDIR',
+  pathToDirectory: 'EISDIR',
   argType: 'ERR_INVALID_ARG_TYPE',
 };
 
@@ -68,11 +70,11 @@ export const getReadWriteError = (error: NodeJS.ErrnoException): Error => {
   }
 
   if (error.code === ERROR_CODE.notFound) {
-    return new CustomError(ERROR_MESSAGE.notFound, ERROR_NAME.notFound);
+    return new CustomError(ERROR_MESSAGE.fileNotFound, ERROR_NAME.notFound);
   }
 
-  if (error.code === ERROR_CODE.directory) {
-    return new CustomError(ERROR_MESSAGE.directory, ERROR_NAME.directory);
+  if (error.code === ERROR_CODE.pathToDirectory) {
+    return new CustomError(ERROR_MESSAGE.pathToDirectory, ERROR_NAME.pathToDirectory);
   }
 
   if (error.code === ERROR_CODE.argType) {
