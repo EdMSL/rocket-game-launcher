@@ -6,13 +6,13 @@ import { assert } from 'chai';
 import {
   readFileDataSync, readJSONFileSync, writeFileData, writeJSONFile,
 } from '$utils/files';
-import { ERROR_MESSAGE, ReadWriteError } from '$utils/errors';
+import { ErrorMessage, ReadWriteError } from '$utils/errors';
 import { createMockFiles, createMockFilesForWrite } from './fixtures/getFiles';
 
-const errorAccessRegExp = new RegExp(ERROR_MESSAGE.access);
-const errorNotFoundRegExp = new RegExp(ERROR_MESSAGE.fileNotFound);
-const errorArgTypeRegExp = new RegExp(ERROR_MESSAGE.argType);
-const errorDirectoryRegExp = new RegExp(ERROR_MESSAGE.pathToDirectory);
+const errorAccessRegExp = new RegExp(ErrorMessage.ACCESS);
+const errorNotFoundRegExp = new RegExp(ErrorMessage.FILE_NOT_FOUND);
+const errorArgTypeRegExp = new RegExp(ErrorMessage.ARG_TYPE);
+const errorDirectoryRegExp = new RegExp(ErrorMessage.PATH_TO_DIRECTORY);
 
 /* eslint-disable max-len, @typescript-eslint/ban-ts-comment */
 describe('#Files', () => {

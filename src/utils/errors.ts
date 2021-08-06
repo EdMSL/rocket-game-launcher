@@ -1,29 +1,29 @@
 import { dialog } from 'electron';
 
-export const ERROR_MESSAGE = {
-  default: "There's been an error",
-  access: 'Permission denied',
-  fileNotFound: 'File not found',
-  directoryNotFound: 'No such directory',
-  pathToDirectory: 'Got path to directory, not file',
-  pathToFile: 'Got path to file, not directory',
-  argType: 'Invalid data in path received',
+export const ErrorMessage = {
+  DEFAULT: "There's been an error",
+  ACCESS: 'Permission denied',
+  FILE_NOT_FOUND: 'File not found',
+  DIRECTORY_NOT_FOUND: 'No such directory',
+  PATH_TO_DIRECTORY: 'Got path to directory, not file',
+  PATH_TO_FILE: 'Got path to file, not directory',
+  ARG_TYPE: 'Invalid data in path received',
 };
 
-export const ERROR_NAME = {
-  syntax: 'SyntaxError',
-  notFound: 'NotFoundError',
-  access: 'AccessError',
-  argType: 'InvalidArgumentError',
-  pathToDirectory: 'DirectoryError',
-  readWrite: 'ReadWriteError',
+export const ErrorName = {
+  SYNTAX: 'SyntaxError',
+  NOT_FOUND: 'NotFoundError',
+  ACCESS: 'AccessError',
+  ARG_TYPE: 'InvalidArgumentError',
+  PATH_TO_DIRECTORY: 'DirectoryError',
+  READ_WRITE: 'ReadWriteError',
 };
 
-export const ERROR_CODE = {
-  access: 'EACCES',
-  notFound: 'ENOENT',
-  pathToDirectory: 'EISDIR',
-  argType: 'ERR_INVALID_ARG_TYPE',
+export const ErrorCode = {
+  ACCESS: 'EACCES',
+  NOT_FOUND: 'ENOENT',
+  PATH_TO_DIRECTORY: 'EISDIR',
+  ARG_TYPE: 'ERR_INVALID_ARG_TYPE',
 };
 
 /**
@@ -31,7 +31,7 @@ export const ERROR_CODE = {
  * @param error Текст ошибки.
  * @param title Заголовок окна.
 */
-export const showErrorBox = (message: string, title = ERROR_MESSAGE.default): void => {
+export const showErrorBox = (message: string, title = ErrorMessage.DEFAULT): void => {
   dialog.showErrorBox(title, message);
 };
 
@@ -56,7 +56,7 @@ export class ReadWriteError extends Error {
   constructor(message: string, cause: Error) {
     super(message);
     this.cause = cause;
-    this.name = ERROR_NAME.readWrite;
+    this.name = ErrorName.READ_WRITE;
   }
 }
 /**
@@ -65,20 +65,20 @@ export class ReadWriteError extends Error {
  * @returns Объект Error
 */
 export const getReadWriteError = (error: NodeJS.ErrnoException): Error => {
-  if (error.code === ERROR_CODE.access) {
-    return new CustomError(ERROR_MESSAGE.access, ERROR_NAME.access);
+  if (error.code === ErrorCode.ACCESS) {
+    return new CustomError(ErrorMessage.ACCESS, ErrorName.ACCESS);
   }
 
-  if (error.code === ERROR_CODE.notFound) {
-    return new CustomError(ERROR_MESSAGE.fileNotFound, ERROR_NAME.notFound);
+  if (error.code === ErrorCode.NOT_FOUND) {
+    return new CustomError(ErrorMessage.FILE_NOT_FOUND, ErrorName.NOT_FOUND);
   }
 
-  if (error.code === ERROR_CODE.pathToDirectory) {
-    return new CustomError(ERROR_MESSAGE.pathToDirectory, ERROR_NAME.pathToDirectory);
+  if (error.code === ErrorCode.PATH_TO_DIRECTORY) {
+    return new CustomError(ErrorMessage.PATH_TO_DIRECTORY, ErrorName.PATH_TO_DIRECTORY);
   }
 
-  if (error.code === ERROR_CODE.argType) {
-    return new CustomError(ERROR_MESSAGE.argType, ERROR_NAME.argType);
+  if (error.code === ErrorCode.ARG_TYPE) {
+    return new CustomError(ErrorMessage.ARG_TYPE, ErrorName.ARG_TYPE);
   }
 
   return error;

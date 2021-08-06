@@ -7,7 +7,7 @@ import fs from 'fs';
 import { LOG_MESSAGE_TYPE, writeToLogFile } from '$utils/log';
 import { iconvDecode } from '$utils/files';
 import { GAME_DIR } from '$constants/paths';
-import { ERROR_MESSAGE } from './errors';
+import { ErrorMessage } from './errors';
 
 /**
  * Запустить приложение (.exe).
@@ -69,7 +69,7 @@ export const runApplication = (
 export const openFolder = (pathToFolder: string): void => {
   if (path.extname(pathToFolder)) {
     writeToLogFile(
-      `Message: Can't open folder. ${ERROR_MESSAGE.pathToDirectory}. Path ${pathToFolder}.`, //eslint-disable-line max-len
+      `Message: Can't open folder. ${ErrorMessage.PATH_TO_DIRECTORY}. Path ${pathToFolder}.`, //eslint-disable-line max-len
       LOG_MESSAGE_TYPE.ERROR,
     );
 
@@ -78,7 +78,7 @@ export const openFolder = (pathToFolder: string): void => {
 
   if (!fs.existsSync(pathToFolder)) {
     writeToLogFile(
-      `Message: Can't open folder. ${ERROR_MESSAGE.directoryNotFound}. Path ${pathToFolder}.`, //eslint-disable-line max-len
+      `Message: Can't open folder. ${ErrorMessage.DIRECTORY_NOT_FOUND}. Path ${pathToFolder}.`, //eslint-disable-line max-len
       LOG_MESSAGE_TYPE.ERROR,
     );
 

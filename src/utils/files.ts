@@ -11,8 +11,8 @@ import {
   ReadWriteError,
   getReadWriteError,
   CustomError,
-  ERROR_CODE,
-  ERROR_NAME,
+  ErrorCode,
+  ErrorName,
 } from '$utils/errors';
 
 /**
@@ -31,8 +31,8 @@ export const readFileDataSync = (
     if (typeof pathToFile === 'number') {
       throw new CustomError(
         'The argument in path must not be a number',
-        ERROR_NAME.argType,
-        ERROR_CODE.argType,
+        ErrorName.ARG_TYPE,
+        ErrorCode.ARG_TYPE,
       );
     }
 
