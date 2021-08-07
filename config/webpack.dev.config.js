@@ -23,7 +23,7 @@ const devWebpackConfig = (env) => {
       target: MAIN ? 'electron12.0-main' : 'electron-renderer',
       devtool: 'cheap-module-source-map',
       optimization: {},
-      devServer: (!MAIN) ? {
+      devServer: !MAIN ? {
         publicPath: 'http://localhost:8085/build/',
         port: '8085',
         host: '0.0.0.0',
@@ -37,9 +37,9 @@ const devWebpackConfig = (env) => {
         ignored: /node_modules/,
       },
       plugins: [
-        ...(!MAIN ? [
+        ...!MAIN ? [
           new webpack.HotModuleReplacementPlugin(),
-        ] : []),
+        ] : [],
       ],
     },
     css('development', `${baseWebpackConfig.externals.paths.src}/renderer/styles/resources`),

@@ -12,6 +12,10 @@ import './styles/main.scss';
 
 const remote = require('@electron/remote');
 
+if (module.hot) {
+  module.hot.accept();
+}
+
 const initialState = remote.getGlobal('state');
 const store = configureStore(initialState, 'renderer');
 
