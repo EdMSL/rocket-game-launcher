@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { NavLink } from 'react-router-dom';
 
+import styles from './styles.module.scss';
 import { Routes } from '$constants/routes';
 import { Button } from '$components/UI/Button';
 import { runApplication, openFolder } from '$utils/process';
@@ -21,7 +22,7 @@ export const MainScreen: React.FC<IProps> = (props) => {
 
   return (
     <div>
-      <p>Main Screen</p>
+      <p className={styles.title}>Main Screen</p>
       <Button
         className="main-btn"
         onClick={onPlayGameBtnClick}

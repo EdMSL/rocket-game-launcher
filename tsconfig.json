@@ -52,7 +52,8 @@
     "./config/webpack.base.config.js",
     "./config/webpack.build.config.js",
     "./config/webpack.dev.config.js",
-    "./.eslintrc.js"
+    "./.eslintrc.js",
+    "./typings.d.ts"
   ],
   "exclude": [
     "node_modules",

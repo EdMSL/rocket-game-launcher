@@ -38,20 +38,13 @@ module.exports = function (mode, resourcesPath) {
       rules: [
         {
           test: /\.(scss|sass|css)$/,
-          exclude: cssModules,
           use: getLoaders({
             sourceMap: mode === 'development',
-            importLoaders: 2,
-          }),
-        },
-        {
-          test: cssModules,
-          use: getLoaders({
-            sourceMap: mode === 'development',
-            importLoaders: 3,
             modules: {
+              auto: true,
               localIdentName: '[local]',
             },
+            importLoaders: 2,
           }),
         },
       ],

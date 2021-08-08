@@ -4,11 +4,10 @@ import {
   Route,
 } from 'react-router-dom';
 
+import styles from './styles.module.scss';
 import { MainScreen } from '$containers/MainScreen';
 import { GameSettingsScreen } from '$containers/GameSettingsScreen';
 import { Routes } from '$constants/routes';
-
-const styles = require('./styles.module.scss').default;
 
 export const App = (): JSX.Element => (
   <main className="app">

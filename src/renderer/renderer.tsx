@@ -4,11 +4,10 @@ import { Provider } from 'react-redux';
 import { HashRouter } from 'react-router-dom';
 import { ConnectedRouter } from 'connected-react-router';
 
+import './styles/main.scss';
 import { App } from '$containers/App';
 import { configureStore } from '$store/store';
 import { history } from '$reducers/root';
-
-import './styles/main.scss';
 
 const remote = require('@electron/remote');
 

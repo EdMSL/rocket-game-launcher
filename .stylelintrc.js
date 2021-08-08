@@ -8,7 +8,7 @@ module.exports = {
     "stylelint-declaration-use-variable",
   ],
   ignoreFiles: [
-    "build/**/*"
+    "app/build/**/*"
   ],
   rules: {
     "at-rule-no-unknown": [true, {
