@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 
 import styles from './styles.module.scss';
 import { IAppState } from '$store/store';
+import { Message } from '$components/Message';
 
 export const Messages: React.FC = () => {
   const messages = useSelector((state: IAppState) => state.main.messages);
@@ -11,12 +12,8 @@ export const Messages: React.FC = () => {
     <div className={styles.messages}>
       {
         messages.length > 0 && (
-          <ul>
-            {messages.map((currentMessage) => (
-              <div>
-                <p>{currentMessage.text}</p>
-              </div>
-            ))}
+          <ul className={styles.messages__list}>
+            {messages.map((currentMessage) => <Message message={currentMessage} />)}
           </ul>
 
         )

@@ -44,6 +44,9 @@ module.exports = {
   },
   /* Стилистические правила переключены на выдачу предупреждения, а не ошибки, как это сделано в исходном конфиге */
   rules: {
+    'arrow-body-style': [1, 'as-needed', {
+      requireReturnForObjectLiteral: false,
+    }],
     'arrow-parens': [1, 'always'],
     'arrow-spacing': [1, {
       before: true,

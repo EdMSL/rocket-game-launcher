@@ -1,0 +1,26 @@
+.message {
+  padding: 16px 8px 8px;
+
+  color: inherit;
+}
+
+.message__text {
+  @include reset-indents;
+  overflow: hidden;
+
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.message__header {
+
+}
+
+.message__btn {
+
+}
+
+.message__btn-text {
+
+}
