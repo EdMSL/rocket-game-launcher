@@ -5,12 +5,13 @@ import {
 } from 'react-router-dom';
 
 import styles from './styles.module.scss';
+import { Routes } from '$constants/routes';
 import { MainScreen } from '$containers/MainScreen';
 import { GameSettingsScreen } from '$containers/GameSettingsScreen';
-import { Routes } from '$constants/routes';
+import { Messages } from '$containers/Messages';
 
 export const App = (): JSX.Element => (
-  <div className="app">
+  <div className={styles.app}>
     <main className={styles.app__main}>
       <Switch>
         <Route
@@ -23,6 +24,7 @@ export const App = (): JSX.Element => (
           component={GameSettingsScreen}
         />
       </Switch>
+      <Messages />
     </main>
   </div>
 );

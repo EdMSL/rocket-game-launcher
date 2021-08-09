@@ -1,4 +1,5 @@
-export const getPathNameFromLocationPath = (path: string): string => path.slice(1);
+const HEXADECIMAL = 16;
+const HEXADECIMAL_FACTOR = 1e8;
 
 /**
  * Преобразовать JSON строку в объект.
@@ -16,3 +17,12 @@ export const parseJSON = <T>(jsonString: string): T => {
     }
   }
 };
+
+/**
+ * Генерирует уникальную строку, пригодную для использования в качестве id.
+ * @param word Слово, которе будет добавлено в начало генерируемой строки.
+ * @returns Строка с уникальным содержимым.
+*/
+export const getRandomId = (
+  word: string,
+): string => `${word}-f${((Math.random() * HEXADECIMAL_FACTOR)).toString(HEXADECIMAL)}-${new Date().getMilliseconds()}`; //eslint-disable-line max-len

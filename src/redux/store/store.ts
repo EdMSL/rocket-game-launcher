@@ -13,11 +13,13 @@ import createSagaMiddleware from 'redux-saga';
 
 import { getRootReducer, history } from '$reducers/root';
 
+///FIXME Выглядит не особо изящно, попробовать переделать
+export type IAppState = ReturnType<ReturnType<typeof getRootReducer>>;
+
 export const configureStore = (
   initialState,
   scope = 'main',
-  ///FIXME Выглядит не особо изящно, попробовать переделать
-): Store<ReturnType<ReturnType<typeof getRootReducer>>> => {
+): Store<IAppState> => {
   const router = routerMiddleware(history);
   const sagaMiddleware = createSagaMiddleware();
 

@@ -11,7 +11,9 @@ import {
 import { readJSONFileSync, writeJSONFile } from '$utils/files';
 import { configPath } from '$constants/paths';
 import { ISystemRootState } from '$reducers/system';
-import { ErrorName, ReadWriteError } from '$utils/errors';
+import {
+  ErrorName, ReadWriteError, showMessageBox,
+} from '$utils/errors';
 
 interface IStorage {
   settings: {
@@ -30,8 +32,14 @@ const getConfigurationData = () => {
     if (error instanceof ReadWriteError) {
       if (error.cause.name === ErrorName.NOT_FOUND) {
         writeToLogFileSync(
-          'Launcher config file not found. Load default values. A new config file will be created ', //eslint-disable-line max-len
+          'Launcher config file not found. Load default values. A new config file will be created', //eslint-disable-line max-len
           LOG_MESSAGE_TYPE.WARNING,
+        );
+
+        showMessageBox(
+          'Will be loaded default values. A new config file will be created',
+          'Launcher config file not found',
+          'warning',
         );
 
         writeJSONFile(configPath, defaultLauncherConfig)

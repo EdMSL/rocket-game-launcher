@@ -40,13 +40,13 @@ export const runApplication = (
     writeToLogFile(`${appName} closed.`);
 
     if (cb) {
-      cb();
+      cb(false);
     }
   });
 
   process.on('exit', () => {
     if (cb) {
-      cb();
+      cb(true);
     }
   });
 
@@ -57,7 +57,7 @@ export const runApplication = (
     );
 
     if (cb) {
-      cb();
+      cb(false);
     }
   });
 };
@@ -65,22 +65,29 @@ export const runApplication = (
 /**
  * Открыть папку в проводнике.
  * @param pathToFolder Путь к папке.
+ * @param cb callback-функция, которая будет вызвана при ошибке.
 */
-export const openFolder = (pathToFolder: string): void => {
+export const openFolder = (pathToFolder: string, cb?): void => {
+  let message: string;
+
   if (path.extname(pathToFolder)) {
+    message = `Message: Can't open folder. ${ErrorMessage.PATH_TO_DIRECTORY}. Path ${pathToFolder}.`; //eslint-disable-line max-len
     writeToLogFile(
-      `Message: Can't open folder. ${ErrorMessage.PATH_TO_DIRECTORY}. Path ${pathToFolder}.`, //eslint-disable-line max-len
+      message,
       LOG_MESSAGE_TYPE.ERROR,
     );
+    cb(message);
 
     return;
   }
 
   if (!fs.existsSync(pathToFolder)) {
+    message = `Message: Can't open folder. ${ErrorMessage.DIRECTORY_NOT_FOUND}. Path ${pathToFolder}.`; //eslint-disable-line max-len
     writeToLogFile(
-      `Message: Can't open folder. ${ErrorMessage.DIRECTORY_NOT_FOUND}. Path ${pathToFolder}.`, //eslint-disable-line max-len
+      message,
       LOG_MESSAGE_TYPE.ERROR,
     );
+    cb(message);
 
     return;
   }

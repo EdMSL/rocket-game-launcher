@@ -18,11 +18,13 @@ module.exports = {
   },
   extends: [
     'airbnb-typescript',
+    'airbnb/hooks',
   ],
   plugins: [
     '@typescript-eslint',
     'import',
     'react',
+    'react-hooks',
   ],
   settings: {
     'import/resolver': {
@@ -126,6 +128,7 @@ module.exports = {
       'maximum': 1,
       'when': 'always',
     }],
+    'react/jsx-tag-spacing': 1,
     'react/prefer-stateless-function': 0,
     'react/prop-types': 0,
 

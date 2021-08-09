@@ -35,6 +35,22 @@ export const showErrorBox = (message: string, title = ErrorMessage.DEFAULT): voi
   dialog.showErrorBox(title, message);
 };
 
+/**
+ * Показать модальное нативное окно с выбранным типом.
+ * @param error Текст ошибки.
+ * @param title Заголовок окна.
+ * @param type Тип окна: `info`, `warning` или `error`.
+*/
+export const showMessageBox = (
+  message: string,
+  title = ErrorMessage.DEFAULT,
+  type = 'info',
+): void => {
+  dialog.showMessageBox({
+    message, title, type,
+  });
+};
+
 export interface IReadWriteError extends Error {
   cause: Error,
   cause1: Error,
