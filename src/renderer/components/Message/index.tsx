@@ -1,9 +1,11 @@
 import React, { useCallback, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import classNames from 'classnames';
 
 import styles from './styles.module.scss';
 import { IMessage } from '$reducers/main';
 import { Button } from '$components/UI/Button';
+import { deleteMessages } from '$actions/main';
 
 interface IProps {
   message: IMessage,
@@ -12,9 +14,15 @@ interface IProps {
 export const Message: React.FC<IProps> = ({ message }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const dispatch = useDispatch();
+
   const onExpandBtnClick = useCallback(() => {
     setIsExpanded(!isExpanded);
   }, [isExpanded]);
+
+  const onCloseBtnClick = useCallback(() => {
+    dispatch(deleteMessages([message.id]));
+  }, [dispatch, message]);
 
   return (
     <li
@@ -33,7 +41,7 @@ export const Message: React.FC<IProps> = ({ message }) => {
         </Button>
         <Button
           className={classNames(styles.message__btn, styles['message__btn--close'])}
-          onClick={onExpandBtnClick}
+          onClick={onCloseBtnClick}
         >
           <p className={styles['message__btn-text']}>Close</p>
         </Button>

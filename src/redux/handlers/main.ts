@@ -14,9 +14,9 @@ const setIsGameRunning: IActionHandler<
   isGameRunning,
 });
 
-const setMessages: IActionHandler<
+const addMessages: IActionHandler<
   IMainRootState,
-  typeof MAIN_ACTIONS.setMessages
+  typeof MAIN_ACTIONS.addMessages
 > = (
   state,
   { payload: messages },
@@ -28,7 +28,19 @@ const setMessages: IActionHandler<
   ],
 });
 
+const deleteMessages: IActionHandler<
+  IMainRootState,
+  typeof MAIN_ACTIONS.deleteMessages
+> = (
+  state,
+  { payload: messagesID },
+) => ({
+  ...state,
+  messages: state.messages.filter((currentMessage) => !messagesID.includes(currentMessage.id)),
+});
+
 export const MAIN_HANDLERS = {
   [MAIN_TYPES.SET_IS_GAME_RUNNING]: setIsGameRunning,
-  [MAIN_TYPES.SET_MESSAGES]: setMessages,
+  [MAIN_TYPES.ADD_MESSAGES]: addMessages,
+  [MAIN_TYPES.DELETE_MESSAGES]: deleteMessages,
 };

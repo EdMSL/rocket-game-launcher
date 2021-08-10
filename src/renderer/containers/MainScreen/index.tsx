@@ -8,7 +8,7 @@ import { GAME_DIR } from '$constants/paths';
 import { runApplication, openFolder } from '$utils/process';
 import { getRandomId } from '$utils/strings';
 import { Button } from '$components/UI/Button';
-import { setIsGameRunning, setMessages } from '$actions/main';
+import { setIsGameRunning, addMessages } from '$actions/main';
 import { IMessage } from '$reducers/main';
 
 interface IProps {
@@ -29,7 +29,7 @@ export const MainScreen: React.FC<IProps> = (props) => {
       text: message,
     };
 
-    dispatch(setMessages([errorMessage]));
+    dispatch(addMessages([errorMessage]));
   }, [dispatch]);
 
   const onPlayGameBtnClick = useCallback(() => {
