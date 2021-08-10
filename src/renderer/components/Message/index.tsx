@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import classNames from 'classnames';
 
 import styles from './styles.module.scss';
 import { IMessage } from '$reducers/main';
@@ -22,13 +23,28 @@ export const Message: React.FC<IProps> = ({ message }) => {
     >
       <div className={styles.message__header}>
         <Button
-          className={styles.message__btn}
+          className={classNames(
+            styles.message__btn,
+            styles['message__btn--expand'],
+          )}
           onClick={onExpandBtnClick}
         >
-          <span className={styles['message__btn-text']}>Close</span>
+          <p className={styles['message__btn-text']}>Expand</p>
+        </Button>
+        <Button
+          className={classNames(styles.message__btn, styles['message__btn--close'])}
+          onClick={onExpandBtnClick}
+        >
+          <p className={styles['message__btn-text']}>Close</p>
         </Button>
       </div>
-      <p className={styles.message__text}>{message.text}</p>
+      <p className={classNames(
+        styles.message__content,
+        isExpanded && styles['message__content--open'],
+      )}
+      >
+        {message.text}
+      </p>
     </li>
   );
 };

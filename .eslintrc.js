@@ -125,6 +125,8 @@ module.exports = {
     }],
     'import/prefer-default-export': 0,
 
+    'jsx-a11y/alt-text': 0,
+
     'react/jsx-indent': 1,
     'react/jsx-fragments': [1, 'element'],
     'react/jsx-max-props-per-line': [2, {

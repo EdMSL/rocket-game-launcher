@@ -18,14 +18,14 @@ const devWebpackConfig = (env) => {
       output: {
         path: `${baseWebpackConfig.externals.paths.dist}`,
         filename: MAIN ? 'index.js' : 'renderer.js',
-        publicPath: 'http://localhost:8085/build/',
+        publicPath: 'http://localhost:8081/build/',
       },
       target: MAIN ? 'electron12.0-main' : 'electron-renderer',
       devtool: 'cheap-module-source-map',
       optimization: {},
       devServer: !MAIN ? {
-        publicPath: 'http://localhost:8085/build/',
-        port: '8085',
+        publicPath: 'http://localhost:8081/build/',
+        port: '8081',
         host: '0.0.0.0',
         historyApiFallback: true,
         hot: true,
