@@ -30,7 +30,7 @@ export const Button: React.FunctionComponent<IButtonProps> = memo(({
   >
     {
       typeof children === 'string'
-        ? <span>{children}</span>
+        ? <span className={`${className}-text`}>{children}</span>
         : children
     }
   </button>

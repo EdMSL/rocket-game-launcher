@@ -68,6 +68,8 @@ module.exports = {
           "transparent",
           "/transparentize/",
           "inherit",
+          "/lighten/",
+          "/darken/",
           "/-func/",
         ],
       },

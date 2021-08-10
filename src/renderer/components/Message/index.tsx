@@ -37,13 +37,13 @@ export const Message: React.FC<IProps> = ({ message }) => {
           )}
           onClick={onExpandBtnClick}
         >
-          <p className={styles['message__btn-text']}>Expand</p>
+          <span className={styles['message__btn-text']}>Expand</span>
         </Button>
         <Button
           className={classNames(styles.message__btn, styles['message__btn--close'])}
           onClick={onCloseBtnClick}
         >
-          <p className={styles['message__btn-text']}>Close</p>
+          <span className={styles['message__btn-text']}>Close</span>
         </Button>
       </div>
       <p className={classNames(
