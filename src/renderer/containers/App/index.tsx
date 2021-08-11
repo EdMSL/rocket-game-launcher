@@ -9,9 +9,11 @@ import { Routes } from '$constants/routes';
 import { MainScreen } from '$containers/MainScreen';
 import { GameSettingsScreen } from '$containers/GameSettingsScreen';
 import { Messages } from '$containers/Messages';
+import { Header } from '$components/Header';
 
 export const App = (): JSX.Element => (
   <div className={styles.app}>
+    <Header />
     <Switch>
       <Route
         exact

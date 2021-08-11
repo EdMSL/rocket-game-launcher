@@ -20,6 +20,7 @@ export const createWindow = (): void => {
     y: mainWindowState.y,
     width: mainWindowState.width,
     height: mainWindowState.height,
+    frame: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,

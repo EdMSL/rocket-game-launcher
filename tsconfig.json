@@ -42,6 +42,9 @@
       "$types/*": [
         "src/redux/types/*"
       ],
+      "$images/*": [
+        "src/images/*"
+      ],
       "$utils/*": [
         "src/utils/*"
       ]

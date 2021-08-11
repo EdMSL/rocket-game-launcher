@@ -30,6 +30,7 @@ const configuration = merge([
         $handlers: path.resolve(__dirname, `${PATHS.src}/redux/handlers/`),
         $reducers: path.resolve(__dirname, `${PATHS.src}/redux/reducers/`),
         $types: path.resolve(__dirname, `${PATHS.src}/redux/types/`),
+        $images: path.resolve(__dirname, `${PATHS.src}/images/`),
         $utils: path.resolve(__dirname, `${PATHS.src}/utils/`),
       },
       fallback: {

@@ -1,0 +1,64 @@
+$icon-size: 24px;
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
+
+  color: $text-secondary;
+
+  background-color: $text-main;
+
+  -webkit-app-region: drag;
+}
+
+.header__logo {
+  width: $icon-size;
+  height: $icon-size;
+  margin-right: 10px;
+}
+
+.header__title {
+  @include reset-indents;
+  flex-grow: 1;
+
+  font-size: 14px;
+}
+
+.header__controls {
+  align-self: stretch;
+  display: flex;
+
+  -webkit-app-region: no-drag;
+}
+
+.header__btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-repeat: no-repeat;
+  background-size: 40% 40%;
+  background-position: center center;
+
+  &--fold {
+    background-image: url('data:image/svg+xml,\
+    <svg width="16" height="16" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">\
+    <path d="M0 236h512v40H0z"/>\
+    </svg>');
+  }
+
+  &--close {
+    background-image: url('data:image/svg+xml,\
+    <svg height="16" width="16" viewBox="0 0 413.348 413.348" xmlns="http://www.w3.org/2000/svg">\
+    <path d="M413.348 24.354L388.994 0l-182.32 182.32L24.354 0 0 24.354l182.32 182.32L0 388.994l24.354 24.354 182.32-182.32 182.32 182.32 24.354-24.354-182.32-182.32z"/>\
+    </svg>');
+  }
+
+  .header__btn-text {
+    color: transparent;
+  }
+}
