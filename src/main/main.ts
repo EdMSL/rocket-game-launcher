@@ -1,4 +1,6 @@
-import { app, BrowserWindow } from 'electron';
+import {
+  app, BrowserWindow, ipcMain,
+} from 'electron';
 
 import { createStorage } from './components/storage';
 import { createWindow } from './components/window';
@@ -20,6 +22,10 @@ const start = async (): Promise<void> => {
 
   writeToLogFileSync('Application ready.');
 };
+
+ipcMain.on('close app', () => {
+  app.quit();
+});
 
 app.on('ready', () => {
   start()

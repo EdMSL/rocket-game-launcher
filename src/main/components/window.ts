@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, ipcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import windowStateKeeper from 'electron-window-state';
@@ -40,6 +40,10 @@ export const createWindow = (): void => {
   if (process.env.NODE_ENV === 'development' && fs.existsSync(pathToExtension)) {
     mainWindow.webContents.session.loadExtension(pathToExtension);
   }
+
+  ipcMain.on('minimize app', () => {
+    mainWindow.minimize();
+  });
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
