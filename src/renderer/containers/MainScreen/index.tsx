@@ -6,16 +6,12 @@ import styles from './styles.module.scss';
 import { Routes } from '$constants/routes';
 import { GAME_DIR } from '$constants/paths';
 import { runApplication, openFolder } from '$utils/process';
-import { getRandomId } from '$utils/strings';
+import { getMessage } from '$utils/data';
 import { Button } from '$components/UI/Button';
 import { setIsGameRunning, addMessages } from '$actions/main';
 import { IMessage } from '$reducers/main';
 
-interface IProps {
-  props?: any,
-}
-
-export const MainScreen: React.FC<IProps> = (props) => {
+export const MainScreen: React.FC = () => {
   const dispatch = useDispatch();
 
   const changeGameState = useCallback((isRunning: boolean) => {
@@ -23,11 +19,7 @@ export const MainScreen: React.FC<IProps> = (props) => {
   }, [dispatch]);
 
   const sendErrorMessage = useCallback((message: string) => {
-    const errorMessage: IMessage = {
-      id: getRandomId('exec'),
-      status: 'error',
-      text: message,
-    };
+    const errorMessage: IMessage = getMessage(message);
 
     dispatch(addMessages([errorMessage]));
   }, [dispatch]);

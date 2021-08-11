@@ -53,7 +53,6 @@ export const showMessageBox = (
 
 export interface IReadWriteError extends Error {
   cause: Error,
-  cause1: Error,
 }
 
 export class CustomError extends Error {

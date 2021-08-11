@@ -76,7 +76,7 @@ export const openFolder = (pathToFolder: string, cb?): void => {
       message,
       LOG_MESSAGE_TYPE.ERROR,
     );
-    cb(message);
+    cb(`Невозможно открыть папку. Указан путь к файлу, не папке. Путь: ${pathToFolder}`);
 
     return;
   }
@@ -87,7 +87,7 @@ export const openFolder = (pathToFolder: string, cb?): void => {
       message,
       LOG_MESSAGE_TYPE.ERROR,
     );
-    cb(message);
+    cb(`Невозможно открыть папку. Папка не найдена. Путь: ${pathToFolder}`);
 
     return;
   }
