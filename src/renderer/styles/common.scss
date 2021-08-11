@@ -10,9 +10,28 @@
   cursor: pointer;
 }
 
-.main-btn {
-  margin-right: 10px;
+.main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+
+  color: $text-main;
+}
+
+.control-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.control-panel__btn {
+  display: inline-block;
   padding: 4px 8px;
+
   color: $text-secondary;
+  text-decoration: none;
+  text-align: center;
+
   background-color: $text-main;
 }

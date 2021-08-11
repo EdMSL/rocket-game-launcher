@@ -12,19 +12,17 @@ import { Messages } from '$containers/Messages';
 
 export const App = (): JSX.Element => (
   <div className={styles.app}>
-    <main className={styles.app__main}>
-      <Switch>
-        <Route
-          exact
-          path={Routes.MAIN_SCREEN}
-          component={MainScreen}
-        />
-        <Route
-          path={Routes.GAME_SETTINGS_SCREEN}
-          component={GameSettingsScreen}
-        />
-      </Switch>
-      <Messages />
-    </main>
+    <Switch>
+      <Route
+        exact
+        path={Routes.MAIN_SCREEN}
+        component={MainScreen}
+      />
+      <Route
+        path={Routes.GAME_SETTINGS_SCREEN}
+        component={GameSettingsScreen}
+      />
+    </Switch>
+    <Messages />
   </div>
 );

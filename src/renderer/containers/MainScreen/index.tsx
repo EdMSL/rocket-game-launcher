@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import classNames from 'classnames';
 
 import styles from './styles.module.scss';
 import { Routes } from '$constants/routes';
@@ -33,27 +34,31 @@ export const MainScreen: React.FC = () => {
   }, [sendErrorMessage]);
 
   return (
-    <div>
-      <p className={styles.title}>Main Screen</p>
-      <Button
-        className="main-btn"
-        onClick={onPlayGameBtnClick}
-      >
-        Start
-      </Button>
-      <Button
-        className="main-btn"
-        onClick={onGameFolderBtnClick}
-      >
-        Open game folder
-      </Button>
-      <NavLink
-        exact
-        to={Routes.GAME_SETTINGS_SCREEN}
-      >
-        Настройки
-      </NavLink>
-    </div>
+    <main className={classNames('main', styles['main-screen__main'])}>
+      <div className={classNames('control-panel', styles['main-screen__control-panel'])}>
+        <Button
+          className="control-panel__btn"
+          onClick={onPlayGameBtnClick}
+        >
+          Play
+        </Button>
+        <Button
+          className="control-panel__btn"
+          onClick={onGameFolderBtnClick}
+        >
+          Open game folder
+        </Button>
+        <NavLink
+          exact
+          to={Routes.GAME_SETTINGS_SCREEN}
+          className="control-panel__btn"
+        >
+          Настройки
+        </NavLink>
+      </div>
+      <div className={classNames('content', styles['main-screen__content'])}>
+        <p>Content</p>
+      </div>
+    </main>
   );
 };
-
