@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ipcRenderer } from 'electron';
 import classNames from 'classnames';
 
@@ -8,9 +8,16 @@ import styles from './styles.module.scss';
 const launcherIcon = require('$images/icon.png');
 
 export const Header: React.FunctionComponent = () => {
+  const [isMaximize, setIsMaximize] = useState(false);
+
   const onMinimizeAppClick = useCallback(() => {
-    ipcRenderer.send('minimize app');
+    ipcRenderer.send('minimize window');
   }, []);
+
+  const onMaximizeAppClick = useCallback(() => {
+    ipcRenderer.send(isMaximize ? 'restore window' : 'maximize window');
+    setIsMaximize(!isMaximize);
+  }, [isMaximize]);
 
   const onCloseAppClick = useCallback(() => {
     ipcRenderer.send('close app');
@@ -31,6 +38,13 @@ export const Header: React.FunctionComponent = () => {
           onClick={onMinimizeAppClick}
         >
           <span className={styles['header__btn-text']}>Fold</span>
+        </Button>
+        <Button
+          tabIndex={-1}
+          className={classNames(styles.header__btn, styles[`header__btn--${isMaximize ? 'restore' : 'maximize'}`])}
+          onClick={onMaximizeAppClick}
+        >
+          <span className={styles['header__btn-text']}>{isMaximize ? 'Restore' : 'Maximize'}</span>
         </Button>
         <Button
           tabIndex={-1}

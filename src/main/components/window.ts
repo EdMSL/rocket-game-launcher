@@ -41,8 +41,16 @@ export const createWindow = (): void => {
     mainWindow.webContents.session.loadExtension(pathToExtension);
   }
 
-  ipcMain.on('minimize app', () => {
+  ipcMain.on('minimize window', () => {
     mainWindow.minimize();
+  });
+
+  ipcMain.on('maximize window', () => {
+    mainWindow.maximize();
+  });
+
+  ipcMain.on('restore window', () => {
+    mainWindow.restore();
   });
 
   mainWindow.once('ready-to-show', () => {
