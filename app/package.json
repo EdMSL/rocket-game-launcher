@@ -1,0 +1,30 @@
+{
+  "name": "rubicon",
+  "version": "0.1.0",
+  "description": "Launcher for TES4: Oblivion game and game builds with it",
+  "main": "./build/index.js",
+  "author": "Eduard Trayt <eduard2011rus@gmail.com> (https://github.com/EdMSL)",
+  "license": "MIT",
+  "build": {
+    "productName": "Rubicon",
+    "companyName": "OA Team",
+    "requested-execution-level": "requireAdministrator",
+    "appId": "Rubicon",
+    "files": [
+      "./build/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "build",
+      "app": "build",
+      "output": "release"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "EdMSL",
+        "repo": "rubicon"
+      }
+    ]
+  }
+}
