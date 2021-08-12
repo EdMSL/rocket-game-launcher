@@ -26,7 +26,6 @@ export const Message: React.FC<IProps> = ({ message }) => {
 
   return (
     <li
-      key={message.id}
       className={styles.message}
     >
       <div className={styles.message__header}>

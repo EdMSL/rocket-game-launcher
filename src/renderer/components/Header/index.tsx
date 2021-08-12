@@ -1,4 +1,6 @@
-import React, { useCallback, useState } from 'react';
+import React, {
+  useCallback, useEffect, useState,
+} from 'react';
 import { ipcRenderer } from 'electron';
 import classNames from 'classnames';
 
@@ -10,13 +12,20 @@ const launcherIcon = require('$images/icon.png');
 export const Header: React.FunctionComponent = () => {
   const [isMaximize, setIsMaximize] = useState(false);
 
+  useEffect(() => {
+    ipcRenderer.on('max-unmax window', (evt, isMax) => {
+      setIsMaximize(isMax);
+    });
+
+    return (): void => { ipcRenderer.removeAllListeners('max-unmax window'); };
+  }, []);
+
   const onMinimizeAppClick = useCallback(() => {
     ipcRenderer.send('minimize window');
   }, []);
 
   const onMaximizeAppClick = useCallback(() => {
-    ipcRenderer.send(isMaximize ? 'restore window' : 'maximize window');
-    setIsMaximize(!isMaximize);
+    ipcRenderer.send('max-unmax window', isMaximize);
   }, [isMaximize]);
 
   const onCloseAppClick = useCallback(() => {
@@ -41,10 +50,15 @@ export const Header: React.FunctionComponent = () => {
         </Button>
         <Button
           tabIndex={-1}
-          className={classNames(styles.header__btn, styles[`header__btn--${isMaximize ? 'restore' : 'maximize'}`])}
+          className={classNames(
+            styles.header__btn,
+            styles[`header__btn--${isMaximize ? 'unmaximize' : 'maximize'}`],
+          )}
           onClick={onMaximizeAppClick}
         >
-          <span className={styles['header__btn-text']}>{isMaximize ? 'Restore' : 'Maximize'}</span>
+          <span className={styles['header__btn-text']}>
+            {isMaximize ? 'Unmaximize' : 'Maximize'}
+          </span>
         </Button>
         <Button
           tabIndex={-1}

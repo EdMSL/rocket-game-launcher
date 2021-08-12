@@ -28,7 +28,12 @@ export const Messages: React.FC = () => {
               Close All
             </Button>
             <ul className={styles.messages__list}>
-              {messages.map((currentMessage) => <Message message={currentMessage} />)}
+              {messages.map((currentMessage) => (
+                <Message
+                  key={currentMessage.id}
+                  message={currentMessage}
+                />
+              ))}
             </ul>
           </React.Fragment>
         )

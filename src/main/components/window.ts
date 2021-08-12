@@ -45,16 +45,25 @@ export const createWindow = (): void => {
     mainWindow.minimize();
   });
 
-  ipcMain.on('maximize window', () => {
-    mainWindow.maximize();
-  });
-
-  ipcMain.on('restore window', () => {
-    mainWindow.restore();
+  ipcMain.on('max-unmax window', (evt, isMax) => {
+    if (isMax) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
   });
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
+    mainWindow.webContents.send('max-unmax window', mainWindow.isMaximized());
+  });
+
+  mainWindow.on('maximize', () => {
+    mainWindow.webContents.send('max-unmax window', true);
+  });
+
+  mainWindow.on('unmaximize', () => {
+    mainWindow.webContents.send('max-unmax window', false);
   });
 
   mainWindowState.manage(mainWindow);
