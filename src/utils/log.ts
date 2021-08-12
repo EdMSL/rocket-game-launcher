@@ -9,7 +9,11 @@ export const LOG_MESSAGE_TYPE = {
   ERROR: 'ERROR',
 };
 
-export const launcherLogPath = path.resolve('./launcher.log');
+export const launcherLogPath = path.resolve(
+  process.env.NODE_ENV === 'development'
+    ? './app/files/launcher.log'
+    : './launcher.log',
+);
 
 /**
   * Создать файл лога.

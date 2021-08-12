@@ -31,7 +31,7 @@ $icon-size: 24px;
 .header__controls {
   align-self: stretch;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   min-width: 90px;
 
   -webkit-app-region: no-drag;
@@ -39,6 +39,7 @@ $icon-size: 24px;
 
 .header__btn {
   flex-grow: 1;
+  max-width: 30px;
 
   background-repeat: no-repeat;
   background-size: 40% 40%;
