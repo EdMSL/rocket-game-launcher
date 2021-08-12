@@ -30,6 +30,8 @@ export const runApplication = (
           `Message: ${iconvDecode('cp866', error.message)} App: ${appName}, path ${pathToApp}.`,
           LOG_MESSAGE_TYPE.ERROR,
         );
+
+        cb(false, `Невозможно запустить приложение. Файл не найден. Путь: ${pathToApp}`);
       } else {
         writeToLogFile(`${appName} started.`);
       }
@@ -47,17 +49,6 @@ export const runApplication = (
   process.on('exit', () => {
     if (cb) {
       cb(true);
-    }
-  });
-
-  process.on('error', (code, signal) => {
-    writeToLogFile(
-      `${appName} process error with code ${code} and signal ${signal}.`,
-      LOG_MESSAGE_TYPE.ERROR,
-    );
-
-    if (cb) {
-      cb(false);
     }
   });
 };

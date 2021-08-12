@@ -15,8 +15,12 @@ import { IMessage } from '$reducers/main';
 export const MainScreen: React.FC = () => {
   const dispatch = useDispatch();
 
-  const changeGameState = useCallback((isRunning: boolean) => {
+  const changeGameState = useCallback((isRunning: boolean, errorMessage: string) => {
     dispatch(setIsGameRunning(isRunning));
+
+    if (errorMessage) {
+      dispatch(addMessages([getMessage(errorMessage)]));
+    }
   }, [dispatch]);
 
   const sendErrorMessage = useCallback((message: string) => {
