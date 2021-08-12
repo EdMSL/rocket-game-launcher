@@ -1,5 +1,5 @@
 import {
-  app, BrowserWindow, ipcMain,
+  app, ipcMain,
 } from 'electron';
 
 import { createStorage } from './components/storage';
@@ -16,9 +16,9 @@ const start = async (): Promise<void> => {
     module.hot.accept();
   }
 
-  createStorage();
+  const store = createStorage();
 
-  createWindow();
+  createWindow(store.getState().system);
 
   writeToLogFileSync('Application ready.');
 };
@@ -32,12 +32,6 @@ app.on('ready', () => {
     .catch((error: Error) => {
       showErrorBox(error.message, "Can't load application");
     });
-});
-
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
 });
 
 app.on('window-all-closed', () => {

@@ -3,13 +3,17 @@ import React, {
 } from 'react';
 import { ipcRenderer } from 'electron';
 import classNames from 'classnames';
+import { useSelector } from 'react-redux';
 
 import { Button } from '$components/UI/Button';
 import styles from './styles.module.scss';
+import { IAppState } from '$store/store';
 
 const launcherIcon = require('$images/icon.png');
 
 export const Header: React.FunctionComponent = () => {
+  const isResizable = useSelector((state: IAppState) => state.system.isResizable);
+
   const [isMaximize, setIsMaximize] = useState(false);
 
   useEffect(() => {
@@ -48,18 +52,22 @@ export const Header: React.FunctionComponent = () => {
         >
           <span className={styles['header__btn-text']}>Fold</span>
         </Button>
-        <Button
-          tabIndex={-1}
-          className={classNames(
-            styles.header__btn,
-            styles[`header__btn--${isMaximize ? 'unmaximize' : 'maximize'}`],
-          )}
-          onClick={onMaximizeAppClick}
-        >
-          <span className={styles['header__btn-text']}>
-            {isMaximize ? 'Unmaximize' : 'Maximize'}
-          </span>
-        </Button>
+        {
+          isResizable && (
+            <Button
+              tabIndex={-1}
+              className={classNames(
+                styles.header__btn,
+                styles[`header__btn--${isMaximize ? 'unmaximize' : 'maximize'}`],
+              )}
+              onClick={onMaximizeAppClick}
+            >
+              <span className={styles['header__btn-text']}>
+                {isMaximize ? 'Unmaximize' : 'Maximize'}
+              </span>
+            </Button>
+          )
+        }
         <Button
           tabIndex={-1}
           className={classNames(styles.header__btn, styles['header__btn--close'])}

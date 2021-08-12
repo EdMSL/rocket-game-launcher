@@ -1,6 +1,7 @@
 import Storage from 'electron-store';
+import { Store } from 'redux';
 
-import { configureStore } from '$store/store';
+import { configureStore, IAppState } from '$store/store';
 import { IUserSettingsRootState } from '$reducers/userSettings';
 import { defaultLauncherConfig, defaultLauncherResolution } from '$constants/defaultParameters';
 import {
@@ -62,7 +63,7 @@ const getConfigurationData = () => {
 /**
   * Функция для создания файла настроек пользователя и хранилища Redux.
 */
-export const createStorage = (): void => {
+export const createStorage = (): Store<IAppState> => {
   const configurationData = getConfigurationData();
 
   // Создаем хранилаще пользовательских настроек (настройки темы и т.п.).
@@ -82,6 +83,7 @@ export const createStorage = (): void => {
   const newStore = {
     ...storageSettings,
     system: {
+      ...defaultLauncherConfig,
       ...configurationData,
     },
   };
@@ -108,4 +110,6 @@ export const createStorage = (): void => {
   });
 
   writeToLogFileSync(`User settings configuration file in the path ${storage.path} has been successfully created or already exists.`); // eslint-disable-line max-len
+
+  return store;
 };

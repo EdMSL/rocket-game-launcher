@@ -5,11 +5,12 @@ import windowStateKeeper from 'electron-window-state';
 
 import { createWaitForWebpackDevServer } from './waitDevServer';
 import { defaultLauncherResolution } from '$constants/defaultParameters';
+import { ISystemRootState } from '$reducers/system';
 
 /**
  * Функция для создания и показа окна приложения
 */
-export const createWindow = (): void => {
+export const createWindow = (systemConfig: ISystemRootState): void => {
   const mainWindowState = windowStateKeeper({
     defaultWidth: defaultLauncherResolution.width,
     defaultHeight: defaultLauncherResolution.height,
@@ -18,8 +19,11 @@ export const createWindow = (): void => {
   const mainWindow = new BrowserWindow({
     x: mainWindowState.x,
     y: mainWindowState.y,
-    width: mainWindowState.width,
-    height: mainWindowState.height,
+    minWidth: systemConfig.isResizable ? systemConfig.minWidth : 0,
+    minHeight: systemConfig.isResizable ? systemConfig.minHeight : 0,
+    width: systemConfig.isResizable ? mainWindowState.width : systemConfig.width,
+    height: systemConfig.isResizable ? mainWindowState.height : systemConfig.height,
+    resizable: systemConfig.isResizable,
     frame: false,
     webPreferences: {
       nodeIntegration: true,
