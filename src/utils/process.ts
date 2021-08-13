@@ -1,8 +1,7 @@
-import {
-  exec, execFile,
-} from 'child_process';
+import { execFile } from 'child_process';
 import path from 'path';
 import fs from 'fs';
+import mime from 'mime';
 
 import { LOG_MESSAGE_TYPE, writeToLogFile } from '$utils/log';
 import { iconvDecode } from '$utils/files';
@@ -21,6 +20,40 @@ export const runApplication = (
   appName = path.basename(pathToApp),
   cb?,
 ): void => {
+  if (!path.extname(pathToApp)) {
+    writeToLogFile(
+      `Message: Can't run application. ${ErrorMessage.PATH_TO_DIRECTORY}. App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
+      LOG_MESSAGE_TYPE.ERROR,
+    );
+
+    cb(false, `Невозможно запустить приложение. Указан путь к папке, не файлу. Путь: ${pathToApp}`);
+
+    return;
+  }
+
+  if (fs.existsSync(pathToApp)) {
+    if (
+      path.extname(pathToApp) !== '.exe'
+      || !mime.getType(pathToApp)?.match(/application\/octet-stream/)
+    ) {
+      writeToLogFile(
+        `Message: Can't run application. ${ErrorMessage.MIME_TYPE}, received: ${mime.getType(pathToApp)}. App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
+        LOG_MESSAGE_TYPE.ERROR,
+      );
+      cb(false, `Невозможно запустить приложение. Файл не является исполняемым (.exe). Путь: ${pathToApp}`); //eslint-disable-line max-len
+
+      return;
+    }
+  } else {
+    writeToLogFile(
+      `Message: Can't run application. ${ErrorMessage.FILE_NOT_FOUND}. App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
+      LOG_MESSAGE_TYPE.ERROR,
+    );
+    cb(false, `Невозможно запустить приложение. Файл не найден. Путь: ${pathToApp}`);
+
+    return;
+  }
+
   const process = execFile(
     pathToApp,
     { encoding: 'binary', cwd: GAME_DIR },
@@ -31,7 +64,7 @@ export const runApplication = (
           LOG_MESSAGE_TYPE.ERROR,
         );
 
-        cb(false, `Невозможно запустить приложение. Файл не найден. Путь: ${pathToApp}`);
+        cb(false, `Невозможно запустить приложение. Неизвестная ошибка. Подробности в лог файле. Путь: ${pathToApp}`); //eslint-disable-line max-len
       } else {
         writeToLogFile(`${appName} started.`);
       }
