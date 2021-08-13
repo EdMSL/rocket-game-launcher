@@ -6,6 +6,7 @@ import { createStorage } from './components/storage';
 import { createWindow } from './components/window';
 import { createLogFile, writeToLogFileSync } from '$utils/log';
 import { showErrorBox } from '$utils/errors';
+import { getSystemInfo } from '$utils/data';
 
 require('@electron/remote/main').initialize();
 
@@ -15,6 +16,8 @@ const start = async (): Promise<void> => {
   if (module.hot) {
     module.hot.accept();
   }
+
+  getSystemInfo();
 
   const store = createStorage();
 

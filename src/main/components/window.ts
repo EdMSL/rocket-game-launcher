@@ -1,7 +1,7 @@
 import {
   BrowserWindow,
   ipcMain,
-  screen,
+  // screen,
 } from 'electron';
 import fs from 'fs';
 import path from 'path';
@@ -10,7 +10,6 @@ import windowStateKeeper from 'electron-window-state';
 import { createWaitForWebpackDevServer } from './waitDevServer';
 import { defaultLauncherResolution } from '$constants/defaultParameters';
 import { ISystemRootState } from '$reducers/system';
-import { writeToLogFile } from '$utils/log';
 import { getDisplaysInfo } from '$utils/data';
 
 /**
@@ -51,7 +50,7 @@ export const createWindow = (systemConfig: ISystemRootState): void => {
     mainWindow.webContents.session.loadExtension(pathToExtension);
   }
 
-  writeToLogFile(getDisplaysInfo(screen.getPrimaryDisplay(), screen.getAllDisplays()));
+  getDisplaysInfo();
 
   ipcMain.on('minimize window', () => {
     mainWindow.minimize();

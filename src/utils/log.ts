@@ -21,7 +21,7 @@ export const launcherLogPath = path.resolve(
 */
 export const createLogFile = (pathToLogFile = launcherLogPath): void => {
   try {
-    fs.writeFileSync(pathToLogFile, '------Log file------');
+    fs.writeFileSync(pathToLogFile, `Log file created at: ${new Date().toLocaleString()}`);
   } catch (error) {
     showErrorBox(error.message, "Can't create log file.");
   }
@@ -34,7 +34,7 @@ export const createLogFile = (pathToLogFile = launcherLogPath): void => {
 */
 export const writeToLogFileSync = (message: string, messageType = LOG_MESSAGE_TYPE.INFO): void => {
   try {
-    fs.appendFileSync(launcherLogPath, `\n${messageType}: ${message}`);
+    fs.appendFileSync(launcherLogPath, `\n[${messageType}]: ${message}`);
   } catch (error) {
     showErrorBox(error.message, "Can't write to log file.");
   }
@@ -46,7 +46,7 @@ export const writeToLogFileSync = (message: string, messageType = LOG_MESSAGE_TY
   * @param messageType Определяет тип сообщения, ошибка, предупреждение или информация.
 */
 export const writeToLogFile = (message: string, messageType = LOG_MESSAGE_TYPE.INFO): void => {
-  fs.appendFile(launcherLogPath, `\n${messageType}: ${message}`, (error) => {
+  fs.appendFile(launcherLogPath, `\n[${messageType}]: ${message}`, (error) => {
     if (error) {
       showErrorBox(error.message, "Can't write to log file.");
     }
