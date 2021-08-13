@@ -25,6 +25,7 @@ export const ErrorCode = {
   NOT_FOUND: 'ENOENT',
   PATH_TO_DIRECTORY: 'EISDIR',
   ARG_TYPE: 'ERR_INVALID_ARG_TYPE',
+  UNKNOWN: 'UNKNOWN',
 };
 
 /**

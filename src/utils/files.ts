@@ -101,7 +101,7 @@ export const writeJSONFile = (
     throw error;
   });
 
-export const iconvDecode = (encoding: string, str = '') => iconv.decode(
+export const iconvDecode = (encoding: string, str: string): string => iconv.decode(
   Buffer.from(str, 'binary'),
   encoding,
 );
