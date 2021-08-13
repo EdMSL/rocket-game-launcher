@@ -1,4 +1,8 @@
-import { BrowserWindow, ipcMain } from 'electron';
+import {
+  BrowserWindow,
+  ipcMain,
+  screen,
+} from 'electron';
 import fs from 'fs';
 import path from 'path';
 import windowStateKeeper from 'electron-window-state';
@@ -6,6 +10,8 @@ import windowStateKeeper from 'electron-window-state';
 import { createWaitForWebpackDevServer } from './waitDevServer';
 import { defaultLauncherResolution } from '$constants/defaultParameters';
 import { ISystemRootState } from '$reducers/system';
+import { writeToLogFile } from '$utils/log';
+import { getDisplaysInfo } from '$utils/data';
 
 /**
  * Функция для создания и показа окна приложения
@@ -44,6 +50,8 @@ export const createWindow = (systemConfig: ISystemRootState): void => {
   if (process.env.NODE_ENV === 'development' && fs.existsSync(pathToExtension)) {
     mainWindow.webContents.session.loadExtension(pathToExtension);
   }
+
+  writeToLogFile(getDisplaysInfo(screen.getPrimaryDisplay(), screen.getAllDisplays()));
 
   ipcMain.on('minimize window', () => {
     mainWindow.minimize();
