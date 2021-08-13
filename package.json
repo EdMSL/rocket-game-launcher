@@ -7,6 +7,7 @@
     "type": "git",
     "url": "git+https://github.com/EdMSL/rubicon.git"
   },
+  "private": true,
   "author": "Eduard Trayt <eduard2011rus@gmail.com> (https://github.com/EdMSL)",
   "license": "MIT",
   "scripts": {
@@ -17,8 +18,8 @@
     "build": "rm -rf ./app/build/* && npm run build:main && npm run build:renderer",
     "build:main": "cross-env NODE_ENV=production webpack --env main --config=./config/webpack.build.config.js --progress",
     "build:renderer": "cross-env NODE_ENV=production webpack --config=./config/webpack.build.config.js --progress",
-    "pack": "cross-env electron-packager ./app 'Rubicon' --out='./app/release' --platform='win32' --arch='ia32' --overwrite --prune --asar --ignore='/src' --icon=src/public/icon.ico",
-    "pack:test": "cross-env electron-packager ./app 'Rubicon' --out='./app/release' --platform='win32' --arch='ia32' --overwrite --prune --ignore='/src' --icon=src/public/icon.ico",
+    "pack": "cross-env electron-packager ./app 'Rubicon' --out='./app/release' --platform='win32' --arch='ia32' --overwrite --prune --asar --ignore='/files' --icon=src/public/icon.ico",
+    "pack:test": "cross-env electron-packager ./app 'Rubicon' --out='./app/release' --platform='win32' --arch='ia32' --overwrite --prune --ignore='/files' --icon=src/public/icon.ico",
     "release": "npm run build && npm run pack",
     "release:test": "npm run build && npm run pack:test",
     "stylelint": "stylelint src/**/*.scss --config ./.stylelintrc-full.js --syntax scss --fix",

@@ -8,7 +8,9 @@
   "build": {
     "productName": "Rubicon",
     "companyName": "OA Team",
-    "requested-execution-level": "requireAdministrator",
+    "win": {
+      "requestedExecutionLevel": "requireAdministrator"
+    },
     "appId": "Rubicon",
     "files": [
       "./build/*",
