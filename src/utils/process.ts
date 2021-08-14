@@ -54,9 +54,12 @@ export const runApplication = (
   }
 
   try {
+    writeToLogFile(`Try to start ${appName}.`);
+
     const process = execFile(
       pathToApp,
       {
+        encoding: 'binary',
         cwd: GAME_DIR,
       },
       (error): void => {
@@ -66,9 +69,7 @@ export const runApplication = (
             LOG_MESSAGE_TYPE.ERROR,
           );
 
-          cb(false, `Не удалось запустить приложение. Путь: ${pathToApp}`); //eslint-disable-line max-len
-        } else {
-          writeToLogFile(`${appName} started.`);
+          cb(false, `Не удалось запустить приложение. Подробности в лог файле. Путь: ${pathToApp}`); //eslint-disable-line max-len
         }
       },
     );
