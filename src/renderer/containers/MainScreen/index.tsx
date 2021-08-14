@@ -34,7 +34,7 @@ export const MainScreen: React.FC = () => {
 
   const onPlayGameBtnClick = useCallback(() => {
     dispatch(setIsGameRunning(true));
-    runApplication('D:\\Oblivion\\Oblivion.exe', 'Oblivion', changeGameState);
+    runApplication('D:/Oblivion/Mod Organizer/ModOrganizer.exe', ['D:/Oblivion/obse_loader.exe'], 'Oblivion', changeGameState);
   }, [dispatch, changeGameState]);
 
   const onGameFolderBtnClick = useCallback(() => {
