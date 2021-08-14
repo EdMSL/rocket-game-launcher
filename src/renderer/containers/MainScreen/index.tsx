@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
 
 import styles from './styles.module.scss';
@@ -11,8 +11,11 @@ import { getMessage } from '$utils/data';
 import { Button } from '$components/UI/Button';
 import { setIsGameRunning, addMessages } from '$actions/main';
 import { IMessage } from '$reducers/main';
+import { IAppState } from '$store/store';
 
 export const MainScreen: React.FC = () => {
+  const isGameRunning = useSelector((state: IAppState) => state.main.isGameRunning);
+
   const dispatch = useDispatch();
 
   const changeGameState = useCallback((isRunning: boolean, errorMessage: string) => {
@@ -30,8 +33,9 @@ export const MainScreen: React.FC = () => {
   }, [dispatch]);
 
   const onPlayGameBtnClick = useCallback(() => {
+    dispatch(setIsGameRunning(true));
     runApplication('D:\\Oblivion\\Oblivion.exe', 'Oblivion', changeGameState);
-  }, [changeGameState]);
+  }, [dispatch, changeGameState]);
 
   const onGameFolderBtnClick = useCallback(() => {
     openFolder(GAME_DIR, sendErrorMessage);
@@ -42,6 +46,7 @@ export const MainScreen: React.FC = () => {
       <div className={classNames('control-panel', styles['main-screen__control-panel'])}>
         <Button
           className="control-panel__btn"
+          isDisabled={isGameRunning}
           onClick={onPlayGameBtnClick}
         >
           Play

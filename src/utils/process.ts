@@ -80,13 +80,6 @@ export const runApplication = (
         cb(false);
       }
     });
-
-    process.on('exit', () => {
-      writeToLogFile(`${appName} exited.`);
-      if (cb) {
-        cb(true);
-      }
-    });
   } catch (error) {
     if (error.code === ErrorCode.UNKNOWN) {
       writeToLogFile(
