@@ -22,4 +22,10 @@ export const defaultLauncherConfig: ISystemRootState = {
   width: defaultLauncherResolution.width,
   height: defaultLauncherResolution.height,
   isFirstLaunch: true,
+  modOrganizer: {
+    isUsed: true,
+    pathToINI: './Mod Organizer/ModOrganizer.ini',
+    profilesParam: 'selected_profile',
+    paramValueRegExp: '',
+  },
 };

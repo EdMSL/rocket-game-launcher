@@ -3,6 +3,12 @@ import { createReducer } from 'reduxsauce';
 import { SYSTEM_HANDLERS } from '$handlers/system'; //eslint-disable-line import/no-cycle
 import { defaultLauncherConfig } from '$constants/defaultParameters'; //eslint-disable-line import/no-cycle, max-len
 
+  interface IModOrganizerParams {
+    isUsed: boolean,
+    pathToINI: string,
+    profilesParam: string,
+    paramValueRegExp: string,
+  }
 export type ISystemRootState = Readonly<{
   isResizable: boolean,
   minWidth: number,
@@ -10,15 +16,17 @@ export type ISystemRootState = Readonly<{
   width: number,
   height: number,
   isFirstLaunch: boolean,
+  modOrganizer: IModOrganizerParams,
 }>;
 
 const INITIAL_STATE: ISystemRootState = {
-  isResizable: true,
+  isResizable: defaultLauncherConfig.isResizable,
   minWidth: defaultLauncherConfig.minWidth,
   minHeight: defaultLauncherConfig.minHeight,
   width: defaultLauncherConfig.width,
   height: defaultLauncherConfig.height,
-  isFirstLaunch: true,
+  isFirstLaunch: defaultLauncherConfig.isFirstLaunch,
+  modOrganizer: defaultLauncherConfig.modOrganizer,
 };
 
 export const systemReducer = createReducer<ISystemRootState>(INITIAL_STATE, SYSTEM_HANDLERS);
