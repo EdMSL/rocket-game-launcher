@@ -177,7 +177,7 @@ export const writeINIFile = (
     throw error;
   });
 
-export const iconvDecode = (encoding: string, str: string): string => iconv.decode(
+export const iconvDecode = (str: string, encoding = Encoding.CP866): string => iconv.decode(
   Buffer.from(str, 'binary'),
   encoding,
 );

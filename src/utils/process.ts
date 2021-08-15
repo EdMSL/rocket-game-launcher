@@ -19,18 +19,18 @@ export const runApplication = (
   appName = path.basename(pathToApp),
   cb?,
 ): void => {
-  if (!path.extname(pathToApp)) {
-    writeToLogFile(
-      `Message: Can't run application. ${ErrorMessage.PATH_TO_DIRECTORY}. App: ${appName}, path: ${pathToApp}.`, //eslint-disable-line max-len
-      LOG_MESSAGE_TYPE.ERROR,
-    );
-
-    cb(false, `Не удалось запустить приложение. Указан путь к папке, не файлу. Путь: ${pathToApp}`);
-
-    return;
-  }
-
   if (fs.existsSync(pathToApp)) {
+    if (fs.statSync(pathToApp).isDirectory()) {
+      writeToLogFile(
+        `Message: Can't run application. ${ErrorMessage.PATH_TO_DIRECTORY}. App: ${appName}, path: ${pathToApp}.`, //eslint-disable-line max-len
+        LOG_MESSAGE_TYPE.ERROR,
+      );
+
+      cb(false, `Не удалось запустить приложение. Указан путь к папке, не файлу. Путь: ${pathToApp}`); //eslint-disable-line max-len
+
+      return;
+    }
+
     if (
       path.extname(pathToApp) !== '.exe'
       || !mime.getType(pathToApp)?.match(/application\/octet-stream/)
@@ -65,7 +65,7 @@ export const runApplication = (
       (error): void => {
         if (error) {
           writeToLogFile(
-            `Message: Can't run application. ${iconvDecode('cp866', error.message)} App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
+            `Message: Can't run application. ${iconvDecode(error.message)} App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
             LOG_MESSAGE_TYPE.ERROR,
           );
 
@@ -115,18 +115,18 @@ export const runApplication = (
 export const openFolder = (pathToFolder: string, cb?): void => {
   let message: string;
 
-  if (path.extname(pathToFolder)) {
-    message = `Message: Can't open folder. ${ErrorMessage.PATH_TO_DIRECTORY}. Path ${pathToFolder}.`; //eslint-disable-line max-len
-    writeToLogFile(
-      message,
-      LOG_MESSAGE_TYPE.ERROR,
-    );
-    cb(`Не удалось открыть папку. Указан путь к файлу, не папке. Путь: ${pathToFolder}`);
+  if (fs.existsSync(pathToFolder)) {
+    if (!fs.statSync(pathToFolder).isDirectory()) {
+      message = `Message: Can't open folder. ${ErrorMessage.PATH_TO_FILE}. Path ${pathToFolder}.`; //eslint-disable-line max-len
+      writeToLogFile(
+        message,
+        LOG_MESSAGE_TYPE.ERROR,
+      );
+      cb(`Не удалось открыть папку. Указан путь к файлу, не папке. Путь: ${pathToFolder}`);
 
-    return;
-  }
-
-  if (!fs.existsSync(pathToFolder)) {
+      return;
+    }
+  } else {
     message = `Message: Can't open folder. ${ErrorMessage.DIRECTORY_NOT_FOUND}. Path ${pathToFolder}.`; //eslint-disable-line max-len
     writeToLogFile(
       message,
@@ -137,5 +137,14 @@ export const openFolder = (pathToFolder: string, cb?): void => {
     return;
   }
 
-  execFile('explorer.exe', [pathToFolder]);
+  try {
+    execFile('explorer.exe', [pathToFolder]);
+  } catch (error) {
+    writeToLogFile(
+      `Message: Can't open folder. Unknown error. ${error.message} Path ${pathToFolder}.`, //eslint-disable-line max-len
+      LOG_MESSAGE_TYPE.ERROR,
+    );
+
+    cb(false, `Не удалось открыть папку. Неизвестная ошибка. Подробности в лог файле. Путь: ${pathToFolder}`); //eslint-disable-line max-len
+  }
 };
