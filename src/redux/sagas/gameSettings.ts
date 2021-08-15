@@ -10,11 +10,14 @@ import { IAppState } from '$store/store'; //eslint-disable-line import/no-cycle
 import { Routes } from '$constants/routes';
 import { readINIFile, writeINIFile } from '$utils/files';
 import { IUnwrap } from '$constants/interfaces';
+import { setIsGameSettingsLoaded } from '$actions/main';
 
 const getState = (state: IAppState): IAppState => state;
 
 export function* initSettingsSaga(): SagaIterator {
   try {
+    yield call(setIsGameSettingsLoaded, false);
+
     const file: IUnwrap<typeof readINIFile> = yield call(
       readINIFile,
       path.resolve('./src/tests/fixtures/Blockhead.ini'),
@@ -25,6 +28,8 @@ export function* initSettingsSaga(): SagaIterator {
     yield call(writeINIFile, path.resolve('./src/tests/fixtures/Blockhead.ini'), file);
   } catch (error) {
     console.log(error.message);
+  } finally {
+    yield call(setIsGameSettingsLoaded, true);
   }
 }
 

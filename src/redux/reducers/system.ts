@@ -3,12 +3,13 @@ import { createReducer } from 'reduxsauce';
 import { SYSTEM_HANDLERS } from '$handlers/system'; //eslint-disable-line import/no-cycle
 import { defaultLauncherConfig } from '$constants/defaultParameters'; //eslint-disable-line import/no-cycle, max-len
 
-  interface IModOrganizerParams {
-    isUsed: boolean,
-    pathToINI: string,
-    profilesParam: string,
-    paramValueRegExp: string,
-  }
+interface IModOrganizerParams {
+  isUsed: boolean,
+  pathToINI: string,
+  profilesParam: string,
+  paramValueRegExp: string,
+}
+
 export type ISystemRootState = Readonly<{
   isResizable: boolean,
   minWidth: number,
