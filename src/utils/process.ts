@@ -57,24 +57,24 @@ export const runApplication = (
   try {
     writeToLogFile(`Try to start ${appName}.`);
 
-    const process = spawn(
-    // const process = execFile(
+    // const process = spawn(
+    const process = execFile(
       pathToApp,
       args,
       {
-        // encoding: 'binary',
+        encoding: 'binary',
         cwd: GAME_DIR,
       },
-      // (error): void => {
-      //   if (error) {
-      //     writeToLogFile(
-      //       `Message: Can't run application. ${iconvDecode('cp866', error.message)} App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
-      //       LOG_MESSAGE_TYPE.ERROR,
-      //     );
+      (error): void => {
+        if (error) {
+          writeToLogFile(
+            `Message: Can't run application. ${iconvDecode('cp866', error.message)} App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
+            LOG_MESSAGE_TYPE.ERROR,
+          );
 
-      //     cb(false, `Не удалось запустить приложение. Подробности в лог файле. Путь: ${pathToApp}`); //eslint-disable-line max-len
-      //   }
-      // },
+          cb(false, `Не удалось запустить приложение. Подробности в лог файле. Путь: ${pathToApp}`); //eslint-disable-line max-len
+        }
+      },
     );
 
     process.on('close', () => {
