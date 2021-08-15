@@ -13,11 +13,12 @@
 
 .messages__btn {
   margin-bottom: 8px;
-  padding: 6px 0px;
+  padding: 6px 0;
+
+  color: $text-main;
 
   font-size: 12px;
   line-height: 1;
-  color: $text-main;
 
   background-color: $text-secondary;
 
@@ -32,6 +33,5 @@
 
 .messages__list {
   @include reset-list;
-
   overflow-y: auto;
 }

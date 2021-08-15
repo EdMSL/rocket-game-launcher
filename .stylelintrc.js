@@ -73,6 +73,5 @@ module.exports = {
     "scss/at-function-pattern": /.+-func/,
     "scss/no-duplicate-dollar-variables": true,
     "scss/media-feature-value-dollar-variable": "always",
-    "scss/operator-no-unspaced": true,
   },
 }
