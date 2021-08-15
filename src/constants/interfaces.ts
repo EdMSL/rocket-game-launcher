@@ -17,3 +17,5 @@ export interface IAction<T> {
 export interface IActionHandler<S, T> {
   (state: S, payload: UnsafeReturnType<T>): S,
 }
+
+export type IUnwrap<T> = T extends (...args: any[]) => Promise<infer U> ? U : T;
