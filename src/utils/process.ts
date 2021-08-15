@@ -89,6 +89,13 @@ export const runApplication = (
       );
 
       cb(false, `Не удалось запустить приложение. Неизвестный тип файла. Путь: ${pathToApp}`); //eslint-disable-line max-len
+    } else if (error.code === ErrorCode.ACCESS) {
+      writeToLogFile(
+        `Message: Can't run application. ${ErrorMessage.ACCESS} App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
+        LOG_MESSAGE_TYPE.ERROR,
+      );
+
+      cb(false, `Не удалось запустить приложение. Нет доступа. Путь: ${pathToApp}`); //eslint-disable-line max-len
     } else {
       writeToLogFile(
         `Message: Can't run application. Unknown error. ${error.message} App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
