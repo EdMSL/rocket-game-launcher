@@ -42,6 +42,9 @@
       "$types/*": [
         "src/redux/types/*"
       ],
+      "$sagas/*": [
+        "src/redux/sagas/*"
+      ],
       "$images/*": [
         "src/images/*"
       ],

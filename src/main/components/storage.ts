@@ -15,6 +15,7 @@ import { ISystemRootState } from '$reducers/system';
 import {
   ErrorName, ReadWriteError, showMessageBox,
 } from '$utils/errors';
+import { Scope } from '$constants/misc';
 
 interface IStorage {
   settings: {
@@ -91,10 +92,10 @@ export const createStorage = (): Store<IAppState> => {
   /* eslint-disable @typescript-eslint/dot-notation */
   global['state'] = newStore;
 
-  const store = configureStore(global['state'], 'main');
+  const appStore = configureStore(global['state'], Scope.MAIN).store;
 
-  store.subscribe(() => {
-    const currentState = store.getState();
+  appStore.subscribe(() => {
+    const currentState = appStore.getState();
     const newStorageData = Object.keys(currentState).reduce((currentParams, param) => {
       if (saveToStorageParams.includes(param)) {
         return {
@@ -111,5 +112,5 @@ export const createStorage = (): Store<IAppState> => {
 
   writeToLogFileSync(`User settings configuration file in the path ${storage.path} has been successfully created or already exists.`); // eslint-disable-line max-len
 
-  return store;
+  return appStore;
 };

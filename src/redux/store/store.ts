@@ -1,6 +1,7 @@
 import {
   createStore, applyMiddleware, compose, Store, Middleware,
 } from 'redux';
+import { createBrowserHistory, History } from 'history';
 import { routerMiddleware } from 'connected-react-router';
 import {
   forwardToMain,
@@ -11,32 +12,35 @@ import {
 } from 'electron-redux';
 import createSagaMiddleware from 'redux-saga';
 
-import { getRootReducer, history } from '$reducers/root';
+import { getRootReducer } from '$reducers/root';
+import gameSetingsSaga from '$sagas/gameSettings'; //eslint-disable-line import/no-cycle
+import { Scope } from '$constants/misc';
 
 ///FIXME Выглядит не особо изящно, попробовать переделать
 export type IAppState = ReturnType<ReturnType<typeof getRootReducer>>;
 
 export const configureStore = (
   initialState,
-  scope = 'main',
-): Store<IAppState> => {
-  const router = routerMiddleware(history);
+  scope: string,
+): { store: Store<IAppState>, history: any, } => {
   const sagaMiddleware = createSagaMiddleware();
+  let history: History<unknown>|undefined;
 
-  let middleware: Middleware[] = [sagaMiddleware];
+  let middleware: Middleware[] = [];
 
-  if (scope === 'renderer') {
+  if (scope === Scope.RENDERER) {
+    history = createBrowserHistory();
+
+    const router = routerMiddleware(history);
+
     middleware = [
       forwardToMain,
       router,
-      ...middleware,
+      sagaMiddleware,
     ];
-  }
-
-  if (scope === 'main') {
+  } else if (scope === Scope.MAIN) {
     middleware = [
       triggerAlias,
-      ...middleware,
       forwardToRenderer,
     ];
   }
@@ -45,24 +49,24 @@ export const configureStore = (
     applyMiddleware(...middleware),
   ];
 
-  const composeEnhancers = typeof window === 'object'
   /* eslint-disable @typescript-eslint/no-explicit-any */
+  const composeEnhancers = typeof window === 'object'
     && (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     ? (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
     : compose;
   /* eslint-enable @typescript-eslint/no-explicit-any */
 
-  const rootReducer = getRootReducer(scope);
+  const rootReducer = getRootReducer(scope, history);
 
   const store = createStore(rootReducer, initialState, composeEnhancers(...enhanced));
 
-  // sagaMiddleware.run(mainSaga);
-
-  if (scope === 'main') {
+  if (scope === Scope.MAIN) {
     replayActionMain(store);
   } else {
+    sagaMiddleware.run(gameSetingsSaga);
+
     replayActionRenderer(store);
   }
 
-  return store;
+  return { store, history };
 };

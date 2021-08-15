@@ -1,25 +1,21 @@
 import { combineReducers } from 'redux';
-import { createMemoryHistory } from 'history';
 import { connectRouter } from 'connected-react-router';
 
 import { gameSettingsReducer } from './gameSettings';
 import { userSettingsReducer } from './userSettings';
 import { systemReducer } from './system';
 import { mainReducer } from './main';
+import { Scope } from '$constants/misc';
 
 interface IReducers {
   gameSettings: typeof gameSettingsReducer,
   userSettings: typeof userSettingsReducer,
   system: typeof systemReducer,
   main: typeof mainReducer,
-  router?: typeof routerReducer,
+  router?: ReturnType<typeof connectRouter>,
 }
 
-export const history = createMemoryHistory();
-
-const routerReducer = connectRouter(history);
-
-export const getRootReducer = (scope = 'main') => {
+export const getRootReducer = (scope: string, history) => {
   let reducers: IReducers = {
     gameSettings: gameSettingsReducer,
     userSettings: userSettingsReducer,
@@ -27,10 +23,10 @@ export const getRootReducer = (scope = 'main') => {
     system: systemReducer,
   };
 
-  if (scope === 'renderer') {
+  if (scope === Scope.RENDERER) {
     reducers = {
       ...reducers,
-      router: routerReducer,
+      router: connectRouter(history),
     };
   }
 

@@ -7,7 +7,7 @@ import { ConnectedRouter } from 'connected-react-router';
 import './styles/main.scss';
 import { App } from '$containers/App';
 import { configureStore } from '$store/store';
-import { history } from '$reducers/root';
+import { Scope } from '$constants/misc';
 
 const remote = require('@electron/remote');
 
@@ -16,7 +16,7 @@ if (module.hot) {
 }
 
 const initialState = remote.getGlobal('state');
-const store = configureStore(initialState, 'renderer');
+const { store, history } = configureStore(initialState, Scope.RENDERER);
 
 render(
   <Provider store={store}>
