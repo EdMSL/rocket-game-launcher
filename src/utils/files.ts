@@ -103,6 +103,27 @@ export const readJSONFileSync = <T>(pathToFile: string): T => {
 };
 
 /**
+ * Асинхронно получить данные из JSON файла.
+ * @param pathToFile Путь к файлу.
+ * @returns Объект с данными из файла.
+*/
+export const readJSONFile = async <T>(pathToFile: string): Promise<T> => {
+  try {
+    const JSONstring = await readFileData(pathToFile)
+      .then((dataBuffer) => dataBuffer.toString());
+
+    return parseJSON<T>(JSONstring);
+  } catch (error) {
+    writeToLogFileSync(
+      `Message: ${error.message}. Path: ${pathToFile}.`,
+      LOG_MESSAGE_TYPE.ERROR,
+    );
+
+    throw error;
+  }
+};
+
+/**
  * Асинхронно получить данные из INI файла.
  * @param pathToFile Путь к файлу.
  * @returns Объект с данными из файла.

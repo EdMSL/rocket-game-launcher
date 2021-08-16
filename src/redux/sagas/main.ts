@@ -1,39 +1,21 @@
 import { SagaIterator } from 'redux-saga';
 import {
   call,
-  put,
   takeLatest,
+  select,
 } from 'redux-saga/effects';
 import path from 'path';
 import { LOCATION_CHANGE, LocationChangeAction } from 'connected-react-router';
 
 import { IAppState } from '$store/store'; //eslint-disable-line import/no-cycle
 import { Routes } from '$constants/routes';
-import {
-  readINIFile, readJSONFile, writeINIFile,
-} from '$utils/files';
+import { readINIFile, writeINIFile } from '$utils/files';
 import { IUnwrap } from '$types/common';
-import { addMessages, setIsGameSettingsLoaded } from '$actions/main';
-import { GAME_SETTINGS_PATH } from '$constants/paths';
-import { checkGameSettingsFileData } from '$utils/check';
+import { setIsGameSettingsLoaded } from '$actions/main';
 
 const getState = (state: IAppState): IAppState => state;
 
-export function* getGameSettingsFileData(): SagaIterator {
-  try {
-    const gameSettingsObj: IUnwrap<typeof readJSONFile> = yield call(readJSONFile, GAME_SETTINGS_PATH);
-    const checkingMessages = checkGameSettingsFileData(gameSettingsObj);
-
-    if (checkingMessages.length > 0) {
-      yield put(addMessages(checkingMessages));
-    }
-  } catch (error) {
-    console.log(error.message);
-    throw error;
-  }
-}
-
-export function* initSettingsSaga(): SagaIterator {
+export function* initLauncherSaga(): SagaIterator {
   try {
     yield call(setIsGameSettingsLoaded, false);
 
@@ -53,8 +35,12 @@ export function* initSettingsSaga(): SagaIterator {
 }
 
 function* locationChangeSaga({ payload: { location } }: LocationChangeAction): SagaIterator {
-  if (location.hash === `#${Routes.GAME_SETTINGS_SCREEN}`) {
-    yield call(initSettingsSaga);
+  const {
+    main: { isLauncherInitialised },
+  }: IAppState = yield select(getState);
+
+  if (!isLauncherInitialised && location.hash === `#${Routes.MAIN_SCREEN}`) {
+    yield call(initLauncherSaga);
   }
 }
 

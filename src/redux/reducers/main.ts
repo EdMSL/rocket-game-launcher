@@ -9,12 +9,14 @@ export interface IMessage {
 }
 
 export type IMainRootState = Readonly<{
+  isLauncherInitialised: boolean,
   isGameRunning: boolean,
   isGameSettingsLoaded: boolean,
   messages: IMessage[],
 }>;
 
 const INITIAL_STATE: IMainRootState = {
+  isLauncherInitialised: false,
   isGameRunning: false,
   isGameSettingsLoaded: false,
   messages: [],
