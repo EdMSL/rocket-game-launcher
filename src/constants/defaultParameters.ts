@@ -1,7 +1,7 @@
 import {
   IError,
   ISuccess,
-} from '$constants/interfaces';
+} from '$types/common';
 import { ISystemRootState } from '$reducers/system'; //eslint-disable-line import/no-cycle
 
 export const SUCCESS_STATUS: ISuccess = 'success';

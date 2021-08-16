@@ -9,7 +9,7 @@ import { LOCATION_CHANGE, LocationChangeAction } from 'connected-react-router';
 import { IAppState } from '$store/store'; //eslint-disable-line import/no-cycle
 import { Routes } from '$constants/routes';
 import { readINIFile, writeINIFile } from '$utils/files';
-import { IUnwrap } from '$constants/interfaces';
+import { IUnwrap } from '$types/common';
 import { setIsGameSettingsLoaded } from '$actions/main';
 
 const getState = (state: IAppState): IAppState => state;

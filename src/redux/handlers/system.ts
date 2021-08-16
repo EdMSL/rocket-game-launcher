@@ -1,4 +1,4 @@
-import { IActionHandler } from '$constants/interfaces';
+import { IActionHandler } from '$types/common';
 import { SYSTEM_TYPES } from '$types/system';
 import { ISystemRootState } from '$reducers/system'; //eslint-disable-line import/no-cycle, max-len
 import * as SYSTEM_ACTIONS from '$actions/system'; //eslint-disable-line import/no-cycle, max-len

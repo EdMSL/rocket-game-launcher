@@ -1,4 +1,4 @@
-import { IActionHandler } from '$constants/interfaces';
+import { IActionHandler } from '$types/common';
 import { USER_SETTINGS_TYPES } from '$types/userSettings';
 import { IUserSettingsRootState } from '$reducers/userSettings'; //eslint-disable-line import/no-cycle, max-len
 import * as USER_SETTINGS_ACTIONS from '$actions/userSettings'; //eslint-disable-line import/no-cycle, max-len

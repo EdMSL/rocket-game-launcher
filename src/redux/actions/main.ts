@@ -1,4 +1,4 @@
-import { IAction } from '$constants/interfaces';
+import { IAction } from '$types/common';
 import { MAIN_TYPES } from '$types/main';
 import { IMainRootState } from '$reducers/main'; //eslint-disable-line import/no-cycle, max-len
 

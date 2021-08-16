@@ -1,4 +1,4 @@
-import { IActionHandler } from '$constants/interfaces';
+import { IActionHandler } from '$types/common';
 import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
 import { IGameSettingsRootState } from '$reducers/gameSettings'; //eslint-disable-line import/no-cycle, max-len
 import * as GAME_SETTINGS_ACTIONS from '$actions/gameSettings'; //eslint-disable-line import/no-cycle, max-len
