@@ -14,6 +14,14 @@ export const createMockFiles = (): void => {
         content: 'Read only!',
         mode: 0o444,
       }),
+      'writeOnly.ini': mock.file({
+        content: '[Section]\r\nparam=data',
+        mode: 0o222,
+      }),
+      'readOnly.ini': mock.file({
+        content: '[Section]\r\nparam=data',
+        mode: 0o444,
+      }),
     },
   });
 };
@@ -27,6 +35,11 @@ export const createMockFilesForWrite = (): void => {
         content: 'some content',
         mode: 0o444,
       }),
+      'readOnly.ini': mock.file({
+        content: '[Section]\r\nparam=data',
+        mode: 0o444,
+      }),
+      'test.ini': '',
     },
     'readOnlyDir': mock.directory({
       mode: 0o444,

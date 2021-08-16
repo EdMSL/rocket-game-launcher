@@ -21,6 +21,7 @@ interface IIniLine {
   text: string,
   comment: string,
   lineType: number,
+  key?: string,
   value?: string,
 }
 
@@ -34,7 +35,7 @@ export interface IIni {
     lines: IIniLine[],
   },
   lineBreak: string,
-  setions: IIniSection[],
+  sections: IIniSection[],
   stringify: () => string,
   getSection: (name: string) => IIniSection,
   addSection: (name: string) => IIniSection,
@@ -160,14 +161,14 @@ export const writeJSONFile = (
 /**
  * Асинхронно записать INI файл.
  * @param pathToFile Путь к файлу.
- * @param data Данные для записи в файл, строка или буфер.
+ * @param iniDataObj Данные для записи в файл.
  * @param encoding Кодировка записываемого файла.
 */
 export const writeINIFile = (
   pathToFile: string,
-  data: IIni,
+  iniDataObj: IIni,
   encoding = Encoding.WIN1251,
-): Promise<void> => writeFileData(pathToFile, iconv.encode(data.stringify(), encoding))
+): Promise<void> => writeFileData(pathToFile, iconv.encode(iniDataObj.stringify(), encoding))
   .catch((error) => {
     writeToLogFile(
       `Message: ${error.message}. Path: ${pathToFile}`,
