@@ -1,6 +1,7 @@
 import { SagaIterator } from 'redux-saga';
 import {
   call,
+  put,
   takeLatest,
   select,
 } from 'redux-saga/effects';
@@ -11,11 +12,22 @@ import { IAppState } from '$store/store'; //eslint-disable-line import/no-cycle
 import { Routes } from '$constants/routes';
 import { readINIFile, writeINIFile } from '$utils/files';
 import { IUnwrap } from '$types/common';
-import { setIsGameSettingsLoaded } from '$actions/main';
+import { setIsGameSettingsLoaded, setIsLauncherInitialised } from '$actions/main';
+import { setGameSettings } from './gameSettings';
 
 const getState = (state: IAppState): IAppState => state;
 
 export function* initLauncherSaga(): SagaIterator {
+  yield put(setIsLauncherInitialised(false));
+
+  try {
+    yield call(setGameSettings);
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
+export function* initGameSettingsSaga(): SagaIterator {
   try {
     yield call(setIsGameSettingsLoaded, false);
 

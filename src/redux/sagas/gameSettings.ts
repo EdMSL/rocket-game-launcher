@@ -15,18 +15,21 @@ import {
 import { IUnwrap } from '$types/common';
 import { addMessages, setIsGameSettingsLoaded } from '$actions/main';
 import { GAME_SETTINGS_PATH } from '$constants/paths';
-import { checkGameSettingsFileData } from '$utils/check';
+import { checkGameSettingsFileBaseFields } from '$utils/check';
+import { IGameSettingsConfig } from '$reducers/gameSettings';
 
 const getState = (state: IAppState): IAppState => state;
 
-export function* getGameSettingsFileData(): SagaIterator {
+export function* setGameSettings(): SagaIterator {
   try {
-    const gameSettingsObj: IUnwrap<typeof readJSONFile> = yield call(readJSONFile, GAME_SETTINGS_PATH);
-    const checkingMessages = checkGameSettingsFileData(gameSettingsObj);
+    const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_PATH);
+    const checkingMessages = checkGameSettingsFileBaseFields(gameSettingsObj);
 
     if (checkingMessages.length > 0) {
       yield put(addMessages(checkingMessages));
     }
+
+    // return gameSettingsObj;
   } catch (error) {
     console.log(error.message);
     throw error;

@@ -9,6 +9,13 @@ export const setIsGameRunning: IAction<IMainRootState['isGameRunning']> = (
   payload: isGameRunning,
 });
 
+export const setIsLauncherInitialised: IAction<IMainRootState['isLauncherInitialised']> = (
+  isLauncherInitialised,
+) => ({
+  type: MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED,
+  payload: isLauncherInitialised,
+});
+
 export const setIsGameSettingsLoaded: IAction<IMainRootState['isGameSettingsLoaded']> = (
   isGameSettingsLoaded,
 ) => ({

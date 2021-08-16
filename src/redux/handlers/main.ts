@@ -14,6 +14,17 @@ const setIsGameRunning: IActionHandler<
   isGameRunning,
 });
 
+const setIsLauncherInitialised: IActionHandler<
+  IMainRootState,
+  typeof MAIN_ACTIONS.setIsLauncherInitialised
+> = (
+  state,
+  { payload: isLauncherInitialised },
+) => ({
+  ...state,
+  isLauncherInitialised,
+});
+
 const setIsGameSettingsLoaded: IActionHandler<
   IMainRootState,
   typeof MAIN_ACTIONS.setIsGameSettingsLoaded
@@ -63,6 +74,7 @@ const deleteMessages: IActionHandler<
 
 export const MAIN_HANDLERS = {
   [MAIN_TYPES.SET_IS_GAME_RUNNING]: setIsGameRunning,
+  [MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED]: setIsLauncherInitialised,
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_LOADED]: setIsGameSettingsLoaded,
   [MAIN_TYPES.SET_MESSAGES]: setMessages,
   [MAIN_TYPES.ADD_MESSAGES]: addMessages,
