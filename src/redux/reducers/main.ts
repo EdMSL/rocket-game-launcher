@@ -12,6 +12,7 @@ export type IMainRootState = Readonly<{
   isLauncherInitialised: boolean,
   isGameRunning: boolean,
   isGameSettingsLoaded: boolean,
+  isGameSettingsAvailable: boolean,
   messages: IMessage[],
 }>;
 
@@ -19,6 +20,7 @@ const INITIAL_STATE: IMainRootState = {
   isLauncherInitialised: false,
   isGameRunning: false,
   isGameSettingsLoaded: false,
+  isGameSettingsAvailable: false,
   messages: [],
 };
 

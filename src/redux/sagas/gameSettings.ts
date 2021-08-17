@@ -5,6 +5,7 @@ import {
   takeLatest,
 } from 'redux-saga/effects';
 import path from 'path';
+import fs from 'fs';
 import { LOCATION_CHANGE, LocationChangeAction } from 'connected-react-router';
 
 import { IAppState } from '$store/store';
@@ -15,18 +16,24 @@ import {
 import { IUnwrap } from '$types/common';
 import { addMessages, setIsGameSettingsLoaded } from '$actions/main';
 import { GAME_SETTINGS_PATH } from '$constants/paths';
-import { checkGameSettingsFileBaseFields } from '$utils/check';
+import { checkGameSettingsFile } from '$utils/check';
 import { IGameSettingsConfig } from '$reducers/gameSettings';
+import { writeToLogFile } from '$utils/log';
 
 const getState = (state: IAppState): IAppState => state;
 
 export function* setGameSettingsSaga(): SagaIterator {
   try {
-    const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_PATH);
-    const checkingMessages = checkGameSettingsFileBaseFields(gameSettingsObj);
+    if (fs.existsSync(GAME_SETTINGS_PATH)) {
+      const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_PATH);
+      const checkingMessages = checkGameSettingsFile(gameSettingsObj);
 
-    if (checkingMessages.length > 0) {
-      yield put(addMessages(checkingMessages));
+      if (checkingMessages.length > 0) {
+        yield put(addMessages(checkingMessages));
+        // yield put(addMessages(checkingMessages));
+      }
+    } else {
+      writeToLogFile('Game settings file settings.json not found.');
     }
 
     // return gameSettingsObj;

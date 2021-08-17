@@ -3,9 +3,9 @@ import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
 import { IGameSettingsRootState } from '$reducers/gameSettings';
 import * as GAME_SETTINGS_ACTIONS from '$actions/gameSettings';
 
-const setSettingsGroups: IActionHandler<
+const setSettingGroups: IActionHandler<
   IGameSettingsRootState,
-  typeof GAME_SETTINGS_ACTIONS.setSettingsGroups
+  typeof GAME_SETTINGS_ACTIONS.setSettingGroups
 > = (
   state,
   { payload: settingsGroups },
@@ -15,5 +15,5 @@ const setSettingsGroups: IActionHandler<
 });
 
 export const GAME_SETTINGS_HANDLERS = {
-  [GAME_SETTINGS_TYPES.SET_SETTINGS_GROUPS]: setSettingsGroups,
+  [GAME_SETTINGS_TYPES.SET_SETTINGS_GROUPS]: setSettingGroups,
 };

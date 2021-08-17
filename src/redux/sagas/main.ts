@@ -6,6 +6,7 @@ import {
   select,
 } from 'redux-saga/effects';
 import path from 'path';
+import fs from 'fs';
 import { LOCATION_CHANGE, LocationChangeAction } from 'connected-react-router';
 
 import { IAppState } from '$store/store';
@@ -14,6 +15,8 @@ import { readINIFile, writeINIFile } from '$utils/files';
 import { IUnwrap } from '$types/common';
 import { setIsGameSettingsLoaded, setIsLauncherInitialised } from '$actions/main';
 import { setGameSettingsSaga } from '$sagas/gameSettings';
+import { GAME_SETTINGS_PATH } from '$constants/paths';
+import { LOG_MESSAGE_TYPE, writeToLogFile } from '$utils/log';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -21,9 +24,13 @@ export function* initLauncherSaga(): SagaIterator {
   yield put(setIsLauncherInitialised(false));
 
   try {
-    yield call(setGameSettingsSaga);
+    if (fs.existsSync(GAME_SETTINGS_PATH)) {
+      yield call(setGameSettingsSaga);
+    } else {
+      writeToLogFile('Game settings file settings.json not found.');
+    }
   } catch (error) {
-    console.log(error);
+    writeToLogFile(error.message, LOG_MESSAGE_TYPE.ERROR);
   } finally {
     yield put(setIsLauncherInitialised(true));
   }

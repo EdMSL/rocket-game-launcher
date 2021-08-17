@@ -8,7 +8,7 @@ import { IMessage } from '$reducers/main';
 import { writeToLogFile } from './log';
 import { getRandomId } from './strings';
 
-export const checkGameSettingsFileBaseFields = (configObj: IGameSettingsConfig): IMessage[] => {
+export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IMessage[] => {
   const messages: IMessage[] = [];
   const logMessages: { msg: string, type: IMessage['status'], }[] = [];
   const ignoredKeys: string[] = [];
@@ -42,7 +42,7 @@ export const checkGameSettingsFileBaseFields = (configObj: IGameSettingsConfig):
       messages.push({
         id: getRandomId('check'),
         status: 'warning',
-        text: 'В файл игровых настроек не добавлено ни одного фала.',
+        text: 'В файл игровых настроек не добавлено ни одного файла.',
       });
       logMessages.push({ msg: 'No game settings files on settings.json', type: 'warning' });
     }
@@ -70,12 +70,12 @@ export const checkGameSettingsFileBaseFields = (configObj: IGameSettingsConfig):
 
     messages.push({
       id: getRandomId('check'),
-      status: 'warning',
+      status: 'info',
       text: `Отсутствуют опциональные поля в файле игровых настроек: ${missedOptionalFields}.`,
     });
     logMessages.push({
       msg: `Missed optional fields on settings.json: ${missedOptionalFields}`,
-      type: 'warning',
+      type: 'info',
     });
   }
 

@@ -15,6 +15,7 @@ import { IAppState } from '$store/store';
 
 export const MainScreen: React.FC = () => {
   const isGameRunning = useSelector((state: IAppState) => state.main.isGameRunning);
+  const isGameSettingsAvailable = useSelector((state: IAppState) => state.main.isGameSettingsAvailable);
 
   const dispatch = useDispatch();
 
@@ -57,13 +58,17 @@ export const MainScreen: React.FC = () => {
         >
           Open game folder
         </Button>
-        <NavLink
-          exact
-          to={Routes.GAME_SETTINGS_SCREEN}
-          className="control-panel__btn"
-        >
-          Настройки
-        </NavLink>
+        {
+          isGameSettingsAvailable && (
+            <NavLink
+              exact
+              to={Routes.GAME_SETTINGS_SCREEN}
+              className="control-panel__btn"
+            >
+              Настройки
+            </NavLink>
+          )
+        }
       </div>
       <div className={classNames('content', styles['main-screen__content'])}>
         <p>Content</p>

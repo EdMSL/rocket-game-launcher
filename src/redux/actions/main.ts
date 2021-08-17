@@ -23,6 +23,13 @@ export const setIsGameSettingsLoaded: IAction<IMainRootState['isGameSettingsLoad
   payload: isGameSettingsLoaded,
 });
 
+export const setIsGameSettingsAvailable: IAction<IMainRootState['isGameSettingsAvailable']> = (
+  isGameSettingsAvailable,
+) => ({
+  type: MAIN_TYPES.SET_IS_GAME_SETTINGS_AVAILABLE,
+  payload: isGameSettingsAvailable,
+});
+
 export const setMessages: IAction<IMainRootState['messages']> = (
   messages,
 ) => ({
