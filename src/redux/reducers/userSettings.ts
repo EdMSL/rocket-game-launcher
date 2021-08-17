@@ -1,7 +1,7 @@
 import { createReducer } from 'reduxsauce';
 
 import { defaultLauncherResolution } from '$constants/defaultParameters';
-import { USER_SETTINGS_HANDLERS } from '$handlers/userSettings'; //eslint-disable-line import/no-cycle, max-len
+import { USER_SETTINGS_HANDLERS } from '$handlers/userSettings';
 
 interface IResolution {
   width: number,

@@ -1,7 +1,7 @@
 import { createReducer } from 'reduxsauce';
 
-import { SYSTEM_HANDLERS } from '$handlers/system'; //eslint-disable-line import/no-cycle
-import { defaultLauncherConfig } from '$constants/defaultParameters'; //eslint-disable-line import/no-cycle, max-len
+import { SYSTEM_HANDLERS } from '$handlers/system';
+import { defaultLauncherConfig } from '$constants/defaultParameters';
 
 interface IModOrganizerParams {
   isUsed: boolean,

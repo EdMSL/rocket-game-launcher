@@ -8,12 +8,12 @@ import {
 import path from 'path';
 import { LOCATION_CHANGE, LocationChangeAction } from 'connected-react-router';
 
-import { IAppState } from '$store/store'; //eslint-disable-line import/no-cycle
+import { IAppState } from '$store/store';
 import { Routes } from '$constants/routes';
 import { readINIFile, writeINIFile } from '$utils/files';
 import { IUnwrap } from '$types/common';
 import { setIsGameSettingsLoaded, setIsLauncherInitialised } from '$actions/main';
-import { setGameSettings } from './gameSettings';
+import { setGameSettingsSaga } from '$sagas/gameSettings';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -21,9 +21,11 @@ export function* initLauncherSaga(): SagaIterator {
   yield put(setIsLauncherInitialised(false));
 
   try {
-    yield call(setGameSettings);
+    yield call(setGameSettingsSaga);
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
+  } finally {
+    yield put(setIsLauncherInitialised(true));
   }
 }
 
@@ -56,6 +58,6 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
   }
 }
 
-export default function* gameSetingsSaga(): SagaIterator {
+export default function* mainSaga(): SagaIterator {
   yield takeLatest(LOCATION_CHANGE, locationChangeSaga);
 }

@@ -7,7 +7,7 @@ import {
 import path from 'path';
 import { LOCATION_CHANGE, LocationChangeAction } from 'connected-react-router';
 
-import { IAppState } from '$store/store'; //eslint-disable-line import/no-cycle
+import { IAppState } from '$store/store';
 import { Routes } from '$constants/routes';
 import {
   readINIFile, readJSONFile, writeINIFile,
@@ -20,7 +20,7 @@ import { IGameSettingsConfig } from '$reducers/gameSettings';
 
 const getState = (state: IAppState): IAppState => state;
 
-export function* setGameSettings(): SagaIterator {
+export function* setGameSettingsSaga(): SagaIterator {
   try {
     const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_PATH);
     const checkingMessages = checkGameSettingsFileBaseFields(gameSettingsObj);

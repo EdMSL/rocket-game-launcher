@@ -13,7 +13,8 @@ import {
 import createSagaMiddleware from 'redux-saga';
 
 import { getRootReducer } from '$reducers/root';
-import gameSetingsSaga from '$sagas/gameSettings'; //eslint-disable-line import/no-cycle
+import mainSaga from '$sagas/main';
+import gameSetingsSaga from '$sagas/gameSettings';
 import { Scope } from '$constants/misc';
 
 ///FIXME Выглядит не особо изящно, попробовать переделать
@@ -63,6 +64,7 @@ export const configureStore = (
   if (scope === Scope.MAIN) {
     replayActionMain(store);
   } else {
+    sagaMiddleware.run(mainSaga);
     sagaMiddleware.run(gameSetingsSaga);
 
     replayActionRenderer(store);

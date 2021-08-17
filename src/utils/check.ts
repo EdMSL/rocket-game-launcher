@@ -1,5 +1,7 @@
 import {
-  GAME_SETTINGS_CONFIG_ALL_FIELDS, GAME_SETTINGS_CONFIG_OPTIONAL_FIELDS, GAME_SETTINGS_CONFIG_REQUIRE_FIELDS,
+  GAME_SETTINGS_CONFIG_ALL_FIELDS,
+  GAME_SETTINGS_CONFIG_OPTIONAL_FIELDS,
+  GAME_SETTINGS_CONFIG_REQUIRE_FIELDS,
 } from '$constants/misc';
 import { IGameSettingsConfig } from '$reducers/gameSettings';
 import { IMessage } from '$reducers/main';
@@ -35,7 +37,7 @@ export const checkGameSettingsFileBaseFields = (configObj: IGameSettingsConfig):
   }
 
   // Проверка на наличие необходимых полей
-  if (GAME_SETTINGS_CONFIG_REQUIRE_FIELDS.some((field) => !filteredObjKeys.includes(field))) {
+  if (!GAME_SETTINGS_CONFIG_REQUIRE_FIELDS.some((field) => !filteredObjKeys.includes(field))) {
     if (Object.keys(configObj.usedFiles).length === 0) {
       messages.push({
         id: getRandomId('check'),

@@ -1,6 +1,6 @@
 import { createReducer } from 'reduxsauce';
 
-import { MAIN_HANDLERS } from '$handlers/main'; //eslint-disable-line import/no-cycle
+import { MAIN_HANDLERS } from '$handlers/main';
 
 export interface IMessage {
   id: string,

@@ -1,6 +1,6 @@
 import { createReducer } from 'reduxsauce';
 
-import { GAME_SETTINGS_HANDLERS } from '$handlers/gameSettings'; //eslint-disable-line import/no-cycle, max-len
+import { GAME_SETTINGS_HANDLERS } from '$handlers/gameSettings';
 
 interface IGameSettingsGroup {
   name: string,

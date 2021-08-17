@@ -1,7 +1,7 @@
 import { IActionHandler } from '$types/common';
 import { MAIN_TYPES } from '$types/main';
-import { IMainRootState } from '$reducers/main'; //eslint-disable-line import/no-cycle, max-len
-import * as MAIN_ACTIONS from '$actions/main'; //eslint-disable-line import/no-cycle, max-len
+import { IMainRootState } from '$reducers/main';
+import * as MAIN_ACTIONS from '$actions/main';
 
 const setIsGameRunning: IActionHandler<
   IMainRootState,

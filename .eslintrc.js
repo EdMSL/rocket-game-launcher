@@ -111,7 +111,7 @@ module.exports = {
     'import/extensions': [2, 'always', {
       'js': 'never', 'ts': 'never', 'tsx': 'never',
     }],
-    'import/no-cycle': [2, { ignoreExternal: true }],
+    'import/no-cycle': 0,
     'import/no-extraneous-dependencies': 0,
     'import/order': [1, {
       groups: [

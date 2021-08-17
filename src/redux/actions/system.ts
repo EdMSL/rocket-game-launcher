@@ -1,6 +1,6 @@
 import { IAction } from '$types/common';
 import { SYSTEM_TYPES } from '$types/system';
-import { ISystemRootState } from '$reducers/system'; //eslint-disable-line import/no-cycle, max-len
+import { ISystemRootState } from '$reducers/system';
 
 export const setIsFirstLaunch: IAction<ISystemRootState['isFirstLaunch']> = (
   isFirstLaunch,
