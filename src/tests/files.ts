@@ -14,7 +14,7 @@ import {
   writeINIFile,
 } from '$utils/files';
 import { ErrorMessage, ReadWriteError } from '$utils/errors';
-import { createMockFiles, createMockFilesForWrite } from './fixtures/getFiles';
+import { createMockFilesForRead, createMockFilesForWrite } from './fixtures/getFiles';
 
 const errorAccessRegExp = new RegExp(ErrorMessage.ACCESS);
 const errorNotFoundRegExp = new RegExp(ErrorMessage.FILE_NOT_FOUND);
@@ -24,7 +24,7 @@ const errorDirectoryRegExp = new RegExp(ErrorMessage.PATH_TO_DIRECTORY);
 /* eslint-disable max-len, @typescript-eslint/ban-ts-comment */
 describe('#Files', () => {
   describe('Read files', () => {
-    before(createMockFiles);
+    before(createMockFilesForRead);
 
     it('Should return correct string', async () => {
       assert.equal(readFileDataSync(`${process.cwd()}/folderName/index.md`), '# Hello world!');

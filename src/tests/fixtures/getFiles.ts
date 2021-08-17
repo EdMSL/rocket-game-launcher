@@ -1,7 +1,7 @@
 import path from 'path';
 import mock from 'mock-fs';
 
-export const createMockFiles = (): void => {
+export const createMockFilesForRead = (): void => {
   mock({
     'folderName': {
       'index.md': '# Hello world!',
@@ -44,5 +44,11 @@ export const createMockFilesForWrite = (): void => {
     'readOnlyDir': mock.directory({
       mode: 0o444,
     }),
+  });
+};
+
+export const createMockFilesForCheck = (): void => {
+  mock({
+    'settings.json': mock.load(path.resolve(__dirname, 'settings.json'), { lazy: false }),
   });
 };

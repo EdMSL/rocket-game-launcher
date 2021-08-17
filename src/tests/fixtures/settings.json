@@ -1,0 +1,53 @@
+{
+  "settingGroups": [
+    {
+      "name": "Graphic",
+      "label": "Графика"
+    },
+    {
+      "name": "Audio",
+      "label": "Аудио"
+    },
+    {
+      "name": "Control",
+      "label": "Управление"
+    }
+  ],
+  "basePathToFiles": "./Data",
+  "baseFilesEncoding": "win1251",
+  "usedFiles": {
+    "anyFile": {
+      "isFromMOProfile": true,
+      "path": "./any.ini",
+      "type": "sectional",
+      "parameters": [
+        {
+          "name": "Any name",
+          "iniGroup": "Display",
+          "settingsGroup": "Graphic",
+          "type": "range",
+          "min": "0",
+          "max": "300",
+          "step": "1",
+          "label": "Any label"
+        }
+      ]
+    },
+    "someFile": {
+      "path": "./ini/some.ini",
+      "type": "line",
+      "parameters": [
+        {
+          "name": "Some name",
+          "settingsGroup": "Control",
+          "type": "select",
+          "label": "Some label",
+          "options": {
+            "1": "1",
+            "2": "1"
+          }
+        }
+      ]
+    }
+  }
+}
