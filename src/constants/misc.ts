@@ -9,8 +9,10 @@ export const Encoding = {
   CP866: 'cp866',
 };
 
-export const GAME_SETTINGS_CONFIG_REQUIRE = ['settingGroups', 'usedFiles'];
-export const GAME_SETTINGS_CONFIG_OPTIONAL = ['basePathToFiles', 'baseFilesEncoding'];
-export const GAME_SETTINGS_CONFIG_ALL = [
-  ...GAME_SETTINGS_CONFIG_REQUIRE,
-  ...GAME_SETTINGS_CONFIG_OPTIONAL];
+export const GAME_SETTINGS_CONFIG_REQUIRE_FIELDS = ['usedFiles'];
+export const GAME_SETTINGS_CONFIG_OPTIONAL_FIELDS = [
+  'settingGroups', 'basePathToFiles', 'baseFilesEncoding',
+];
+export const GAME_SETTINGS_CONFIG_ALL_FIELDS = [
+  ...GAME_SETTINGS_CONFIG_REQUIRE_FIELDS,
+  ...GAME_SETTINGS_CONFIG_OPTIONAL_FIELDS];

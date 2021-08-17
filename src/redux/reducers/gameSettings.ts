@@ -8,7 +8,7 @@ interface IGameSettingsGroup {
 }
 
 export interface IGameSettingsConfig {
-  settingGroups: IGameSettingsRootState['settingGroups'],
+  settingGroups?: IGameSettingsRootState['settingGroups'],
   basePathToFiles?: IGameSettingsRootState['basePathToFiles'],
   baseFilesEncoding?: IGameSettingsRootState['baseFilesEncoding'],
   usedFiles: IGameSettingsRootState['usedFiles'],
