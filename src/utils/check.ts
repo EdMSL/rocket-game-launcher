@@ -8,15 +8,77 @@ import { IMessage } from '$reducers/main';
 import { writeToLogFile } from './log';
 import { getRandomId } from './strings';
 
+interface ICheckingLogMessage {
+  msg: string,
+  type: IMessage['status'],
+}
+
+interface ICheckingResult {
+  mainMessages: IMessage[],
+  logMessages: ICheckingLogMessage[],
+}
+
+const checkSettingGroups = (obj: IGameSettingsConfig): ICheckingResult => {
+  const groupsMessages: IMessage[] = [];
+  const logMessages: ICheckingLogMessage[] = [];
+
+  if (obj.settingGroups?.some((group) => !group.name)) {
+    groupsMessages.push({
+      id: getRandomId('check'),
+      status: 'error',
+      text: 'Некоторые из групп настроек не имеют обязательного поля "name"',
+    });
+    logMessages.push({
+      msg: 'Some of setting grops have\'t required field "name"',
+      type: 'error',
+    });
+  }
+
+  return { mainMessages: groupsMessages, logMessages };
+};
+
+const checkSettingOptionalFileds = (obj: IGameSettingsConfig): ICheckingResult => {
+  let optionalMessages: IMessage[] = [];
+  let logMessages: ICheckingLogMessage[] = [];
+
+  if (GAME_SETTINGS_CONFIG_OPTIONAL_FIELDS.some((field) => !Object.keys(obj).includes(field))) {
+    const missedOptionalFields = GAME_SETTINGS_CONFIG_OPTIONAL_FIELDS.filter(
+      (currKey) => !Object.keys(obj).includes(currKey),
+    );
+
+    optionalMessages.push({
+      id: getRandomId('check'),
+      status: 'info',
+      text: `Отсутствуют опциональные поля в файле игровых настроек: ${missedOptionalFields}.`,
+    });
+    logMessages.push({
+      msg: `Missed optional fields on settings.json: ${missedOptionalFields}`,
+      type: 'info',
+    });
+  }
+
+  if (obj.settingGroups!.length > 0) {
+    const groupsCheckResult = checkSettingGroups(obj);
+
+    optionalMessages = [...optionalMessages, ...groupsCheckResult.mainMessages];
+    logMessages = [...logMessages, ...groupsCheckResult.logMessages];
+  }
+
+  return { mainMessages: optionalMessages, logMessages };
+};
+
 export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IMessage[] => {
-  const messages: IMessage[] = [];
-  const logMessages: { msg: string, type: IMessage['status'], }[] = [];
+  const currentSettingsObj = { ...configObj };
+
+  let messages: IMessage[] = [];
+  let logMessages: ICheckingLogMessage[] = [];
   const ignoredKeys: string[] = [];
 
   // Отфильтруем невалидные поля.
   const filteredObjKeys = Object.keys(configObj).filter((currentKey) => {
     if (!GAME_SETTINGS_CONFIG_ALL_FIELDS.includes(currentKey)) {
       ignoredKeys.push(currentKey);
+      delete currentSettingsObj[currentKey];
 
       return false;
     }
@@ -38,7 +100,7 @@ export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IMessage[
 
   // Проверка на наличие необходимых полей
   if (!GAME_SETTINGS_CONFIG_REQUIRE_FIELDS.some((field) => !filteredObjKeys.includes(field))) {
-    if (Object.keys(configObj.usedFiles).length === 0) {
+    if (Object.keys(currentSettingsObj.usedFiles).length === 0) {
       messages.push({
         id: getRandomId('check'),
         status: 'warning',
@@ -63,21 +125,10 @@ export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IMessage[
   }
 
   // Проверка наличия опциональных полей
-  if (GAME_SETTINGS_CONFIG_OPTIONAL_FIELDS.some((field) => !filteredObjKeys.includes(field))) {
-    const missedOptionalFields = GAME_SETTINGS_CONFIG_OPTIONAL_FIELDS.filter(
-      (currKey) => !filteredObjKeys.includes(currKey),
-    );
+  const optionalCheckResult = checkSettingOptionalFileds(currentSettingsObj);
 
-    messages.push({
-      id: getRandomId('check'),
-      status: 'info',
-      text: `Отсутствуют опциональные поля в файле игровых настроек: ${missedOptionalFields}.`,
-    });
-    logMessages.push({
-      msg: `Missed optional fields on settings.json: ${missedOptionalFields}`,
-      type: 'info',
-    });
-  }
+  messages = [...messages, ...optionalCheckResult.mainMessages];
+  logMessages = [...logMessages, ...optionalCheckResult.logMessages];
 
   logMessages.forEach((currentMsg) => {
     writeToLogFile(currentMsg.msg, currentMsg.type);
