@@ -1,11 +1,10 @@
 import { createReducer } from 'reduxsauce';
 
 import { MAIN_HANDLERS } from '$handlers/main';
+import { IMessage } from '$utils/message';
 
-export interface IMessage {
+export interface IUserMessage extends IMessage {
   id: string,
-  status: 'error'|'warning'|'info'|'success',
-  text: string,
 }
 
 export type IMainRootState = Readonly<{
@@ -13,7 +12,7 @@ export type IMainRootState = Readonly<{
   isGameRunning: boolean,
   isGameSettingsLoaded: boolean,
   isGameSettingsAvailable: boolean,
-  messages: IMessage[],
+  messages: IUserMessage[],
 }>;
 
 const INITIAL_STATE: IMainRootState = {

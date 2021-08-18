@@ -7,11 +7,10 @@ import styles from './styles.module.scss';
 import { Routes } from '$constants/routes';
 import { GAME_DIR } from '$constants/paths';
 import { runApplication, openFolder } from '$utils/process';
-import { getMessage } from '$utils/data';
 import { Button } from '$components/UI/Button';
 import { setIsGameRunning, addMessages } from '$actions/main';
-import { IMessage } from '$reducers/main';
 import { IAppState } from '$store/store';
+import { CreateUserMessage } from '$utils/message';
 
 export const MainScreen: React.FC = () => {
   const isGameRunning = useSelector((state: IAppState) => state.main.isGameRunning);
@@ -23,14 +22,12 @@ export const MainScreen: React.FC = () => {
     dispatch(setIsGameRunning(isRunning));
 
     if (errorMessage) {
-      dispatch(addMessages([getMessage(errorMessage)]));
+      dispatch(addMessages([CreateUserMessage.error(errorMessage)]));
     }
   }, [dispatch]);
 
   const sendErrorMessage = useCallback((message: string) => {
-    const errorMessage: IMessage = getMessage(message);
-
-    dispatch(addMessages([errorMessage]));
+    dispatch(addMessages([CreateUserMessage.error(message)]));
   }, [dispatch]);
 
   const onPlayGameBtnClick = useCallback(() => {

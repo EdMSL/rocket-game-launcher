@@ -1,8 +1,6 @@
 import { screen } from 'electron';
 import si from 'systeminformation';
 
-import { IMessage } from '$reducers/main';
-import { getRandomId } from '$utils/strings';
 import { LogMessageType, writeToLogFile } from './log';
 
 const ONE_GB = 1073741824;
@@ -13,14 +11,6 @@ const ONE_GB = 1073741824;
  * @param status Статус сообщения: `info`, `error`, `warning` или `success`. По-умолчанию `error.`
  * @returns Объект сообщения.
 */
-export const getMessage = (
-  content: string,
-  status: IMessage['status'] = 'error',
-): IMessage => ({
-  id: getRandomId(status),
-  status,
-  text: content,
-});
 
 /**
  * Получить информацию о доступных дисплеях и записать их в файл лога.

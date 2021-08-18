@@ -3,12 +3,12 @@ import { useDispatch } from 'react-redux';
 import classNames from 'classnames';
 
 import styles from './styles.module.scss';
-import { IMessage } from '$reducers/main';
+import { IUserMessage } from '$reducers/main';
 import { Button } from '$components/UI/Button';
 import { deleteMessages } from '$actions/main';
 
 interface IProps {
-  message: IMessage,
+  message: IUserMessage,
 }
 
 export const Message: React.FC<IProps> = ({ message }) => {

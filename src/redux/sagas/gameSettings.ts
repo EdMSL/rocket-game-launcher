@@ -19,7 +19,7 @@ import { GAME_SETTINGS_PATH } from '$constants/paths';
 import { checkGameSettingsFile } from '$utils/check';
 import { IGameSettingsConfig } from '$reducers/gameSettings';
 import { LogMessageType, writeToLogFile } from '$utils/log';
-import { getRandomId } from '$utils/strings';
+import { CreateUserMessage } from '$utils/message';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -38,13 +38,12 @@ export function* setGameSettingsSaga(): SagaIterator {
 
     // return gameSettingsObj;
   } catch (error) {
-    yield put(addMessages([{
-      id: getRandomId('syntax'),
-      status: 'error',
-      text: 'Ошибка обработки файла settings.json. Игровые настройки будут недоступны. Подробности в файле лога', //eslint-disable-line max-len
-    }]));
+    yield put(addMessages([CreateUserMessage.error('Ошибка обработки файла settings.json. Игровые настройки будут недоступны. Подробности в файле лога')])); //eslint-disable-line max-len
 
-    writeToLogFile(`An error occurred while processing the file settings.json. ${error.message}`, LogMessageType.ERROR);
+    writeToLogFile(
+      `An error occurred while processing the file settings.json. ${error.message}`,
+      LogMessageType.ERROR,
+    );
   }
 }
 

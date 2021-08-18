@@ -4,48 +4,25 @@ import {
   GAME_SETTINGS_CONFIG_REQUIRE_FIELDS,
 } from '$constants/misc';
 import { IGameSettingsConfig } from '$reducers/gameSettings';
-import { IMessage } from '$reducers/main';
-import { writeToLogFile } from './log';
-import { getRandomId } from './strings';
-
-interface ICheckingLogMessage {
-  msg: string,
-  type: IMessage['status'],
-}
+import { IUserMessage } from '$reducers/main';
+import { writeToLogFile } from '$utils/log';
+import { pushMessagesToArrays, IMessage } from '$utils/message';
 
 interface ICheckingResult {
-  mainMessages: IMessage[],
-  logMessages: ICheckingLogMessage[],
+  mainMessages: IUserMessage[],
+  logMessages: IMessage[],
 }
 
-const pushMessagesToArrays = (
-  mainMessages: IMessage[],
-  logMessages: ICheckingLogMessage[],
-  userMessageText: string,
-  logMessageText: string,
-  msgStatus: IMessage['status'] = 'warning',
-): void => {
-  mainMessages.push({
-    id: getRandomId('check'),
-    status: msgStatus,
-    text: userMessageText,
-  });
-  logMessages.push({
-    msg: logMessageText,
-    type: msgStatus,
-  });
-};
-
 const checkSettingGroups = (obj: IGameSettingsConfig): ICheckingResult => {
-  const groupsMessages: IMessage[] = [];
-  const logMessages: ICheckingLogMessage[] = [];
+  const groupsMessages: IUserMessage[] = [];
+  const logMessages: IMessage[] = [];
 
   if (obj.settingGroups?.some((group) => !group.name)) {
     pushMessagesToArrays(
       groupsMessages,
       logMessages,
       'Некоторые из групп настроек не имеют обязательного поля "name". Игровые настройки будут недоступны.', //eslint-disable-line max-len
-      'Some of setting grops have\'t required field "name"',
+      'Some of setting groups have\'t required field "name"',
       'error',
     );
   }
@@ -54,8 +31,8 @@ const checkSettingGroups = (obj: IGameSettingsConfig): ICheckingResult => {
 };
 
 const checkSettingOptionalFileds = (obj: IGameSettingsConfig): ICheckingResult => {
-  let optionalMessages: IMessage[] = [];
-  let logMessages: ICheckingLogMessage[] = [];
+  let optionalMessages: IUserMessage[] = [];
+  let logMessages: IMessage[] = [];
 
   if (GAME_SETTINGS_CONFIG_OPTIONAL_FIELDS.some((field) => !Object.keys(obj).includes(field))) {
     const missedOptionalFields = GAME_SETTINGS_CONFIG_OPTIONAL_FIELDS.filter(
@@ -81,11 +58,11 @@ const checkSettingOptionalFileds = (obj: IGameSettingsConfig): ICheckingResult =
   return { mainMessages: optionalMessages, logMessages };
 };
 
-export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IMessage[] => {
+export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IUserMessage[] => {
   const currentSettingsObj = { ...configObj };
 
-  let messages: IMessage[] = [];
-  let logMessages: ICheckingLogMessage[] = [];
+  let messages: IUserMessage[] = [];
+  let logMessages: IMessage[] = [];
   const ignoredKeys: string[] = [];
 
   // Отфильтруем невалидные поля.
@@ -140,7 +117,7 @@ export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IMessage[
   logMessages = [...logMessages, ...optionalCheckResult.logMessages];
 
   logMessages.forEach((currentMsg) => {
-    writeToLogFile(currentMsg.msg, currentMsg.type);
+    writeToLogFile(currentMsg.text, currentMsg.type);
   });
 
   return messages;

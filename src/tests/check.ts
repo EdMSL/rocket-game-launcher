@@ -34,6 +34,6 @@ describe('#Check', () => {
     const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
     // @ts-ignore
     delete obj.usedFiles;
-    assert.equal(checkGameSettingsFile(obj)[0].status, 'error');
+    assert.equal(checkGameSettingsFile(obj)[0].type, 'error');
   });
 });
