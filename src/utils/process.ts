@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import mime from 'mime';
 
-import { LOG_MESSAGE_TYPE, writeToLogFile } from '$utils/log';
+import { LogMessageType, writeToLogFile } from '$utils/log';
 import { iconvDecode } from '$utils/files';
 import { GAME_DIR } from '$constants/paths';
 import { ErrorCode, ErrorMessage } from '$utils/errors';
@@ -23,7 +23,7 @@ export const runApplication = (
     if (fs.statSync(pathToApp).isDirectory()) {
       writeToLogFile(
         `Message: Can't run application. ${ErrorMessage.PATH_TO_DIRECTORY}. App: ${appName}, path: ${pathToApp}.`, //eslint-disable-line max-len
-        LOG_MESSAGE_TYPE.ERROR,
+        LogMessageType.ERROR,
       );
 
       cb(false, `Не удалось запустить приложение. Указан путь к папке, не файлу. Путь: ${pathToApp}`); //eslint-disable-line max-len
@@ -37,7 +37,7 @@ export const runApplication = (
     ) {
       writeToLogFile(
         `Message: Can't run application. ${ErrorMessage.MIME_TYPE}, received: ${mime.getType(pathToApp)}. App: ${appName}, path: ${pathToApp}.`, //eslint-disable-line max-len
-        LOG_MESSAGE_TYPE.ERROR,
+        LogMessageType.ERROR,
       );
       cb(false, `Не удалось запустить приложение. Файл не является исполняемым (.exe). Путь: ${pathToApp}`); //eslint-disable-line max-len
 
@@ -46,7 +46,7 @@ export const runApplication = (
   } else {
     writeToLogFile(
       `Message: Can't run application. ${ErrorMessage.FILE_NOT_FOUND}. App: ${appName}, path: ${pathToApp}.`, //eslint-disable-line max-len
-      LOG_MESSAGE_TYPE.ERROR,
+      LogMessageType.ERROR,
     );
     cb(false, `Не удалось запустить приложение. Файл не найден. Путь: ${pathToApp}`);
 
@@ -66,7 +66,7 @@ export const runApplication = (
         if (error) {
           writeToLogFile(
             `Message: Can't run application. ${iconvDecode(error.message)} App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
-            LOG_MESSAGE_TYPE.ERROR,
+            LogMessageType.ERROR,
           );
 
           cb(false, `Не удалось запустить приложение. Подробности в лог файле. Путь: ${pathToApp}`); //eslint-disable-line max-len
@@ -85,21 +85,21 @@ export const runApplication = (
     if (error.code === ErrorCode.UNKNOWN) {
       writeToLogFile(
         `Message: Can't run application. Unknown file type. ${error.message} App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
-        LOG_MESSAGE_TYPE.ERROR,
+        LogMessageType.ERROR,
       );
 
       cb(false, `Не удалось запустить приложение. Неизвестный тип файла. Путь: ${pathToApp}`); //eslint-disable-line max-len
     } else if (error.code === ErrorCode.ACCESS) {
       writeToLogFile(
         `Message: Can't run application. ${ErrorMessage.ACCESS} App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
-        LOG_MESSAGE_TYPE.ERROR,
+        LogMessageType.ERROR,
       );
 
       cb(false, `Не удалось запустить приложение. Нет доступа. Путь: ${pathToApp}`); //eslint-disable-line max-len
     } else {
       writeToLogFile(
         `Message: Can't run application. Unknown error. ${error.message} App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
-        LOG_MESSAGE_TYPE.ERROR,
+        LogMessageType.ERROR,
       );
 
       cb(false, `Не удалось запустить приложение. Неизвестная ошибка. Подробности в лог файле. Путь: ${pathToApp}`); //eslint-disable-line max-len
@@ -120,7 +120,7 @@ export const openFolder = (pathToFolder: string, cb?): void => {
       message = `Message: Can't open folder. ${ErrorMessage.PATH_TO_FILE}. Path ${pathToFolder}.`; //eslint-disable-line max-len
       writeToLogFile(
         message,
-        LOG_MESSAGE_TYPE.ERROR,
+        LogMessageType.ERROR,
       );
       cb(`Не удалось открыть папку. Указан путь к файлу, не папке. Путь: ${pathToFolder}`);
 
@@ -130,7 +130,7 @@ export const openFolder = (pathToFolder: string, cb?): void => {
     message = `Message: Can't open folder. ${ErrorMessage.DIRECTORY_NOT_FOUND}. Path ${pathToFolder}.`; //eslint-disable-line max-len
     writeToLogFile(
       message,
-      LOG_MESSAGE_TYPE.ERROR,
+      LogMessageType.ERROR,
     );
     cb(`Не удалось открыть папку. Папка не найдена. Путь: ${pathToFolder}`);
 
@@ -142,7 +142,7 @@ export const openFolder = (pathToFolder: string, cb?): void => {
   } catch (error) {
     writeToLogFile(
       `Message: Can't open folder. Unknown error. ${error.message} Path ${pathToFolder}.`, //eslint-disable-line max-len
-      LOG_MESSAGE_TYPE.ERROR,
+      LogMessageType.ERROR,
     );
 
     cb(false, `Не удалось открыть папку. Неизвестная ошибка. Подробности в лог файле. Путь: ${pathToFolder}`); //eslint-disable-line max-len

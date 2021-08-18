@@ -18,7 +18,8 @@ import { addMessages, setIsGameSettingsLoaded } from '$actions/main';
 import { GAME_SETTINGS_PATH } from '$constants/paths';
 import { checkGameSettingsFile } from '$utils/check';
 import { IGameSettingsConfig } from '$reducers/gameSettings';
-import { writeToLogFile } from '$utils/log';
+import { LogMessageType, writeToLogFile } from '$utils/log';
+import { getRandomId } from '$utils/strings';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -30,7 +31,6 @@ export function* setGameSettingsSaga(): SagaIterator {
 
       if (checkingMessages.length > 0) {
         yield put(addMessages(checkingMessages));
-        // yield put(addMessages(checkingMessages));
       }
     } else {
       writeToLogFile('Game settings file settings.json not found.');
@@ -38,8 +38,13 @@ export function* setGameSettingsSaga(): SagaIterator {
 
     // return gameSettingsObj;
   } catch (error) {
-    console.log(error.message);
-    throw error;
+    yield put(addMessages([{
+      id: getRandomId('syntax'),
+      status: 'error',
+      text: 'Ошибка обработки файла settings.json. Игровые настройки будут недоступны. Подробности в файле лога', //eslint-disable-line max-len
+    }]));
+
+    writeToLogFile(`An error occurred while processing the file settings.json. ${error.message}`, LogMessageType.ERROR);
   }
 }
 

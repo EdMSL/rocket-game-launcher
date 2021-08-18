@@ -3,7 +3,7 @@ import path from 'path';
 
 import { showErrorBox } from '$utils/errors';
 
-export const LOG_MESSAGE_TYPE = {
+export const LogMessageType = {
   INFO: 'INFO',
   WARNING: 'WARNING',
   ERROR: 'ERROR',
@@ -30,9 +30,9 @@ export const createLogFile = (pathToLogFile = launcherLogPath): void => {
 /**
   * Синхронно записать информацию в файл лога.
   * @param message Строка для записи в лог.
-  * @param messageType Определяет тип сообщения, ошибка, предупреждение или информация.
+  * @param messageType Определяет тип сообщения, ошибка, предупреждение или информация. По умолчанию `info`.
 */
-export const writeToLogFileSync = (message: string, messageType = LOG_MESSAGE_TYPE.INFO): void => {
+export const writeToLogFileSync = (message: string, messageType = LogMessageType.INFO): void => {
   try {
     fs.appendFileSync(
       launcherLogPath,
@@ -46,9 +46,9 @@ export const writeToLogFileSync = (message: string, messageType = LOG_MESSAGE_TY
 /**
   * Асинхронно записать информацию в файл лога.
   * @param message Строка для записи в лог.
-  * @param messageType Определяет тип сообщения, ошибка, предупреждение или информация.
+  * @param messageType Определяет тип сообщения, ошибка, предупреждение или информация. По умолчанию `info`.
 */
-export const writeToLogFile = (message: string, messageType = LOG_MESSAGE_TYPE.INFO): void => {
+export const writeToLogFile = (message: string, messageType = LogMessageType.INFO): void => {
   fs.appendFile(
     launcherLogPath,
     `\n[${messageType.toUpperCase()}][${new Date().toLocaleString()}]: ${message}`,

@@ -3,7 +3,7 @@ import iconv from 'iconv-lite';
 import { Ini } from 'ini-api';
 
 import {
-  LOG_MESSAGE_TYPE,
+  LogMessageType,
   writeToLogFile,
   writeToLogFileSync,
 } from '$utils/log';
@@ -95,7 +95,7 @@ export const readJSONFileSync = <T>(pathToFile: string): T => {
   } catch (error) {
     writeToLogFileSync(
       `Message: ${error.message}. Path: ${pathToFile}.`,
-      LOG_MESSAGE_TYPE.ERROR,
+      LogMessageType.ERROR,
     );
 
     throw error;
@@ -116,7 +116,7 @@ export const readJSONFile = async <T>(pathToFile: string): Promise<T> => {
   } catch (error) {
     writeToLogFileSync(
       `Message: ${error.message}. Path: ${pathToFile}.`,
-      LOG_MESSAGE_TYPE.ERROR,
+      LogMessageType.ERROR,
     );
 
     throw error;
@@ -139,7 +139,7 @@ export const readINIFile = async (
   } catch (error) {
     writeToLogFileSync(
       `Message: ${error.message}. Path: ${pathToFile}.`,
-      LOG_MESSAGE_TYPE.ERROR,
+      LogMessageType.ERROR,
     );
 
     throw error;
@@ -173,7 +173,7 @@ export const writeJSONFile = (
   .catch((error) => {
     writeToLogFile(
       `Message: ${error.message}. Path: ${pathToFile}`,
-      LOG_MESSAGE_TYPE.ERROR,
+      LogMessageType.ERROR,
     );
 
     throw error;
@@ -193,7 +193,7 @@ export const writeINIFile = (
   .catch((error) => {
     writeToLogFile(
       `Message: ${error.message}. Path: ${pathToFile}`,
-      LOG_MESSAGE_TYPE.ERROR,
+      LogMessageType.ERROR,
     );
 
     throw error;

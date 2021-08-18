@@ -5,7 +5,7 @@ import { configureStore, IAppState } from '$store/store';
 import { IUserSettingsRootState } from '$reducers/userSettings';
 import { defaultLauncherConfig, defaultLauncherResolution } from '$constants/defaultParameters';
 import {
-  LOG_MESSAGE_TYPE,
+  LogMessageType,
   writeToLogFile,
   writeToLogFileSync,
 } from '$utils/log';
@@ -35,7 +35,7 @@ const getConfigurationData = () => {
       if (error.cause.name === ErrorName.NOT_FOUND) {
         writeToLogFileSync(
           'Launcher config file not found. Load default values. A new config file will be created', //eslint-disable-line max-len
-          LOG_MESSAGE_TYPE.WARNING,
+          LogMessageType.WARNING,
         );
 
         showMessageBox(
@@ -49,7 +49,7 @@ const getConfigurationData = () => {
             writeToLogFile('New config file config.json successfully created.');
           })
           .catch(() => {
-            writeToLogFile('New config file config.json not created.', LOG_MESSAGE_TYPE.WARNING);
+            writeToLogFile('New config file config.json not created.', LogMessageType.WARNING);
           });
 
         return defaultLauncherConfig;

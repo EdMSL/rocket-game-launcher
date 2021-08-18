@@ -3,7 +3,7 @@ import si from 'systeminformation';
 
 import { IMessage } from '$reducers/main';
 import { getRandomId } from '$utils/strings';
-import { LOG_MESSAGE_TYPE, writeToLogFile } from './log';
+import { LogMessageType, writeToLogFile } from './log';
 
 const ONE_GB = 1073741824;
 
@@ -68,7 +68,7 @@ export const getSystemInfo = async (): Promise<void> => {
 
     writeToLogFile(result);
   } catch (error) {
-    writeToLogFile(error.message, LOG_MESSAGE_TYPE.ERROR);
+    writeToLogFile(error.message, LogMessageType.ERROR);
   }
 };
 

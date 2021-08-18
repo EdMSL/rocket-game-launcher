@@ -16,7 +16,7 @@ import { IUnwrap } from '$types/common';
 import { setIsGameSettingsLoaded, setIsLauncherInitialised } from '$actions/main';
 import { setGameSettingsSaga } from '$sagas/gameSettings';
 import { GAME_SETTINGS_PATH } from '$constants/paths';
-import { LOG_MESSAGE_TYPE, writeToLogFile } from '$utils/log';
+import { LogMessageType, writeToLogFile } from '$utils/log';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -30,7 +30,7 @@ export function* initLauncherSaga(): SagaIterator {
       writeToLogFile('Game settings file settings.json not found.');
     }
   } catch (error) {
-    writeToLogFile(error.message, LOG_MESSAGE_TYPE.ERROR);
+    writeToLogFile(error.message, LogMessageType.ERROR);
   } finally {
     yield put(setIsLauncherInitialised(true));
   }
