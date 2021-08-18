@@ -27,7 +27,7 @@
     "eslint-nofix": "eslint --config ./.eslintrc.js src --ext .ts,.tsx,.js,.jsx",
     "tslint": "tsc --project tsconfig.json",
     "lint": "npm run stylelint && npm run eslint && npm run tslint",
-    "test": "mocha --no-package --config ./.mocharc.js"
+    "test": "mocha --config ./.mocharc.js"
   },
   "lint-staged": {
     "src/**/*.scss": [

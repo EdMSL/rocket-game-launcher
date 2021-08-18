@@ -1,8 +1,4 @@
-import path from 'path';
-import fs from 'fs';
-import mock from 'mock-fs';
 import { assert } from 'chai';
-import { Ini } from 'ini-api';
 
 import { checkGameSettingsFile } from '$utils/check';
 import { createMockFilesForCheck } from './fixtures/getFiles';
