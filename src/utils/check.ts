@@ -1,11 +1,12 @@
 import {
-  GAME_SETTINGS_CONFIG_ALL_FIELDS,
+  GAME_SETTINGS_CONFIG_ALL_MAIN_FIELDS,
   GAME_SETTINGS_CONFIG_OPTIONAL_FIELDS,
   GAME_SETTINGS_CONFIG_REQUIRE_FIELDS,
+  GAME_SETTINGS_CONFIG_SETTING_GROUP_FIELDS,
 } from '$constants/misc';
 import { IGameSettingsConfig } from '$reducers/gameSettings';
 import { IUserMessage } from '$reducers/main';
-import { writeToLogFile } from '$utils/log';
+import { writeToLogFile, writeToLogFileSync } from '$utils/log';
 import { pushMessagesToArrays, IMessage } from '$utils/message';
 
 interface ICheckingResult {
@@ -16,15 +17,66 @@ interface ICheckingResult {
 const checkSettingGroups = (obj: IGameSettingsConfig): ICheckingResult => {
   const groupsMessages: IUserMessage[] = [];
   const logMessages: IMessage[] = [];
+  const noNameGroups: number[] = [];
+  const noLabelGroups: number[] = [];
+  const unknownFieldsGroupsMessages: string[][] = [];
 
-  if (obj.settingGroups?.some((group) => !group.name)) {
+  obj.settingGroups?.forEach((group, index) => {
+    if (!group.name) {
+      noNameGroups.push(index + 1);
+    }
+
+    if (!group.label) {
+      noLabelGroups.push(index + 1);
+    }
+
+    // Проверка на лишние поля в группах
+    const unknonGroupFields: string[] = [];
+
+    Object.keys(group).forEach((field) => {
+      if (!GAME_SETTINGS_CONFIG_SETTING_GROUP_FIELDS.includes(field)) {
+        unknonGroupFields.push(field);
+      }
+    });
+
+    if (unknonGroupFields.length > 0) {
+      unknownFieldsGroupsMessages.push([
+        `Группа ${index + 1} имеет неизвестные поля: ${unknonGroupFields}`,
+        `Group ${index + 1} have unknown fields: ${unknonGroupFields}`,
+      ]);
+    }
+  });
+
+  if (noNameGroups.length > 0) {
     pushMessagesToArrays(
       groupsMessages,
       logMessages,
-      'Некоторые из групп настроек не имеют обязательного поля "name". Игровые настройки будут недоступны.', //eslint-disable-line max-len
-      'Some of setting groups have\'t required field "name"',
+      `Группа(ы) ${noNameGroups} не имеют обязательного поля "name". Игровые настройки будут недоступны.`, //eslint-disable-line max-len
+      `Groups ${noNameGroups} have't required field "name".`,
       'error',
     );
+  }
+
+  if (noLabelGroups.length > 0) {
+    pushMessagesToArrays(
+      groupsMessages,
+      logMessages,
+      `Группа(ы) ${noLabelGroups} не имеют поля "label".`,
+      `Groups ${noLabelGroups} have't field "label".`,
+      'info',
+    );
+  }
+
+  if (unknownFieldsGroupsMessages.length > 0) {
+    unknownFieldsGroupsMessages.forEach((group) => {
+      pushMessagesToArrays(
+        groupsMessages,
+        logMessages,
+        group[0],
+        group[1],
+        'info',
+      );
+    });
   }
 
   return { mainMessages: groupsMessages, logMessages };
@@ -59,6 +111,8 @@ const checkSettingOptionalFileds = (obj: IGameSettingsConfig): ICheckingResult =
 };
 
 export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IUserMessage[] => {
+  writeToLogFileSync('Start of settings.json checking');
+
   const currentSettingsObj = { ...configObj };
 
   let messages: IUserMessage[] = [];
@@ -67,7 +121,7 @@ export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IUserMess
 
   // Отфильтруем невалидные поля.
   const filteredObjKeys = Object.keys(configObj).filter((currentKey) => {
-    if (!GAME_SETTINGS_CONFIG_ALL_FIELDS.includes(currentKey)) {
+    if (!GAME_SETTINGS_CONFIG_ALL_MAIN_FIELDS.includes(currentKey)) {
       ignoredKeys.push(currentKey);
       delete currentSettingsObj[currentKey];
 
@@ -81,7 +135,7 @@ export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IUserMess
     pushMessagesToArrays(
       messages,
       logMessages,
-      `Найдены некорректные поля в файле игровых настроек: ${ignoredKeys}`,
+      `Найдены неизвестные поля в файле игровых настроек: ${ignoredKeys}`,
       `Invalid fields detected on settings.json: ${ignoredKeys}`,
     );
   }

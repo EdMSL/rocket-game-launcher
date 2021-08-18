@@ -13,6 +13,7 @@ export const GAME_SETTINGS_CONFIG_REQUIRE_FIELDS = ['usedFiles'];
 export const GAME_SETTINGS_CONFIG_OPTIONAL_FIELDS = [
   'settingGroups', 'basePathToFiles', 'baseFilesEncoding',
 ];
-export const GAME_SETTINGS_CONFIG_ALL_FIELDS = [
+export const GAME_SETTINGS_CONFIG_ALL_MAIN_FIELDS = [
   ...GAME_SETTINGS_CONFIG_REQUIRE_FIELDS,
   ...GAME_SETTINGS_CONFIG_OPTIONAL_FIELDS];
+export const GAME_SETTINGS_CONFIG_SETTING_GROUP_FIELDS = ['name', 'label'];

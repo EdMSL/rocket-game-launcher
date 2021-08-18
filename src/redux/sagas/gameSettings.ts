@@ -14,7 +14,9 @@ import {
   readINIFile, readJSONFile, writeINIFile,
 } from '$utils/files';
 import { IUnwrap } from '$types/common';
-import { addMessages, setIsGameSettingsLoaded } from '$actions/main';
+import {
+  addMessages, setIsGameSettingsAvailable, setIsGameSettingsLoaded,
+} from '$actions/main';
 import { GAME_SETTINGS_PATH } from '$constants/paths';
 import { checkGameSettingsFile } from '$utils/check';
 import { IGameSettingsConfig } from '$reducers/gameSettings';
@@ -32,6 +34,11 @@ export function* setGameSettingsSaga(): SagaIterator {
       if (checkingMessages.length > 0) {
         yield put(addMessages(checkingMessages));
       }
+
+      // Определяем, будет ли доступен раздел настроек
+      yield put(setIsGameSettingsAvailable(
+        !checkingMessages.some((currentMsg) => currentMsg.type === 'error'),
+      ));
     } else {
       writeToLogFile('Game settings file settings.json not found.');
     }

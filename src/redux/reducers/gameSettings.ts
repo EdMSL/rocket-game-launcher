@@ -21,6 +21,7 @@ export type IGameSettingsRootState = Readonly<{
   usedFiles: Record<string, unknown>,
 }>;
 
+// Если добавляем поле в settings.json, то добаляем его здесь в стейт и constants/misc
 const INITIAL_STATE: IGameSettingsRootState = {
   settingGroups: [],
   basePathToFiles: '',
