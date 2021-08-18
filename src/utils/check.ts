@@ -18,20 +18,36 @@ interface ICheckingResult {
   logMessages: ICheckingLogMessage[],
 }
 
+const pushMessagesToArrays = (
+  mainMessages: IMessage[],
+  logMessages: ICheckingLogMessage[],
+  userMessageText: string,
+  logMessageText: string,
+  msgStatus: IMessage['status'] = 'warning',
+): void => {
+  mainMessages.push({
+    id: getRandomId('check'),
+    status: msgStatus,
+    text: userMessageText,
+  });
+  logMessages.push({
+    msg: logMessageText,
+    type: msgStatus,
+  });
+};
+
 const checkSettingGroups = (obj: IGameSettingsConfig): ICheckingResult => {
   const groupsMessages: IMessage[] = [];
   const logMessages: ICheckingLogMessage[] = [];
 
   if (obj.settingGroups?.some((group) => !group.name)) {
-    groupsMessages.push({
-      id: getRandomId('check'),
-      status: 'error',
-      text: 'Некоторые из групп настроек не имеют обязательного поля "name"',
-    });
-    logMessages.push({
-      msg: 'Some of setting grops have\'t required field "name"',
-      type: 'error',
-    });
+    pushMessagesToArrays(
+      groupsMessages,
+      logMessages,
+      'Некоторые из групп настроек не имеют обязательного поля "name". Игровые настройки будут недоступны.', //eslint-disable-line max-len
+      'Some of setting grops have\'t required field "name"',
+      'error',
+    );
   }
 
   return { mainMessages: groupsMessages, logMessages };
@@ -46,15 +62,13 @@ const checkSettingOptionalFileds = (obj: IGameSettingsConfig): ICheckingResult =
       (currKey) => !Object.keys(obj).includes(currKey),
     );
 
-    optionalMessages.push({
-      id: getRandomId('check'),
-      status: 'info',
-      text: `Отсутствуют опциональные поля в файле игровых настроек: ${missedOptionalFields}.`,
-    });
-    logMessages.push({
-      msg: `Missed optional fields on settings.json: ${missedOptionalFields}`,
-      type: 'info',
-    });
+    pushMessagesToArrays(
+      optionalMessages,
+      logMessages,
+      `Отсутствуют опциональные поля в файле игровых настроек: ${missedOptionalFields}.`,
+      `Missed optional fields on settings.json: ${missedOptionalFields}`,
+      'info',
+    );
   }
 
   if (obj.settingGroups!.length > 0) {
@@ -87,41 +101,36 @@ export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IMessage[
   });
 
   if (ignoredKeys.length > 0) {
-    messages.push({
-      id: getRandomId('check'),
-      status: 'warning',
-      text: `Найдены некорректные поля в файле игровых настроек: ${ignoredKeys}`,
-    });
-    logMessages.push({
-      msg: `Invalid fields detected on settings.json: ${ignoredKeys}`,
-      type: 'warning',
-    });
+    pushMessagesToArrays(
+      messages,
+      logMessages,
+      `Найдены некорректные поля в файле игровых настроек: ${ignoredKeys}`,
+      `Invalid fields detected on settings.json: ${ignoredKeys}`,
+    );
   }
 
   // Проверка на наличие необходимых полей
   if (!GAME_SETTINGS_CONFIG_REQUIRE_FIELDS.some((field) => !filteredObjKeys.includes(field))) {
     if (Object.keys(currentSettingsObj.usedFiles).length === 0) {
-      messages.push({
-        id: getRandomId('check'),
-        status: 'warning',
-        text: 'В файл игровых настроек не добавлено ни одного файла.',
-      });
-      logMessages.push({ msg: 'No game settings files on settings.json', type: 'warning' });
+      pushMessagesToArrays(
+        messages,
+        logMessages,
+        'В файл игровых настроек не добавлено ни одного файла.',
+        'No game settings files on settings.json',
+      );
     }
   } else {
     const missedRequredFields = GAME_SETTINGS_CONFIG_REQUIRE_FIELDS.filter(
       (currKey) => !filteredObjKeys.includes(currKey),
     );
 
-    messages.push({
-      id: getRandomId('check'),
-      status: 'error',
-      text: `Отсутствуют необходимые поля в файле игровых настроек: ${missedRequredFields}. Игровые настройки будут недоступны.`, //eslint-disable-line max-len
-    });
-    logMessages.push({
-      msg: `Missed required fields on settings.json: ${missedRequredFields}`,
-      type: 'error',
-    });
+    pushMessagesToArrays(
+      messages,
+      logMessages,
+      `Отсутствуют необходимые поля в файле игровых настроек: ${missedRequredFields}. Игровые настройки будут недоступны.`, //eslint-disable-line max-len
+      `Missed required fields on settings.json: ${missedRequredFields}`,
+      'error',
+    );
   }
 
   // Проверка наличия опциональных полей

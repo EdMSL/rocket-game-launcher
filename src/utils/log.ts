@@ -51,7 +51,7 @@ export const writeToLogFileSync = (message: string, messageType = LOG_MESSAGE_TY
 export const writeToLogFile = (message: string, messageType = LOG_MESSAGE_TYPE.INFO): void => {
   fs.appendFile(
     launcherLogPath,
-    `\n[${messageType}][${new Date().toLocaleString()}]: ${message}`,
+    `\n[${messageType.toUpperCase()}][${new Date().toLocaleString()}]: ${message}`,
     (error) => {
       if (error) {
         showErrorBox(error.message, "Can't write to log file.");
