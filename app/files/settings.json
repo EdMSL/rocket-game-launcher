@@ -13,8 +13,8 @@
       "label": "Управление"
     }
   ],
-  "basePathToFiles": "",
-  "baseFilesEncoding": "utf-8",
+  "basePathToFiles": "./Data",
+  "baseFilesEncoding": "win1251",
   "usedFiles": {
     "BlockheadIni": {
       "isFromMOProfile": false,

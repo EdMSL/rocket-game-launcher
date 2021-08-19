@@ -18,7 +18,7 @@ import {
   addMessages, setIsGameSettingsAvailable, setIsGameSettingsLoaded,
 } from '$actions/main';
 import { GAME_SETTINGS_PATH } from '$constants/paths';
-import { checkGameSettingsFile } from '$utils/check';
+import { createGameSettingsConfig } from '$utils/check';
 import { IGameSettingsConfig } from '$reducers/gameSettings';
 import { LogMessageType, writeToLogFile } from '$utils/log';
 import { CreateUserMessage } from '$utils/message';
@@ -33,7 +33,7 @@ export function* setGameSettingsSaga(): SagaIterator {
       const {
         newUserMessages: checkingMessages,
         newSettingsConfigObj,
-      } = checkGameSettingsFile(gameSettingsObj);
+      } = createGameSettingsConfig(gameSettingsObj);
 
       if (checkingMessages.length > 0) {
         yield put(addMessages(checkingMessages));

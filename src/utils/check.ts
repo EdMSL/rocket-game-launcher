@@ -139,7 +139,7 @@ const checkSettingOptionalFileds = (obj: IGameSettingsConfig): ICheckingResult =
   };
 };
 
-export const checkGameSettingsFile = (configObj: IGameSettingsConfig): ICheckingResult => {
+export const createGameSettingsConfig = (configObj: IGameSettingsConfig): ICheckingResult => {
   writeToLogFileSync('Start of settings.json checking');
 
   let currentSettingsObj = { ...configObj };

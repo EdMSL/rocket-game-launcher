@@ -7,6 +7,7 @@ import { createWindow } from './components/window';
 import { createLogFile, writeToLogFileSync } from '$utils/log';
 import { showErrorBox } from '$utils/errors';
 import { getSystemInfo } from '$utils/data';
+import { GAME_DIR } from '$constants/paths';
 
 require('@electron/remote/main').initialize();
 
@@ -23,6 +24,7 @@ const start = async (): Promise<void> => {
 
   createWindow(store.getState().system);
 
+  writeToLogFileSync(`Working directory: ${GAME_DIR}`);
   writeToLogFileSync('Application ready.');
 };
 

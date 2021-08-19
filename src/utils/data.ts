@@ -1,7 +1,9 @@
 import { screen } from 'electron';
 import si from 'systeminformation';
 
-import { LogMessageType, writeToLogFile } from './log';
+import {
+  LogMessageType, writeToLogFile, writeToLogFileSync,
+} from './log';
 
 const ONE_GB = 1073741824;
 
@@ -29,7 +31,7 @@ export const getDisplaysInfo = (): void => {
     });
   }
 
-  writeToLogFile(result);
+  writeToLogFileSync(result);
 };
 
 /**

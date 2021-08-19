@@ -24,8 +24,10 @@ export const defaultLauncherConfig: ISystemRootState = {
   isFirstLaunch: true,
   modOrganizer: {
     isUsed: true,
+    path: './Mod Organizer',
     pathToINI: './Mod Organizer/ModOrganizer.ini',
-    profilesParam: 'selected_profile',
-    paramValueRegExp: '',
+    pathToProfiles: './Mod Organizer/profiles',
+    profileParam: 'selected_profile',
+    profileParamValueRegExp: '',
   },
 };

@@ -5,9 +5,11 @@ import { defaultLauncherConfig } from '$constants/defaultParameters';
 
 interface IModOrganizerParams {
   isUsed: boolean,
+  path: string,
   pathToINI: string,
-  profilesParam: string,
-  paramValueRegExp: string,
+  pathToProfiles: string,
+  profileParam: string,
+  profileParamValueRegExp: string,
 }
 
 export type ISystemRootState = Readonly<{
