@@ -4,6 +4,7 @@ import {
   GAME_SETTINGS_CONFIG_OPTIONAL_FIELDS,
   GAME_SETTINGS_CONFIG_REQUIRE_FIELDS,
   GAME_SETTINGS_CONFIG_SETTING_GROUP_FIELDS,
+  USED_FILE_REQUIRED_FIELDS,
 } from '$constants/misc';
 import {
   IGameSettingsConfig, IGameSettingsRootState, IUsedFile,
@@ -18,10 +19,17 @@ import { getTypeOfElement } from './data';
 interface ICheckingResult {
   newUserMessages: IUserMessage[],
   newLogMessages?: IMessage[],
+}
+
+interface ISettingsConfigCheckingResult extends ICheckingResult {
   newSettingsConfigObj: IGameSettingsConfig,
 }
 
-const checkSettingGroups = (obj: IGameSettingsConfig): ICheckingResult => {
+interface IUsedFilesCheckingResult extends ICheckingResult {
+  newUsedFilesObj: IGameSettingsConfig['usedFiles'],
+}
+
+const checkSettingGroups = (obj: IGameSettingsConfig): ISettingsConfigCheckingResult => {
   const groupsMessages: IUserMessage[] = [];
   const logMessages: IMessage[] = [];
   const noNameGroups: number[] = [];
@@ -98,7 +106,7 @@ const checkSettingGroups = (obj: IGameSettingsConfig): ICheckingResult => {
   };
 };
 
-const checkSettingOptionalFileds = (obj: IGameSettingsConfig): ICheckingResult => {
+const checkSettingOptionalFileds = (obj: IGameSettingsConfig): ISettingsConfigCheckingResult => {
   let optionalMessages: IUserMessage[] = [];
   let logMessages: IMessage[] = [];
   let currentSettingsConfigObj = { ...obj };
@@ -148,7 +156,9 @@ const checkSettingOptionalFileds = (obj: IGameSettingsConfig): ICheckingResult =
  * На выходе получаем сообщение о результате проверки, записи в логе и итоговый конфиг.
  * Поля используемых файлов для настроек проверяются отдельно.
 */
-export const createGameSettingsConfig = (configObj: IGameSettingsConfig): ICheckingResult => {
+export const createGameSettingsConfig = (
+  configObj: IGameSettingsConfig,
+): ISettingsConfigCheckingResult => {
   writeToLogFileSync('Start of settings.json checking');
 
   let currentSettingsObj = { ...configObj };
@@ -249,17 +259,52 @@ export const createGameSettingsConfig = (configObj: IGameSettingsConfig): ICheck
   return { newUserMessages: userMessages, newSettingsConfigObj: currentSettingsObj };
 };
 
-const checkUsedFile = (usedFile: IUsedFile) => {
+const checkUsedFile = (
+  usedFile: IUsedFile,
+  usedFilesObj: IGameSettingsConfig['usedFiles'],
+): IUsedFilesCheckingResult => {
+  const messages: IUserMessage[] = [];
+  const logMessages: IMessage[] = [];
+  const newUsedFilesObj: IGameSettingsConfig['usedFiles'] = {};
+  const unknownFields: string[] = [];
 
-};
-
-export const checkUsedFiles = (usedFiles: IGameSettingsRootState['usedFiles']): IUserMessage[] => {
-  const newUserMessages: IUserMessage[] = [];
-  const newLogMessages: IMessage[] = [];
-
-  Object.keys(usedFiles).forEach((filename) => {
-    checkUsedFile(usedFiles[filename]);
+  // Фильтруем неизвестные поля
+  Object.keys(usedFile).forEach((field) => {
+    if (!USED_FILE_REQUIRED_FIELDS.includes(field)) {
+      unknownFields.push(field);
+      // delete usedFile[field]
+    }
   });
 
-  return newUserMessages;
+  return {
+    newUserMessages: messages,
+    newLogMessages: logMessages,
+    newUsedFilesObj,
+  };
+};
+
+export const checkUsedFiles = (usedFiles: IGameSettingsRootState['usedFiles']): IUsedFilesCheckingResult => {
+  const userMessages: IUserMessage[] = [];
+  const logMessages: IMessage[] = [];
+  const usedFilesObj: IGameSettingsConfig['usedFiles'] = {};
+
+  Object.keys(usedFiles).forEach((filename) => {
+    const typeOfUsedFileData = getTypeOfElement(usedFiles[filename]);
+
+    if (typeOfUsedFileData === 'object') {
+      const {
+        newLogMessages, newUserMessages, newUsedFilesObj,
+      } = checkUsedFile(usedFiles[filename], usedFilesObj);
+    } else {
+      pushMessagesToArrays(
+        userMessages,
+        logMessages,
+        `Объект настроек ${filename} имеет некорректный тип. Параметр будет проигнорирован.`,
+        `${filename} from usedFiles must be an object, got ${typeOfUsedFileData}`,
+        'error',
+      );
+    }
+  });
+
+  return { newUserMessages: userMessages, newUsedFilesObj: usedFilesObj };
 };
