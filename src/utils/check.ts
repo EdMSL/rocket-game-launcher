@@ -5,12 +5,13 @@ import {
   GAME_SETTINGS_CONFIG_REQUIRE_FIELDS,
   GAME_SETTINGS_CONFIG_SETTING_GROUP_FIELDS,
 } from '$constants/misc';
-import { IGameSettingsConfig } from '$reducers/gameSettings';
+import { IGameSettingsConfig, IGameSettingsRootState } from '$reducers/gameSettings';
 import { IUserMessage } from '$reducers/main';
 import { writeToLogFile, writeToLogFileSync } from '$utils/log';
 import {
   pushMessagesToArrays, IMessage, CreateUserMessage,
 } from '$utils/message';
+import { getTypeOfElement } from './data';
 
 interface ICheckingResult {
   newUserMessages: IUserMessage[],
@@ -139,6 +140,12 @@ const checkSettingOptionalFileds = (obj: IGameSettingsConfig): ICheckingResult =
   };
 };
 
+/**
+ * Проверка файла игровых настроек на соответствие требованиям.
+ * Проверка на наличие необходимых и опциональных полей, а так же фильтрация некорректных.
+ * На выходе получаем сообщение о результате проверки, записи в логе и итоговый конфиг.
+ * Поля используемых файлов для настроек проверяются отдельно.
+*/
 export const createGameSettingsConfig = (configObj: IGameSettingsConfig): ICheckingResult => {
   writeToLogFileSync('Start of settings.json checking');
 
@@ -170,12 +177,30 @@ export const createGameSettingsConfig = (configObj: IGameSettingsConfig): ICheck
 
   // Проверка необходимых полей
   if (!GAME_SETTINGS_CONFIG_REQUIRE_FIELDS.some((field) => !filteredObjKeys.includes(field))) {
-    if (Object.keys(currentSettingsObj.usedFiles).length === 0) {
+    if (typeof currentSettingsObj.usedFiles !== 'object') {
       pushMessagesToArrays(
         userMessages,
         logMessages,
         'В файл игровых настроек не добавлено ни одного файла.',
         'No game settings files on settings.json',
+      );
+    }
+    if (
+      getTypeOfElement(currentSettingsObj.usedFiles) === 'object'
+      && Object.keys(currentSettingsObj.usedFiles).length === 0
+    ) {
+      pushMessagesToArrays(
+        userMessages,
+        logMessages,
+        'В файл игровых настроек не добавлено ни одного файла.',
+        'No game settings files on settings.json',
+      );
+    } else if (getTypeOfElement(currentSettingsObj.usedFiles) !== 'object') {
+      pushMessagesToArrays(
+        userMessages,
+        logMessages,
+        'Параметр usedFile в settings.json имеет некорректный тип. Должен быть объект. Игровые настройки будут недоступны. Подробности в файле лога.', //eslint-disable-line max-len
+        `Parameter usedFile must be an object, ${getTypeOfElement(currentSettingsObj.usedFiles)}.`,
       );
     }
   } else {
@@ -220,4 +245,11 @@ export const createGameSettingsConfig = (configObj: IGameSettingsConfig): ICheck
   }
 
   return { newUserMessages: userMessages, newSettingsConfigObj: currentSettingsObj };
+};
+
+export const checkUsedFiles = (usedFiles: IGameSettingsRootState['usedFiles']): IUserMessage[] => {
+  const newUserMessages: IUserMessage[] = [];
+  const newLogMessages: IMessage[] = [];
+
+  return newUserMessages;
 };

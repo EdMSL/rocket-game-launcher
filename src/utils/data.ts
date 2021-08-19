@@ -64,3 +64,13 @@ export const getSystemInfo = async (): Promise<void> => {
   }
 };
 
+/**
+ * Получить тип у элемента. В отличие от `typeof` разделяет `array` и `oject`.
+ * @param element Элемент, для которого нужно определить тип.
+ * @returns Строка с типом элемента.
+*/
+export const getTypeOfElement = (element: any): string => {
+  const getElementType = {}.toString;
+  const elementType = getElementType.call(element).slice(8, -1);
+  return elementType;
+};

@@ -3,6 +3,7 @@ import {
   call,
   put,
   takeLatest,
+  select,
 } from 'redux-saga/effects';
 import path from 'path';
 import fs from 'fs';
@@ -18,7 +19,7 @@ import {
   addMessages, setIsGameSettingsAvailable, setIsGameSettingsLoaded,
 } from '$actions/main';
 import { GAME_SETTINGS_PATH } from '$constants/paths';
-import { createGameSettingsConfig } from '$utils/check';
+import { checkUsedFiles, createGameSettingsConfig } from '$utils/check';
 import { IGameSettingsConfig } from '$reducers/gameSettings';
 import { LogMessageType, writeToLogFile } from '$utils/log';
 import { CreateUserMessage } from '$utils/message';
@@ -67,14 +68,11 @@ export function* initGameSettingsSaga(): SagaIterator {
   try {
     yield call(setIsGameSettingsLoaded, false);
 
-    const file: IUnwrap<typeof readINIFile> = yield call(
-      readINIFile,
-      path.resolve('./src/tests/fixtures/Blockhead.ini'),
-    );
+    const {
+      gameSettings: { usedFiles },
+    }: IAppState = yield select(getState);
 
-    file.addSection('Section #9');
-
-    yield call(writeINIFile, path.resolve('./src/tests/fixtures/Blockhead.ini'), file);
+    yield call(checkUsedFiles, usedFiles);
   } catch (error) {
     console.log(error.message);
   } finally {
