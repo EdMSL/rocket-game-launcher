@@ -29,28 +29,24 @@ const getState = (state: IAppState): IAppState => state;
 
 export function* setGameSettingsSaga(): SagaIterator {
   try {
-    if (fs.existsSync(GAME_SETTINGS_PATH)) {
-      const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_PATH);
-      const {
-        newUserMessages: checkingMessages,
-        newSettingsConfigObj,
-      } = createGameSettingsConfig(gameSettingsObj);
+    const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_PATH);
+    const {
+      newUserMessages: checkingMessages,
+      newSettingsConfigObj,
+    } = createGameSettingsConfig(gameSettingsObj);
 
-      if (checkingMessages.length > 0) {
-        yield put(addMessages(checkingMessages));
-      }
+    if (checkingMessages.length > 0) {
+      yield put(addMessages(checkingMessages));
+    }
 
-      // Определяем, будет ли доступен раздел настроек
-      const isHasErrorsInCheckingResult = checkingMessages.some(
-        (currentMsg) => currentMsg.type === 'error',
-      );
+    // Определяем, будет ли доступен раздел настроек
+    const isHasErrorsInCheckingResult = checkingMessages.some(
+      (currentMsg) => currentMsg.type === 'error',
+    );
 
-      if (!isHasErrorsInCheckingResult) {
-        yield put(setIsGameSettingsAvailable(true));
-        yield put(setGameSettingsConfig(newSettingsConfigObj));
-      }
-    } else {
-      writeToLogFile('Game settings file settings.json not found.');
+    if (!isHasErrorsInCheckingResult) {
+      yield put(setIsGameSettingsAvailable(true));
+      yield put(setGameSettingsConfig(newSettingsConfigObj));
     }
 
     // return gameSettingsObj;

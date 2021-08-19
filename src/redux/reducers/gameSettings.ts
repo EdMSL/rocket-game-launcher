@@ -7,6 +7,18 @@ interface IGameSettingsGroup {
   label: string,
 }
 
+export interface IUsedFile {
+  path: string,
+  type: string,
+  parameters: any[],
+  encoding?: string,
+  isFromMOProfile?: boolean,
+}
+
+export interface IUsedFiles {
+  [key: string]: IUsedFile,
+}
+
 export interface IGameSettingsConfig {
   settingGroups?: IGameSettingsRootState['settingGroups'],
   basePathToFiles?: IGameSettingsRootState['basePathToFiles'],
@@ -18,7 +30,7 @@ export type IGameSettingsRootState = Readonly<{
   settingGroups: IGameSettingsGroup[],
   basePathToFiles: string,
   baseFilesEncoding: string,
-  usedFiles: Record<string, unknown>,
+  usedFiles: IUsedFiles,
 }>;
 
 // Если добавляем поле в settings.json, то добаляем его здесь в стейт и constants/misc

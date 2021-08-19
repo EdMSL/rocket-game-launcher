@@ -5,7 +5,9 @@ import {
   GAME_SETTINGS_CONFIG_REQUIRE_FIELDS,
   GAME_SETTINGS_CONFIG_SETTING_GROUP_FIELDS,
 } from '$constants/misc';
-import { IGameSettingsConfig, IGameSettingsRootState } from '$reducers/gameSettings';
+import {
+  IGameSettingsConfig, IGameSettingsRootState, IUsedFile,
+} from '$reducers/gameSettings';
 import { IUserMessage } from '$reducers/main';
 import { writeToLogFile, writeToLogFileSync } from '$utils/log';
 import {
@@ -247,9 +249,17 @@ export const createGameSettingsConfig = (configObj: IGameSettingsConfig): ICheck
   return { newUserMessages: userMessages, newSettingsConfigObj: currentSettingsObj };
 };
 
+const checkUsedFile = (usedFile: IUsedFile) => {
+
+};
+
 export const checkUsedFiles = (usedFiles: IGameSettingsRootState['usedFiles']): IUserMessage[] => {
   const newUserMessages: IUserMessage[] = [];
   const newLogMessages: IMessage[] = [];
+
+  Object.keys(usedFiles).forEach((filename) => {
+    checkUsedFile(usedFiles[filename]);
+  });
 
   return newUserMessages;
 };

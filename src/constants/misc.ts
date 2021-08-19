@@ -17,3 +17,5 @@ export const GAME_SETTINGS_CONFIG_ALL_MAIN_FIELDS = [
   ...GAME_SETTINGS_CONFIG_REQUIRE_FIELDS,
   ...GAME_SETTINGS_CONFIG_OPTIONAL_FIELDS];
 export const GAME_SETTINGS_CONFIG_SETTING_GROUP_FIELDS = ['name', 'label'];
+export const USED_FILE_REQUIRED_FIELDS = ['path', 'type', 'parameters'];
+export const USED_FILE_OPTIONAL_FIELDS = ['encoding', 'isFromMOProfile'];
