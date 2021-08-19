@@ -35,7 +35,7 @@ const checkSettingGroups = (obj: IGameSettingsConfig): ICheckingResult => {
     if (!group.label) {
       noLabelGroups.push(index + 1);
 
-      currentSettingsConfigObj.settingGroups![index].label = currentSettingsConfigObj.settingGroups![index].name;
+      currentSettingsConfigObj.settingGroups![index].label = currentSettingsConfigObj.settingGroups![index].name.toString();
     }
 
     // Проверка на лишние поля в группах

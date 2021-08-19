@@ -22,6 +22,7 @@ import { checkGameSettingsFile } from '$utils/check';
 import { IGameSettingsConfig } from '$reducers/gameSettings';
 import { LogMessageType, writeToLogFile } from '$utils/log';
 import { CreateUserMessage } from '$utils/message';
+import { setGameSettingsConfig } from '$actions/gameSettings';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -39,9 +40,14 @@ export function* setGameSettingsSaga(): SagaIterator {
       }
 
       // Определяем, будет ли доступен раздел настроек
-      yield put(setIsGameSettingsAvailable(
-        !checkingMessages.some((currentMsg) => currentMsg.type === 'error'),
-      ));
+      const isHasErrorsInCheckingResult = checkingMessages.some(
+        (currentMsg) => currentMsg.type === 'error',
+      );
+
+      if (!isHasErrorsInCheckingResult) {
+        yield put(setIsGameSettingsAvailable(true));
+        yield put(setGameSettingsConfig(newSettingsConfigObj));
+      }
     } else {
       writeToLogFile('Game settings file settings.json not found.');
     }
