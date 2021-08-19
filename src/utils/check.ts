@@ -13,7 +13,7 @@ import {
 } from '$utils/message';
 
 interface ICheckingResult {
-  newMainMessages: IUserMessage[],
+  newUserMessages: IUserMessage[],
   newLogMessages?: IMessage[],
   newSettingsConfigObj: IGameSettingsConfig,
 }
@@ -44,6 +44,7 @@ const checkSettingGroups = (obj: IGameSettingsConfig): ICheckingResult => {
     Object.keys(group).forEach((field) => {
       if (!GAME_SETTINGS_CONFIG_SETTING_GROUP_FIELDS.includes(field)) {
         unknonGroupFields.push(field);
+        delete currentSettingsConfigObj.settingGroups![index][field];
       }
     });
 
@@ -88,7 +89,7 @@ const checkSettingGroups = (obj: IGameSettingsConfig): ICheckingResult => {
   }
 
   return {
-    newMainMessages: groupsMessages,
+    newUserMessages: groupsMessages,
     newLogMessages: logMessages,
     newSettingsConfigObj: currentSettingsConfigObj,
   };
@@ -115,10 +116,10 @@ const checkSettingOptionalFileds = (obj: IGameSettingsConfig): ICheckingResult =
 
   if (obj.settingGroups!.length > 0) {
     const {
-      newMainMessages, newLogMessages, newSettingsConfigObj,
+      newUserMessages, newLogMessages, newSettingsConfigObj,
     } = checkSettingGroups(currentSettingsConfigObj);
 
-    optionalMessages = [...optionalMessages, ...newMainMessages];
+    optionalMessages = [...optionalMessages, ...newUserMessages];
     logMessages = [...logMessages, ...newLogMessages!];
     currentSettingsConfigObj = { ...newSettingsConfigObj };
   }
@@ -132,7 +133,7 @@ const checkSettingOptionalFileds = (obj: IGameSettingsConfig): ICheckingResult =
   }
 
   return {
-    newMainMessages: optionalMessages,
+    newUserMessages: optionalMessages,
     newLogMessages: logMessages,
     newSettingsConfigObj: currentSettingsConfigObj,
   };
@@ -142,7 +143,7 @@ export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IChecking
   writeToLogFileSync('Start of settings.json checking');
 
   let currentSettingsObj = { ...configObj };
-  let messages: IUserMessage[] = [];
+  let userMessages: IUserMessage[] = [];
   let logMessages: IMessage[] = [];
   const ignoredKeys: string[] = [];
 
@@ -160,7 +161,7 @@ export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IChecking
 
   if (ignoredKeys.length > 0) {
     pushMessagesToArrays(
-      messages,
+      userMessages,
       logMessages,
       `Найдены неизвестные поля в файле игровых настроек: ${ignoredKeys}`,
       `Invalid fields detected on settings.json: ${ignoredKeys}`,
@@ -171,7 +172,7 @@ export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IChecking
   if (!GAME_SETTINGS_CONFIG_REQUIRE_FIELDS.some((field) => !filteredObjKeys.includes(field))) {
     if (Object.keys(currentSettingsObj.usedFiles).length === 0) {
       pushMessagesToArrays(
-        messages,
+        userMessages,
         logMessages,
         'В файл игровых настроек не добавлено ни одного файла.',
         'No game settings files on settings.json',
@@ -183,7 +184,7 @@ export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IChecking
     );
 
     pushMessagesToArrays(
-      messages,
+      userMessages,
       logMessages,
       `Отсутствуют необходимые поля в файле игровых настроек: ${missedRequredFields}. Игровые настройки будут недоступны.`, //eslint-disable-line max-len
       `Missed required fields on settings.json: ${missedRequredFields}`,
@@ -193,23 +194,23 @@ export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IChecking
 
   // Проверка опциональных полей
   const {
-    newMainMessages, newLogMessages, newSettingsConfigObj,
+    newUserMessages, newLogMessages, newSettingsConfigObj,
   } = checkSettingOptionalFileds(currentSettingsObj);
 
-  messages = [...messages, ...newMainMessages];
+  userMessages = [...userMessages, ...newUserMessages];
   logMessages = [...logMessages, ...newLogMessages!];
   currentSettingsObj = { ...newSettingsConfigObj };
 
-  if (messages.length > 0) {
-    if (messages.some((message) => message.type === 'error')) {
-      messages = [CreateUserMessage.error('При проверке файла настроек settings.json обнаружены ошибки. Игровые настройки будут недоступны. Подробности в файле лога')]; //eslint-disable-line max-len
-    } else if (messages.some((message) => message.type === 'warning')) {
-      messages = [CreateUserMessage.warning('При проверке файла настроек settings.json обнаружены недочеты. Подробности в файле лога')]; //eslint-disable-line max-len
+  if (userMessages.length > 0) {
+    if (userMessages.some((message) => message.type === 'error')) {
+      userMessages = [CreateUserMessage.error('При проверке файла настроек settings.json обнаружены ошибки. Игровые настройки будут недоступны. Подробности в файле лога')]; //eslint-disable-line max-len
+    } else if (userMessages.some((message) => message.type === 'warning')) {
+      userMessages = [CreateUserMessage.warning('При проверке файла настроек settings.json обнаружены недочеты. Подробности в файле лога')]; //eslint-disable-line max-len
     } else {
-      messages = [CreateUserMessage.info('При проверке файла настроек settings.json критических ошибок не обнаружено. Подробности в файле лога')]; //eslint-disable-line max-len
+      userMessages = [CreateUserMessage.info('При проверке файла настроек settings.json критических ошибок не обнаружено. Подробности в файле лога')]; //eslint-disable-line max-len
     }
   } else {
-    messages = [];
+    userMessages = [];
   }
 
   if (logMessages.length > 0) {
@@ -218,5 +219,5 @@ export const checkGameSettingsFile = (configObj: IGameSettingsConfig): IChecking
     });
   }
 
-  return { newMainMessages: messages, newSettingsConfigObj: currentSettingsObj };
+  return { newUserMessages: userMessages, newSettingsConfigObj: currentSettingsObj };
 };

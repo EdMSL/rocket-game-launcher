@@ -29,7 +29,10 @@ export function* setGameSettingsSaga(): SagaIterator {
   try {
     if (fs.existsSync(GAME_SETTINGS_PATH)) {
       const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_PATH);
-      const { newMainMessages: checkingMessages } = checkGameSettingsFile(gameSettingsObj);
+      const {
+        newUserMessages: checkingMessages,
+        newSettingsConfigObj,
+      } = checkGameSettingsFile(gameSettingsObj);
 
       if (checkingMessages.length > 0) {
         yield put(addMessages(checkingMessages));
@@ -54,7 +57,7 @@ export function* setGameSettingsSaga(): SagaIterator {
   }
 }
 
-export function* initSettingsSaga(): SagaIterator {
+export function* initGameSettingsSaga(): SagaIterator {
   try {
     yield call(setIsGameSettingsLoaded, false);
 
@@ -75,7 +78,7 @@ export function* initSettingsSaga(): SagaIterator {
 
 function* locationChangeSaga({ payload: { location } }: LocationChangeAction): SagaIterator {
   if (location.hash === `#${Routes.GAME_SETTINGS_SCREEN}`) {
-    yield call(initSettingsSaga);
+    yield call(initGameSettingsSaga);
   }
 }
 
