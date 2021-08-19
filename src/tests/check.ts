@@ -14,20 +14,20 @@ describe('#Check', () => {
   });
 
   it('Should return no messages array', () => {
-    assert.equal(checkGameSettingsFile(readJSONFileSync(`${process.cwd()}/settings.json`)).length, 0);
+    assert.equal(checkGameSettingsFile(readJSONFileSync(`${process.cwd()}/settings.json`)).newMainMessages.length, 0);
   });
 
   it('Should return array with messages', () => {
     // Чтобы не считывать постоянно данные из реального файла, это делается один раз, а затем клонируем объект данных из мокового файла.
     const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
     delete obj.baseFilesEncoding;
-    assert.equal(checkGameSettingsFile(obj).length, 1);
+    assert.equal(checkGameSettingsFile(obj).newMainMessages.length, 1);
     // @ts-ignore
     delete obj.usedFiles;
-    assert.equal(checkGameSettingsFile(obj).length, 2);
+    assert.equal(checkGameSettingsFile(obj).newMainMessages.length, 2);
     // @ts-ignore
     obj.new = '111';
-    assert.equal(checkGameSettingsFile(obj).length, 3);
+    assert.equal(checkGameSettingsFile(obj).newMainMessages.length, 3);
   });
 
   it('Should return array with error message', () => {

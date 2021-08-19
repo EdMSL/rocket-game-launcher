@@ -6,14 +6,14 @@
     },
     {
       "name": "Audio",
-      "label": "Аудио"
+      "label": "Аудио",
+      "fflabel2": "Аудио"
     },
     {
       "name": "Control",
       "label": "Управление"
     }
   ],
-  "basePathToFiles": "",
   "baseFilesEncoding": "utf-8",
   "usedFiles": {
     "BlockheadIni": {

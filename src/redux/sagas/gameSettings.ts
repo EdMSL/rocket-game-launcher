@@ -29,7 +29,7 @@ export function* setGameSettingsSaga(): SagaIterator {
   try {
     if (fs.existsSync(GAME_SETTINGS_PATH)) {
       const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_PATH);
-      const checkingMessages = checkGameSettingsFile(gameSettingsObj);
+      const { newMainMessages: checkingMessages } = checkGameSettingsFile(gameSettingsObj);
 
       if (checkingMessages.length > 0) {
         yield put(addMessages(checkingMessages));
