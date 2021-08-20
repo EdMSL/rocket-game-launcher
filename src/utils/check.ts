@@ -1,10 +1,14 @@
+
+import Joi from 'joi';
+
 import {
   Encoding,
-  GAME_SETTINGS_CONFIG_ALL_MAIN_FIELDS,
+  GAME_SETTINGS_CONFIG_AVAILABLE_MAIN_FIELDS,
   GAME_SETTINGS_CONFIG_OPTIONAL_FIELDS,
   GAME_SETTINGS_CONFIG_REQUIRE_FIELDS,
   GAME_SETTINGS_CONFIG_SETTING_GROUP_FIELDS,
   USED_FILE_REQUIRED_FIELDS,
+  USED_FILE_AVAILABLE_FIELDS,
 } from '$constants/misc';
 import {
   IGameSettingsConfig, IGameSettingsRootState, IUsedFile,
@@ -150,6 +154,28 @@ const checkSettingOptionalFileds = (obj: IGameSettingsConfig): ISettingsConfigCh
   };
 };
 
+const check = (configObj: IGameSettingsConfig) => {
+  const schema = Joi.object({
+    settingGroups: Joi.array()
+      .items({
+        name: Joi.string().required(),
+        label: Joi.string().optional(),
+      }),
+    baseFilesEncoding: Joi.string(),
+    basePathToFiles: Joi.string(),
+    usedFiles: Joi.object()
+      .pattern(
+        Joi.string(),
+        Joi.object().pattern(
+          Joi.string(),
+          Joi.any(),
+        ),
+      ),
+  });
+
+  return schema.validate(configObj, { abortEarly: false });
+};
+
 /**
  * Проверка файла игровых настроек на соответствие требованиям.
  * Проверка на наличие необходимых и опциональных полей, а так же фильтрация некорректных.
@@ -166,9 +192,12 @@ export const createGameSettingsConfig = (
   let logMessages: IMessage[] = [];
   const ignoredKeys: string[] = [];
 
+  const result = check(configObj);
+  console.log(result);
+
   // Отфильтруем невалидные поля.
   const filteredObjKeys = Object.keys(configObj).filter((currentKey) => {
-    if (!GAME_SETTINGS_CONFIG_ALL_MAIN_FIELDS.includes(currentKey)) {
+    if (!GAME_SETTINGS_CONFIG_AVAILABLE_MAIN_FIELDS.includes(currentKey)) {
       ignoredKeys.push(currentKey);
       delete currentSettingsObj[currentKey];
 
@@ -270,7 +299,7 @@ const checkUsedFile = (
 
   // Фильтруем неизвестные поля
   Object.keys(usedFile).forEach((field) => {
-    if (!USED_FILE_REQUIRED_FIELDS.includes(field)) {
+    if (!USED_FILE_AVAILABLE_FIELDS.includes(field)) {
       unknownFields.push(field);
       // delete usedFile[field]
     }
