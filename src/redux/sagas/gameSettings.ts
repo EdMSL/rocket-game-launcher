@@ -20,7 +20,7 @@ import {
 } from '$actions/main';
 import { GAME_SETTINGS_PATH } from '$constants/paths';
 import { checkUsedFiles, createGameSettingsConfig } from '$utils/check';
-import { IGameSettingsConfig } from '$reducers/gameSettings';
+import { IGameSettingsConfig } from '$types/gameSettings';
 import { LogMessageType, writeToLogFile } from '$utils/log';
 import { CreateUserMessage } from '$utils/message';
 import { setGameSettingsConfig } from '$actions/gameSettings';

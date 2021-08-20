@@ -9,7 +9,7 @@ import windowStateKeeper from 'electron-window-state';
 
 import { createWaitForWebpackDevServer } from './waitDevServer';
 import { defaultLauncherResolution } from '$constants/defaultParameters';
-import { ISystemRootState } from '$reducers/system';
+import { ISystemRootState } from '$types/system';
 import { getDisplaysInfo } from '$utils/data';
 
 /**

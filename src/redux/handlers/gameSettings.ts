@@ -1,6 +1,5 @@
 import { IActionHandler } from '$types/common';
-import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
-import { IGameSettingsRootState } from '$reducers/gameSettings';
+import { GAME_SETTINGS_TYPES, IGameSettingsRootState } from '$types/gameSettings';
 import * as GAME_SETTINGS_ACTIONS from '$actions/gameSettings';
 
 const setGameSettingsConfig: IActionHandler<

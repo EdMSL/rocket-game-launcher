@@ -1,6 +1,5 @@
 import { IAction } from '$types/common';
-import { MAIN_TYPES } from '$types/main';
-import { IMainRootState } from '$reducers/main';
+import { MAIN_TYPES, IMainRootState } from '$types/main';
 
 export const setIsGameRunning: IAction<IMainRootState['isGameRunning']> = (
   isGameRunning,

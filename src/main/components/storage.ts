@@ -2,7 +2,7 @@ import Storage from 'electron-store';
 import { Store } from 'redux';
 
 import { configureStore, IAppState } from '$store/store';
-import { IUserSettingsRootState } from '$reducers/userSettings';
+import { IUserSettingsRootState } from '$types/userSettings';
 import { defaultLauncherConfig, defaultLauncherResolution } from '$constants/defaultParameters';
 import {
   LogMessageType,
@@ -11,7 +11,7 @@ import {
 } from '$utils/log';
 import { readJSONFileSync, writeJSONFile } from '$utils/files';
 import { CONFIG_PATH } from '$constants/paths';
-import { ISystemRootState } from '$reducers/system';
+import { ISystemRootState } from '$types/system';
 import {
   ErrorName, ReadWriteError, showMessageBox,
 } from '$utils/errors';

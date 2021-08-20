@@ -1,19 +1,7 @@
 import { createReducer } from 'reduxsauce';
 
 import { MAIN_HANDLERS } from '$handlers/main';
-import { IMessage } from '$utils/message';
-
-export interface IUserMessage extends IMessage {
-  id: string,
-}
-
-export type IMainRootState = Readonly<{
-  isLauncherInitialised: boolean,
-  isGameRunning: boolean,
-  isGameSettingsLoaded: boolean,
-  isGameSettingsAvailable: boolean,
-  messages: IUserMessage[],
-}>;
+import { IMainRootState } from '$types/main';
 
 const INITIAL_STATE: IMainRootState = {
   isLauncherInitialised: false,

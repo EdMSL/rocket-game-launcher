@@ -2,15 +2,7 @@ import { createReducer } from 'reduxsauce';
 
 import { defaultLauncherResolution } from '$constants/defaultParameters';
 import { USER_SETTINGS_HANDLERS } from '$handlers/userSettings';
-
-interface IResolution {
-  width: number,
-  height: number,
-}
-
-export type IUserSettingsRootState = Readonly<{
-  resolution: IResolution,
-}>;
+import { IUserSettingsRootState } from '$types/userSettings';
 
 const INITIAL_STATE: IUserSettingsRootState = {
   resolution: defaultLauncherResolution,

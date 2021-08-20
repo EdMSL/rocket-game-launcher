@@ -1,4 +1,4 @@
-import { IUserMessage } from '$reducers/main';
+import { IUserMessage } from '$types/main';
 import { getRandomId } from '$utils/strings';
 
 export type IMessageType = 'error'|'warning'|'info'|'success';

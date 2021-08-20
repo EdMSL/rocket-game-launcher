@@ -6,6 +6,7 @@ import {
 } from './log';
 
 const ONE_GB = 1073741824;
+const SYMBOLS_TO_TYPE = 8;
 
 /**
  * Получить объект сообщения для вывода пользователю.
@@ -69,8 +70,8 @@ export const getSystemInfo = async (): Promise<void> => {
  * @param element Элемент, для которого нужно определить тип.
  * @returns Строка с типом элемента.
 */
-export const getTypeOfElement = (element: any): string => {
+export const getTypeOfElement = (element: unknown): string => {
   const getElementType = {}.toString;
-  const elementType = getElementType.call(element).slice(8, -1);
+  const elementType = getElementType.call(element).slice(SYMBOLS_TO_TYPE, -1);
   return elementType;
 };

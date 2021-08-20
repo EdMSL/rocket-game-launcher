@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { createGameSettingsConfig } from '$utils/check';
 import { createMockFilesForCheck } from './fixtures/getFiles';
 import { readJSONFileSync } from '$utils/files';
-import { IGameSettingsConfig } from '$reducers/gameSettings';
+import { IGameSettingsConfig } from '$types/gameSettings';
 
 /* eslint-disable max-len, @typescript-eslint/ban-ts-comment */
 describe('#Check', () => {

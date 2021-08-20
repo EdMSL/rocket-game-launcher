@@ -1,6 +1,5 @@
 import { IAction } from '$types/common';
-import { SYSTEM_TYPES } from '$types/system';
-import { ISystemRootState } from '$reducers/system';
+import { SYSTEM_TYPES, ISystemRootState } from '$types/system';
 
 export const setIsFirstLaunch: IAction<ISystemRootState['isFirstLaunch']> = (
   isFirstLaunch,

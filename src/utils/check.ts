@@ -8,8 +8,8 @@ import {
 } from '$constants/misc';
 import {
   IGameSettingsConfig, IGameSettingsRootState, IUsedFile,
-} from '$reducers/gameSettings';
-import { IUserMessage } from '$reducers/main';
+} from '$types/gameSettings';
+import { IUserMessage } from '$types/main';
 import { writeToLogFile, writeToLogFileSync } from '$utils/log';
 import {
   pushMessagesToArrays, IMessage, CreateUserMessage,

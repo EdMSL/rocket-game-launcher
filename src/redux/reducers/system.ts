@@ -1,26 +1,8 @@
 import { createReducer } from 'reduxsauce';
 
-import { SYSTEM_HANDLERS } from '$handlers/system';
 import { defaultLauncherConfig } from '$constants/defaultParameters';
-
-interface IModOrganizerParams {
-  isUsed: boolean,
-  path: string,
-  pathToINI: string,
-  pathToProfiles: string,
-  profileParam: string,
-  profileParamValueRegExp: string,
-}
-
-export type ISystemRootState = Readonly<{
-  isResizable: boolean,
-  minWidth: number,
-  minHeight: number,
-  width: number,
-  height: number,
-  isFirstLaunch: boolean,
-  modOrganizer: IModOrganizerParams,
-}>;
+import { SYSTEM_HANDLERS } from '$handlers/system';
+import { ISystemRootState } from '$types/system';
 
 const INITIAL_STATE: ISystemRootState = {
   isResizable: defaultLauncherConfig.isResizable,

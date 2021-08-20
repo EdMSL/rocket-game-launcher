@@ -1,6 +1,5 @@
 import { IActionHandler } from '$types/common';
-import { MAIN_TYPES } from '$types/main';
-import { IMainRootState } from '$reducers/main';
+import { MAIN_TYPES, IMainRootState } from '$types/main';
 import * as MAIN_ACTIONS from '$actions/main';
 
 const setIsGameRunning: IActionHandler<

@@ -14,7 +14,7 @@ import { CreateUserMessage } from '$utils/message';
 
 export const MainScreen: React.FC = () => {
   const isGameRunning = useSelector((state: IAppState) => state.main.isGameRunning);
-  const isGameSettingsAvailable = useSelector((state: IAppState) => state.main.isGameSettingsAvailable);
+  const isGameSettingsAvailable = useSelector((state: IAppState) => state.main.isGameSettingsAvailable); //eslint-disable-line max-len
 
   const dispatch = useDispatch();
 

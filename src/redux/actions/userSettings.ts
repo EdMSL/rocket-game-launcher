@@ -1,6 +1,5 @@
 import { IAction } from '$types/common';
-import { USER_SETTINGS_TYPES } from '$types/userSettings';
-import { IUserSettingsRootState } from '$reducers/userSettings';
+import { USER_SETTINGS_TYPES, IUserSettingsRootState } from '$types/userSettings';
 
 export const setLauncherResolution: IAction<IUserSettingsRootState['resolution']> = (
   resolution,

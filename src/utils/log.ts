@@ -30,7 +30,8 @@ export const createLogFile = (pathToLogFile = launcherLogPath): void => {
 /**
   * Синхронно записать информацию в файл лога.
   * @param message Строка для записи в лог.
-  * @param messageType Определяет тип сообщения, ошибка, предупреждение или информация. По умолчанию `info`.
+  * @param messageType Определяет тип сообщения, ошибка, предупреждение или информация.
+  * По умолчанию `info`.
 */
 export const writeToLogFileSync = (message: string, messageType = LogMessageType.INFO): void => {
   try {
@@ -46,7 +47,8 @@ export const writeToLogFileSync = (message: string, messageType = LogMessageType
 /**
   * Асинхронно записать информацию в файл лога.
   * @param message Строка для записи в лог.
-  * @param messageType Определяет тип сообщения, ошибка, предупреждение или информация. По умолчанию `info`.
+  * @param messageType Определяет тип сообщения, ошибка, предупреждение или информация.
+  * По умолчанию `info`.
 */
 export const writeToLogFile = (message: string, messageType = LogMessageType.INFO): void => {
   fs.appendFile(

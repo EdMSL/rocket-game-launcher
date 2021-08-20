@@ -2,7 +2,7 @@ import {
   IError,
   ISuccess,
 } from '$types/common';
-import { ISystemRootState } from '$reducers/system';
+import { ISystemRootState } from '$types/system';
 
 export const SUCCESS_STATUS: ISuccess = 'success';
 export const ERROR_STATUS: IError = 'error';
