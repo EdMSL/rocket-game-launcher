@@ -150,6 +150,7 @@ module.exports = {
     '@typescript-eslint/func-call-spacing': [1, 'never'],
     '@typescript-eslint/indent': 0,
     '@typescript-eslint/keyword-spacing': [1],
+    '@typescript-eslint/lines-between-class-members': 0,
     '@typescript-eslint/member-delimiter-style': [1, {
       multiline: {
         delimiter: 'comma',

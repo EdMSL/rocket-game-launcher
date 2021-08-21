@@ -1,5 +1,5 @@
 import {
-  app, ipcMain,
+  app, ipcMain, globalShortcut,
 } from 'electron';
 
 import { createStorage } from './components/storage';
@@ -24,6 +24,10 @@ const start = async (): Promise<void> => {
 
   createWindow(store.getState().system);
 
+  globalShortcut.register('Alt+Q', () => {
+    app.quit();
+  });
+
   writeToLogFileSync(`Working directory: ${GAME_DIR}`);
   writeToLogFileSync('Application ready.');
 };
@@ -37,6 +41,10 @@ app.on('ready', () => {
     .catch((error: Error) => {
       showErrorBox(error.message, "Can't load application");
     });
+});
+
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
 });
 
 app.on('window-all-closed', () => {

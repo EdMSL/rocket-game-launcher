@@ -1,7 +1,7 @@
 import {
   BrowserWindow,
   ipcMain,
-  // screen,
+  globalShortcut,
 } from 'electron';
 import fs from 'fs';
 import path from 'path';
@@ -76,6 +76,16 @@ export const createWindow = (systemConfig: ISystemRootState): void => {
   mainWindow.on('unmaximize', () => {
     mainWindow.webContents.send('max-unmax window', false);
   });
+
+  if (process.env.NODE_ENV === 'development') {
+    globalShortcut.register('F11', () => {
+      mainWindow.webContents.openDevTools();
+    });
+
+    globalShortcut.register('F5', () => {
+      mainWindow.reload();
+    });
+  }
 
   mainWindowState.manage(mainWindow);
 };
