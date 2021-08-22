@@ -13,6 +13,18 @@ const setGameSettingsConfig: IActionHandler<
   ...gameSettingsConfig,
 });
 
+const setGameSettingsUsedFiles: IActionHandler<
+  IGameSettingsRootState,
+  typeof GAME_SETTINGS_ACTIONS.setGameSettingsUsedFiles
+> = (
+  state,
+  { payload: gameSettingsUsedFiles },
+) => ({
+  ...state,
+  usedFiles: gameSettingsUsedFiles,
+});
+
 export const GAME_SETTINGS_HANDLERS = {
   [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_CONFIG]: setGameSettingsConfig,
+  [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_USED_FILES]: setGameSettingsUsedFiles,
 };

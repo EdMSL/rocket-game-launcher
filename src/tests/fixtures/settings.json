@@ -24,7 +24,7 @@
         {
           "name": "Any name",
           "iniGroup": "Display",
-          "settingsGroup": "Graphic",
+          "settingGroup": "Graphic",
           "type": "range",
           "min": "0",
           "max": "300",
@@ -39,7 +39,7 @@
       "parameters": [
         {
           "name": "Some name",
-          "settingsGroup": "Control",
+          "settingGroup": "Control",
           "type": "select",
           "label": "Some label",
           "options": {

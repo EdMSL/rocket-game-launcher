@@ -14,16 +14,18 @@ import { Routes } from '$constants/routes';
 import {
   readINIFile, readJSONFile, writeINIFile,
 } from '$utils/files';
-import { IUnwrap } from '$types/common';
+import { IUnwrap, IUnwrapSync } from '$types/common';
 import {
   addMessages, setIsGameSettingsAvailable, setIsGameSettingsLoaded,
 } from '$actions/main';
 import { GAME_SETTINGS_PATH } from '$constants/paths';
 import { checkUsedFiles, createGameSettingsConfig } from '$utils/check';
 import { IGameSettingsConfig } from '$types/gameSettings';
-import { LogMessageType, writeToLogFile } from '$utils/log';
+import {
+  LogMessageType, writeToLogFile, writeToLogFileSync,
+} from '$utils/log';
 import { CreateUserMessage } from '$utils/message';
-import { setGameSettingsConfig } from '$actions/gameSettings';
+import { setGameSettingsConfig, setGameSettingsUsedFiles } from '$actions/gameSettings';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -65,12 +67,29 @@ export function* initGameSettingsSaga(): SagaIterator {
     yield call(setIsGameSettingsLoaded, false);
 
     const {
-      gameSettings: { usedFiles },
+      gameSettings: {
+        usedFiles,
+        baseFilesEncoding,
+        settingGroups,
+      },
     }: IAppState = yield select(getState);
 
-    yield call(checkUsedFiles, usedFiles);
+    const { newUserMessages, newUsedFilesObj }: IUnwrapSync<typeof checkUsedFiles> = yield call(
+      checkUsedFiles,
+      usedFiles,
+      baseFilesEncoding,
+      settingGroups.length > 0,
+    );
+
+    if (newUserMessages.length > 0) {
+      yield put(addMessages(newUserMessages));
+    }
+
+    yield put(setGameSettingsUsedFiles(
+      Object.keys(newUsedFilesObj).length > 0 ? newUsedFilesObj : {},
+    ));
   } catch (error) {
-    console.log(error.message);
+    writeToLogFileSync(error.message);
   } finally {
     yield call(setIsGameSettingsLoaded, true);
   }

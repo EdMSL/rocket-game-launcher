@@ -10,6 +10,7 @@ export interface ILauncherResolution {
 export type UnsafeReturnType<T> = T extends (...args: any[]) => infer R ? R : any;
 
 export type IUnwrap<T> = T extends (...args: any[]) => Promise<infer U> ? U : T;
+export type IUnwrapSync<T> = T extends (...args: any[]) => infer U ? U : T;
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 export interface IAction<T> {

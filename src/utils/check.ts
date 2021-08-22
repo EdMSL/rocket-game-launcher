@@ -1,7 +1,9 @@
 
 import Joi from 'joi';
 
-import { Encoding, USED_FILE_AVAILABLE_FIELDS } from '$constants/misc';
+import {
+  Encoding, SettingParameterControllerType, UsedFileView,
+} from '$constants/misc';
 import {
   IGameSettingsConfig, IGameSettingsRootState, IUsedFile,
 } from '$types/gameSettings';
@@ -10,9 +12,8 @@ import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';
 import {
-  pushMessagesToArrays, IMessage, CreateUserMessage,
+  IMessage, CreateUserMessage,
 } from '$utils/message';
-import { getTypeOfElement } from '$utils/data';
 
 interface ICheckingResult {
   newUserMessages: IUserMessage[],
@@ -27,43 +28,66 @@ interface IUsedFilesCheckingResult extends ICheckingResult {
   newUsedFilesObj: IGameSettingsConfig['usedFiles'],
 }
 
-/**
- * Проверка полей для конфига игровых настроек с удалением неизвестных ключей
- * и установкой значений по умолчанию для опциональных полей.
- * @param configObj Объект для проверки.
- * @returns Объект, содержащий измененный конфиг, и список ошибок.
-*/
-const checkGameSettings = (configObj: IGameSettingsConfig): Joi.ValidationResult => {
-  const schema = Joi.object({
-    settingGroups: Joi.array()
-      .items(Joi.object({
-        name: Joi.string().required(),
-        label: Joi.string().optional().default(Joi.ref('name')),
-      })).optional().min(1),
-    baseFilesEncoding: Joi.string().optional().default(Encoding.WIN1251),
-    basePathToFiles: Joi.string().optional().default('./'),
-    usedFiles: Joi.object()
-      .pattern(
+interface IUsedFileError {
+  parent: string,
+  error: Joi.ValidationError,
+}
+
+const settingsMainSchema = Joi.object({
+  settingGroups: Joi.array()
+    .items(Joi.object({
+      name: Joi.string().required(),
+      label: Joi.string().optional().default(Joi.ref('name')),
+    })).optional().min(1),
+  baseFilesEncoding: Joi.string().optional().default(Encoding.WIN1251),
+  basePathToFiles: Joi.string().optional().default('./'),
+  usedFiles: Joi.object()
+    .pattern(
+      Joi.string(),
+      Joi.object().pattern(
         Joi.string(),
-        Joi.object().pattern(
-          Joi.string(),
-          Joi.any(),
-        ),
+        Joi.any(),
       ),
-  });
+    ),
+});
 
-  const validateResult = schema.validate(configObj, {
-    abortEarly: false,
-    stripUnknown: true,
-  });
+const settingParameterSchema = Joi.object({
+  name: Joi.string().required(),
+  type: Joi.string().required().valid(...Object.values(SettingParameterControllerType)),
+  label: Joi.string().optional().default(Joi.ref('name')),
+  iniGroup: Joi.string().when(
+    Joi.ref('$view'), { is: UsedFileView.SECTIONAL, then: Joi.required() },
+  ),
+  settingGroup: Joi.string().when(Joi.ref('$isSettingGroupsExists'), {
+    is: true, then: Joi.required(),
+  }),
+  options: Joi.object().pattern(
+    Joi.string(),
+    Joi.string(),
+  ).when(Joi.ref('type'), { is: SettingParameterControllerType.SELECT, then: Joi.required() }),
+  min: Joi.number().when(
+    Joi.ref('type'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+  ),
+  max: Joi.number().when(
+    Joi.ref('type'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+  ),
+  step: Joi.number().when(
+    Joi.ref('type'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+  ),
+});
 
-  return validateResult;
-};
+const usedFileSchema = Joi.object({
+  isFromMOProfile: Joi.bool().optional().default(false),
+  encoding: Joi.string().optional().default(Joi.ref('$encoding')),
+  path: Joi.string().required(),
+  view: Joi.string().required().valid(...Object.values(UsedFileView)),
+  parameters: Joi.array().items(settingParameterSchema),
+});
 
 /**
  * Проверка файла игровых настроек на соответствие требованиям.
  * Проверка на наличие необходимых и опциональных полей, а так же фильтрация некорректных.
- * На выходе получаем сообщение о результате проверки, записи в логе и итоговый конфиг.
+ * На выходе получаем сообщение о результате проверки и итоговый конфиг.
  * Поля используемых файлов для настроек проверяются отдельно.
 */
 export const createGameSettingsConfig = (
@@ -73,65 +97,68 @@ export const createGameSettingsConfig = (
 
   let userMessages: IUserMessage[] = [];
 
-  const result = checkGameSettings(configObj);
+  const validateResult = settingsMainSchema.validate(configObj, {
+    abortEarly: false,
+    stripUnknown: true,
+  });
 
-  if (result.error && result.error?.details?.length > 0) {
+  if (validateResult.error && validateResult.error?.details?.length > 0) {
     userMessages = [CreateUserMessage.error('При проверке файла настроек settings.json обнаружены ошибки. Игровые настройки будут недоступны. Подробности в файле лога.')]; //eslint-disable-line max-len
 
-    result.error.details.forEach((currentMsg) => {
+    validateResult.error.details.forEach((currentMsg) => {
       writeToLogFile(currentMsg.message, LogMessageType.ERROR);
     });
   }
 
-  return { newUserMessages: userMessages, newSettingsConfigObj: { ...result.value } };
+  return { newUserMessages: userMessages, newSettingsConfigObj: { ...validateResult.value } };
 };
 
-const checkUsedFile = (
-  usedFile: IUsedFile,
-  usedFilesObj: IGameSettingsConfig['usedFiles'],
+/**
+ * Проверка всех полей из `usedFiles` на соответствие шаблону.
+ * Проверка на наличие необходимых и опциональных полей, а так же фильтрация некорректных.
+ * На выходе получаем сообщение о результате проверки и итоговые настройки для каждого файла.
+*/
+export const checkUsedFiles = (
+  usedFiles: IGameSettingsRootState['usedFiles'],
+  baseFilesEncoding: IGameSettingsRootState['baseFilesEncoding'],
+  isSettingGroupsExists: boolean,
 ): IUsedFilesCheckingResult => {
-  const messages: IUserMessage[] = [];
-  const logMessages: IMessage[] = [];
-  const newUsedFilesObj: IGameSettingsConfig['usedFiles'] = {};
-  const unknownFields: string[] = [];
+  writeToLogFileSync('Start checking of used files in settings.json');
 
-  // Фильтруем неизвестные поля
-  Object.keys(usedFile).forEach((field) => {
-    if (!USED_FILE_AVAILABLE_FIELDS.includes(field)) {
-      unknownFields.push(field);
-      // delete usedFile[field]
+  let userMessages: IUserMessage[] = [];
+  const validationErrors: IUsedFileError[] = [];
+
+  const newUsedFilesObj = Object.keys(usedFiles).reduce((acc, key) => {
+    const result = usedFileSchema.validate(usedFiles[key], {
+      abortEarly: false,
+      stripUnknown: true,
+      context: {
+        encoding: baseFilesEncoding,
+        isSettingGroupsExists,
+        view: usedFiles[key].view,
+      },
+    });
+
+    if (result.error) {
+      validationErrors.push({ parent: key, error: result.error });
+
+      return {
+        ...acc,
+      };
     }
-  });
+    return {
+      ...acc,
+      [key]: result.value,
+    };
+  }, {});
 
-  return {
-    newUserMessages: messages,
-    newLogMessages: logMessages,
-    newUsedFilesObj,
-  };
-};
+  if (validationErrors.length > 0) {
+    userMessages = [CreateUserMessage.error('При проверке данных для игровых настроек в файле settings.json обнаружены ошибки. Некоторые настройки будут недоступны. Подробности в файле лога.')]; //eslint-disable-line max-len
 
-export const checkUsedFiles = (usedFiles: IGameSettingsRootState['usedFiles']): IUsedFilesCheckingResult => {
-  const userMessages: IUserMessage[] = [];
-  const logMessages: IMessage[] = [];
-  const usedFilesObj: IGameSettingsConfig['usedFiles'] = {};
+    validationErrors.forEach((currentMsg) => {
+      writeToLogFile(`${currentMsg.parent}: ${currentMsg.error.message}`, LogMessageType.ERROR);
+    });
+  }
 
-  Object.keys(usedFiles).forEach((filename) => {
-    const typeOfUsedFileData = getTypeOfElement(usedFiles[filename]);
-
-    if (typeOfUsedFileData === 'object') {
-      const {
-        newLogMessages, newUserMessages, newUsedFilesObj,
-      } = checkUsedFile(usedFiles[filename], usedFilesObj);
-    } else {
-      pushMessagesToArrays(
-        userMessages,
-        logMessages,
-        `Объект настроек ${filename} имеет некорректный тип. Параметр будет проигнорирован.`,
-        `${filename} from usedFiles must be an object, got ${typeOfUsedFileData}`,
-        'error',
-      );
-    }
-  });
-
-  return { newUserMessages: userMessages, newUsedFilesObj: usedFilesObj };
+  return { newUserMessages: userMessages, newUsedFilesObj };
 };
