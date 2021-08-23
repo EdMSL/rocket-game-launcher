@@ -48,7 +48,7 @@ const settingsMainSchema = Joi.object({
         Joi.string(),
         Joi.any(),
       ),
-    ),
+    ).required(),
 });
 
 const settingParameterSchema = Joi.object({
@@ -90,7 +90,7 @@ const usedFileSchema = Joi.object({
  * На выходе получаем сообщение о результате проверки и итоговый конфиг.
  * Поля используемых файлов для настроек проверяются отдельно.
 */
-export const createGameSettingsConfig = (
+export const checkGameSettingsConfigMainFields = (
   configObj: IGameSettingsConfig,
 ): ISettingsConfigCheckingResult => {
   writeToLogFileSync('Start of settings.json checking');

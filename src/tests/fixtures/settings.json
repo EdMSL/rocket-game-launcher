@@ -19,7 +19,7 @@
     "anyFile": {
       "isFromMOProfile": true,
       "path": "./any.ini",
-      "type": "sectional",
+      "view": "sectional",
       "parameters": [
         {
           "name": "Any name",
@@ -35,7 +35,7 @@
     },
     "someFile": {
       "path": "./ini/some.ini",
-      "type": "line",
+      "view": "line",
       "parameters": [
         {
           "name": "Some name",
