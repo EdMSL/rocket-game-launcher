@@ -12,7 +12,7 @@ import { IAppState } from '$store/store';
 import { Routes } from '$constants/routes';
 import { setIsLauncherInitialised } from '$actions/main';
 import { setGameSettingsSaga } from '$sagas/gameSettings';
-import { GAME_SETTINGS_PATH } from '$constants/paths';
+import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import { LogMessageType, writeToLogFile } from '$utils/log';
 
 const getState = (state: IAppState): IAppState => state;
@@ -21,7 +21,7 @@ export function* initLauncherSaga(): SagaIterator {
   yield put(setIsLauncherInitialised(false));
 
   try {
-    if (fs.existsSync(GAME_SETTINGS_PATH)) {
+    if (fs.existsSync(GAME_SETTINGS_FILE_PATH)) {
       yield call(setGameSettingsSaga);
     } else {
       writeToLogFile('Game settings file settings.json not found.');

@@ -10,7 +10,7 @@ import {
   writeToLogFileSync,
 } from '$utils/log';
 import { readJSONFileSync, writeJSONFile } from '$utils/files';
-import { CONFIG_PATH } from '$constants/paths';
+import { CONFIG_FILE_PATH } from '$constants/paths';
 import { ISystemRootState } from '$types/system';
 import {
   ErrorName, ReadWriteError, showMessageBox,
@@ -29,7 +29,7 @@ const getConfigurationData = () => {
   // Считываем данные из файла конфигурации лаунчера. Эти данные затем передаются в стейт Redux.
   // Если файл не найден, то создаем новый с дефолтными настройками.
   try {
-    return readJSONFileSync<ISystemRootState>(CONFIG_PATH);
+    return readJSONFileSync<ISystemRootState>(CONFIG_FILE_PATH);
   } catch (error) {
     if (error instanceof ReadWriteError) {
       if (error.cause.name === ErrorName.NOT_FOUND) {
@@ -44,7 +44,7 @@ const getConfigurationData = () => {
           'warning',
         );
 
-        writeJSONFile(CONFIG_PATH, defaultLauncherConfig)
+        writeJSONFile(CONFIG_FILE_PATH, defaultLauncherConfig)
           .then(() => {
             writeToLogFile('New config file config.json successfully created.');
           })

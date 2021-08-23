@@ -102,12 +102,7 @@ describe('#Check', () => {
     //   const obj = readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`);
     //   const result = checkUsedFiles(obj.usedFiles, Encoding.WIN1251, true);
 
-    //   assert.hasAllKeys(result.newUsedFilesObj.anyFile, ['isFromMOProfile', 'path', 'view', 'parameters', 'encoding']);
-    //   assert.hasAllKeys(result.newUsedFilesObj.someFile, ['isFromMOProfile', 'path', 'view', 'parameters', 'encoding']);
-    //   assert.hasAllKeys(result.newUsedFilesObj.newFile, ['isFromMOProfile', 'path', 'view', 'parameters', 'encoding']);
-
     //   assert.equal(result.newUsedFilesObj.anyFile.encoding, Encoding.WIN1251);
-    //   assert.equal(result.newUsedFilesObj.someFile.isFromMOProfile, false);
     // });
 
     // it('Should return correct data in parameters', () => {

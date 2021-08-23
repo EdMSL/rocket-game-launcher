@@ -24,10 +24,11 @@ export const defaultLauncherConfig: ISystemRootState = {
   isFirstLaunch: true,
   modOrganizer: {
     isUsed: true,
-    path: './Mod Organizer',
-    pathToINI: './Mod Organizer/ModOrganizer.ini',
-    pathToProfiles: './Mod Organizer/profiles',
+    path: '.\\Mod Organizer',
+    pathToINI: '.\\Mod Organizer\\ModOrganizer.ini',
+    pathToProfiles: '.\\Mod Organizer\\profiles',
     profileParam: 'selected_profile',
     profileParamValueRegExp: '',
   },
+  gameOnDocumentsPath: '%HOME_DIR%\\Documents\\My Games\\Oblivion',
 };

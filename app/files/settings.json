@@ -13,12 +13,11 @@
       "label": "Управление"
     }
   ],
-  "basePathToFiles": "./Data",
+  "basePathToFiles": ".\\Data",
   "baseFilesEncoding": "win1251",
   "usedFiles": {
     "BlockheadIni": {
-      "isFromMOProfile": false,
-      "path": "./src/tests/fixtures/Blockhead.ini",
+      "path": ".\\src\\tests\\fixtures\\Blockhead.ini",
       "view": "sectional",
       "parameters": [
         {
@@ -41,7 +40,7 @@
       ]
     },
     "MenuIni": {
-      "path": "./src/tests/fixtures/Menu.ini",
+      "path": ".\\src\\tests\\fixtures\\Menu.ini",
       "view": "line",
       "encoding": "utf-8",
       "parameters": [

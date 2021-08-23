@@ -78,7 +78,6 @@ const settingParameterSchema = Joi.object({
 });
 
 const usedFileSchema = Joi.object({
-  isFromMOProfile: Joi.bool().optional().default(false),
   encoding: Joi.string().optional().default(Joi.ref('$encoding')),
   path: Joi.string().required(),
   view: Joi.string().required().valid(...Object.values(UsedFileView)),

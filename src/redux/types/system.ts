@@ -19,4 +19,5 @@ export type ISystemRootState = Readonly<{
   height: number,
   isFirstLaunch: boolean,
   modOrganizer: IModOrganizerParams,
+  gameOnDocumentsPath: string,
 }>;

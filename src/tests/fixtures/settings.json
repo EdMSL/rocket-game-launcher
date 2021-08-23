@@ -17,7 +17,6 @@
   "baseFilesEncoding": "win1251",
   "usedFiles": {
     "anyFile": {
-      "isFromMOProfile": true,
       "path": "./any.ini",
       "view": "sectional",
       "parameters": [

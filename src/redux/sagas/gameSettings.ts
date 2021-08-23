@@ -18,7 +18,7 @@ import { IUnwrap, IUnwrapSync } from '$types/common';
 import {
   addMessages, setIsGameSettingsAvailable, setIsGameSettingsLoaded,
 } from '$actions/main';
-import { GAME_SETTINGS_PATH } from '$constants/paths';
+import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import { checkUsedFiles, checkGameSettingsConfigMainFields } from '$utils/check';
 import { IGameSettingsConfig } from '$types/gameSettings';
 import {
@@ -31,7 +31,7 @@ const getState = (state: IAppState): IAppState => state;
 
 export function* setGameSettingsSaga(): SagaIterator {
   try {
-    const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_PATH);
+    const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_FILE_PATH);
     const {
       newUserMessages: checkingMessages,
       newSettingsConfigObj,
@@ -59,6 +59,18 @@ export function* setGameSettingsSaga(): SagaIterator {
       `An error occurred while processing the file settings.json. ${error.message}`,
       LogMessageType.ERROR,
     );
+  }
+}
+
+function* getDataFromUsedFiles(): SagaIterator {
+  try {
+    const {
+      gameSettings: {
+        usedFiles,
+      },
+    }: IAppState = yield select(getState);
+  } catch (error) {
+    writeToLogFile(error, LogMessageType.ERROR);
   }
 }
 

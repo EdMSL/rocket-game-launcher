@@ -25,7 +25,6 @@ export interface IUsedFile {
   view: string,
   parameters: IGameSettingParameter[],
   encoding?: string,
-  isFromMOProfile?: boolean,
 }
 
 export interface IUsedFiles {
