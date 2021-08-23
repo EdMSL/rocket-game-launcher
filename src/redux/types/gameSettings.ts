@@ -8,10 +8,22 @@ interface IGameSettingGroup {
   label: string,
 }
 
+interface IGameSettingParameter {
+  name: string,
+  iniGroup: string,
+  settingGroup: string,
+  type: string,
+  label: string,
+  min?: number,
+  max?: number,
+  step?: number,
+  options?: { [key: string]: string, },
+}
+
 export interface IUsedFile {
   path: string,
   view: string,
-  parameters: any[],
+  parameters: IGameSettingParameter[],
   encoding?: string,
   isFromMOProfile?: boolean,
 }

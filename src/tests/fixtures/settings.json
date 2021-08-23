@@ -30,6 +30,12 @@
           "max": "300",
           "step": "1",
           "label": "Any label"
+        },
+        {
+          "name": "Any new name",
+          "iniGroup": "Display",
+          "settingGroup": "Control",
+          "type": "checkbox"
         }
       ]
     },
@@ -46,6 +52,19 @@
             "1": "1",
             "2": "1"
           }
+        }
+      ]
+    },
+    "newFile": {
+      "path": "./ini/new.ini",
+      "view": "line",
+      "encoding": "utf-8",
+      "parameters": [
+        {
+          "name": "New name",
+          "settingGroup": "Control",
+          "type": "checkbox",
+          "label": "New label"
         }
       ]
     }

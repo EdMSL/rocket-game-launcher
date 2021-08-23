@@ -4,20 +4,15 @@ import Joi from 'joi';
 import {
   Encoding, SettingParameterControllerType, UsedFileView,
 } from '$constants/misc';
-import {
-  IGameSettingsConfig, IGameSettingsRootState, IUsedFile,
-} from '$types/gameSettings';
+import { IGameSettingsConfig, IGameSettingsRootState } from '$types/gameSettings';
 import { IUserMessage } from '$types/main';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';
-import {
-  IMessage, CreateUserMessage,
-} from '$utils/message';
+import { CreateUserMessage } from '$utils/message';
 
 interface ICheckingResult {
   newUserMessages: IUserMessage[],
-  newLogMessages?: IMessage[],
 }
 
 interface ISettingsConfigCheckingResult extends ICheckingResult {
@@ -51,16 +46,22 @@ const settingsMainSchema = Joi.object({
     ).required(),
 });
 
+//FIXME Добавить проверку на уникальность имени в пределах файла
+//FIXME Добавить проверку на наличие указанного settingGroup в списке пдоступных settingGroups,
 const settingParameterSchema = Joi.object({
   name: Joi.string().required(),
   type: Joi.string().required().valid(...Object.values(SettingParameterControllerType)),
   label: Joi.string().optional().default(Joi.ref('name')),
   iniGroup: Joi.string().when(
-    Joi.ref('$view'), { is: UsedFileView.SECTIONAL, then: Joi.required() },
+    Joi.ref('$view'), {
+      is: UsedFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
+    },
   ),
-  settingGroup: Joi.string().when(Joi.ref('$isSettingGroupsExists'), {
-    is: true, then: Joi.required(),
-  }),
+  settingGroup: Joi.string().when(
+    Joi.ref('$isSettingGroupsExists'), {
+      is: true, then: Joi.required(), otherwise: Joi.forbidden(),
+    },
+  ),
   options: Joi.object().pattern(
     Joi.string(),
     Joi.string(),
@@ -124,7 +125,6 @@ export const checkUsedFiles = (
   isSettingGroupsExists: boolean,
 ): IUsedFilesCheckingResult => {
   writeToLogFileSync('Start checking of used files in settings.json');
-
   let userMessages: IUserMessage[] = [];
   const validationErrors: IUsedFileError[] = [];
 
