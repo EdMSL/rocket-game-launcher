@@ -12,7 +12,8 @@ const INITIAL_STATE: ISystemRootState = {
   height: defaultLauncherConfig.height,
   isFirstLaunch: defaultLauncherConfig.isFirstLaunch,
   modOrganizer: defaultLauncherConfig.modOrganizer,
-  gameOnDocumentsPath: defaultLauncherConfig.gameOnDocumentsPath,
+  documentsPath: defaultLauncherConfig.documentsPath,
+  customPaths: defaultLauncherConfig.customPaths,
 };
 
 export const systemReducer = createReducer<ISystemRootState>(INITIAL_STATE, SYSTEM_HANDLERS);

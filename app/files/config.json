@@ -12,6 +12,7 @@
     "profileParam": "selected_profile",
     "profileParamValueRegExp": ""
   },
-  "gameOnDocumentsPath": "@homedir\\Documents\\My Games\\Oblivion\\Oblivion.ini",
-  "isFirstLaunch": false
+  "documentsPath": ".\\My Games\\Oblivion",
+  "isFirstLaunch": false,
+  "customPaths": {}
 }

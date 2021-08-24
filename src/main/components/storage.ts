@@ -1,5 +1,6 @@
 import Storage from 'electron-store';
 import { Store } from 'redux';
+import path from 'path';
 
 import { configureStore, IAppState } from '$store/store';
 import { IUserSettingsRootState } from '$types/userSettings';
@@ -10,7 +11,9 @@ import {
   writeToLogFileSync,
 } from '$utils/log';
 import { readJSONFileSync, writeJSONFile } from '$utils/files';
-import { CONFIG_FILE_PATH } from '$constants/paths';
+import {
+  CONFIG_FILE_PATH, DOCUMENTS_DIR, GAME_DIR,
+} from '$constants/paths';
 import { ISystemRootState } from '$types/system';
 import {
   ErrorName, ReadWriteError, showMessageBox,
@@ -21,6 +24,13 @@ interface IStorage {
   settings: {
     userSettings: IUserSettingsRootState,
   },
+}
+
+interface ICustomPaths {
+  '%DOCUMENTS%': string,
+  //@ts-ignore
+  '%MO%'?: string|undefined,
+  [label: string]: string,
 }
 
 const saveToStorageParams = ['userSettings'];
@@ -61,6 +71,22 @@ const getConfigurationData = () => {
     throw new Error('Found problems with config.json. See log for more details.');
   }
 };
+
+/**
+ * Генерация пользовательских путей с добавлением двух по умолчанию: для папки
+ * игры в документах пользователя
+ * и папки профилей Mod Organizer, если он используется.
+ * @param configData Данные из файла config.json
+ * @returns Объект с пользовательскими путями.
+*/
+const createCustomPaths = (configData: ISystemRootState): ICustomPaths => ({
+  '%DOCUMENTS%': path.resolve(DOCUMENTS_DIR, configData.documentsPath),
+  ...configData.modOrganizer.isUsed ? {
+    '%MO%': path.resolve(GAME_DIR, configData.modOrganizer.pathToProfiles),
+  } : {},
+  ...configData.customPaths,
+});
+
 /**
   * Функция для создания файла настроек пользователя и хранилища Redux.
 */
@@ -80,12 +106,14 @@ export const createStorage = (): Store<IAppState> => {
   });
 
   const storageSettings = storage.get('settings');
+  const customPaths = createCustomPaths(configurationData);
 
   const newStore = {
     ...storageSettings,
     system: {
       ...defaultLauncherConfig,
       ...configurationData,
+      customPaths: { ...customPaths },
     },
   };
 

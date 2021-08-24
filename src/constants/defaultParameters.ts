@@ -30,5 +30,6 @@ export const defaultLauncherConfig: ISystemRootState = {
     profileParam: 'selected_profile',
     profileParamValueRegExp: '',
   },
-  gameOnDocumentsPath: '%HOME_DIR%\\Documents\\My Games\\Oblivion',
+  documentsPath: '.\\My Games\\Oblivion',
+  customPaths: {},
 };
