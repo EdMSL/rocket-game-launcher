@@ -38,11 +38,15 @@ const configFileDataSchema = Joi.object({
   height: Joi.number().optional().default(defaultLauncherConfig.height),
   modOrganizer: {
     isUsed: Joi.bool().optional().default(defaultLauncherConfig.modOrganizer.isUsed),
-    path: Joi.bool().optional().default(defaultLauncherConfig.modOrganizer.path),
-    pathToINI: Joi.bool().optional().default(defaultLauncherConfig.modOrganizer.pathToINI),
-    pathToProfiles: Joi.bool().optional().default(defaultLauncherConfig.modOrganizer.pathToProfiles),
-    profileParam: Joi.bool().optional().default(defaultLauncherConfig.modOrganizer.profileParam),
-    profileParamValueRegExp: Joi.bool().optional().default(defaultLauncherConfig.modOrganizer.profileParamValueRegExp),
+    path: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.path),
+    pathToINI: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToINI),
+    pathToProfiles: Joi.string().optional().default(
+      defaultLauncherConfig.modOrganizer.pathToProfiles,
+    ),
+    profileParam: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.profileParam),
+    profileParamValueRegExp: Joi.string().optional().allow('').default(
+      defaultLauncherConfig.modOrganizer.profileParamValueRegExp,
+    ),
   },
   documentsPath: Joi.string().optional().default(defaultLauncherConfig.documentsPath),
   isFirstLaunch: Joi.bool().optional().default(defaultLauncherConfig.isFirstLaunch),
@@ -53,6 +57,8 @@ const configFileDataSchema = Joi.object({
 }).optional().default(defaultLauncherConfig.customPaths);
 
 export const checkConfigFileData = (configObj: ISystemRootState): ISystemRootState => {
+  writeToLogFileSync('Start of config.json checking');
+
   const validateResult = configFileDataSchema.validate(configObj, {
     abortEarly: false,
     stripUnknown: true,

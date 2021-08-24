@@ -18,7 +18,7 @@ export const defaultLauncherResolution = {
 export const defaultLauncherConfig: ISystemRootState = {
   isResizable: false,
   minWidth: defaultLauncherResolution.minWidth,
-  minHeight: defaultLauncherResolution.minWidth,
+  minHeight: defaultLauncherResolution.minHeight,
   width: defaultLauncherResolution.width,
   height: defaultLauncherResolution.height,
   isFirstLaunch: true,
