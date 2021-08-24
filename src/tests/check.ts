@@ -15,14 +15,11 @@ describe('#Check', () => {
   //     let result = checkGameSettingsConfigMainFields(readJSONFileSync(`${process.cwd()}/settings.json`));
 
   //     assert.hasAllKeys(result, ['newUserMessages', 'newSettingsConfigObj']);
-  //     assert.hasAllKeys(result.newSettingsConfigObj, ['baseFilesEncoding', 'basePathToFiles', 'settingGroups', 'usedFiles']);
 
   //     delete result.newSettingsConfigObj.settingGroups;
   //     delete result.newSettingsConfigObj.baseFilesEncoding;
-  //     delete result.newSettingsConfigObj.basePathToFiles;
 
   //     result = checkGameSettingsConfigMainFields(result.newSettingsConfigObj);
-  //     assert.hasAllKeys(result.newSettingsConfigObj, ['baseFilesEncoding', 'basePathToFiles', 'usedFiles']);
   //     assert.doesNotHaveAnyKeys(result.newSettingsConfigObj, ['settingGroups']);
   //   });
 
@@ -30,7 +27,6 @@ describe('#Check', () => {
   //     const obj = readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`);
 
   //     delete obj.baseFilesEncoding;
-  //     delete obj.basePathToFiles;
   //     obj.settingGroups![0].name = 'new';
   //     // @ts-ignore
   //     delete obj.settingGroups[0].label;
@@ -38,7 +34,6 @@ describe('#Check', () => {
   //     const result = checkGameSettingsConfigMainFields(obj);
 
   //     assert.equal(result.newSettingsConfigObj.baseFilesEncoding, Encoding.WIN1251);
-  //     assert.equal(result.newSettingsConfigObj.basePathToFiles, './');
   //     assert.equal(result.newSettingsConfigObj.settingGroups![0].label, 'new');
   //   });
 
@@ -49,7 +44,6 @@ describe('#Check', () => {
   //     delete obj.baseFilesEncoding;
   //     assert.equal(checkGameSettingsConfigMainFields(obj).newUserMessages.length, 0);
 
-  //     delete obj.basePathToFiles;
   //     assert.equal(checkGameSettingsConfigMainFields(obj).newUserMessages.length, 0);
 
   //     // @ts-ignore

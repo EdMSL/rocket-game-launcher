@@ -35,7 +35,6 @@ const settingsMainSchema = Joi.object({
       label: Joi.string().optional().default(Joi.ref('name')),
     })).optional().min(1),
   baseFilesEncoding: Joi.string().optional().default(Encoding.WIN1251),
-  basePathToFiles: Joi.string().optional().default('./'),
   usedFiles: Joi.object()
     .pattern(
       Joi.string(),

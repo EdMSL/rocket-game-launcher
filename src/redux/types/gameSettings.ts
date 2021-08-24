@@ -33,14 +33,12 @@ export interface IUsedFiles {
 
 export interface IGameSettingsConfig {
   settingGroups?: IGameSettingsRootState['settingGroups'],
-  basePathToFiles?: IGameSettingsRootState['basePathToFiles'],
   baseFilesEncoding?: IGameSettingsRootState['baseFilesEncoding'],
   usedFiles: IGameSettingsRootState['usedFiles'],
 }
 
 export type IGameSettingsRootState = Readonly<{
   settingGroups: IGameSettingGroup[],
-  basePathToFiles: string,
   baseFilesEncoding: string,
   usedFiles: IUsedFiles,
 }>;

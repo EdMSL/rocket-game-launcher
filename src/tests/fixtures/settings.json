@@ -13,7 +13,6 @@
       "label": "Управление"
     }
   ],
-  "basePathToFiles": "./Data",
   "baseFilesEncoding": "win1251",
   "usedFiles": {
     "anyFile": {
