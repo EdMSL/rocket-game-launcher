@@ -10,6 +10,8 @@ import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';
 import { CreateUserMessage } from '$utils/message';
+import { defaultLauncherConfig } from '$constants/defaultParameters';
+import { ISystemRootState } from '$types/system';
 
 interface ICheckingResult {
   newUserMessages: IUserMessage[],
@@ -27,6 +29,43 @@ interface IUsedFileError {
   parent: string,
   error: Joi.ValidationError,
 }
+
+const configFileDataSchema = Joi.object({
+  isResizable: Joi.bool().optional().default(defaultLauncherConfig.isResizable),
+  minWidth: Joi.number().optional().default(defaultLauncherConfig.minWidth),
+  minHeight: Joi.number().optional().default(defaultLauncherConfig.minHeight),
+  width: Joi.number().optional().default(defaultLauncherConfig.width),
+  height: Joi.number().optional().default(defaultLauncherConfig.height),
+  modOrganizer: {
+    isUsed: Joi.bool().optional().default(defaultLauncherConfig.modOrganizer.isUsed),
+    path: Joi.bool().optional().default(defaultLauncherConfig.modOrganizer.path),
+    pathToINI: Joi.bool().optional().default(defaultLauncherConfig.modOrganizer.pathToINI),
+    pathToProfiles: Joi.bool().optional().default(defaultLauncherConfig.modOrganizer.pathToProfiles),
+    profileParam: Joi.bool().optional().default(defaultLauncherConfig.modOrganizer.profileParam),
+    profileParamValueRegExp: Joi.bool().optional().default(defaultLauncherConfig.modOrganizer.profileParamValueRegExp),
+  },
+  documentsPath: Joi.string().optional().default(defaultLauncherConfig.documentsPath),
+  isFirstLaunch: Joi.bool().optional().default(defaultLauncherConfig.isFirstLaunch),
+  customPaths: Joi.object().pattern(
+    Joi.string(),
+    Joi.string(),
+  ),
+}).optional().default(defaultLauncherConfig.customPaths);
+
+export const checkConfigFileData = (configObj: ISystemRootState): ISystemRootState => {
+  const validateResult = configFileDataSchema.validate(configObj, {
+    abortEarly: false,
+    stripUnknown: true,
+  });
+
+  if (validateResult.error && validateResult.error?.details?.length > 0) {
+    validateResult.error.details.forEach((currentMsg) => {
+      writeToLogFile(currentMsg.message, LogMessageType.ERROR);
+    });
+  }
+
+  return validateResult.value;
+};
 
 const settingsMainSchema = Joi.object({
   settingGroups: Joi.array()

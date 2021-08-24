@@ -19,6 +19,7 @@ import {
   ErrorName, ReadWriteError, showMessageBox,
 } from '$utils/errors';
 import { Scope } from '$constants/misc';
+import { checkConfigFileData } from '$utils/check';
 
 interface IStorage {
   settings: {
@@ -35,11 +36,14 @@ interface ICustomPaths {
 
 const saveToStorageParams = ['userSettings'];
 
-const getConfigurationData = () => {
+const getConfigurationData = (): ISystemRootState => {
   // Считываем данные из файла конфигурации лаунчера. Эти данные затем передаются в стейт Redux.
   // Если файл не найден, то создаем новый с дефолтными настройками.
   try {
-    return readJSONFileSync<ISystemRootState>(CONFIG_FILE_PATH);
+    let configData = readJSONFileSync<ISystemRootState>(CONFIG_FILE_PATH);
+    configData = checkConfigFileData(configData);
+
+    return configData;
   } catch (error) {
     if (error instanceof ReadWriteError) {
       if (error.cause.name === ErrorName.NOT_FOUND) {
