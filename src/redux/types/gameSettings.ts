@@ -1,6 +1,7 @@
 export const GAME_SETTINGS_TYPES = {
   SET_GAME_SETTINGS_CONFIG: 'SET_GAME_SETTINGS_CONFIG',
   SET_GAME_SETTINGS_USED_FILES: 'SET_GAME_SETTINGS_USED_FILES',
+  SET_MO_PROFILE: 'SET_MO_PROFILE',
 };
 
 interface IGameSettingGroup {
@@ -41,4 +42,5 @@ export type IGameSettingsRootState = Readonly<{
   settingGroups: IGameSettingGroup[],
   baseFilesEncoding: string,
   usedFiles: IUsedFiles,
+  moProfile: string,
 }>;

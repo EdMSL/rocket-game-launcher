@@ -18,6 +18,7 @@ export const ErrorName = {
   ARG_TYPE: 'InvalidArgumentError',
   PATH_TO_DIRECTORY: 'DirectoryError',
   READ_WRITE: 'ReadWriteError',
+  SAGA_ERROR: 'SagaError',
 };
 
 export const ErrorCode = {
@@ -76,6 +77,7 @@ export class ReadWriteError extends Error {
     this.name = ErrorName.READ_WRITE;
   }
 }
+
 /**
  * Функция получения конечной ошибки чтения/записи (модуля `fs`) на основе кода из ошибки `NodeJS`
  * @param error Объект ошибки чтения/записи
@@ -100,3 +102,10 @@ export const getReadWriteError = (error: NodeJS.ErrnoException): Error => {
 
   return error;
 };
+
+export class SagaError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = ErrorName.SAGA_ERROR;
+  }
+}

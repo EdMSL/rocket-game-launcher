@@ -7,8 +7,10 @@ interface IModOrganizerParams {
   path: string,
   pathToINI: string,
   pathToProfiles: string,
+  profileSection: string,
   profileParam: string,
   profileParamValueRegExp: string,
+  isSectional: boolean,
 }
 
 export type ISystemRootState = Readonly<{

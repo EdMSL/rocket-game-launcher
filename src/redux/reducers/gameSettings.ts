@@ -8,6 +8,7 @@ const INITIAL_STATE: IGameSettingsRootState = {
   settingGroups: [],
   baseFilesEncoding: '',
   usedFiles: {},
+  moProfile: '',
 };
 
 export const gameSettingsReducer = createReducer<IGameSettingsRootState>(

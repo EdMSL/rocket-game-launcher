@@ -1,5 +1,9 @@
 import { IAction } from '$types/common';
-import { GAME_SETTINGS_TYPES, IGameSettingsConfig } from '$types/gameSettings';
+import {
+  GAME_SETTINGS_TYPES,
+  IGameSettingsConfig,
+  IGameSettingsRootState,
+} from '$types/gameSettings';
 
 export const setGameSettingsConfig: IAction<IGameSettingsConfig> = (
   gameSetingsConfig,
@@ -13,4 +17,11 @@ export const setGameSettingsUsedFiles: IAction<IGameSettingsConfig['usedFiles']>
 ) => ({
   type: GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_USED_FILES,
   payload: gameSetingsUsedFiles,
+});
+
+export const setMoProfile: IAction<IGameSettingsRootState['moProfile']> = (
+  moProfile,
+) => ({
+  type: GAME_SETTINGS_TYPES.SET_MO_PROFILE,
+  payload: moProfile,
 });

@@ -24,7 +24,19 @@ const setGameSettingsUsedFiles: IActionHandler<
   usedFiles: gameSettingsUsedFiles,
 });
 
+const setMoProfile: IActionHandler<
+  IGameSettingsRootState,
+  typeof GAME_SETTINGS_ACTIONS.setMoProfile
+> = (
+  state,
+  { payload: moProfile },
+) => ({
+  ...state,
+  moProfile,
+});
+
 export const GAME_SETTINGS_HANDLERS = {
   [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_CONFIG]: setGameSettingsConfig,
   [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_USED_FILES]: setGameSettingsUsedFiles,
+  [GAME_SETTINGS_TYPES.SET_MO_PROFILE]: setMoProfile,
 };

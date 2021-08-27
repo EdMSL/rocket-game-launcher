@@ -9,8 +9,10 @@
     "path": ".\\Mod Organizer",
     "pathToINI": ".\\Mod Organizer\\ModOrganizer.ini",
     "pathToProfiles": ".\\Mod Organizer\\profiles",
+    "profileSection": "General",
     "profileParam": "selected_profile",
-    "profileParamValueRegExp": ""
+    "profileParamValueRegExp": "",
+    "isSectional": true
   },
   "documentsPath": ".\\My Games\\Oblivion",
   "isFirstLaunch": false,

@@ -18,14 +18,17 @@ import { IUnwrap, IUnwrapSync } from '$types/common';
 import {
   addMessages, setIsGameSettingsAvailable, setIsGameSettingsLoaded,
 } from '$actions/main';
-import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
+import { GAME_DIR, GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import { checkUsedFiles, checkGameSettingsConfigMainFields } from '$utils/check';
 import { IGameSettingsConfig } from '$types/gameSettings';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';
 import { CreateUserMessage } from '$utils/message';
-import { setGameSettingsConfig, setGameSettingsUsedFiles } from '$actions/gameSettings';
+import {
+  setGameSettingsConfig, setGameSettingsUsedFiles, setMoProfile,
+} from '$actions/gameSettings';
+import { ErrorName, SagaError } from '$utils/errors';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -59,6 +62,73 @@ export function* setGameSettingsSaga(): SagaIterator {
       `An error occurred while processing the file settings.json. ${error.message}`,
       LogMessageType.ERROR,
     );
+  }
+}
+
+function* getDataFromMOIniSaga() {
+  try {
+    const {
+      system: {
+        modOrganizer: {
+          pathToINI,
+          profileSection,
+          profileParam,
+          profileParamValueRegExp,
+          isSectional,
+        },
+      },
+    }: IAppState = yield select(getState);
+
+    const iniData: IUnwrap<typeof readINIFile> = yield call(
+      readINIFile,
+      path.resolve(GAME_DIR, pathToINI),
+    );
+
+    // Недокументированная возможность на случай перехода инишника МО на несекционный.
+    // Искать профиль через RegExp
+    if (isSectional) {
+      const currentMOProfileIniSection = iniData.getSection(profileSection);
+
+      //TODO Додулать проверку с RegExp
+      if (currentMOProfileIniSection) {
+        const profileName = currentMOProfileIniSection.getValue(profileParam);
+
+        if (profileName) {
+          const name = profileName;
+          // if (profileParamValueRegExp) {
+          //   const execResult = /sdsd/.s(profileName);
+
+          //   if (execResult?.length! > 0) {
+          //     name = ...execResult[0];
+          //   } else {
+          //     throw new SagaError('profileParamValueRegExp');
+          //   }
+          // }
+
+          yield put(setMoProfile(name.toString()));// Если вдруг будет число
+        } else {
+          throw new SagaError('profileName');
+        }
+      } else {
+        throw new SagaError('profileSection');
+      }
+    } else {
+      // Поиск если ини не секционный
+    }
+  } catch (error) {
+    if (error.name === ErrorName.SAGA_ERROR) {
+      yield put(setMoProfile(''));
+      yield put(addMessages([CreateUserMessage.error(
+        'Не удалось получить текущий профиль Mod Organizer. Настройки из файлов, привязанных к профилю, будут недоступны. Подробности в файле лога.', //eslint-disable-line max-len
+      )]));
+
+      writeToLogFile(
+        `Can't get current Mod Organizer profile. Problem with: ${error.message}`,
+        LogMessageType.ERROR,
+      );
+    } else {
+      writeToLogFile(error.message, LogMessageType.ERROR);
+    }
   }
 }
 

@@ -28,6 +28,7 @@ interface IIniLine {
 interface IIniSection {
   lines: IIniLine[],
   name: string,
+  getValue: (key: string) => string,
 }
 
 export interface IIni {
