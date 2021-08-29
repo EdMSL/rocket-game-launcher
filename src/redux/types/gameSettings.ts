@@ -6,7 +6,7 @@ export const GAME_SETTINGS_TYPES = {
 
 interface IGameSettingGroup {
   name: string,
-  label: string,
+  label?: string,
 }
 
 interface IGameSettingParameter {

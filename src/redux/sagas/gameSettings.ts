@@ -160,7 +160,7 @@ export function* initGameSettingsSaga(): SagaIterator {
       checkUsedFiles,
       usedFiles,
       baseFilesEncoding,
-      settingGroups.length > 0,
+      settingGroups,
     );
 
     if (newUserMessages.length > 0) {

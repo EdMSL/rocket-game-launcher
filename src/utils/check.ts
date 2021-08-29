@@ -92,8 +92,6 @@ const settingsMainSchema = Joi.object({
     ).required(),
 });
 
-//FIXME Добавить проверку на уникальность имени в пределах файла
-//FIXME Добавить проверку на наличие указанного settingGroup в списке пдоступных settingGroups,
 const settingParameterSchema = Joi.object({
   name: Joi.string().required(),
   type: Joi.string().required().valid(...Object.values(SettingParameterControllerType)),
@@ -107,7 +105,7 @@ const settingParameterSchema = Joi.object({
     Joi.ref('$isSettingGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
-  ),
+  ).valid(Joi.ref('$availableSettingGroups', { in: true })),
   options: Joi.object().pattern(
     Joi.string(),
     Joi.string(),
@@ -167,20 +165,22 @@ export const checkGameSettingsConfigMainFields = (
 export const checkUsedFiles = (
   usedFiles: IGameSettingsRootState['usedFiles'],
   baseFilesEncoding: IGameSettingsRootState['baseFilesEncoding'],
-  isSettingGroupsExists: boolean,
+  settingGroups: IGameSettingsRootState['settingGroups'],
 ): IUsedFilesCheckingResult => {
   writeToLogFileSync('Start checking of used files in settings.json');
   let userMessages: IUserMessage[] = [];
   const validationErrors: IUsedFileError[] = [];
 
+  const availableSettingGroups = settingGroups.map((group) => group.name);
   const newUsedFilesObj = Object.keys(usedFiles).reduce((acc, key) => {
     const result = usedFileSchema.validate(usedFiles[key], {
       abortEarly: false,
       stripUnknown: true,
       context: {
         encoding: baseFilesEncoding,
-        isSettingGroupsExists,
+        isSettingGroupsExists: settingGroups.length > 0,
         view: usedFiles[key].view,
+        availableSettingGroups,
       },
     });
 
