@@ -12,7 +12,9 @@ import { LOCATION_CHANGE, LocationChangeAction } from 'connected-react-router';
 import { IAppState } from '$store/store';
 import { Routes } from '$constants/routes';
 import {
-  readINIFile, readJSONFile, writeINIFile,
+  readDirectory,
+  readINIFile,
+  readJSONFile,
 } from '$utils/files';
 import { IUnwrap, IUnwrapSync } from '$types/common';
 import {
@@ -26,9 +28,11 @@ import {
 } from '$utils/log';
 import { CreateUserMessage } from '$utils/message';
 import {
-  setGameSettingsConfig, setGameSettingsUsedFiles, setMoProfile,
+  setGameSettingsConfig, setGameSettingsUsedFiles, setMoProfile, setMoProfiles,
 } from '$actions/gameSettings';
-import { ErrorName, SagaError } from '$utils/errors';
+import {
+  ErrorName, ReadWriteError, SagaError,
+} from '$utils/errors';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -42,19 +46,10 @@ export function* setGameSettingsSaga(): SagaIterator {
 
     if (checkingMessages.length > 0) {
       yield put(addMessages(checkingMessages));
-    }
-
-    // Определяем, будет ли доступен раздел настроек
-    const isHasErrorsInCheckingResult = checkingMessages.some(
-      (currentMsg) => currentMsg.type === 'error',
-    );
-
-    if (!isHasErrorsInCheckingResult) {
+    } else {
       yield put(setIsGameSettingsAvailable(true));
       yield put(setGameSettingsConfig(newSettingsConfigObj));
     }
-
-    // return gameSettingsObj;
   } catch (error) {
     yield put(addMessages([CreateUserMessage.error('Ошибка обработки файла settings.json. Игровые настройки будут недоступны. Подробности в файле лога')])); //eslint-disable-line max-len
 
@@ -65,7 +60,48 @@ export function* setGameSettingsSaga(): SagaIterator {
   }
 }
 
-function* getDataFromMOIniSaga() {
+function* getMOProfilesSaga(): SagaIterator {
+  const {
+    system: {
+      modOrganizer: {
+        pathToProfiles,
+      },
+    },
+  }: IAppState = yield select(getState);
+
+  try {
+    const profiles: IUnwrap<typeof readDirectory> = yield call(
+      readINIFile,
+      path.resolve(GAME_DIR, pathToProfiles),
+    );
+
+    if (profiles.length > 0) {
+      yield put(setMoProfiles(profiles));
+    } else {
+      throw new SagaError('profiles quantity = 0');
+    }
+  } catch (error) {
+    if (error instanceof SagaError) {
+      writeToLogFile(
+        `Can't get current Mod Organizer profiles. Problem with: ${error.message}`,
+        LogMessageType.ERROR,
+      );
+    } else if (error instanceof ReadWriteError) {
+      writeToLogFileSync(
+        `Message: ${error.message}. Path: ${pathToProfiles}.`,
+        LogMessageType.ERROR,
+      );
+    } else {
+      writeToLogFile(error.message);
+    }
+
+    yield put(addMessages([CreateUserMessage.error(
+      'Ошибка при попытке получения профилей Mod Organizer. Настройки из файлов, привязанных к профилю, будут недоступны. Подробности в файле лога.', //eslint-disable-line max-len
+    )]));
+  }
+}
+
+function* getDataFromMOIniSaga(): SagaIterator {
   try {
     const {
       system: {
@@ -74,7 +110,6 @@ function* getDataFromMOIniSaga() {
           profileSection,
           profileParam,
           profileParamValueRegExp,
-          isSectional,
         },
       },
     }: IAppState = yield select(getState);
@@ -84,36 +119,32 @@ function* getDataFromMOIniSaga() {
       path.resolve(GAME_DIR, pathToINI),
     );
 
-    // Недокументированная возможность на случай перехода инишника МО на несекционный.
-    // Искать профиль через RegExp
-    if (isSectional) {
-      const currentMOProfileIniSection = iniData.getSection(profileSection);
+    const currentMOProfileIniSection = iniData.getSection(profileSection);
 
-      //TODO Додулать проверку с RegExp
-      if (currentMOProfileIniSection) {
-        const profileName = currentMOProfileIniSection.getValue(profileParam);
+    //TODO Возможно имеет смысл перейти на зависимость от версии МО
+    if (currentMOProfileIniSection) {
+      const profileName = currentMOProfileIniSection.getValue(profileParam);
 
-        if (profileName) {
-          const name = profileName;
-          // if (profileParamValueRegExp) {
-          //   const execResult = /sdsd/.s(profileName);
+      if (profileName) {
+        let name = profileName;
 
-          //   if (execResult?.length! > 0) {
-          //     name = ...execResult[0];
-          //   } else {
-          //     throw new SagaError('profileParamValueRegExp');
-          //   }
-          // }
+        if (profileParamValueRegExp) {
+          const result = profileName.match(new RegExp(profileParamValueRegExp)) || [];
 
-          yield put(setMoProfile(name.toString()));// Если вдруг будет число
-        } else {
-          throw new SagaError('profileName');
+          if (result.length > 0) {
+            // eslint-disable-next-line prefer-destructuring
+            name = result[1];
+          } else {
+            throw new SagaError('profileParamValueRegExp');
+          }
         }
+
+        yield put(setMoProfile(name.toString()));// Если вдруг будет число
       } else {
-        throw new SagaError('profileSection');
+        throw new SagaError('profileName');
       }
     } else {
-      // Поиск если ини не секционный
+      throw new SagaError('profileSection');
     }
   } catch (error) {
     if (error.name === ErrorName.SAGA_ERROR) {
@@ -148,6 +179,9 @@ export function* initGameSettingsSaga(): SagaIterator {
   try {
     yield call(setIsGameSettingsLoaded, false);
 
+    yield call(getMOProfilesSaga);
+    yield call(getDataFromMOIniSaga);
+
     const {
       gameSettings: {
         usedFiles,
@@ -171,7 +205,7 @@ export function* initGameSettingsSaga(): SagaIterator {
       Object.keys(newUsedFilesObj).length > 0 ? newUsedFilesObj : {},
     ));
   } catch (error) {
-    writeToLogFileSync(error.message);
+    writeToLogFileSync(`Error during init game settings. Message: ${error.message}`);
   } finally {
     yield call(setIsGameSettingsLoaded, true);
   }

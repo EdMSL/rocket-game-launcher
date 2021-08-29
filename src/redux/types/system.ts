@@ -10,7 +10,6 @@ interface IModOrganizerParams {
   profileSection: string,
   profileParam: string,
   profileParamValueRegExp: string,
-  isSectional: boolean,
 }
 
 export type ISystemRootState = Readonly<{

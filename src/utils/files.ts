@@ -83,6 +83,16 @@ export const readFileData = (pathToFile: string): Promise<Buffer> => fsPromises.
     throw new ReadWriteError(`Can't read file. ${readWriteError.message}`, readWriteError);
   });
 
+export const readDirectory = (
+  pathToDirectory: string,
+): Promise<string[]> => fsPromises.readdir(pathToDirectory)
+  .then((data) => data)
+  .catch((error) => {
+    const readWriteError = getReadWriteError(error);
+
+    throw new ReadWriteError(`Can't read directory. ${readWriteError.message}`, readWriteError);
+  });
+
 /**
  * Синхронно получить данные из JSON файла.
  * @param pathToFile Путь к файлу.

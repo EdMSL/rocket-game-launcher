@@ -25,3 +25,10 @@ export const setMoProfile: IAction<IGameSettingsRootState['moProfile']> = (
   type: GAME_SETTINGS_TYPES.SET_MO_PROFILE,
   payload: moProfile,
 });
+
+export const setMoProfiles: IAction<IGameSettingsRootState['moProfiles']> = (
+  moProfiles,
+) => ({
+  type: GAME_SETTINGS_TYPES.SET_MO_PROFILES,
+  payload: moProfiles,
+});

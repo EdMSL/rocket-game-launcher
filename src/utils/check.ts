@@ -48,7 +48,6 @@ const configFileDataSchema = Joi.object({
     profileParamValueRegExp: Joi.string().optional().allow('').default(
       defaultLauncherConfig.modOrganizer.profileParamValueRegExp,
     ),
-    isSectional: Joi.bool().optional().default(defaultLauncherConfig.isResizable),
   },
   documentsPath: Joi.string().optional().default(defaultLauncherConfig.documentsPath),
   isFirstLaunch: Joi.bool().optional().default(defaultLauncherConfig.isFirstLaunch),

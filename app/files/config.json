@@ -11,8 +11,7 @@
     "pathToProfiles": ".\\Mod Organizer\\profiles",
     "profileSection": "General",
     "profileParam": "selected_profile",
-    "profileParamValueRegExp": "",
-    "isSectional": true
+    "profileParamValueRegExp": ""
   },
   "documentsPath": ".\\My Games\\Oblivion",
   "isFirstLaunch": false,
