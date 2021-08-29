@@ -80,7 +80,8 @@ const settingsMainSchema = Joi.object({
     .items(Joi.object({
       name: Joi.string().required(),
       label: Joi.string().optional().default(Joi.ref('name')),
-    })).optional().min(1),
+    })).optional().min(1)
+    .default([]),
   baseFilesEncoding: Joi.string().optional().default(Encoding.WIN1251),
   usedFiles: Joi.object()
     .pattern(

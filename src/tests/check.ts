@@ -20,7 +20,7 @@ describe('#Check', () => {
       delete result.newSettingsConfigObj.baseFilesEncoding;
 
       result = checkGameSettingsConfigMainFields(result.newSettingsConfigObj);
-      assert.doesNotHaveAnyKeys(result.newSettingsConfigObj, ['settingGroups']);
+      assert.hasAllKeys(result.newSettingsConfigObj, ['settingGroups', 'baseFilesEncoding', 'usedFiles']);
     });
 
     it('Should return object with default values', () => {
@@ -58,30 +58,29 @@ describe('#Check', () => {
       assert.equal(checkGameSettingsConfigMainFields(obj).newUserMessages.length, 0);
     });
 
-    it('Should return array with error message', () => {
-    // Чтобы не считывать постоянно данные из реального файла, это делается один раз в before хуке, а затем клонируем объект данных из мокового файла.
-      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+    describe('All tests should return array with error message', () => {
+      // Чтобы не считывать постоянно данные из реального файла после изменения полей, это делается один раз в before хуке, а затем клонируем объект данных из мокового файла.
+      it('Should return error about missed required usedFiles field', () => {
+        const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
 
-      // @ts-ignore
-      delete obj.usedFiles;
-      assert.equal(checkGameSettingsConfigMainFields(obj).newUserMessages.length, 1);
+        // @ts-ignore
+        delete obj.usedFiles;
+        assert.equal(checkGameSettingsConfigMainFields(obj).newUserMessages.length, 1);
+      });
+      it('Should return error about incorrect data in settingGroups field', () => {
+        const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
 
-      obj.usedFiles = {};
-      // @ts-ignore
-      obj.usedFiles.Some = {};
+        // @ts-ignore
+        obj.settingGroups = '';
+        assert.equal(checkGameSettingsConfigMainFields(obj).newUserMessages.length, 1);
+      });
+      it('Should return error about missed required name field in settingGroups item', () => {
+        const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
 
-      // @ts-ignore
-      obj.settingGroups = '';
-      assert.equal(checkGameSettingsConfigMainFields(obj).newUserMessages.length, 1);
-
-      obj.settingGroups = [{
-        name: 'Some',
-        label: 'name',
-      }];
-
-      // @ts-ignore
-      delete obj.settingGroups[0].name;
-      assert.equal(checkGameSettingsConfigMainFields(obj).newUserMessages.length, 1);
+        // @ts-ignore
+        delete obj.settingGroups[0].name;
+        assert.equal(checkGameSettingsConfigMainFields(obj).newUserMessages.length, 1);
+      });
     });
   });
 
@@ -111,33 +110,48 @@ describe('#Check', () => {
       assert.isNumber(result.newUsedFilesObj.anyFile.parameters[0].max);
     });
 
-    it('Should return array witn error message', () => {
-      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
-      const usedFiles = { ...obj.usedFiles };
+    describe('All tests should return array witn error message', () => {
+      it('Should return error abouy unnecessary settingGroup parameter', () => {
+        const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+        const usedFiles = { ...obj.usedFiles };
 
-      //@ts-ignore
-      delete usedFiles.anyFile.parameters[0].name;
-      //@ts-ignore
-      assert.equal(checkUsedFiles(usedFiles, Encoding.WIN1251, obj.settingGroups).newUserMessages.length, 1);
+        delete obj.settingGroups;
+        assert.equal(checkUsedFiles(usedFiles, Encoding.WIN1251, []).newUserMessages.length, 1);
+      });
 
-      usedFiles.anyFile.parameters[0].name = 'Any name';
+      it('Should return error about incorrect settingGroup parameter', () => {
+        const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+        const usedFiles = { ...obj.usedFiles };
+        usedFiles.anyFile.parameters[0].settingGroup = 'Group';
+        //@ts-ignore
+        assert.equal(checkUsedFiles(usedFiles, Encoding.WIN1251, obj.settingGroups).newUserMessages.length, 1);
+      });
 
-      usedFiles.someFile.parameters[0].type = 'Incorrect type';
-      //@ts-ignore
-      assert.equal(checkUsedFiles(usedFiles, Encoding.WIN1251, obj.settingGroups).newUserMessages.length, 1);
+      it('Should return error about missed name field', () => {
+        const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+        const usedFiles = { ...obj.usedFiles };
+        //@ts-ignore
+        delete usedFiles.anyFile.parameters[0].name;
+        //@ts-ignore
+        assert.equal(checkUsedFiles(usedFiles, Encoding.WIN1251, obj.settingGroups).newUserMessages.length, 1);
+      });
 
-      usedFiles.someFile.parameters[0].type = 'select';
+      it('Should return error about incorrect type field', () => {
+        const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+        const usedFiles = { ...obj.usedFiles };
 
-      usedFiles.someFile.parameters[0].iniGroup = 'Not needed group';
-      //@ts-ignore
-      assert.equal(checkUsedFiles(usedFiles, Encoding.WIN1251, obj.settingGroups).newUserMessages.length, 1);
+        usedFiles.someFile.parameters[0].type = 'Incorrect type';
+        //@ts-ignore
+        assert.equal(checkUsedFiles(usedFiles, Encoding.WIN1251, obj.settingGroups).newUserMessages.length, 1);
+      });
 
-      //@ts-ignore
-      delete usedFiles.someFile.parameters[0].iniGroup;
-
-      usedFiles.anyFile.parameters[0].settingGroup = 'Group';
-      //@ts-ignore
-      assert.equal(checkUsedFiles(usedFiles, Encoding.WIN1251, obj.settingGroups).newUserMessages.length, 1);
+      it('Should return error about iniGroup parameter for line view ini file', () => {
+        const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+        const usedFiles = { ...obj.usedFiles };
+        usedFiles.someFile.parameters[0].iniGroup = 'Not needed group';
+        //@ts-ignore
+        assert.equal(checkUsedFiles(usedFiles, Encoding.WIN1251, obj.settingGroups).newUserMessages.length, 1);
+      });
     });
   });
 });
