@@ -71,7 +71,7 @@ function* getMOProfilesSaga(): SagaIterator {
 
   try {
     const profiles: IUnwrap<typeof readDirectory> = yield call(
-      readINIFile,
+      readDirectory,
       path.resolve(GAME_DIR, pathToProfiles),
     );
 
