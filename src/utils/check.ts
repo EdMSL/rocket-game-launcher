@@ -58,7 +58,7 @@ const configFileDataSchema = Joi.object({
 }).optional().default(defaultLauncherConfig.customPaths);
 
 export const checkConfigFileData = (configObj: ISystemRootState): ISystemRootState => {
-  writeToLogFileSync('Start of config.json checking');
+  writeToLogFileSync('Start of config.json checking.');
 
   const validateResult = configFileDataSchema.validate(configObj, {
     abortEarly: false,
@@ -137,7 +137,7 @@ const usedFileSchema = Joi.object({
 export const checkGameSettingsConfigMainFields = (
   configObj: IGameSettingsConfig,
 ): ISettingsConfigCheckingResult => {
-  writeToLogFileSync('Start of settings.json checking');
+  writeToLogFileSync('Start of settings.json checking.');
 
   let userMessages: IUserMessage[] = [];
 
@@ -167,7 +167,8 @@ export const checkUsedFiles = (
   baseFilesEncoding: IGameSettingsRootState['baseFilesEncoding'],
   settingGroups: IGameSettingsRootState['settingGroups'],
 ): IUsedFilesCheckingResult => {
-  writeToLogFileSync('Start checking of used files in settings.json');
+  writeToLogFileSync('Start checking of used files in settings.json.');
+
   let userMessages: IUserMessage[] = [];
   const validationErrors: IUsedFileError[] = [];
 

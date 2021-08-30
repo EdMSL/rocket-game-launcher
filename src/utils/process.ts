@@ -26,7 +26,7 @@ export const runApplication = (
         LogMessageType.ERROR,
       );
 
-      cb(false, `Не удалось запустить приложение. Указан путь к папке, не файлу. Путь: ${pathToApp}`); //eslint-disable-line max-len
+      cb(false, `Не удалось запустить приложение. Указан путь к папке, не файлу. Путь: ${pathToApp}.`); //eslint-disable-line max-len
 
       return;
     }
@@ -39,7 +39,7 @@ export const runApplication = (
         `Message: Can't run application. ${ErrorMessage.MIME_TYPE}, received: ${mime.getType(pathToApp)}. App: ${appName}, path: ${pathToApp}.`, //eslint-disable-line max-len
         LogMessageType.ERROR,
       );
-      cb(false, `Не удалось запустить приложение. Файл не является исполняемым (.exe). Путь: ${pathToApp}`); //eslint-disable-line max-len
+      cb(false, `Не удалось запустить приложение. Файл не является исполняемым (.exe). Путь: ${pathToApp}.`); //eslint-disable-line max-len
 
       return;
     }
@@ -48,7 +48,7 @@ export const runApplication = (
       `Message: Can't run application. ${ErrorMessage.FILE_NOT_FOUND}. App: ${appName}, path: ${pathToApp}.`, //eslint-disable-line max-len
       LogMessageType.ERROR,
     );
-    cb(false, `Не удалось запустить приложение. Файл не найден. Путь: ${pathToApp}`);
+    cb(false, `Не удалось запустить приложение. Файл не найден. Путь: ${pathToApp}.`);
 
     return;
   }
@@ -69,7 +69,7 @@ export const runApplication = (
             LogMessageType.ERROR,
           );
 
-          cb(false, `Не удалось запустить приложение. Подробности в лог файле. Путь: ${pathToApp}`); //eslint-disable-line max-len
+          cb(false, `Не удалось запустить приложение. Подробности в файле лога. Путь: ${pathToApp}.`); //eslint-disable-line max-len
         }
       },
     );
@@ -88,21 +88,21 @@ export const runApplication = (
         LogMessageType.ERROR,
       );
 
-      cb(false, `Не удалось запустить приложение. Неизвестный тип файла. Путь: ${pathToApp}`); //eslint-disable-line max-len
+      cb(false, `Не удалось запустить приложение. Неизвестный тип файла. Путь: ${pathToApp}.`); //eslint-disable-line max-len
     } else if (error.code === ErrorCode.ACCESS) {
       writeToLogFile(
         `Message: Can't run application. ${ErrorMessage.ACCESS} App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
         LogMessageType.ERROR,
       );
 
-      cb(false, `Не удалось запустить приложение. Нет доступа. Путь: ${pathToApp}`); //eslint-disable-line max-len
+      cb(false, `Не удалось запустить приложение. Нет доступа. Путь: ${pathToApp}.`); //eslint-disable-line max-len
     } else {
       writeToLogFile(
         `Message: Can't run application. Unknown error. ${error.message} App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
         LogMessageType.ERROR,
       );
 
-      cb(false, `Не удалось запустить приложение. Неизвестная ошибка. Подробности в лог файле. Путь: ${pathToApp}`); //eslint-disable-line max-len
+      cb(false, `Не удалось запустить приложение. Неизвестная ошибка. Подробности в файле лога. Путь: ${pathToApp}.`); //eslint-disable-line max-len
     }
   }
 };
@@ -122,7 +122,7 @@ export const openFolder = (pathToFolder: string, cb?): void => {
         message,
         LogMessageType.ERROR,
       );
-      cb(`Не удалось открыть папку. Указан путь к файлу, не папке. Путь: ${pathToFolder}`);
+      cb(`Не удалось открыть папку. Указан путь к файлу, не папке. Путь: ${pathToFolder}.`);
 
       return;
     }
@@ -132,7 +132,7 @@ export const openFolder = (pathToFolder: string, cb?): void => {
       message,
       LogMessageType.ERROR,
     );
-    cb(`Не удалось открыть папку. Папка не найдена. Путь: ${pathToFolder}`);
+    cb(`Не удалось открыть папку. Папка не найдена. Путь: ${pathToFolder}.`);
 
     return;
   }
@@ -145,6 +145,6 @@ export const openFolder = (pathToFolder: string, cb?): void => {
       LogMessageType.ERROR,
     );
 
-    cb(false, `Не удалось открыть папку. Неизвестная ошибка. Подробности в лог файле. Путь: ${pathToFolder}`); //eslint-disable-line max-len
+    cb(false, `Не удалось открыть папку. Неизвестная ошибка. Подробности в лог файле. Путь: ${pathToFolder}.`); //eslint-disable-line max-len
   }
 };

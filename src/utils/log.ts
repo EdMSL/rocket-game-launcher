@@ -21,7 +21,7 @@ export const launcherLogPath = path.resolve(
 */
 export const createLogFile = (pathToLogFile = launcherLogPath): void => {
   try {
-    fs.writeFileSync(pathToLogFile, `Log file created at: ${new Date().toLocaleString()}`);
+    fs.writeFileSync(pathToLogFile, `Log file created at: ${new Date().toLocaleString()}.`);
   } catch (error) {
     showErrorBox(error.message, "Can't create log file.");
   }
