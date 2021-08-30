@@ -201,7 +201,7 @@ export const writeFileData = (
 export const writeJSONFile = (
   pathToFile: string,
   data: Record<string, unknown>,
-): Promise<void> => writeFileData(pathToFile, JSON.stringify(data))
+): Promise<void> => writeFileData(pathToFile, JSON.stringify(data, null, 2))
   .catch((error) => {
     writeToLogFile(
       `Message: ${error.message}. Path: '${pathToFile}'`,
