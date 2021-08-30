@@ -31,7 +31,9 @@ import {
   setGameSettingsConfig, setGameSettingsUsedFiles, setMoProfile, setMoProfiles,
 } from '$actions/gameSettings';
 import {
-  ErrorName, ReadWriteError, SagaError,
+  CustomError,
+  ReadWriteError,
+  SagaError,
 } from '$utils/errors';
 
 const getState = (state: IAppState): IAppState => state;
@@ -69,35 +71,35 @@ function* getMOProfilesSaga(): SagaIterator {
     },
   }: IAppState = yield select(getState);
 
+  const profilesPath = path.resolve(GAME_DIR, pathToProfiles);
+
   try {
     const profiles: IUnwrap<typeof readDirectory> = yield call(
       readDirectory,
-      path.resolve(GAME_DIR, pathToProfiles),
+      profilesPath,
     );
 
     if (profiles.length > 0) {
       yield put(setMoProfiles(profiles));
     } else {
-      throw new SagaError('profiles quantity = 0');
+      throw new CustomError('There are no profiles in the profiles folder.');
     }
   } catch (error) {
-    if (error instanceof SagaError) {
-      writeToLogFile(
-        `Can't get current Mod Organizer profiles. Problem with: ${error.message}`,
-        LogMessageType.ERROR,
-      );
+    let errorMessage = '';
+
+    if (error instanceof CustomError) {
+      errorMessage = error.message;
     } else if (error instanceof ReadWriteError) {
-      writeToLogFileSync(
-        `Message: ${error.message}. Path: ${pathToProfiles}.`,
-        LogMessageType.ERROR,
-      );
+      errorMessage = `${error.message}. Path '${profilesPath}'.`;
     } else {
-      writeToLogFile(error.message);
+      errorMessage = `Unknown error. Message: ${error.message}`;
     }
 
     yield put(addMessages([CreateUserMessage.error(
       'Ошибка при попытке получения профилей Mod Organizer. Настройки из файлов, привязанных к профилю, будут недоступны. Подробности в файле лога.', //eslint-disable-line max-len
     )]));
+
+    throw new SagaError('Get Mod Organizer profiles', errorMessage);
   }
 }
 
@@ -135,31 +137,35 @@ function* getDataFromMOIniSaga(): SagaIterator {
             // eslint-disable-next-line prefer-destructuring
             name = result[1];
           } else {
-            throw new SagaError('profileParamValueRegExp');
+            throw new CustomError('profileParamValueRegExp');
           }
         }
 
         yield put(setMoProfile(name.toString()));// Если вдруг будет число
       } else {
-        throw new SagaError('profileName');
+        throw new CustomError('profileName');
       }
     } else {
-      throw new SagaError('profileSection');
+      throw new CustomError('profileSection');
     }
   } catch (error) {
-    if (error.name === ErrorName.SAGA_ERROR) {
-      yield put(setMoProfile(''));
-      yield put(addMessages([CreateUserMessage.error(
-        'Не удалось получить текущий профиль Mod Organizer. Настройки из файлов, привязанных к профилю, будут недоступны. Подробности в файле лога.', //eslint-disable-line max-len
-      )]));
+    let errorMessage = '';
 
-      writeToLogFile(
-        `Can't get current Mod Organizer profile. Problem with: ${error.message}`,
-        LogMessageType.ERROR,
-      );
+    if (error instanceof CustomError) {
+      yield put(setMoProfile(''));
+
+      errorMessage = `Can't get current Mod Organizer profile. Problem with: ${error.message}`;
+    } else if (error instanceof ReadWriteError) {
+      errorMessage = `${error.message}. Path '${error.path}'.`;
     } else {
-      writeToLogFile(error.message, LogMessageType.ERROR);
+      errorMessage = `Unknown error. Message: ${error.message}`;
     }
+
+    yield put(addMessages([CreateUserMessage.error(
+      'Не удалось получить текущий профиль Mod Organizer. Настройки из файлов, привязанных к профилю, будут недоступны. Подробности в файле лога.', //eslint-disable-line max-len
+    )]));
+
+    throw new SagaError('Get data from Mod Organizer INI file', errorMessage);
   }
 }
 
@@ -178,9 +184,7 @@ function* getDataFromUsedFiles(): SagaIterator {
 export function* initGameSettingsSaga(): SagaIterator {
   try {
     yield call(setIsGameSettingsLoaded, false);
-
-    yield call(getMOProfilesSaga);
-    yield call(getDataFromMOIniSaga);
+    writeToLogFileSync('Start game settings initialisation.');
 
     const {
       gameSettings: {
@@ -188,7 +192,17 @@ export function* initGameSettingsSaga(): SagaIterator {
         baseFilesEncoding,
         settingGroups,
       },
+      system: {
+        modOrganizer: {
+          isUsed,
+        },
+      },
     }: IAppState = yield select(getState);
+
+    if (isUsed) {
+      yield call(getMOProfilesSaga);
+      yield call(getDataFromMOIniSaga);
+    }
 
     const { newUserMessages, newUsedFilesObj }: IUnwrapSync<typeof checkUsedFiles> = yield call(
       checkUsedFiles,
@@ -204,8 +218,20 @@ export function* initGameSettingsSaga(): SagaIterator {
     yield put(setGameSettingsUsedFiles(
       Object.keys(newUsedFilesObj).length > 0 ? newUsedFilesObj : {},
     ));
+
+    writeToLogFileSync('Game settings initialisation completed.');
   } catch (error) {
-    writeToLogFileSync(`Error during init game settings. Message: ${error.message}`);
+    let errorMessage = '';
+
+    if (error instanceof SagaError) {
+      errorMessage = `An error occured during ${error.sagaName}. ${error.message}`;
+    } else if (error instanceof ReadWriteError) {
+      errorMessage = `${error.message}. Path '${error.path}'.`;
+    } else {
+      errorMessage = `Unknown error. Message: ${error.message}`;
+    }
+
+    writeToLogFileSync(`Game settings initialization failed. Reason: ${errorMessage}`);
   } finally {
     yield call(setIsGameSettingsLoaded, true);
   }

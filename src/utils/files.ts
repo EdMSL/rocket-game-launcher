@@ -66,7 +66,11 @@ export const readFileDataSync = (
   } catch (error) {
     const readWriteError = getReadWriteError(error);
 
-    throw new ReadWriteError(`Can't read file. ${readWriteError.message}`, readWriteError);
+    throw new ReadWriteError(
+      `Can't read file. ${readWriteError.message}`,
+      readWriteError,
+      pathToFile,
+    );
   }
 };
 
@@ -80,17 +84,30 @@ export const readFileData = (pathToFile: string): Promise<Buffer> => fsPromises.
   .catch((error) => {
     const readWriteError = getReadWriteError(error);
 
-    throw new ReadWriteError(`Can't read file. ${readWriteError.message}`, readWriteError);
+    throw new ReadWriteError(
+      `Can't read file. ${readWriteError.message}`,
+      readWriteError,
+      pathToFile,
+    );
   });
 
+/**
+ * Асинхронно получить содержимое папки.
+ * @param pathToDirectory Путь к папке.
+ * @returns Массив с именами файлов\папок.
+*/
 export const readDirectory = (
   pathToDirectory: string,
 ): Promise<string[]> => fsPromises.readdir(pathToDirectory)
   .then((data) => data)
   .catch((error) => {
-    const readWriteError = getReadWriteError(error);
+    const readWriteError = getReadWriteError(error, true);
 
-    throw new ReadWriteError(`Can't read directory. ${readWriteError.message}`, readWriteError);
+    throw new ReadWriteError(
+      `Can't read directory. ${readWriteError.message}`,
+      readWriteError,
+      pathToDirectory,
+    );
   });
 
 /**
@@ -105,7 +122,7 @@ export const readJSONFileSync = <T>(pathToFile: string): T => {
     return parseJSON<T>(JSONstring);
   } catch (error) {
     writeToLogFileSync(
-      `Message: ${error.message}. Path: ${pathToFile}.`,
+      `Message: ${error.message}. Path: '${pathToFile}'.`,
       LogMessageType.ERROR,
     );
 
@@ -126,7 +143,7 @@ export const readJSONFile = async <T>(pathToFile: string): Promise<T> => {
     return parseJSON<T>(JSONstring);
   } catch (error) {
     writeToLogFileSync(
-      `Message: ${error.message}. Path: ${pathToFile}.`,
+      `Message: ${error.message}. Path: '${pathToFile}'.`,
       LogMessageType.ERROR,
     );
 
@@ -149,7 +166,7 @@ export const readINIFile = async (
     return new Ini(iconv.decode(INIData, encoding));
   } catch (error) {
     writeToLogFileSync(
-      `Message: ${error.message}. Path: ${pathToFile}.`,
+      `Message: ${error.message}. Path: '${pathToFile}'.`,
       LogMessageType.ERROR,
     );
 
@@ -169,7 +186,11 @@ export const writeFileData = (
   .catch((error) => {
     const readWriteError = getReadWriteError(error);
 
-    throw new ReadWriteError(`Can't write file. ${readWriteError.message}`, readWriteError);
+    throw new ReadWriteError(
+      `Can't write file. ${readWriteError.message}`,
+      readWriteError,
+      pathToFile,
+    );
   });
 
 /**
@@ -183,7 +204,7 @@ export const writeJSONFile = (
 ): Promise<void> => writeFileData(pathToFile, JSON.stringify(data))
   .catch((error) => {
     writeToLogFile(
-      `Message: ${error.message}. Path: ${pathToFile}`,
+      `Message: ${error.message}. Path: '${pathToFile}'`,
       LogMessageType.ERROR,
     );
 
@@ -203,7 +224,7 @@ export const writeINIFile = (
 ): Promise<void> => writeFileData(pathToFile, iconv.encode(iniDataObj.stringify(), encoding))
   .catch((error) => {
     writeToLogFile(
-      `Message: ${error.message}. Path: ${pathToFile}`,
+      `Message: ${error.message}. Path: '${pathToFile}'`,
       LogMessageType.ERROR,
     );
 

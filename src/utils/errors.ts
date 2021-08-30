@@ -17,6 +17,7 @@ export const ErrorName = {
   ACCESS: 'AccessError',
   ARG_TYPE: 'InvalidArgumentError',
   PATH_TO_DIRECTORY: 'DirectoryError',
+  PATH_TO_FILE: 'NotDirectoryError',
   READ_WRITE: 'ReadWriteError',
   SAGA_ERROR: 'SagaError',
 };
@@ -25,6 +26,7 @@ export const ErrorCode = {
   ACCESS: 'EACCES',
   NOT_FOUND: 'ENOENT',
   PATH_TO_DIRECTORY: 'EISDIR',
+  PATH_TO_FILE: 'ENOTDIR',
   ARG_TYPE: 'ERR_INVALID_ARG_TYPE',
   UNKNOWN: 'UNKNOWN',
 };
@@ -70,30 +72,50 @@ export class CustomError extends Error {
 
 export class ReadWriteError extends Error {
   public cause: Error;
+  public path: string;
 
-  constructor(message: string, cause: Error) {
+  constructor(message: string, cause: Error, path: string) {
     super(message);
     this.cause = cause;
+    this.path = path;
     this.name = ErrorName.READ_WRITE;
+  }
+}
+
+export class SagaError extends Error {
+  public sagaName;
+
+  constructor(sagaName: string, message: string) {
+    super(message);
+    this.name = ErrorName.SAGA_ERROR;
+    this.sagaName = sagaName;
   }
 }
 
 /**
  * Функция получения конечной ошибки чтения/записи (модуля `fs`) на основе кода из ошибки `NodeJS`
  * @param error Объект ошибки чтения/записи
+ * @param isDirOperation Операция над директорией или нет. По умолчанию `false`
  * @returns Объект Error
 */
-export const getReadWriteError = (error: NodeJS.ErrnoException): Error => {
+export const getReadWriteError = (error: NodeJS.ErrnoException, isDirOperation = false): Error => {
   if (error.code === ErrorCode.ACCESS) {
     return new CustomError(ErrorMessage.ACCESS, ErrorName.ACCESS);
   }
 
   if (error.code === ErrorCode.NOT_FOUND) {
-    return new CustomError(ErrorMessage.FILE_NOT_FOUND, ErrorName.NOT_FOUND);
+    return new CustomError(
+      isDirOperation ? ErrorMessage.DIRECTORY_NOT_FOUND : ErrorMessage.FILE_NOT_FOUND,
+      ErrorName.NOT_FOUND,
+    );
   }
 
   if (error.code === ErrorCode.PATH_TO_DIRECTORY) {
     return new CustomError(ErrorMessage.PATH_TO_DIRECTORY, ErrorName.PATH_TO_DIRECTORY);
+  }
+
+  if (error.code === ErrorCode.PATH_TO_FILE) {
+    return new CustomError(ErrorMessage.PATH_TO_FILE, ErrorName.PATH_TO_FILE);
   }
 
   if (error.code === ErrorCode.ARG_TYPE) {
@@ -102,10 +124,3 @@ export const getReadWriteError = (error: NodeJS.ErrnoException): Error => {
 
   return error;
 };
-
-export class SagaError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = ErrorName.SAGA_ERROR;
-  }
-}
