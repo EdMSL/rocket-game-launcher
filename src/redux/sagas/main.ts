@@ -1,3 +1,6 @@
+import {
+  push, LOCATION_CHANGE, LocationChangeAction,
+} from 'connected-react-router';
 import { SagaIterator } from 'redux-saga';
 import {
   call,
@@ -6,12 +9,11 @@ import {
   select,
 } from 'redux-saga/effects';
 import fs from 'fs';
-import { LOCATION_CHANGE, LocationChangeAction } from 'connected-react-router';
 
 import { IAppState } from '$store/store';
 import { Routes } from '$constants/routes';
 import { setIsLauncherInitialised } from '$actions/main';
-import { setGameSettingsSaga } from '$sagas/gameSettings';
+import { initGameSettingsSaga, setGameSettingsSaga } from '$sagas/gameSettings';
 import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import { LogMessageType, writeToLogFile } from '$utils/log';
 
@@ -40,6 +42,14 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
 
   if (!isLauncherInitialised && location.hash === `#${Routes.MAIN_SCREEN}`) {
     yield call(initLauncherSaga);
+  }
+
+  if (location.hash === `#${Routes.GAME_SETTINGS_SCREEN}`) {
+    if (isLauncherInitialised) {
+      yield call(initGameSettingsSaga);
+    } else {
+      yield put(push(`#${Routes.MAIN_SCREEN}`));
+    }
   }
 }
 

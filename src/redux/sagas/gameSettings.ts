@@ -237,12 +237,6 @@ export function* initGameSettingsSaga(): SagaIterator {
   }
 }
 
-function* locationChangeSaga({ payload: { location } }: LocationChangeAction): SagaIterator {
-  if (location.hash === `#${Routes.GAME_SETTINGS_SCREEN}`) {
-    yield call(initGameSettingsSaga);
-  }
-}
-
 export default function* gameSetingsSaga(): SagaIterator {
-  yield takeLatest(LOCATION_CHANGE, locationChangeSaga);
+  // yield takeLatest(LOCATION_CHANGE, locationChangeSaga);
 }
