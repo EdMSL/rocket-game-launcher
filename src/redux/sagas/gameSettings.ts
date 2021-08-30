@@ -194,12 +194,12 @@ export function* initGameSettingsSaga(): SagaIterator {
       },
       system: {
         modOrganizer: {
-          isUsed,
+          isUsed: isMOUsed,
         },
       },
     }: IAppState = yield select(getState);
 
-    if (isUsed) {
+    if (isMOUsed) {
       yield call(getMOProfilesSaga);
       yield call(getDataFromMOIniSaga);
     }
