@@ -1,9 +1,13 @@
 import { screen } from 'electron';
 import si from 'systeminformation';
 
+import { UsedFileView } from '$constants/misc';
+import { IIniObj } from './files';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from './log';
+import { CreateUserMessage, IMessage } from './message';
+import { getLineIniParameterValue } from './strings';
 
 const ONE_GB = 1073741824;
 const SYMBOLS_TO_TYPE = 8;
@@ -74,4 +78,69 @@ export const getTypeOfElement = (element: unknown): string => {
   const getElementType = {}.toString;
   const elementType = getElementType.call(element).slice(SYMBOLS_TO_TYPE, -1);
   return elementType;
+};
+
+export interface IGeneratedGameSettingsParam {
+  paramName: string,
+  paramGroup: string,
+  paramValue: string,
+  paramErrors: IMessage[],
+}
+
+export const getParameterData = (
+  currentIni: IIniObj,
+  currentParam,
+  iniType: string,
+  iniName: string,
+  iniFileName: string,
+  moProfileName = '',
+): IGeneratedGameSettingsParam => {
+  const paramErrors: IMessage[] = [];
+  let paramName;
+  let paramGroup;
+  let paramValue = '';
+
+  if (iniType === UsedFileView.SECTIONAL) {
+    paramGroup = currentIni.getSection(currentParam.iniGroup);
+
+    if (!paramGroup) {
+      paramErrors.push(CreateUserMessage.warning(
+        `${iniFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит группы параметров "${currentParam.iniGroup}", указанной в параметре ${currentParam.name} из ${iniName}`, //eslint-disable-line max-len
+      ));
+    } else {
+      const parameterLine = paramGroup.getLine(currentParam.name);
+
+      if (parameterLine) {
+        paramName = `${paramGroup.name}/${parameterLine.key}`;
+        paramValue = parameterLine.value;
+      } else {
+        paramErrors.push(CreateUserMessage.warning(
+          `${iniFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} из группы "${currentParam.iniGroup}" не содержит опции "${currentParam.name}", указанной в параметре ${currentParam.name} из ${iniName}`, //eslint-disable-line max-len
+        ));
+      }
+    }
+  } else {
+    currentIni.globals.lines.some((line) => {
+      paramValue = getLineIniParameterValue(line.text, currentParam.name);
+
+      if (paramValue) {
+        paramName = currentParam.name;
+      }
+
+      return Boolean(paramValue);
+    });
+
+    if (!paramName) {
+      paramErrors.push(CreateUserMessage.warning(
+        `${iniFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит опции "${currentParam.name}", указанной в параметре ${currentParam.name} из ${iniName}`, //eslint-disable-line max-len
+      ));
+    }
+  }
+
+  return {
+    paramName,
+    paramGroup,
+    paramValue,
+    paramErrors,
+  };
 };

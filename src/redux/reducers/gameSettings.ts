@@ -10,6 +10,7 @@ const INITIAL_STATE: IGameSettingsRootState = {
   usedFiles: {},
   moProfile: '',
   moProfiles: [],
+  gameOptions: {},
 };
 
 export const gameSettingsReducer = createReducer<IGameSettingsRootState>(

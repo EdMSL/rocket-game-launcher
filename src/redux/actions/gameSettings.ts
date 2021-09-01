@@ -2,8 +2,16 @@ import { IAction } from '$types/common';
 import {
   GAME_SETTINGS_TYPES,
   IGameSettingsConfig,
+  IGameSettingsOptions,
   IGameSettingsRootState,
 } from '$types/gameSettings';
+
+export const setGameSettingsOptions: IAction<IGameSettingsOptions> = (
+  gameSetingsOptions,
+) => ({
+  type: GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_OPTIONS,
+  payload: gameSetingsOptions,
+});
 
 export const setGameSettingsConfig: IAction<IGameSettingsConfig> = (
   gameSetingsConfig,

@@ -26,3 +26,12 @@ export const parseJSON = <T>(jsonString: string): T => {
 export const getRandomId = (
   word: string,
 ): string => `${word}-f${((Math.random() * HEXADECIMAL_FACTOR)).toString(HEXADECIMAL)}-${new Date().getMilliseconds()}`; //eslint-disable-line max-len
+
+export const getParameterRegExp = (parameterName): RegExp => new RegExp(`set[\\s]+${parameterName}[\\s]+to[\\s]+[-0-9]+`, 'i');
+
+export const getLineIniParameterValue = (ini: string, parameterName: string): string => {
+  const value = ini.match(getParameterRegExp(parameterName));
+  // @ts-ignore
+  // Возвращается в любом случае массив, типы для match указаны неверно
+  return value[0].match(/\s[-0-9]+/)[0].trim() ?? '';
+};

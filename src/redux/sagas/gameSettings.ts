@@ -4,6 +4,7 @@ import {
   put,
   takeLatest,
   select,
+  all,
 } from 'redux-saga/effects';
 import path from 'path';
 import fs from 'fs';
@@ -12,6 +13,7 @@ import { LOCATION_CHANGE, LocationChangeAction } from 'connected-react-router';
 import { IAppState } from '$store/store';
 import { Routes } from '$constants/routes';
 import {
+  getPathTofile,
   readDirectory,
   readINIFile,
   readJSONFile,
@@ -174,10 +176,49 @@ function* getDataFromUsedFiles(): SagaIterator {
     const {
       gameSettings: {
         usedFiles,
+        moProfile,
+      },
+      system: {
+        customPaths,
       },
     }: IAppState = yield select(getState);
+
+    const currentFilesData: IUnwrap<typeof readINIFile>[] = yield all(Object.keys(usedFiles).map((fileName) => call(
+      readINIFile,
+      getPathTofile(usedFiles[fileName].path, customPaths, moProfile),
+    )));
+
+    // const options = Object.keys(currentFilesData).reduce((currentOptions, currentFile, paramIndex) => {
+    //   const {
+    //     paramName, paramValue, paramError,
+    //   } = getParameterData(
+    //     currentIni,
+    //     currentFile,
+    //     iniType,
+    //     iniName,
+    //     path.basename(currentUsedIniFiles[iniName].path),
+    //     moProfileName,
+    //   );
+
+    //   if (paramError) {
+    //         paramsErrorArr.push(paramError);
+    //         wrongParametersIndexes.push(paramIndex);
+
+    //         return { ...currentOptions };
+    //       }
+
+    //   return {
+    //     ...currentOptions,
+    //     [paramName]: {
+    //       default: paramValue,
+    //       value: paramValue,
+    //       settingsGroup: currentFile.settingGroup,
+    //       parent: iniName,
+    //     },
+    //   };
+    // }, {});
   } catch (error) {
-    writeToLogFile(error, LogMessageType.ERROR);
+    throw new SagaError('Get data from used files', error.message);
   }
 }
 
@@ -218,6 +259,8 @@ export function* initGameSettingsSaga(): SagaIterator {
     yield put(setGameSettingsUsedFiles(
       Object.keys(newUsedFilesObj).length > 0 ? newUsedFilesObj : {},
     ));
+
+    yield call(getDataFromUsedFiles);
 
     writeToLogFileSync('Game settings initialisation completed.');
   } catch (error) {

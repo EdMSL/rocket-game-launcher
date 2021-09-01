@@ -1,4 +1,5 @@
 import fs, { promises as fsPromises } from 'fs';
+import path from 'path';
 import iconv from 'iconv-lite';
 import { Ini } from 'ini-api';
 
@@ -16,6 +17,7 @@ import {
   ErrorName,
 } from '$utils/errors';
 import { Encoding } from '$constants/misc';
+import { ISystemRootState } from '$types/system';
 
 interface IIniLine {
   text: string,
@@ -31,7 +33,7 @@ interface IIniSection {
   getValue: (key: string) => string,
 }
 
-export interface IIni {
+export interface IIniObj {
   globals: {
     lines: IIniLine[],
   },
@@ -159,7 +161,7 @@ export const readJSONFile = async <T>(pathToFile: string): Promise<T> => {
 export const readINIFile = async (
   pathToFile: string,
   encoding = Encoding.WIN1251,
-): Promise<IIni> => {
+): Promise<IIniObj> => {
   try {
     const INIData = await readFileData(pathToFile);
 
@@ -219,7 +221,7 @@ export const writeJSONFile = (
 */
 export const writeINIFile = (
   pathToFile: string,
-  iniDataObj: IIni,
+  iniDataObj: IIniObj,
   encoding = Encoding.WIN1251,
 ): Promise<void> => writeFileData(pathToFile, iconv.encode(iniDataObj.stringify(), encoding))
   .catch((error) => {
@@ -236,3 +238,15 @@ export const iconvDecode = (str: string, encoding = Encoding.CP866): string => i
   encoding,
 );
 
+export const getPathTofile = (
+  pathToFile: string,
+  customPaths: ISystemRootState['customPaths'],
+  profile: string,
+): string => {
+  if (/%MO%/.test(pathToFile)) {
+    return path.resolve(customPaths['%MO%'], profile, pathToFile);
+  } else if (/%DOCUMENTS%/.test(pathToFile)) {
+    return path.resolve(customPaths['%DOCUMENTS%'], pathToFile);
+  }
+  return pathToFile;
+};
