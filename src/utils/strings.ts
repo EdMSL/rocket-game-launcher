@@ -27,11 +27,20 @@ export const getRandomId = (
   word: string,
 ): string => `${word}-f${((Math.random() * HEXADECIMAL_FACTOR)).toString(HEXADECIMAL)}-${new Date().getMilliseconds()}`; //eslint-disable-line max-len
 
-export const getParameterRegExp = (parameterName): RegExp => new RegExp(`set[\\s]+${parameterName}[\\s]+to[\\s]+[-0-9]+`, 'i');
+export const getParameterRegExp = (parameterName): RegExp => new RegExp(`set\\s+${parameterName}\\s+to\\s+(.+)$`, 'i');
 
 export const getLineIniParameterValue = (ini: string, parameterName: string): string => {
-  const value = ini.match(getParameterRegExp(parameterName));
-  // @ts-ignore
-  // Возвращается в любом случае массив, типы для match указаны неверно
-  return value[0].match(/\s[-0-9]+/)[0].trim() ?? '';
+  const paramResult = ini.match(getParameterRegExp(parameterName.trim()));
+
+  if (paramResult!?.length > 0) {
+    // @ts-ignore
+    const value = paramResult[0].match(/to\s+(.+)$/);
+
+    if (value!?.length > 1) {
+      // @ts-ignore
+      return value[1].trim();
+    }
+  }
+
+  return '';
 };

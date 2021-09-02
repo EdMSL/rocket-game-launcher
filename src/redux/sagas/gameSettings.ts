@@ -13,8 +13,10 @@ import { LOCATION_CHANGE, LocationChangeAction } from 'connected-react-router';
 import { IAppState } from '$store/store';
 import { Routes } from '$constants/routes';
 import {
-  getPathTofile,
+  getPathToFile,
+  IIniObj,
   readDirectory,
+  readFileForGameOptions,
   readINIFile,
   readJSONFile,
 } from '$utils/files';
@@ -24,19 +26,21 @@ import {
 } from '$actions/main';
 import { GAME_DIR, GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import { checkUsedFiles, checkGameSettingsConfigMainFields } from '$utils/check';
-import { IGameSettingsConfig } from '$types/gameSettings';
+import { IGameSettingsConfig, IGameSettingsOptions } from '$types/gameSettings';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';
-import { CreateUserMessage } from '$utils/message';
+import { CreateUserMessage, IMessage } from '$utils/message';
 import {
-  setGameSettingsConfig, setGameSettingsUsedFiles, setMoProfile, setMoProfiles,
+  setGameSettingsConfig, setGameSettingsOptions, setGameSettingsUsedFiles, setMoProfile, setMoProfiles,
 } from '$actions/gameSettings';
 import {
   CustomError,
   ReadWriteError,
   SagaError,
 } from '$utils/errors';
+import { getOptionData } from '$utils/data';
+import { IUserMessage } from '$types/main';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -183,40 +187,83 @@ function* getDataFromUsedFiles(): SagaIterator {
       },
     }: IAppState = yield select(getState);
 
-    const currentFilesData: IUnwrap<typeof readINIFile>[] = yield all(Object.keys(usedFiles).map((fileName) => call(
-      readINIFile,
-      getPathTofile(usedFiles[fileName].path, customPaths, moProfile),
-    )));
+    const currentFilesData: IUnwrap<typeof readFileForGameOptions>[] = yield all(
+      Object.keys(usedFiles).map((fileName) => call(
+        readFileForGameOptions,
+        getPathToFile(usedFiles[fileName].path, customPaths, moProfile),
+        fileName,
+      )),
+    );
 
-    // const options = Object.keys(currentFilesData).reduce((currentOptions, currentFile, paramIndex) => {
-    //   const {
-    //     paramName, paramValue, paramError,
-    //   } = getParameterData(
-    //     currentIni,
-    //     currentFile,
-    //     iniType,
-    //     iniName,
-    //     path.basename(currentUsedIniFiles[iniName].path),
-    //     moProfileName,
-    //   );
+    const currentFilesDataObj = currentFilesData.reduce<{ [key: string]: IIniObj, }>(
+      (filesData, currentFile) => ({
+        ...filesData,
+        [currentFile.name]: currentFile.fileData,
+      }),
+      {},
+    );
 
-    //   if (paramError) {
-    //         paramsErrorArr.push(paramError);
-    //         wrongParametersIndexes.push(paramIndex);
+    let optionsErrors: IUserMessage[] = [];
 
-    //         return { ...currentOptions };
-    //       }
+    const totalGameOptions: IGameSettingsOptions = Object.keys(usedFiles).reduce(
+      (gameOptions, currentUsedFile) => {
+        const optionsFromFile = usedFiles[currentUsedFile].parameters.reduce(
+          (currentOptions, currentParameter) => {
+            const {
+              paramName, paramValue, paramErrors,
+            } = getOptionData(
+              currentFilesDataObj[currentUsedFile],
+              currentParameter,
+              usedFiles[currentUsedFile].view,
+              currentUsedFile,
+              path.basename(usedFiles[currentUsedFile].path),
+              moProfile,
+            );
 
-    //   return {
-    //     ...currentOptions,
-    //     [paramName]: {
-    //       default: paramValue,
-    //       value: paramValue,
-    //       settingsGroup: currentFile.settingGroup,
-    //       parent: iniName,
-    //     },
-    //   };
-    // }, {});
+            if (paramErrors.length > 0) {
+              optionsErrors = [...optionsErrors, ...paramErrors];
+
+              return { ...currentOptions };
+            }
+
+            return {
+              ...currentOptions,
+              [paramName]: {
+                default: paramValue,
+                value: paramValue,
+                settingsGroup: currentParameter.settingGroup,
+                parent: currentUsedFile,
+              },
+            };
+          },
+          {},
+        );
+
+        if (Object.keys(optionsFromFile).length > 0) {
+          return {
+            ...gameOptions,
+            [currentUsedFile]: optionsFromFile,
+          };
+        }
+
+        return {
+          ...gameOptions,
+        };
+      },
+      {},
+    );
+
+    if (optionsErrors.length > 0) {
+      yield put(addMessages(optionsErrors));
+    }
+
+    if (Object.keys(totalGameOptions).length > 0) {
+      yield put(setGameSettingsOptions(totalGameOptions));
+    } else {
+      yield put(addMessages([CreateUserMessage.error('Нет доступных настроек для вывода.')]));
+
+      throw new CustomError('No game options to show.');
+    }
   } catch (error) {
     throw new SagaError('Get data from used files', error.message);
   }
@@ -274,7 +321,10 @@ export function* initGameSettingsSaga(): SagaIterator {
       errorMessage = `Unknown error. Message: ${error.message}`;
     }
 
-    writeToLogFileSync(`Game settings initialization failed. Reason: ${errorMessage}`);
+    writeToLogFileSync(
+      `Game settings initialization failed. Reason: ${errorMessage}`,
+      LogMessageType.ERROR,
+    );
   } finally {
     yield call(setIsGameSettingsLoaded, true);
   }

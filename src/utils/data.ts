@@ -6,8 +6,10 @@ import { IIniObj } from './files';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from './log';
-import { CreateUserMessage, IMessage } from './message';
+import { CreateUserMessage } from './message';
 import { getLineIniParameterValue } from './strings';
+import { IGameSettingsParameter } from '$types/gameSettings';
+import { IUserMessage } from '$types/main';
 
 const ONE_GB = 1073741824;
 const SYMBOLS_TO_TYPE = 8;
@@ -84,18 +86,28 @@ export interface IGeneratedGameSettingsParam {
   paramName: string,
   paramGroup: string,
   paramValue: string,
-  paramErrors: IMessage[],
+  paramErrors: IUserMessage[],
 }
 
-export const getParameterData = (
+/**
+ * Генерирует объект с полями, необходимыми для создания
+ * объекта игровой опции для записи в state.
+ * @param currentIni Данные из файла, которые используются в опции.
+ * @param currentParam Объект параметра, на основе которого создается опция.
+ * @param iniType Тип файла.
+ * @param iniName Имя, используемой в settings.json для данного файла.
+ * @param iniFileName Полное имя файла.
+ * @param moProfileName Профиль МО.
+*/
+export const getOptionData = (
   currentIni: IIniObj,
-  currentParam,
+  currentParam: IGameSettingsParameter,
   iniType: string,
   iniName: string,
   iniFileName: string,
   moProfileName = '',
 ): IGeneratedGameSettingsParam => {
-  const paramErrors: IMessage[] = [];
+  const paramErrors: IUserMessage[] = [];
   let paramName;
   let paramGroup;
   let paramValue = '';
@@ -105,7 +117,7 @@ export const getParameterData = (
 
     if (!paramGroup) {
       paramErrors.push(CreateUserMessage.warning(
-        `${iniFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит группы параметров "${currentParam.iniGroup}", указанной в параметре ${currentParam.name} из ${iniName}`, //eslint-disable-line max-len
+        `Файл ${iniFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит группы параметров "${currentParam.iniGroup}", указанной в параметре ${currentParam.name} из ${iniName}`, //eslint-disable-line max-len
       ));
     } else {
       const parameterLine = paramGroup.getLine(currentParam.name);
@@ -115,7 +127,7 @@ export const getParameterData = (
         paramValue = parameterLine.value;
       } else {
         paramErrors.push(CreateUserMessage.warning(
-          `${iniFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} из группы "${currentParam.iniGroup}" не содержит опции "${currentParam.name}", указанной в параметре ${currentParam.name} из ${iniName}`, //eslint-disable-line max-len
+          `Файл ${iniFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} из группы "${currentParam.iniGroup}" не содержит параметра "${currentParam.name}", указанного в ${iniName}`, //eslint-disable-line max-len
         ));
       }
     }
@@ -132,7 +144,7 @@ export const getParameterData = (
 
     if (!paramName) {
       paramErrors.push(CreateUserMessage.warning(
-        `${iniFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит опции "${currentParam.name}", указанной в параметре ${currentParam.name} из ${iniName}`, //eslint-disable-line max-len
+        `Файл ${iniFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит параметра "${currentParam.name}", указанного в ${iniName}`, //eslint-disable-line max-len
       ));
     }
   }

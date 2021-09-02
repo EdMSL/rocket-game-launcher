@@ -176,6 +176,19 @@ export const readINIFile = async (
   }
 };
 
+export const readFileForGameOptions = async (
+  pathToFile: string,
+  name: string,
+  encoding = Encoding.WIN1251,
+): Promise<{ name: string, fileData: IIniObj, }> => {
+  const fileData = await readINIFile(pathToFile, encoding);
+
+  return {
+    name,
+    fileData,
+  };
+};
+
 /**
  * Асинхронно записать файл.
  * @param pathToFile Путь к файлу.
@@ -238,13 +251,16 @@ export const iconvDecode = (str: string, encoding = Encoding.CP866): string => i
   encoding,
 );
 
-export const getPathTofile = (
+export const getPathToFile = (
   pathToFile: string,
   customPaths: ISystemRootState['customPaths'],
   profile: string,
 ): string => {
   if (/%MO%/.test(pathToFile)) {
-    return path.resolve(customPaths['%MO%'], profile, pathToFile);
+    if (profile) {
+      return path.resolve(customPaths['%MO%'], profile, pathToFile);
+    }
+    throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
   } else if (/%DOCUMENTS%/.test(pathToFile)) {
     return path.resolve(customPaths['%DOCUMENTS%'], pathToFile);
   }

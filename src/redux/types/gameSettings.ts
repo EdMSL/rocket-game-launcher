@@ -24,7 +24,7 @@ interface IGameSettingsGroup {
   label?: string,
 }
 
-interface IGameSettingsParameter {
+export interface IGameSettingsParameter {
   name: string,
   iniGroup: string,
   settingGroup: string,
