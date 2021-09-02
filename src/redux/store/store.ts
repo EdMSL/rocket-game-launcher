@@ -1,7 +1,9 @@
 import {
   createStore, applyMiddleware, compose, Store, Middleware,
 } from 'redux';
-import { createBrowserHistory, History } from 'history';
+import {
+  createHashHistory, History,
+} from 'history';
 import { routerMiddleware } from 'connected-react-router';
 import {
   forwardToMain,
@@ -30,16 +32,14 @@ export const configureStore = (
   let middleware: Middleware[] = [];
 
   if (scope === Scope.RENDERER) {
-    history = createBrowserHistory();
-
-    const router = routerMiddleware(history);
+    history = createHashHistory();
 
     middleware = [
       forwardToMain,
-      router,
+      routerMiddleware(history),
       sagaMiddleware,
     ];
-  } else if (scope === Scope.MAIN) {
+  } else {
     middleware = [
       triggerAlias,
       forwardToRenderer,

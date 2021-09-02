@@ -40,15 +40,15 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
     main: { isLauncherInitialised },
   }: IAppState = yield select(getState);
 
-  if (!isLauncherInitialised && location.hash === `#${Routes.MAIN_SCREEN}`) {
+  if (!isLauncherInitialised && location.pathname === `${Routes.MAIN_SCREEN}`) {
     yield call(initLauncherSaga);
   }
 
-  if (location.hash === `#${Routes.GAME_SETTINGS_SCREEN}`) {
+  if (location.pathname === `${Routes.GAME_SETTINGS_SCREEN}`) {
     if (isLauncherInitialised) {
       yield call(initGameSettingsSaga);
     } else {
-      yield put(push(`#${Routes.MAIN_SCREEN}`));
+      yield put(push(`${Routes.MAIN_SCREEN}`));
     }
   }
 }
