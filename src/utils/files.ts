@@ -2,6 +2,7 @@ import fs, { promises as fsPromises } from 'fs';
 import path from 'path';
 import iconv from 'iconv-lite';
 import { Ini } from 'ini-api';
+import xmlParser from 'fast-xml-parser';
 
 import {
   LogMessageType,
@@ -43,6 +44,11 @@ export interface IIniObj {
   getSection: (name: string) => IIniSection,
   addSection: (name: string) => IIniSection,
 }
+
+export interface IXmlObj {
+  [key: string]: any,
+}
+
 /**
  * Синхронно считать данные из файла.
  * @param pathToFile Путь к файлу.
@@ -156,6 +162,7 @@ export const readJSONFile = async <T>(pathToFile: string): Promise<T> => {
 /**
  * Асинхронно получить данные из INI файла.
  * @param pathToFile Путь к файлу.
+ * @param encoding Кодировка файла. По умолчанию `win1251`.
  * @returns Объект с данными из файла.
 */
 export const readINIFile = async (
@@ -176,10 +183,38 @@ export const readINIFile = async (
   }
 };
 
+/**
+ * Асинхронно получить данные из XML файла или файла со схожей структурой.
+ * @param pathToFile Путь к файлу.
+ * @param encoding Кодировка файла. По умолчанию `win1251`.
+ * @returns Объект с данными из файла.
+*/
+export const readXMLFile = async (
+  pathToFile: string,
+  encoding = Encoding.WIN1251,
+): Promise<IXmlObj> => {
+  try {
+    const XMLDataStr = await readFileData(pathToFile);
+
+    return xmlParser.parse(iconv.decode(XMLDataStr, encoding), {
+      attributeNamePrefix: '',
+      ignoreAttributes: false,
+      parseAttributeValue: true,
+    });
+  } catch (error) {
+    writeToLogFileSync(
+      `Message: ${error.message}. Path: '${pathToFile}'.`,
+      LogMessageType.ERROR,
+    );
+
+    throw error;
+  }
+};
+
 export const readFileForGameOptions = async (
   pathToFile: string,
   name: string,
-  encoding = Encoding.WIN1251,
+  encoding: string,
 ): Promise<{ name: string, fileData: IIniObj, }> => {
   const fileData = await readINIFile(pathToFile, encoding);
 

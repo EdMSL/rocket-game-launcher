@@ -55,6 +55,23 @@
           }
         }
       ]
+    },
+    "OblivionReloaded": {
+      "path": ".\\src\\tests\\fixtures\\OblivionReloaded.dll.config",
+      "view": "tag",
+      "parameters": [
+        {
+          "name": "AnisotropicFilter",
+          "attributeName": "Value",
+          "path": "_Main/Main/Misc",
+          "settingGroup": "Audio",
+          "type": "range",
+          "label": "Фильтрация",
+          "min": "1",
+          "max": "5",
+          "step": "1"
+        }
+      ]
     }
   }
 }

@@ -7,11 +7,8 @@ import {
   all,
 } from 'redux-saga/effects';
 import path from 'path';
-import fs from 'fs';
-import { LOCATION_CHANGE, LocationChangeAction } from 'connected-react-router';
 
 import { IAppState } from '$store/store';
-import { Routes } from '$constants/routes';
 import {
   getPathToFile,
   IIniObj,
@@ -30,9 +27,13 @@ import { IGameSettingsConfig, IGameSettingsOptions } from '$types/gameSettings';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';
-import { CreateUserMessage, IMessage } from '$utils/message';
+import { CreateUserMessage } from '$utils/message';
 import {
-  setGameSettingsConfig, setGameSettingsOptions, setGameSettingsUsedFiles, setMoProfile, setMoProfiles,
+  setGameSettingsConfig,
+  setGameSettingsOptions,
+  setGameSettingsUsedFiles,
+  setMoProfile,
+  setMoProfiles,
 } from '$actions/gameSettings';
 import {
   CustomError,
@@ -192,6 +193,7 @@ function* getDataFromUsedFiles(): SagaIterator {
         readFileForGameOptions,
         getPathToFile(usedFiles[fileName].path, customPaths, moProfile),
         fileName,
+        usedFiles[fileName].encoding,
       )),
     );
 

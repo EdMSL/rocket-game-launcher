@@ -40,7 +40,7 @@ export interface IUsedFile {
   path: string,
   view: string,
   parameters: IGameSettingsParameter[],
-  encoding?: string,
+  encoding: string,
 }
 
 export interface IUsedFiles {
