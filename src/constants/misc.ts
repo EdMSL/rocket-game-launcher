@@ -12,6 +12,7 @@ export const Encoding = {
 export const UsedFileView = {
   SECTIONAL: 'sectional',
   LINE: 'line',
+  TAG: 'tag',
 };
 
 export const SettingParameterControllerType = {

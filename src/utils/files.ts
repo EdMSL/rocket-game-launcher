@@ -17,7 +17,7 @@ import {
   ErrorCode,
   ErrorName,
 } from '$utils/errors';
-import { Encoding } from '$constants/misc';
+import { Encoding, UsedFileView } from '$constants/misc';
 import { ISystemRootState } from '$types/system';
 
 interface IIniLine {
@@ -213,10 +213,17 @@ export const readXMLFile = async (
 
 export const readFileForGameOptions = async (
   pathToFile: string,
+  fileType: string,
   name: string,
   encoding: string,
-): Promise<{ name: string, fileData: IIniObj, }> => {
-  const fileData = await readINIFile(pathToFile, encoding);
+): Promise<{ name: string, fileData: IIniObj|IXmlObj, }> => {
+  let fileData: IIniObj|IXmlObj = {};
+
+  if (fileType === UsedFileView.LINE || fileType === UsedFileView.SECTIONAL) {
+    fileData = await readINIFile(pathToFile, encoding);
+  } else if (fileType === UsedFileView.TAG) {
+    fileData = await readXMLFile(pathToFile, encoding);
+  }
 
   return {
     name,

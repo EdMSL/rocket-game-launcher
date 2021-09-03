@@ -2,7 +2,7 @@ import { screen } from 'electron';
 import si from 'systeminformation';
 
 import { UsedFileView } from '$constants/misc';
-import { IIniObj } from './files';
+import { IIniObj, IXmlObj } from './files';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from './log';
@@ -92,19 +92,19 @@ export interface IGeneratedGameSettingsParam {
 /**
  * Генерирует объект с полями, необходимыми для создания
  * объекта игровой опции для записи в state.
- * @param currentIni Данные из файла, которые используются в опции.
- * @param currentParam Объект параметра, на основе которого создается опция.
- * @param iniType Тип файла.
- * @param iniName Имя, используемой в settings.json для данного файла.
- * @param iniFileName Полное имя файла.
+ * @param currentFileData Данные из файла, которые используются в опции.
+ * @param currentGameSettingParameter Объект параметра, на основе которого создается опция.
+ * @param fileView Вид структуры файла.
+ * @param gameSettingsFileName Имя, используемой в settings.json для данного файла.
+ * @param baseFileName Полное базовое имя файла.
  * @param moProfileName Профиль МО.
 */
 export const getOptionData = (
-  currentIni: IIniObj,
-  currentParam: IGameSettingsParameter,
-  iniType: string,
-  iniName: string,
-  iniFileName: string,
+  currentFileData: IIniObj|IXmlObj,
+  currentGameSettingParameter: IGameSettingsParameter,
+  fileView: string,
+  gameSettingsFileName: string,
+  baseFileName: string,
   moProfileName = '',
 ): IGeneratedGameSettingsParam => {
   const paramErrors: IUserMessage[] = [];
@@ -112,31 +112,31 @@ export const getOptionData = (
   let paramGroup;
   let paramValue = '';
 
-  if (iniType === UsedFileView.SECTIONAL) {
-    paramGroup = currentIni.getSection(currentParam.iniGroup);
+  if (fileView === UsedFileView.SECTIONAL) {
+    paramGroup = currentFileData.getSection(currentGameSettingParameter.iniGroup);
 
     if (!paramGroup) {
       paramErrors.push(CreateUserMessage.warning(
-        `Файл ${iniFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит группы параметров "${currentParam.iniGroup}", указанной в параметре ${currentParam.name} из ${iniName}`, //eslint-disable-line max-len
+        `Файл ${baseFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит группы параметров "${currentGameSettingParameter.iniGroup}", указанной в параметре ${currentGameSettingParameter.name} из ${gameSettingsFileName}`, //eslint-disable-line max-len
       ));
     } else {
-      const parameterLine = paramGroup.getLine(currentParam.name);
+      const parameterLine = paramGroup.getLine(currentGameSettingParameter.name);
 
       if (parameterLine) {
         paramName = `${paramGroup.name}/${parameterLine.key}`;
         paramValue = parameterLine.value;
       } else {
         paramErrors.push(CreateUserMessage.warning(
-          `Файл ${iniFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} из группы "${currentParam.iniGroup}" не содержит параметра "${currentParam.name}", указанного в ${iniName}`, //eslint-disable-line max-len
+          `Файл ${baseFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} из группы "${currentGameSettingParameter.iniGroup}" не содержит параметра "${currentGameSettingParameter.name}", указанного в ${gameSettingsFileName}`, //eslint-disable-line max-len
         ));
       }
     }
-  } else {
-    currentIni.globals.lines.some((line) => {
-      paramValue = getLineIniParameterValue(line.text, currentParam.name);
+  } else if (fileView === UsedFileView.LINE) {
+    currentFileData.globals.lines.some((line) => {
+      paramValue = getLineIniParameterValue(line.text, currentGameSettingParameter.name);
 
       if (paramValue) {
-        paramName = currentParam.name;
+        paramName = currentGameSettingParameter.name;
       }
 
       return Boolean(paramValue);
@@ -144,7 +144,32 @@ export const getOptionData = (
 
     if (!paramName) {
       paramErrors.push(CreateUserMessage.warning(
-        `Файл ${iniFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит параметра "${currentParam.name}", указанного в ${iniName}`, //eslint-disable-line max-len
+        `Файл ${baseFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит параметра "${currentGameSettingParameter.name}", указанного в ${gameSettingsFileName}`, //eslint-disable-line max-len
+      ));
+    }
+  } else if (fileView === UsedFileView.TAG) {
+    const pathArr = [
+      ...currentGameSettingParameter.attributePath!?.split('/'),
+      currentGameSettingParameter.name,
+    ];
+
+    const getProp = (obj): void => {
+      Object.keys(obj).forEach((key) => {
+        if (typeof obj[key] === 'object') {
+          getProp(obj[key]);
+        } else if (key === currentGameSettingParameter.name) {
+          console.log(obj);
+          paramName = pathArr.join('/');
+          paramValue = obj[currentGameSettingParameter.attributeName!];
+        }
+      });
+    };
+
+    getProp(currentFileData);
+
+    if (!paramName || !paramValue) {
+      paramErrors.push(CreateUserMessage.warning(
+        `Файл ${baseFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит параметра "${currentGameSettingParameter.name}", указанного в ${gameSettingsFileName}`, //eslint-disable-line max-len
       ));
     }
   }

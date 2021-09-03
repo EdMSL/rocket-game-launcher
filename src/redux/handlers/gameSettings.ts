@@ -10,7 +10,7 @@ const setGameSettingsOptions: IActionHandler<
   { payload: gameSettingsOptions },
 ) => ({
   ...state,
-  ...gameSettingsOptions,
+  gameOptions: gameSettingsOptions,
 });
 
 const setGameSettingsConfig: IActionHandler<

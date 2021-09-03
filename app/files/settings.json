@@ -63,7 +63,7 @@
         {
           "name": "AnisotropicFilter",
           "attributeName": "Value",
-          "path": "_Main/Main/Misc",
+          "attributePath": "_Main/Main/Misc",
           "settingGroup": "Audio",
           "type": "range",
           "label": "Фильтрация",

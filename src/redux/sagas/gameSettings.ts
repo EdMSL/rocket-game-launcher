@@ -12,6 +12,7 @@ import { IAppState } from '$store/store';
 import {
   getPathToFile,
   IIniObj,
+  IXmlObj,
   readDirectory,
   readFileForGameOptions,
   readINIFile,
@@ -192,12 +193,13 @@ function* getDataFromUsedFiles(): SagaIterator {
       Object.keys(usedFiles).map((fileName) => call(
         readFileForGameOptions,
         getPathToFile(usedFiles[fileName].path, customPaths, moProfile),
+        usedFiles[fileName].view,
         fileName,
         usedFiles[fileName].encoding,
       )),
     );
 
-    const currentFilesDataObj = currentFilesData.reduce<{ [key: string]: IIniObj, }>(
+    const currentFilesDataObj = currentFilesData.reduce<{ [key: string]: IIniObj|IXmlObj, }>(
       (filesData, currentFile) => ({
         ...filesData,
         [currentFile.name]: currentFile.fileData,

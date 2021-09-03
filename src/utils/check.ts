@@ -101,6 +101,16 @@ const settingParameterSchema = Joi.object({
       is: UsedFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ),
+  attributeName: Joi.string().when(
+    Joi.ref('$view'), {
+      is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+    },
+  ),
+  attributePath: Joi.string().when(
+    Joi.ref('$view'), {
+      is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+    },
+  ),
   settingGroup: Joi.string().when(
     Joi.ref('$isSettingGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),

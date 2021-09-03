@@ -26,9 +26,11 @@ interface IGameSettingsGroup {
 
 export interface IGameSettingsParameter {
   name: string,
-  iniGroup: string,
-  settingGroup: string,
   type: string,
+  iniGroup?: string,
+  settingGroup?: string,
+  attributeName?: string,
+  attributePath?: string,
   label?: string,
   min?: number,
   max?: number,
