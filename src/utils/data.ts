@@ -151,25 +151,26 @@ export const getOptionData = (
     const pathArr = [
       ...currentGameSettingParameter.attributePath!?.split('/'),
       currentGameSettingParameter.name,
+      currentGameSettingParameter.attributeName,
     ];
 
-    const getProp = (obj): void => {
-      Object.keys(obj).forEach((key) => {
-        if (typeof obj[key] === 'object') {
-          getProp(obj[key]);
-        } else if (key === currentGameSettingParameter.name) {
-          console.log(obj);
-          paramName = pathArr.join('/');
-          paramValue = obj[currentGameSettingParameter.attributeName!];
-        }
-      });
+    let index = 0;
+    const getProp = (obj, key): void => {
+      index += 1;
+
+      if (typeof obj[key] === 'object') {
+        getProp(obj[key], pathArr[index]);
+      } else if (key === currentGameSettingParameter.attributeName) {
+        paramName = pathArr.join('/');
+        paramValue = obj[currentGameSettingParameter.attributeName!];
+      }
     };
 
-    getProp(currentFileData);
+    getProp(currentFileData, pathArr[index]);
 
     if (!paramName || !paramValue) {
       paramErrors.push(CreateUserMessage.warning(
-        `Файл ${baseFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит параметра "${currentGameSettingParameter.name}", указанного в ${gameSettingsFileName}`, //eslint-disable-line max-len
+        `Файл ${baseFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит параметра "${currentGameSettingParameter.name}", указанного в ${gameSettingsFileName}, либо допущена ошибка в пути к параметру.`, //eslint-disable-line max-len
       ));
     }
   }
