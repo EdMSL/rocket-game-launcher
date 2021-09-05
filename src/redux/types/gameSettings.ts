@@ -24,8 +24,22 @@ interface IGameSettingsGroup {
   label?: string,
 }
 
-export interface IGameSettingsParameter {
+export interface IGameSettingsItemParameter {
   name: string,
+  controllerType?: string,
+  iniGroup?: string,
+  settingGroup?: string,
+  attributeName?: string,
+  attributePath?: string,
+  min?: number,
+  max?: number,
+  step?: number,
+  options?: { [key: string]: string, },
+}
+
+export interface IGameSettingsParameter {
+  parameterType: string,
+  name?: string,
   controllerType: string,
   iniGroup?: string,
   settingGroup?: string,
@@ -36,6 +50,7 @@ export interface IGameSettingsParameter {
   max?: number,
   step?: number,
   options?: { [key: string]: string, },
+  items?: IGameSettingsItemParameter[],
 }
 
 export interface IUsedFile {

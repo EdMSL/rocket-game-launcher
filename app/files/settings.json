@@ -75,7 +75,7 @@
       ]
     },
     "TQPIni": {
-      "path": "Data\\ini\\TQP.ini",
+      "path": ".\\src\\tests\\fixtures\\TQP.ini",
       "view": "line",
       "parameters": [
         {
@@ -106,7 +106,7 @@
       ]
     },
     "FormIDFinderIni": {
-      "path": "Data\\ini\\formID Finder.ini",
+      "path": ".\\src\\tests\\fixtures\\formID Finder.ini",
       "view": "line",
       "parameters": [
         {
@@ -115,21 +115,21 @@
           "label": "Показать информацию об объекте",
           "items": [
             {
-              "name": "FormIDFinderQuest.KeyPressed1",
-              "controllerType": "select",
-              "options": {
-                "2": "1",
-                "3": "2",
-                "4": "3"
-              }
-            },
-            {
               "name": "FormIDFinderQuest.KeyModifier1",
               "controllerType": "select",
               "options": {
                 "0": "Нет",
                 "2": "1",
                 "3": "2"
+              }
+            },
+            {
+              "name": "FormIDFinderQuest.KeyPressed1",
+              "controllerType": "select",
+              "options": {
+                "2": "1",
+                "3": "2",
+                "4": "3"
               }
             }
           ]

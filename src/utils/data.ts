@@ -8,7 +8,7 @@ import {
 } from './log';
 import { CreateUserMessage } from './message';
 import { getLineIniParameterValue } from './strings';
-import { IGameSettingsParameter } from '$types/gameSettings';
+import { IGameSettingsItemParameter, IGameSettingsParameter } from '$types/gameSettings';
 import { IUserMessage } from '$types/main';
 
 const ONE_GB = 1073741824;
@@ -101,7 +101,7 @@ export interface IGeneratedGameSettingsParam {
 */
 export const getOptionData = (
   currentFileData: IIniObj|IXmlObj,
-  currentGameSettingParameter: IGameSettingsParameter,
+  currentGameSettingParameter: IGameSettingsParameter|IGameSettingsItemParameter,
   fileView: string,
   gameSettingsFileName: string,
   baseFileName: string,
@@ -133,7 +133,7 @@ export const getOptionData = (
     }
   } else if (fileView === UsedFileView.LINE) {
     currentFileData.globals.lines.some((line) => {
-      paramValue = getLineIniParameterValue(line.text, currentGameSettingParameter.name);
+      paramValue = getLineIniParameterValue(line.text, currentGameSettingParameter.name!);
 
       if (paramValue) {
         paramName = currentGameSettingParameter.name;

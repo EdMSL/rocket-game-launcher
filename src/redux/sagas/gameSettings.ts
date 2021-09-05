@@ -43,6 +43,7 @@ import {
 } from '$utils/errors';
 import { getOptionData } from '$utils/data';
 import { IUserMessage } from '$types/main';
+import { SettingsParameterType } from '$constants/misc';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -213,6 +214,53 @@ function* getDataFromUsedFiles(): SagaIterator {
       (gameOptions, currentUsedFile) => {
         const optionsFromFile = usedFiles[currentUsedFile].parameters.reduce(
           (currentOptions, currentParameter) => {
+            if (
+              currentParameter.parameterType === SettingsParameterType.COMPOSED
+              || currentParameter.parameterType === SettingsParameterType.GROUP
+            ) {
+              let specParamsErrors: IUserMessage[] = [];
+
+              const optionsFromParameter = currentParameter.items!.reduce((options, currentOption) => {
+                const {
+                  paramName, paramValue, paramErrors,
+                } = getOptionData(
+                  currentFilesDataObj[currentUsedFile],
+                  currentOption,
+                  usedFiles[currentUsedFile].view,
+                  currentUsedFile,
+                  path.basename(usedFiles[currentUsedFile].path),
+                  moProfile,
+                );
+
+                if (paramErrors.length > 0) {
+                  specParamsErrors = [...paramErrors];
+
+                  return { ...options };
+                }
+
+                return {
+                  ...options,
+                  [paramName]: {
+                    default: paramValue,
+                    value: paramValue,
+                    settingsGroup: currentParameter.settingGroup,
+                    parent: currentUsedFile,
+                  },
+                };
+              }, {});
+
+              if (specParamsErrors.length > 0) {
+                optionsErrors = [...optionsErrors, ...specParamsErrors];
+
+                return { ...currentOptions };
+              }
+
+              return {
+                ...currentOptions,
+                ...optionsFromParameter,
+              };
+            }
+
             const {
               paramName, paramValue, paramErrors,
             } = getOptionData(
@@ -329,8 +377,10 @@ export function* initGameSettingsSaga(): SagaIterator {
       `Game settings initialization failed. Reason: ${errorMessage}`,
       LogMessageType.ERROR,
     );
+
+    yield put(addMessages([CreateUserMessage.error('Произошла ошибка в процессе генерации игровых настроек. Подробности в файле лога.')]));//eslint-disable-line max-len
   } finally {
-    yield call(setIsGameSettingsLoaded, true);
+    yield put(setIsGameSettingsLoaded(true));
   }
 }
 
