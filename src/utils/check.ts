@@ -94,7 +94,7 @@ const settingsMainSchema = Joi.object({
 
 const settingParameterSchema = Joi.object({
   name: Joi.string().required(),
-  type: Joi.string().required().valid(...Object.values(SettingParameterControllerType)),
+  controllerType: Joi.string().required().valid(...Object.values(SettingParameterControllerType)),
   label: Joi.string().optional().default(Joi.ref('name')),
   iniGroup: Joi.string().when(
     Joi.ref('$view'), {
@@ -119,15 +119,17 @@ const settingParameterSchema = Joi.object({
   options: Joi.object().pattern(
     Joi.string(),
     Joi.string(),
-  ).when(Joi.ref('type'), { is: SettingParameterControllerType.SELECT, then: Joi.required() }),
+  ).when(
+    Joi.ref('controllerType'), { is: SettingParameterControllerType.SELECT, then: Joi.required() },
+  ),
   min: Joi.number().when(
-    Joi.ref('type'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
   ),
   max: Joi.number().when(
-    Joi.ref('type'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
   ),
   step: Joi.number().when(
-    Joi.ref('type'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
   ),
 });
 

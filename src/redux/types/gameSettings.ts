@@ -26,7 +26,7 @@ interface IGameSettingsGroup {
 
 export interface IGameSettingsParameter {
   name: string,
-  type: string,
+  controllerType: string,
   iniGroup?: string,
   settingGroup?: string,
   attributeName?: string,

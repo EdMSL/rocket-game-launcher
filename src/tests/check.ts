@@ -140,7 +140,7 @@ describe('#Check', () => {
         const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
         const usedFiles = { ...obj.usedFiles };
 
-        usedFiles.someFile.parameters[0].type = 'Incorrect type';
+        usedFiles.someFile.parameters[0].controllerType = 'Incorrect type';
         //@ts-ignore
         assert.equal(checkUsedFiles(usedFiles, Encoding.WIN1251, obj.settingGroups).newUserMessages.length, 1);
       });
