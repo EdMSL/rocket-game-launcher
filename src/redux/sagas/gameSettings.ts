@@ -24,7 +24,9 @@ import {
 } from '$actions/main';
 import { GAME_DIR, GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import { checkUsedFiles, checkGameSettingsConfigMainFields } from '$utils/check';
-import { IGameSettingsConfig, IGameSettingsOptions } from '$types/gameSettings';
+import {
+  IGameSettingsConfig, IGameSettingsItemParameter, IGameSettingsOptions, IGameSettingsParameter,
+} from '$types/gameSettings';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';
@@ -44,6 +46,10 @@ import {
 import { getOptionData } from '$utils/data';
 import { IUserMessage } from '$types/main';
 import { SettingsParameterType } from '$constants/misc';
+
+interface IGetDataFromFilesResult {
+  [key: string]: IIniObj|IXmlObj,
+}
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -178,7 +184,7 @@ function* getDataFromMOIniSaga(): SagaIterator {
   }
 }
 
-function* getDataFromUsedFiles(): SagaIterator {
+function* getDataFromUsedFiles(): SagaIterator<IGetDataFromFilesResult> {
   try {
     const {
       gameSettings: {
@@ -200,20 +206,38 @@ function* getDataFromUsedFiles(): SagaIterator {
       )),
     );
 
-    const currentFilesDataObj = currentFilesData.reduce<{ [key: string]: IIniObj|IXmlObj, }>(
+    return currentFilesData.reduce<IGetDataFromFilesResult>(
       (filesData, currentFile) => ({
         ...filesData,
         [currentFile.name]: currentFile.fileData,
       }),
       {},
     );
+  } catch (error: any) {
+    throw new SagaError('Get data from used files', error.message);
+  }
+}
 
+// Генерируем опции для каждого файла.
+function* generateGameOptions(): SagaIterator {
+  try {
     let optionsErrors: IUserMessage[] = [];
+
+    const currentFilesDataObj: IUnwrap<IGetDataFromFilesResult> = yield call(getDataFromUsedFiles);
+
+    const {
+      gameSettings: {
+        usedFiles,
+        moProfile,
+      },
+    }: IAppState = yield select(getState);
 
     const totalGameOptions: IGameSettingsOptions = Object.keys(usedFiles).reduce(
       (gameOptions, currentUsedFile) => {
         const optionsFromFile = usedFiles[currentUsedFile].parameters.reduce(
           (currentOptions, currentParameter) => {
+            //Если опция с типом group или composed,
+            // то генерация производится для каждого параметра в items.
             if (
               currentParameter.parameterType === SettingsParameterType.COMPOSED
               || currentParameter.parameterType === SettingsParameterType.GROUP
@@ -317,13 +341,13 @@ function* getDataFromUsedFiles(): SagaIterator {
       throw new CustomError('No game options to show.');
     }
   } catch (error: any) {
-    throw new SagaError('Get data from used files', error.message);
+    throw new SagaError('Generate game options', error.message);
   }
 }
 
 export function* initGameSettingsSaga(): SagaIterator {
   try {
-    yield call(setIsGameSettingsLoaded, false);
+    yield put(setIsGameSettingsLoaded(false));
     writeToLogFileSync('Start game settings initialisation.');
 
     const {
@@ -359,7 +383,7 @@ export function* initGameSettingsSaga(): SagaIterator {
       Object.keys(newUsedFilesObj).length > 0 ? newUsedFilesObj : {},
     ));
 
-    yield call(getDataFromUsedFiles);
+    yield call(generateGameOptions);
 
     writeToLogFileSync('Game settings initialisation completed.');
   } catch (error: any) {
