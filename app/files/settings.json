@@ -20,6 +20,7 @@
       "view": "sectional",
       "parameters": [
         {
+          "parameterType": "default",
           "name": "CheckOverrideSourceType",
           "iniGroup": "EquipmentOverride",
           "settingGroup": "Graphic",
@@ -70,6 +71,68 @@
           "min": "1",
           "max": "5",
           "step": "1"
+        }
+      ]
+    },
+    "TQPIni": {
+      "path": "Data\\ini\\TQP.ini",
+      "view": "line",
+      "parameters": [
+        {
+          "parameterType": "group",
+          "label": "Удалить предмет/заклинание",
+          "settingGroup": "Control",
+          "controllerType": "select",
+          "options": {
+            "2": "1",
+            "3": "2",
+            "4": "3"
+          },
+          "items": [
+            {
+              "name": "aveTQP.dxInvLeftSingleKey"
+            },
+            {
+              "name": "aveTQP.dxInvRightSingleKey"
+            },
+            {
+              "name": "aveTQP.dxInvLeftStackKey"
+            },
+            {
+              "name": "aveTQP.dxInvRightStackKey"
+            }
+          ]
+        }
+      ]
+    },
+    "FormIDFinderIni": {
+      "path": "Data\\ini\\formID Finder.ini",
+      "view": "line",
+      "parameters": [
+        {
+          "parameterType": "composed",
+          "settingGroup": "Control",
+          "label": "Показать информацию об объекте",
+          "items": [
+            {
+              "name": "FormIDFinderQuest.KeyPressed1",
+              "controllerType": "select",
+              "options": {
+                "2": "1",
+                "3": "2",
+                "4": "3"
+              }
+            },
+            {
+              "name": "FormIDFinderQuest.KeyModifier1",
+              "controllerType": "select",
+              "options": {
+                "0": "Нет",
+                "2": "1",
+                "3": "2"
+              }
+            }
+          ]
         }
       ]
     }

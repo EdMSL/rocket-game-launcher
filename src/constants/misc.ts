@@ -20,3 +20,9 @@ export const SettingParameterControllerType = {
   RANGE: 'range',
   SELECT: 'select',
 };
+
+export const SettingsParameterType = {
+  DEFAULT: 'default',
+  GROUP: 'group',
+  COMPOSED: 'composed',
+};

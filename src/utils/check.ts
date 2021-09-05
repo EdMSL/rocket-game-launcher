@@ -2,7 +2,10 @@
 import Joi from 'joi';
 
 import {
-  Encoding, SettingParameterControllerType, UsedFileView,
+  Encoding,
+  SettingParameterControllerType,
+  UsedFileView,
+  SettingsParameterType,
 } from '$constants/misc';
 import { IGameSettingsConfig, IGameSettingsRootState } from '$types/gameSettings';
 import { IUserMessage } from '$types/main';
@@ -92,9 +95,9 @@ const settingsMainSchema = Joi.object({
     ).required(),
 });
 
-const settingParameterSchema = Joi.object({
+const settingParameterSchemaDefault = Joi.object({
+  parameterType: Joi.string().optional().default(SettingsParameterType.DEFAULT).valid(SettingsParameterType.DEFAULT),
   name: Joi.string().required(),
-  controllerType: Joi.string().required().valid(...Object.values(SettingParameterControllerType)),
   label: Joi.string().optional().default(Joi.ref('name')),
   iniGroup: Joi.string().when(
     Joi.ref('$view'), {
@@ -116,6 +119,7 @@ const settingParameterSchema = Joi.object({
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ).valid(Joi.ref('$availableSettingGroups', { in: true })),
+  controllerType: Joi.string().required().valid(...Object.values(SettingParameterControllerType)),
   options: Joi.object().pattern(
     Joi.string(),
     Joi.string(),
@@ -133,11 +137,105 @@ const settingParameterSchema = Joi.object({
   ),
 });
 
+const settingParameterSchemaGroup = Joi.object({
+  parameterType: Joi.string().required().valid(SettingsParameterType.GROUP),
+  settingGroup: Joi.string().when(
+    Joi.ref('$isSettingGroupsExists'), {
+      is: true, then: Joi.required(), otherwise: Joi.forbidden(),
+    },
+  ).valid(Joi.ref('$availableSettingGroups', { in: true })),
+  controllerType: Joi.string().required().valid(...Object.values(SettingParameterControllerType)),
+  options: Joi.object().pattern(
+    Joi.string(),
+    Joi.string(),
+  ).when(
+    Joi.ref('controllerType'), { is: SettingParameterControllerType.SELECT, then: Joi.required() },
+  ),
+  min: Joi.number().when(
+    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+  ),
+  max: Joi.number().when(
+    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+  ),
+  step: Joi.number().when(
+    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+  ),
+  label: Joi.string().required(),
+  items: Joi.array()
+    .items(Joi.object({
+      name: Joi.string().required(),
+      iniGroup: Joi.string().when(
+        Joi.ref('$view'), {
+          is: UsedFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
+        },
+      ),
+      attributeName: Joi.string().when(
+        Joi.ref('$view'), {
+          is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+        },
+      ),
+      attributePath: Joi.string().when(
+        Joi.ref('$view'), {
+          is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+        },
+      ),
+    })).required().min(2),
+});
+
+const settingParameterSchemaComposed = Joi.object({
+  parameterType: Joi.string().required().valid(SettingsParameterType.COMPOSED),
+  settingGroup: Joi.string().when(
+    Joi.ref('$isSettingGroupsExists'), {
+      is: true, then: Joi.required(), otherwise: Joi.forbidden(),
+    },
+  ).valid(Joi.ref('$availableSettingGroups', { in: true })),
+  label: Joi.string().required(),
+  items: Joi.array()
+    .items(Joi.object({
+      name: Joi.string().required(),
+      iniGroup: Joi.string().when(
+        Joi.ref('$view'), {
+          is: UsedFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
+        },
+      ),
+      attributeName: Joi.string().when(
+        Joi.ref('$view'), {
+          is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+        },
+      ),
+      attributePath: Joi.string().when(
+        Joi.ref('$view'), {
+          is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+        },
+      ),
+      controllerType: Joi.string().required().valid(...Object.values(SettingParameterControllerType)),
+      options: Joi.object().pattern(
+        Joi.string(),
+        Joi.string(),
+      ).when(
+        Joi.ref('controllerType'), { is: SettingParameterControllerType.SELECT, then: Joi.required() },
+      ),
+      min: Joi.number().when(
+        Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+      ),
+      max: Joi.number().when(
+        Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+      ),
+      step: Joi.number().when(
+        Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+      ),
+    })).required().min(2),
+});
+
 const usedFileSchema = Joi.object({
   encoding: Joi.string().optional().default(Joi.ref('$encoding')),
   path: Joi.string().required(),
   view: Joi.string().required().valid(...Object.values(UsedFileView)),
-  parameters: Joi.array().items(settingParameterSchema),
+  parameters: Joi.array().items(Joi.alternatives().try(
+    settingParameterSchemaDefault,
+    settingParameterSchemaGroup,
+    settingParameterSchemaComposed,
+  )),
 });
 
 /**
@@ -212,7 +310,7 @@ export const checkUsedFiles = (
 
   if (validationErrors.length > 0) {
     userMessages = [CreateUserMessage.error('При проверке данных для игровых настроек в файле settings.json обнаружены ошибки. Некоторые настройки будут недоступны. Подробности в файле лога.')]; //eslint-disable-line max-len
-
+    console.log(validationErrors);
     validationErrors.forEach((currentMsg) => {
       writeToLogFile(`${currentMsg.parent}: ${currentMsg.error.message}`, LogMessageType.ERROR);
     });
