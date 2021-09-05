@@ -28,7 +28,7 @@ export function* initLauncherSaga(): SagaIterator {
     } else {
       writeToLogFile('Game settings file settings.json not found.');
     }
-  } catch (error) {
+  } catch (error: any) {
     writeToLogFile(error.message, LogMessageType.ERROR);
   } finally {
     yield put(setIsLauncherInitialised(true));

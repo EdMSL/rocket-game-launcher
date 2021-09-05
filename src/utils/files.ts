@@ -71,7 +71,7 @@ export const readFileDataSync = (
     }
 
     return fs.readFileSync(pathToFile, encoding);
-  } catch (error) {
+  } catch (error: any) {
     const readWriteError = getReadWriteError(error);
 
     throw new ReadWriteError(
@@ -128,7 +128,7 @@ export const readJSONFileSync = <T>(pathToFile: string): T => {
     const JSONstring = readFileDataSync(pathToFile);
 
     return parseJSON<T>(JSONstring);
-  } catch (error) {
+  } catch (error: any) {
     writeToLogFileSync(
       `Message: ${error.message}. Path: '${pathToFile}'.`,
       LogMessageType.ERROR,
@@ -149,7 +149,7 @@ export const readJSONFile = async <T>(pathToFile: string): Promise<T> => {
       .then((dataBuffer) => dataBuffer.toString());
 
     return parseJSON<T>(JSONstring);
-  } catch (error) {
+  } catch (error: any) {
     writeToLogFileSync(
       `Message: ${error.message}. Path: '${pathToFile}'.`,
       LogMessageType.ERROR,
@@ -173,7 +173,7 @@ export const readINIFile = async (
     const INIData = await readFileData(pathToFile);
 
     return new Ini(iconv.decode(INIData, encoding));
-  } catch (error) {
+  } catch (error: any) {
     writeToLogFileSync(
       `Message: ${error.message}. Path: '${pathToFile}'.`,
       LogMessageType.ERROR,
@@ -201,7 +201,7 @@ export const readXMLFile = async (
       ignoreAttributes: false,
       parseAttributeValue: true,
     });
-  } catch (error) {
+  } catch (error: any) {
     writeToLogFileSync(
       `Message: ${error.message}. Path: '${pathToFile}'.`,
       LogMessageType.ERROR,

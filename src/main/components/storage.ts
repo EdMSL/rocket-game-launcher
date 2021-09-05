@@ -44,7 +44,7 @@ const getConfigurationData = (): ISystemRootState => {
     configData = checkConfigFileData(configData);
 
     return configData;
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof ReadWriteError) {
       if (error.cause.name === ErrorName.NOT_FOUND) {
         writeToLogFileSync(

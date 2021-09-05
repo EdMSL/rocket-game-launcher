@@ -66,7 +66,7 @@ export const getSystemInfo = async (): Promise<void> => {
     }
 
     writeToLogFile(result);
-  } catch (error) {
+  } catch (error: any) {
     writeToLogFile(error.message, LogMessageType.ERROR);
   }
 };

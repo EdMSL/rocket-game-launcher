@@ -81,7 +81,7 @@ export const runApplication = (
         cb(false);
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     if (error.code === ErrorCode.UNKNOWN) {
       writeToLogFile(
         `Message: Can't run application. Unknown file type. ${error.message} App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
@@ -139,7 +139,7 @@ export const openFolder = (pathToFolder: string, cb?): void => {
 
   try {
     execFile('explorer.exe', [pathToFolder]);
-  } catch (error) {
+  } catch (error: any) {
     writeToLogFile(
       `Message: Can't open folder. Unknown error. ${error.message} Path ${pathToFolder}.`, //eslint-disable-line max-len
       LogMessageType.ERROR,

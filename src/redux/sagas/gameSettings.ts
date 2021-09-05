@@ -60,7 +60,7 @@ export function* setGameSettingsSaga(): SagaIterator {
       yield put(setIsGameSettingsAvailable(true));
       yield put(setGameSettingsConfig(newSettingsConfigObj));
     }
-  } catch (error) {
+  } catch (error: any) {
     yield put(addMessages([CreateUserMessage.error('Ошибка обработки файла settings.json. Игровые настройки будут недоступны. Подробности в файле лога')])); //eslint-disable-line max-len
 
     writeToLogFile(
@@ -92,7 +92,7 @@ function* getMOProfilesSaga(): SagaIterator {
     } else {
       throw new CustomError('There are no profiles in the profiles folder.');
     }
-  } catch (error) {
+  } catch (error: any) {
     let errorMessage = '';
 
     if (error instanceof CustomError) {
@@ -156,7 +156,7 @@ function* getDataFromMOIniSaga(): SagaIterator {
     } else {
       throw new CustomError('profileSection');
     }
-  } catch (error) {
+  } catch (error: any) {
     let errorMessage = '';
 
     if (error instanceof CustomError) {
@@ -268,7 +268,7 @@ function* getDataFromUsedFiles(): SagaIterator {
 
       throw new CustomError('No game options to show.');
     }
-  } catch (error) {
+  } catch (error: any) {
     throw new SagaError('Get data from used files', error.message);
   }
 }
@@ -314,7 +314,7 @@ export function* initGameSettingsSaga(): SagaIterator {
     yield call(getDataFromUsedFiles);
 
     writeToLogFileSync('Game settings initialisation completed.');
-  } catch (error) {
+  } catch (error: any) {
     let errorMessage = '';
 
     if (error instanceof SagaError) {

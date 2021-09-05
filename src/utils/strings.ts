@@ -9,7 +9,7 @@ const HEXADECIMAL_FACTOR = 1e8;
 export const parseJSON = <T>(jsonString: string): T => {
   try {
     return JSON.parse(jsonString);
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof SyntaxError) {
       throw new Error(`JSON parse error. ${error.message}`);
     } else {
