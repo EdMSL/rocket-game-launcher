@@ -43,6 +43,7 @@
       "parameters": [
         {
           "name": "Some name",
+          "parameterType": "default",
           "settingGroup": "Control",
           "controllerType": "select",
           "label": "Some label",
@@ -63,6 +64,82 @@
           "settingGroup": "Control",
           "controllerType": "checkbox",
           "label": "New label"
+        }
+      ]
+    },
+    "tagFile": {
+      "path": "./ini/tag.config",
+      "view": "tag",
+      "parameters": [
+        {
+          "name": "AnisotropicFilter",
+          "attributeName": "Value",
+          "attributePath": "_Main/Main/Misc",
+          "settingGroup": "Audio",
+          "controllerType": "checkbox",
+          "label": "Фильтрация"
+        }
+      ]
+    },
+    "groupFile": {
+      "path": "./ini/group.ini",
+      "view": "line",
+      "parameters": [
+        {
+          "parameterType": "group",
+          "label": "Group label",
+          "settingGroup": "Control",
+          "controllerType": "select",
+          "options": {
+            "2": "1",
+            "3": "2",
+            "4": "3"
+          },
+          "items": [
+            {
+              "name": "groupParam1"
+            },
+            {
+              "name": "groupParam2"
+            },
+            {
+              "name": "groupParam3"
+            },
+            {
+              "name": "groupParam4"
+            }
+          ]
+        }
+      ]
+    },
+    "composedFile": {
+      "path": "./ini/composed.ini",
+      "view": "line",
+      "parameters": [
+        {
+          "parameterType": "composed",
+          "settingGroup": "Control",
+          "label": "Composed label",
+          "items": [
+            {
+              "name": "composedParam1",
+              "controllerType": "select",
+              "options": {
+                "0": "Нет",
+                "2": "1",
+                "3": "2"
+              }
+            },
+            {
+              "name": "composedParam2",
+              "controllerType": "select",
+              "options": {
+                "2": "1",
+                "3": "2",
+                "4": "3"
+              }
+            }
+          ]
         }
       ]
     }

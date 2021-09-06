@@ -93,29 +93,84 @@ describe('#Check', () => {
       assert.hasAllKeys(result, ['newUserMessages', 'newUsedFilesObj']);
     });
 
-    it('Should return correct data for used files main fields', () => {
+    it('Should return empty user messages array', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      //@ts-ignore
+      const result = checkUsedFiles(obj.usedFiles, Encoding.WIN1251, obj.settingGroups);
+      assert.equal(result.newUserMessages.length, 0);
+    });
+
+    it('Should return correct default data for used files main fields', () => {
       const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
       //@ts-ignore
       const result = checkUsedFiles(obj.usedFiles, Encoding.WIN1251, obj.settingGroups);
       assert.equal(result.newUsedFilesObj.anyFile.encoding, Encoding.WIN1251);
     });
 
-    it('Should return correct data in parameters', () => {
+    it('Should return correct data from default parameter', () => {
       const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
       //@ts-ignore
       const result = checkUsedFiles(obj.usedFiles, Encoding.WIN1251, obj.settingGroups);
 
-      assert.containsAllKeys(result.newUsedFilesObj.anyFile.parameters[0], ['name', 'iniGroup', 'settingGroup', 'controllerType', 'label']);
+      assert.hasAllKeys(result.newUsedFilesObj.anyFile.parameters[0], ['name', 'iniGroup', 'settingGroup', 'controllerType', 'parameterType', 'label', 'max', 'min', 'step']);
+      assert.hasAllKeys(result.newUsedFilesObj.anyFile.parameters[1], ['name', 'iniGroup', 'settingGroup', 'controllerType', 'parameterType', 'label']);
+      assert.hasAllKeys(result.newUsedFilesObj.someFile.parameters[0], ['name', 'settingGroup', 'controllerType', 'parameterType', 'label', 'options']);
+      assert.equal(result.newUsedFilesObj.anyFile.parameters[0].parameterType, 'default');
       assert.equal(result.newUsedFilesObj.anyFile.parameters[1].label, 'Any new name');
       assert.isNumber(result.newUsedFilesObj.anyFile.parameters[0].max);
     });
 
+    it('Should return correct data from group parameter', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      //@ts-ignore
+      const result = checkUsedFiles(obj.usedFiles, Encoding.WIN1251, obj.settingGroups);
+
+      assert.hasAllKeys(result.newUsedFilesObj.groupFile.parameters[0], ['settingGroup', 'controllerType', 'parameterType', 'label', 'options', 'items']);
+      //@ts-ignore
+      assert.hasAllKeys(result.newUsedFilesObj.groupFile.parameters[0].items[0], ['name']);
+    });
+
+    it('Should return correct data from composed parameter', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      //@ts-ignore
+      const result = checkUsedFiles(obj.usedFiles, Encoding.WIN1251, obj.settingGroups);
+
+      assert.hasAllKeys(result.newUsedFilesObj.composedFile.parameters[0], ['settingGroup', 'parameterType', 'label', 'items']);
+      //@ts-ignore
+      assert.hasAllKeys(result.newUsedFilesObj.composedFile.parameters[0].items[0], ['name', 'controllerType', 'options']);
+    });
+
+    it('Should return correct data from tag file parameter', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      //@ts-ignore
+      const result = checkUsedFiles(obj.usedFiles, Encoding.WIN1251, obj.settingGroups);
+
+      assert.hasAllKeys(result.newUsedFilesObj.tagFile.parameters[0], ['name', 'settingGroup', 'parameterType', 'controllerType', 'label', 'attributeName', 'attributePath']);
+    });
+
     describe('All tests should return array witn error message', () => {
-      it('Should return error abouy unnecessary settingGroup parameter', () => {
+      it('Should return error about unnecessary settingGroup parameter', () => {
         const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
         const usedFiles = { ...obj.usedFiles };
 
         delete obj.settingGroups;
+        assert.equal(checkUsedFiles(usedFiles, Encoding.WIN1251, []).newUserMessages.length, 1);
+      });
+
+      it('Should return error about forbidden name parameter', () => {
+        const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+        const usedFiles = { ...obj.usedFiles };
+
+        usedFiles.groupFile.parameters[0].name = 'Forbidden name';
+        assert.equal(checkUsedFiles(usedFiles, Encoding.WIN1251, []).newUserMessages.length, 1);
+      });
+
+      it('Should return error about forbidden attributePath parameter', () => {
+        const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+        const usedFiles = { ...obj.usedFiles };
+
+        usedFiles.groupFile.parameters[0].attributePath = './somepath';
+        usedFiles.someFile.parameters[0].attributePath = './somepath';
         assert.equal(checkUsedFiles(usedFiles, Encoding.WIN1251, []).newUserMessages.length, 1);
       });
 
@@ -149,6 +204,22 @@ describe('#Check', () => {
         const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
         const usedFiles = { ...obj.usedFiles };
         usedFiles.someFile.parameters[0].iniGroup = 'Not needed group';
+        //@ts-ignore
+        assert.equal(checkUsedFiles(usedFiles, Encoding.WIN1251, obj.settingGroups).newUserMessages.length, 1);
+      });
+
+      it('Should return error about iniGroup parameter for tag view ini file', () => {
+        const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+        const usedFiles = { ...obj.usedFiles };
+        usedFiles.tagFile.parameters[0].iniGroup = 'Not needed group';
+        //@ts-ignore
+        assert.equal(checkUsedFiles(usedFiles, Encoding.WIN1251, obj.settingGroups).newUserMessages.length, 1);
+      });
+
+      it('Should return error about iniGroup parameter for tag view ini file', () => {
+        const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+        const usedFiles = { ...obj.usedFiles };
+        usedFiles.tagFile.parameters[0].iniGroup = 'Not needed group';
         //@ts-ignore
         assert.equal(checkUsedFiles(usedFiles, Encoding.WIN1251, obj.settingGroups).newUserMessages.length, 1);
       });

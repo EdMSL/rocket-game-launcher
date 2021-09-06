@@ -309,7 +309,7 @@ export const checkUsedFiles = (
   }, {});
 
   if (validationErrors.length > 0) {
-    userMessages = [CreateUserMessage.error('При проверке данных для игровых настроек в файле settings.json обнаружены ошибки. Некоторые настройки будут недоступны. Подробности в файле лога.')]; //eslint-disable-line max-len
+    userMessages = [CreateUserMessage.error('В файле settings.json обнаружены ошибки. Настройки будут недоступны. Подробности в файле лога.')]; //eslint-disable-line max-len
     validationErrors.forEach((currentMsg) => {
       writeToLogFile(`${currentMsg.parent}: ${currentMsg.error.message}`, LogMessageType.ERROR);
     });
