@@ -78,7 +78,7 @@ export const checkConfigFileData = (configObj: ISystemRootState): ISystemRootSta
   return validateResult.value;
 };
 
-const settingsMainSchema = Joi.object({
+const settingsMainSchema = Joi.object<IGameSettingsConfig>({
   settingGroups: Joi.array()
     .items(Joi.object({
       name: Joi.string().required(),
@@ -247,25 +247,19 @@ const usedFileSchema = Joi.object({
 */
 export const checkGameSettingsConfigMainFields = (
   configObj: IGameSettingsConfig,
-): ISettingsConfigCheckingResult => {
+): IGameSettingsConfig => {
   writeToLogFileSync('Start of settings.json checking.');
-
-  let userMessages: IUserMessage[] = [];
 
   const validateResult = settingsMainSchema.validate(configObj, {
     abortEarly: false,
     stripUnknown: true,
   });
 
-  if (validateResult.error && validateResult.error?.details?.length > 0) {
-    userMessages = [CreateUserMessage.error('При проверке файла настроек settings.json обнаружены ошибки. Игровые настройки будут недоступны. Подробности в файле лога.')]; //eslint-disable-line max-len
-
-    validateResult.error.details.forEach((currentMsg) => {
-      writeToLogFile(currentMsg.message, LogMessageType.ERROR);
-    });
+  if (validateResult.error) {
+    throw new CustomError(`settings.json main fields validation error. ${validateResult.error.message}.`); //eslint-disable-line max-len
   }
 
-  return { newUserMessages: userMessages, newSettingsConfigObj: { ...validateResult.value } };
+  return validateResult.value;
 };
 
 /**
@@ -316,8 +310,8 @@ export const checkUsedFiles = (
   }, {});
 
   if (validationErrors.length > 0) {
-    validationErrors.forEach((currentMsg) => {
-      writeToLogFile(`${currentMsg.parent}: ${currentMsg.error}`, LogMessageType.ERROR);
+    validationErrors.forEach((currentError) => {
+      writeToLogFile(`${currentError.parent}: ${currentError.error}`, LogMessageType.WARNING);
     });
   }
 

@@ -13,9 +13,14 @@ import fs from 'fs';
 import { IAppState } from '$store/store';
 import { Routes } from '$constants/routes';
 import { setIsLauncherInitialised } from '$actions/main';
-import { initGameSettingsSaga, setGameSettingsSaga } from '$sagas/gameSettings';
+import { initGameSettingsSaga, setInitialGameSettingsConfigSaga } from '$sagas/gameSettings';
 import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
-import { LogMessageType, writeToLogFile } from '$utils/log';
+import {
+  LogMessageType, writeToLogFile, writeToLogFileSync,
+} from '$utils/log';
+import {
+  CustomError, ReadWriteError, SagaError,
+} from '$utils/errors';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -24,12 +29,27 @@ export function* initLauncherSaga(): SagaIterator {
 
   try {
     if (fs.existsSync(GAME_SETTINGS_FILE_PATH)) {
-      yield call(setGameSettingsSaga);
+      yield call(setInitialGameSettingsConfigSaga);
     } else {
       writeToLogFile('Game settings file settings.json not found.');
     }
   } catch (error: any) {
-    writeToLogFile(error.message, LogMessageType.ERROR);
+    let errorMessage = '';
+
+    if (error instanceof SagaError) {
+      errorMessage = `Error with: "${error.sagaName}". ${error.message}`;
+    } else if (error instanceof CustomError) {
+      errorMessage = `${error.message}`;
+    } else if (error instanceof ReadWriteError) {
+      errorMessage = `${error.message}. Path '${error.path}'.`;
+    } else {
+      errorMessage = `Unknown error. Message: ${error.message}`;
+    }
+
+    writeToLogFileSync(
+      `An error occured during launcher initialization: ${errorMessage}`,
+      LogMessageType.ERROR,
+    );
   } finally {
     yield put(setIsLauncherInitialised(true));
   }

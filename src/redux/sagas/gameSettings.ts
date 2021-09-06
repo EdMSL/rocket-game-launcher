@@ -53,27 +53,31 @@ interface IGetDataFromFilesResult {
 
 const getState = (state: IAppState): IAppState => state;
 
-export function* setGameSettingsSaga(): SagaIterator {
+export function* setInitialGameSettingsConfigSaga(): SagaIterator {
   try {
     const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_FILE_PATH);
-    const {
-      newUserMessages: checkingMessages,
-      newSettingsConfigObj,
-    } = checkGameSettingsConfigMainFields(gameSettingsObj);
+    const newSettingsConfigObj = checkGameSettingsConfigMainFields(gameSettingsObj);
 
-    if (checkingMessages.length > 0) {
-      yield put(addMessages(checkingMessages));
-    } else {
-      yield put(setIsGameSettingsAvailable(true));
-      yield put(setGameSettingsConfig(newSettingsConfigObj));
-    }
+    yield put(setGameSettingsConfig(newSettingsConfigObj));
+    yield put(setIsGameSettingsAvailable(true));
   } catch (error: any) {
+    // writeToLogFile(
+    //   `An error occurred while processing the file settings.json. ${error.message}`,
+    //   LogMessageType.ERROR,
+    // );
+    let errorMessage = '';
+
+    if (error instanceof CustomError) {
+      errorMessage = error.message;
+    } else if (error instanceof ReadWriteError) {
+      errorMessage = `${error.message}. Path '${error.path}'.`;
+    } else {
+      errorMessage = `Unknown error. Message: ${error.message}`;
+    }
+
     yield put(addMessages([CreateUserMessage.error('Ошибка обработки файла settings.json. Игровые настройки будут недоступны. Подробности в файле лога')])); //eslint-disable-line max-len
 
-    writeToLogFile(
-      `An error occurred while processing the file settings.json. ${error.message}`,
-      LogMessageType.ERROR,
-    );
+    throw new SagaError('Set initial game settings saga', errorMessage);
   }
 }
 
