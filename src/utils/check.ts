@@ -274,7 +274,6 @@ export const checkUsedFiles = (
 ): IGameSettingsConfig['usedFiles'] => {
   writeToLogFileSync('Start checking of used files in settings.json.');
 
-  // let userMessages: IUserMessage[] = [];
   const validationErrors: IUsedFileError[] = [];
 
   const availableSettingGroups = settingGroups.map((group) => group.name);
