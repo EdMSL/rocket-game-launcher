@@ -15,6 +15,7 @@ import {
 import { CreateUserMessage } from '$utils/message';
 import { defaultLauncherConfig } from '$constants/defaultParameters';
 import { ISystemRootState } from '$types/system';
+import { CustomError } from './errors';
 
 interface ICheckingResult {
   newUserMessages: IUserMessage[],
@@ -30,7 +31,7 @@ interface IUsedFilesCheckingResult extends ICheckingResult {
 
 interface IUsedFileError {
   parent: string,
-  error: Joi.ValidationError,
+  error: string,
 }
 
 const configFileDataSchema = Joi.object({
@@ -276,15 +277,15 @@ export const checkUsedFiles = (
   usedFiles: IGameSettingsRootState['usedFiles'],
   baseFilesEncoding: IGameSettingsRootState['baseFilesEncoding'],
   settingGroups: IGameSettingsRootState['settingGroups'],
-): IUsedFilesCheckingResult => {
+): IGameSettingsConfig['usedFiles'] => {
   writeToLogFileSync('Start checking of used files in settings.json.');
 
-  let userMessages: IUserMessage[] = [];
+  // let userMessages: IUserMessage[] = [];
   const validationErrors: IUsedFileError[] = [];
 
   const availableSettingGroups = settingGroups.map((group) => group.name);
   const newUsedFilesObj = Object.keys(usedFiles).reduce((filesObj, fileName) => {
-    const result = usedFileSchema.validate(usedFiles[fileName], {
+    const validationResult = usedFileSchema.validate(usedFiles[fileName], {
       abortEarly: false,
       stripUnknown: true,
       context: {
@@ -295,8 +296,14 @@ export const checkUsedFiles = (
       },
     });
 
-    if (result.error) {
-      validationErrors.push({ parent: fileName, error: result.error });
+    if (validationResult.error) {
+      validationResult.error.details.forEach((detail) => {
+        if (detail.type === 'alternatives.match') {
+          validationErrors.push({ parent: fileName, error: detail.context!.message });
+        } else {
+          validationErrors.push({ parent: fileName, error: detail.message });
+        }
+      });
 
       return {
         ...filesObj,
@@ -304,16 +311,19 @@ export const checkUsedFiles = (
     }
     return {
       ...filesObj,
-      [fileName]: result.value,
+      [fileName]: validationResult.value,
     };
   }, {});
 
   if (validationErrors.length > 0) {
-    userMessages = [CreateUserMessage.error('В файле settings.json обнаружены ошибки. Настройки будут недоступны. Подробности в файле лога.')]; //eslint-disable-line max-len
     validationErrors.forEach((currentMsg) => {
-      writeToLogFile(`${currentMsg.parent}: ${currentMsg.error.message}`, LogMessageType.ERROR);
+      writeToLogFile(`${currentMsg.parent}: ${currentMsg.error}`, LogMessageType.ERROR);
     });
   }
 
-  return { newUserMessages: userMessages, newUsedFilesObj };
+  if (Object.keys(newUsedFilesObj).length === 0) {
+    throw new CustomError('No options available after game settings validation.');
+  }
+
+  return newUsedFilesObj;
 };

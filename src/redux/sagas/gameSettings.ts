@@ -368,20 +368,18 @@ export function* initGameSettingsSaga(): SagaIterator {
       yield call(getDataFromMOIniSaga);
     }
 
-    const { newUserMessages, newUsedFilesObj }: IUnwrapSync<typeof checkUsedFiles> = yield call(
+    const newUsedFilesObj: IUnwrapSync<typeof checkUsedFiles> = yield call(
       checkUsedFiles,
       usedFiles,
       baseFilesEncoding,
       settingGroups,
     );
 
-    if (newUserMessages.length > 0) {
-      yield put(addMessages(newUserMessages));
+    if (Object.keys(newUsedFilesObj).length !== Object.keys(usedFiles).length) {
+      yield put(addMessages([CreateUserMessage.warning('Обнаружены ошибки в файле игровых настроек settings.json. Некоторые настройки будут недоступны. Подробности в файле лога.')])); //eslint-disable-line max-len
     }
 
-    yield put(setGameSettingsUsedFiles(
-      Object.keys(newUsedFilesObj).length > 0 ? newUsedFilesObj : {},
-    ));
+    yield put(setGameSettingsUsedFiles(newUsedFilesObj));
 
     yield call(generateGameOptions);
 
@@ -391,6 +389,8 @@ export function* initGameSettingsSaga(): SagaIterator {
 
     if (error instanceof SagaError) {
       errorMessage = `An error occured during ${error.sagaName}. ${error.message}`;
+    } else if (error instanceof CustomError) {
+      errorMessage = `${error.message}`;
     } else if (error instanceof ReadWriteError) {
       errorMessage = `${error.message}. Path '${error.path}'.`;
     } else {
