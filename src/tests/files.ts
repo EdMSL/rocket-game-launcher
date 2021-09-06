@@ -184,7 +184,7 @@ describe('#Files', () => {
 
     it('Should correct write to JSON file', async () => {
       await writeJSONFile(`${process.cwd()}/writeFolder/test.json`, { data: 'Some data' });
-      assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/test.json`, 'utf8'), '{"data":"Some data"}');
+      assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/test.json`, 'utf8'), '{\n  "data": "Some data"\n}');
     });
 
     it('Should correct write to INI file', async () => {

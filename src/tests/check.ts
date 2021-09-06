@@ -105,7 +105,7 @@ describe('#Check', () => {
       //@ts-ignore
       const result = checkUsedFiles(obj.usedFiles, Encoding.WIN1251, obj.settingGroups);
 
-      assert.containsAllKeys(result.newUsedFilesObj.anyFile.parameters[0], ['name', 'iniGroup', 'settingGroup', 'type', 'label']);
+      assert.containsAllKeys(result.newUsedFilesObj.anyFile.parameters[0], ['name', 'iniGroup', 'settingGroup', 'controllerType', 'label']);
       assert.equal(result.newUsedFilesObj.anyFile.parameters[1].label, 'Any new name');
       assert.isNumber(result.newUsedFilesObj.anyFile.parameters[0].max);
     });

@@ -211,23 +211,29 @@ export const readXMLFile = async (
   }
 };
 
+/**
+ * Асинхронно получить данные из файла для последующей генерации игровых настроек.
+ * @param pathToFile Путь к файлу.
+ * @param fileView Структура(вид) файла. На его основе определяется метод для чтения файла.
+ * @param name Имя для определения файла при генерации опций.
+ * @param encoding Кодировка файла.
+*/
 export const readFileForGameOptions = async (
   pathToFile: string,
-  fileType: string,
+  fileView: string,
   name: string,
   encoding: string,
-): Promise<{ name: string, fileData: IIniObj|IXmlObj, }> => {
+): Promise<{ [key: string]: IIniObj|IXmlObj, }> => {
   let fileData: IIniObj|IXmlObj = {};
 
-  if (fileType === UsedFileView.LINE || fileType === UsedFileView.SECTIONAL) {
+  if (fileView === UsedFileView.LINE || fileView === UsedFileView.SECTIONAL) {
     fileData = await readINIFile(pathToFile, encoding);
-  } else if (fileType === UsedFileView.TAG) {
+  } else if (fileView === UsedFileView.TAG) {
     fileData = await readXMLFile(pathToFile, encoding);
   }
 
   return {
-    name,
-    fileData,
+    [name]: fileData,
   };
 };
 

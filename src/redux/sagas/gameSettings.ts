@@ -209,7 +209,7 @@ function* getDataFromUsedFiles(): SagaIterator<IGetDataFromFilesResult> {
     return currentFilesData.reduce<IGetDataFromFilesResult>(
       (filesData, currentFile) => ({
         ...filesData,
-        [currentFile.name]: currentFile.fileData,
+        ...currentFile,
       }),
       {},
     );

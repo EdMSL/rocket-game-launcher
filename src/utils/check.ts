@@ -283,34 +283,33 @@ export const checkUsedFiles = (
   const validationErrors: IUsedFileError[] = [];
 
   const availableSettingGroups = settingGroups.map((group) => group.name);
-  const newUsedFilesObj = Object.keys(usedFiles).reduce((acc, key) => {
-    const result = usedFileSchema.validate(usedFiles[key], {
+  const newUsedFilesObj = Object.keys(usedFiles).reduce((filesObj, fileName) => {
+    const result = usedFileSchema.validate(usedFiles[fileName], {
       abortEarly: false,
       stripUnknown: true,
       context: {
         encoding: baseFilesEncoding,
         isSettingGroupsExists: settingGroups.length > 0,
-        view: usedFiles[key].view,
+        view: usedFiles[fileName].view,
         availableSettingGroups,
       },
     });
 
     if (result.error) {
-      validationErrors.push({ parent: key, error: result.error });
+      validationErrors.push({ parent: fileName, error: result.error });
 
       return {
-        ...acc,
+        ...filesObj,
       };
     }
     return {
-      ...acc,
-      [key]: result.value,
+      ...filesObj,
+      [fileName]: result.value,
     };
   }, {});
 
   if (validationErrors.length > 0) {
     userMessages = [CreateUserMessage.error('При проверке данных для игровых настроек в файле settings.json обнаружены ошибки. Некоторые настройки будут недоступны. Подробности в файле лога.')]; //eslint-disable-line max-len
-    console.log(validationErrors);
     validationErrors.forEach((currentMsg) => {
       writeToLogFile(`${currentMsg.parent}: ${currentMsg.error.message}`, LogMessageType.ERROR);
     });
