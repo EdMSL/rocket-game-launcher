@@ -35,7 +35,7 @@ export const GameSettingsScreen: React.FC<IProps> = (props) => {
 
   return (
     <main className={classNames('main', styles['game-settings-screen__main'])}>
-      <div className={classNames('control-panel', styles['game-settings-screen__control-panel'])}>
+      <div className={classNames('control-panel', styles['game-settings-screen__navigation'])}>
         {
           settingGroups.map((group) => (
             <NavLink

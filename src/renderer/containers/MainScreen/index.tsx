@@ -48,13 +48,13 @@ export const MainScreen: React.FC = () => {
           isDisabled={isGameRunning}
           onClick={onPlayGameBtnClick}
         >
-          Play
+          Играть
         </Button>
         <Button
           className="control-panel__btn"
           onClick={onGameFolderBtnClick}
         >
-          Open game folder
+          Открыть папку игры
         </Button>
         {
           isGameSettingsAvailable && (
