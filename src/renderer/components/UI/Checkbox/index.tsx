@@ -1,0 +1,81 @@
+import React from 'react';
+import classNames from 'classnames';
+
+import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
+
+const styles = require('./styles.module.scss');
+
+interface IProps {
+  id: string,
+  name?: string,
+  parent?: string,
+  group?: string,
+  label: string,
+  description?: string,
+  isChecked: boolean,
+  isDisabled?: boolean,
+  className?: string | null,
+  classNameCheckbox?: string | null,
+  hintParameter?: string,
+  multiparameters?: string,
+  onChange: (event?: React.ChangeEvent<HTMLInputElement>) => void,
+  onHover?: (id: string) => void,
+  onLeave?: () => void,
+}
+
+export const Checkbox: React.FunctionComponent<IProps> = ({
+  id,
+  name = id,
+  parent = '',
+  group = '',
+  label,
+  description = '',
+  isChecked,
+  isDisabled = false,
+  className = null,
+  classNameCheckbox = null,
+  hintParameter = '',
+  multiparameters = '',
+  onChange,
+  onHover = null,
+  onLeave = null,
+}) => (
+  <div className={classNames(styles.checkbox__block, className)}>
+    <input
+      className={classNames('visually-hidden', styles.checkbox__input)}
+      type="checkbox"
+      id={id}
+      name={name}
+      data-parent={parent}
+      data-group={group}
+      data-multiparameters={multiparameters}
+      checked={isChecked}
+      disabled={isDisabled}
+      onChange={onChange}
+    />
+    <label
+      className={classNames(styles.checkbox__label, classNameCheckbox)}
+      htmlFor={id}
+    >
+      <span>{label}</span>
+      {
+          id !== 'resolutionCheckbox'
+          && description
+          && onHover
+          && onLeave
+          && (
+            <GameSettingsHintBlock
+              id={id}
+              description={description}
+              hintParameter={hintParameter}
+              iniName={parent}
+              parametersNames={multiparameters ? multiparameters.split(',') : [name]}
+              iniGroup={group}
+              onHover={onHover}
+              onLeave={onLeave}
+            />
+          )
+        }
+    </label>
+  </div>
+);

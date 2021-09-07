@@ -1,0 +1,34 @@
+.settings_hint-icon {
+  position: relative;
+
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  margin-left: var(--space-s);
+
+  vertical-align: text-bottom;
+
+  & svg {
+    fill: var(--bg-default);
+  }
+}
+
+.settings_hint-block {
+  position: absolute;
+  top: 0;
+  left: calc(100% + var(--space-s));
+  z-index: 10;
+
+  min-width: 150px;
+  padding: var(--indent-s);
+
+  background-color: var(--bg-accent);
+  border-radius: 4px;
+}
+
+.hint__text {
+  @include reset-indents;
+  color: var(--text-accent);
+  font-size: 12px;
+  line-height: 1.5;
+}

@@ -40,9 +40,6 @@ module.exports = {
     "no-extra-semicolons": null,
 
     "no-unknown-animations": true,
-    "property-no-vendor-prefix": [true, {
-      "message": "Not needed with autoprefixer",
-    }],
     "time-min-milliseconds": [300, {
       "message": "No very fast animation",
       "ignore": ["delay"],
