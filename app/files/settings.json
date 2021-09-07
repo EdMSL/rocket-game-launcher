@@ -15,6 +15,33 @@
   ],
   "baseFilesEncoding": "win1251",
   "usedFiles": {
+    "OblivionIni": {
+      "path": ".\\src\\tests\\fixtures\\oblivion.ini",
+      "view": "sectional",
+      "parameters": [
+        {
+          "parameterType": "combined",
+          "settingGroup": "Graphic",
+          "label": "Разрешение экрана",
+          "controllerType": "select",
+          "options": {
+            "1024x768": "1024x768",
+            "1366x768": "1366x768",
+            "1920x1080": "1920x1080"
+          },
+          "items": [
+            {
+              "name": "iSize W",
+              "iniGroup": "Display"
+            },
+            {
+              "name": "iSize H",
+              "iniGroup": "Display"
+            }
+          ]
+        }
+      ]
+    },
     "BlockheadIni": {
       "path": ".\\src\\tests\\fixtures\\Blockhead.ini",
       "view": "sectional",
@@ -110,7 +137,7 @@
       "view": "line",
       "parameters": [
         {
-          "parameterType": "composed",
+          "parameterType": "related",
           "settingGroup": "Control",
           "label": "Показать информацию об объекте",
           "items": [

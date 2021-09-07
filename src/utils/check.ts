@@ -183,6 +183,51 @@ const settingParameterSchemaGroup = Joi.object({
     })).required().min(2),
 });
 
+const settingParameterSchemaCombined = Joi.object({
+  parameterType: Joi.string().required().valid(SettingsParameterType.COMBINED),
+  settingGroup: Joi.string().when(
+    Joi.ref('$isSettingGroupsExists'), {
+      is: true, then: Joi.required(), otherwise: Joi.forbidden(),
+    },
+  ).valid(Joi.ref('$availableSettingGroups', { in: true })),
+  controllerType: Joi.string().required().valid(...Object.values(SettingParameterControllerType)),
+  options: Joi.object().pattern(
+    Joi.string(),
+    Joi.string(),
+  ).when(
+    Joi.ref('controllerType'), { is: SettingParameterControllerType.SELECT, then: Joi.required() },
+  ),
+  min: Joi.number().when(
+    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+  ),
+  max: Joi.number().when(
+    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+  ),
+  step: Joi.number().when(
+    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+  ),
+  label: Joi.string().required(),
+  items: Joi.array()
+    .items(Joi.object({
+      name: Joi.string().required(),
+      iniGroup: Joi.string().when(
+        Joi.ref('$view'), {
+          is: UsedFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
+        },
+      ),
+      attributeName: Joi.string().when(
+        Joi.ref('$view'), {
+          is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+        },
+      ),
+      attributePath: Joi.string().when(
+        Joi.ref('$view'), {
+          is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+        },
+      ),
+    })).required().min(2),
+});
+
 const settingParameterSchemaRelated = Joi.object({
   parameterType: Joi.string().required().valid(SettingsParameterType.RELATED),
   settingGroup: Joi.string().when(
@@ -236,6 +281,7 @@ const usedFileSchema = Joi.object({
     settingParameterSchemaDefault,
     settingParameterSchemaGroup,
     settingParameterSchemaRelated,
+    settingParameterSchemaCombined,
   )),
 });
 

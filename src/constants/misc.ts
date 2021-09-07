@@ -25,4 +25,5 @@ export const SettingsParameterType = {
   DEFAULT: 'default',
   GROUP: 'group',
   RELATED: 'related',
+  COMBINED: 'combined',
 };

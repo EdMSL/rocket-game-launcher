@@ -245,6 +245,7 @@ function* generateGameOptions(): SagaIterator {
             if (
               currentParameter.parameterType === SettingsParameterType.RELATED
               || currentParameter.parameterType === SettingsParameterType.GROUP
+              || currentParameter.parameterType === SettingsParameterType.COMBINED
             ) {
               let specParamsErrors: IUserMessage[] = [];
 
