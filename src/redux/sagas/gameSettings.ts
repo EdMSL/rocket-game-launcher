@@ -240,10 +240,10 @@ function* generateGameOptions(): SagaIterator {
       (gameOptions, currentUsedFile) => {
         const optionsFromFile = usedFiles[currentUsedFile].parameters.reduce(
           (currentOptions, currentParameter) => {
-            //Если опция с типом group или composed,
+            //Если опция с типом group или related,
             // то генерация производится для каждого параметра в items.
             if (
-              currentParameter.parameterType === SettingsParameterType.COMPOSED
+              currentParameter.parameterType === SettingsParameterType.RELATED
               || currentParameter.parameterType === SettingsParameterType.GROUP
             ) {
               let specParamsErrors: IUserMessage[] = [];

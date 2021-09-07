@@ -89,7 +89,7 @@ describe('#Check', () => {
       //@ts-ignore
       const result = checkUsedFiles(obj.usedFiles, Encoding.WIN1251, obj.settingGroups);
 
-      assert.hasAllKeys(result, ['anyFile', 'composedFile', 'groupFile', 'newFile', 'someFile', 'tagFile']);
+      assert.hasAllKeys(result, ['anyFile', 'relatedFile', 'groupFile', 'newFile', 'someFile', 'tagFile']);
     });
 
     it('Should return correct default data for used files main fields', () => {
@@ -122,14 +122,14 @@ describe('#Check', () => {
       assert.hasAllKeys(result.groupFile.parameters[0].items[0], ['name']);
     });
 
-    it('Should return correct data from composed parameter', () => {
+    it('Should return correct data from related parameter', () => {
       const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
       //@ts-ignore
       const result = checkUsedFiles(obj.usedFiles, Encoding.WIN1251, obj.settingGroups);
 
-      assert.hasAllKeys(result.composedFile.parameters[0], ['settingGroup', 'parameterType', 'label', 'items']);
+      assert.hasAllKeys(result.relatedFile.parameters[0], ['settingGroup', 'parameterType', 'label', 'items']);
       //@ts-ignore
-      assert.hasAllKeys(result.composedFile.parameters[0].items[0], ['name', 'controllerType', 'options']);
+      assert.hasAllKeys(result.relatedFile.parameters[0].items[0], ['name', 'controllerType', 'options']);
     });
 
     it('Should return correct data from tag file parameter', () => {

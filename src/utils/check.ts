@@ -183,8 +183,8 @@ const settingParameterSchemaGroup = Joi.object({
     })).required().min(2),
 });
 
-const settingParameterSchemaComposed = Joi.object({
-  parameterType: Joi.string().required().valid(SettingsParameterType.COMPOSED),
+const settingParameterSchemaRelated = Joi.object({
+  parameterType: Joi.string().required().valid(SettingsParameterType.RELATED),
   settingGroup: Joi.string().when(
     Joi.ref('$isSettingGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
@@ -235,7 +235,7 @@ const usedFileSchema = Joi.object({
   parameters: Joi.array().items(Joi.alternatives().try(
     settingParameterSchemaDefault,
     settingParameterSchemaGroup,
-    settingParameterSchemaComposed,
+    settingParameterSchemaRelated,
   )),
 });
 

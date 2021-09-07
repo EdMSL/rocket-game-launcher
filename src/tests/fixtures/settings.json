@@ -112,17 +112,17 @@
         }
       ]
     },
-    "composedFile": {
-      "path": "./ini/composed.ini",
+    "relatedFile": {
+      "path": "./ini/related.ini",
       "view": "line",
       "parameters": [
         {
-          "parameterType": "composed",
+          "parameterType": "related",
           "settingGroup": "Control",
-          "label": "Composed label",
+          "label": "Related label",
           "items": [
             {
-              "name": "composedParam1",
+              "name": "relatedParam1",
               "controllerType": "select",
               "options": {
                 "0": "Нет",
@@ -131,7 +131,7 @@
               }
             },
             {
-              "name": "composedParam2",
+              "name": "relatedParam2",
               "controllerType": "select",
               "options": {
                 "2": "1",

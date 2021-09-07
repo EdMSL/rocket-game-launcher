@@ -24,5 +24,5 @@ export const SettingParameterControllerType = {
 export const SettingsParameterType = {
   DEFAULT: 'default',
   GROUP: 'group',
-  COMPOSED: 'composed',
+  RELATED: 'related',
 };
