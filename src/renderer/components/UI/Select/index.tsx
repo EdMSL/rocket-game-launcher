@@ -3,9 +3,7 @@ import classNames from 'classnames';
 
 import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
 
-const styles = require('./styles.module.scss');
-
-export interface ISelectOptions {
+export interface ISelectOption {
   label: string,
   value: string,
 }
@@ -20,7 +18,7 @@ interface IProps {
   multiparameters?: string,
   value: string,
   isDisabled?: boolean,
-  optionsArr: ISelectOptions[],
+  optionsArr: ISelectOption[],
   className?: string | null,
   hintParameter?: string,
   onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void,
@@ -53,14 +51,14 @@ export const Select: React.FunctionComponent<IProps> = ({
   const currentOptionsArr = optionsArr.length !== 0 ? optionsArr : defaultOptionsArr;
 
   return (
-    <div className={classNames(styles.select__block, className)}>
+    <div className={classNames('select__block', className)}>
       {
         label && (
           <label
-            className={styles.select__label}
+            className="select__label"
             htmlFor={id}
           >
-            <span>{label}</span>
+            <span className="select__label-text">{label}</span>
             {
               description
               && onHover
@@ -82,7 +80,7 @@ export const Select: React.FunctionComponent<IProps> = ({
         )
       }
       <select
-        className={styles.select__input}
+        className="select__input"
         id={id}
         name={name}
         data-parent={parent}

@@ -1,3 +1,20 @@
+.visually-hidden {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+
+  white-space: nowrap;
+
+  border: 0;
+
+  clip: rect(0 0 0 0);
+  clip-path: inset(100%);
+}
+
 .button {
   @include reset-indents;
   font: inherit;
@@ -8,6 +25,180 @@
   border: none;
   outline: none;
   cursor: pointer;
+}
+
+.checkbox__block {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  padding-right: 30px;
+}
+
+.checkbox__label {
+  display: flex;
+  align-items: center;
+
+  cursor: pointer;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    right: -26px;
+
+    display: block;
+    width: 16px;
+    height: 16px;
+
+    border: 1px solid $border-color;
+    border-radius: 3px;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 7px;
+    right: -21px;
+
+    display: none;
+    width: 6px;
+    height: 6px;
+
+    background-color: $border-color;
+  }
+
+  .checkbox__input:checked + &::after {
+    display: block;
+  }
+}
+
+.range__block {
+  display: flex;
+  align-items: center;
+}
+
+.range__controls {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  width: 50%;
+}
+
+.range__label,
+.range__value {
+  margin: 0;
+}
+
+.range__label {
+  width: 30%;
+  margin-right: 10px;
+}
+
+.range__input {
+  flex-grow: 1;
+
+  margin: 0 10px;
+
+  appearance: none;
+
+  &::-webkit-slider-thumb {
+    width: 12px;
+    height: 24px;
+    margin-top: -10px;
+
+    background-color: $bg-color;
+    border-radius: 3px;
+
+    appearance: none;
+    cursor: pointer;
+  }
+
+  &::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 5px;
+
+    background-color: $bg-color;
+  }
+
+  &:hover {
+    &::-webkit-slider-thumb {
+      transform: scale(1.1);
+    }
+  }
+
+  &:focus {
+    outline: none;
+
+    &::-webkit-slider-thumb {
+      border-color: $focus-color;
+    }
+  }
+}
+
+.range__button {
+  align-self: stretch;
+  display: flex;
+
+  & svg {
+    fill: $bg-color;
+  }
+}
+
+.range__value {
+  width: 20%;
+
+  text-align: right;
+}
+
+.select__block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.select__label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.select__label-text {
+  color: inherit;
+}
+
+.select__input {
+  width: 250px;
+  padding: 12px;
+
+  color: $text-secondary;
+  text-align: center;
+
+  border-color: $border-color;
+  outline: none;
+
+  cursor: pointer;
+
+  &:hover {
+    outline: 1px solid $border-color;
+  }
+
+  &:disabled {
+    color: var(--text-disabled);
+
+    border-color: darken($color: $border-color, $amount: 50);
+  }
+
+  &:focus {
+    border-color: $focus-color;
+  }
+
+  &:disabled,
+  &:focus {
+    &:hover {
+      outline: none;
+    }
+  }
 }
 
 .main {
@@ -37,5 +228,9 @@
 
   &:disabled {
     background-color: darken($color: $text-secondary, $amount: 40);
+  }
+
+  &--active {
+    background-color: $focus-color;
   }
 }

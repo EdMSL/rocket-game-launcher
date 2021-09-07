@@ -3,8 +3,6 @@ import classNames from 'classnames';
 
 import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
 
-const styles = require('./styles.module.scss');
-
 interface IProps {
   id: string,
   name?: string,
@@ -40,9 +38,9 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
   onHover = null,
   onLeave = null,
 }) => (
-  <div className={classNames(styles.checkbox__block, className)}>
+  <div className={classNames('checkbox__block', className)}>
     <input
-      className={classNames('visually-hidden', styles.checkbox__input)}
+      className={classNames('visually-hidden', 'checkbox__input')}
       type="checkbox"
       id={id}
       name={name}
@@ -54,7 +52,7 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
       onChange={onChange}
     />
     <label
-      className={classNames(styles.checkbox__label, classNameCheckbox)}
+      className={classNames('checkbox__label', classNameCheckbox)}
       htmlFor={id}
     >
       <span>{label}</span>

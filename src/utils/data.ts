@@ -10,6 +10,7 @@ import { CreateUserMessage } from './message';
 import { getLineIniParameterValue } from './strings';
 import { IGameSettingsItemParameter, IGameSettingsParameter } from '$types/gameSettings';
 import { IUserMessage } from '$types/main';
+import { ISelectOption } from '$components/UI/Select';
 
 const ONE_GB = 1073741824;
 const SYMBOLS_TO_TYPE = 8;
@@ -182,3 +183,15 @@ export const getOptionData = (
     paramErrors,
   };
 };
+
+/**
+ * Генерирует опции (`options`) для UI компонента `Select`.
+ * @param obj Объект или массив строк, на основе которых будет сгенерирован список опций
+ * @returns Массив с опциями
+*/
+export const generateSelectOptions = (
+  obj: { [key: string]: string, } | string[],
+): ISelectOption[] => Object.keys(obj).map((key) => ({
+  label: obj[key],
+  value: Array.isArray(obj) ? obj[key] : key,
+}));

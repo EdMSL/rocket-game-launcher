@@ -3,8 +3,6 @@ import classNames from 'classnames';
 
 import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
 
-const styles = require('./styles.module.scss');
-
 interface IProps {
   id: string,
   name?: string,
@@ -61,8 +59,8 @@ export const Range: React.FunctionComponent<IProps> = ({
   }, [onButtonClick, parent, name, step, max, min, group]);
 
   return (
-    <div className={classNames(styles.range__block, className)}>
-      <div className={styles.range__label}>
+    <div className={classNames('range__block', className)}>
+      <div className="range__label">
         <span>{label}</span>
         {
           description
@@ -83,12 +81,12 @@ export const Range: React.FunctionComponent<IProps> = ({
           )
         }
       </div>
-      <div className={styles.range__controls}>
+      <div className="range__controls">
         {
           onButtonClick && (
             <button
               type="button"
-              className={classNames('button', styles.range__button)}
+              className={classNames('button', 'range__button')}
               name="minus"
               onClick={onRangeBtnClick}
             >
@@ -99,7 +97,7 @@ export const Range: React.FunctionComponent<IProps> = ({
           )
         }
         <input
-          className={styles.range__input}
+          className="range__input"
           type="range"
           name={name}
           data-group={group}
@@ -116,7 +114,7 @@ export const Range: React.FunctionComponent<IProps> = ({
           onButtonClick && (
             <button
               type="button"
-              className={classNames('button', styles.range__button)}
+              className={classNames('button', 'range__input')}
               name="plus"
               onClick={onRangeBtnClick}
             >
@@ -127,7 +125,7 @@ export const Range: React.FunctionComponent<IProps> = ({
           )
         }
       </div>
-      <p className={styles.range__value}>
+      <p className="range__input">
         {valueText}
       </p>
     </div>
