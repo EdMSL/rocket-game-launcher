@@ -11,6 +11,7 @@ import { IAppState } from '$store/store';
 import { generateSelectOptions } from '$utils/data';
 import { GameSettingsBlock } from '$components/GameSettingsBlock';
 import { Select } from '$components/UI/Select';
+import { changeMoProfile } from '$actions/gameSettings';
 
 interface IProps {
   props?: any,
@@ -30,8 +31,8 @@ export const GameSettingsScreen: React.FC<IProps> = (props) => {
   const dispatch = useDispatch();
 
   const onMOProfilesSelectChange = useCallback(({ target }) => {
-    // dispatch(writeMOIni(target.value));
-  }, []);
+    dispatch(changeMoProfile(target.value));
+  }, [dispatch]);
 
   return (
     <main className={classNames('main', styles['game-settings-screen__main'])}>

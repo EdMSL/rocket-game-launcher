@@ -20,18 +20,27 @@ import {
 } from '$utils/files';
 import { IUnwrap, IUnwrapSync } from '$types/common';
 import {
-  addMessages, setIsGameSettingsAvailable, setIsGameSettingsLoaded,
+  addMessages,
+  setIsGameSettingsAvailable,
+  setIsGameSettingsLoaded,
 } from '$actions/main';
 import { GAME_DIR, GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import { checkUsedFiles, checkGameSettingsConfigMainFields } from '$utils/check';
 import {
-  IGameSettingsConfig, IGameSettingsItemParameter, IGameSettingsOptions, IGameSettingsParameter,
+  GAME_SETTINGS_TYPES,
+  IGameSettingsConfig,
+  IGameSettingsItemParameter,
+  IGameSettingsOptions,
+  IGameSettingsParameter,
 } from '$types/gameSettings';
 import {
-  LogMessageType, writeToLogFile, writeToLogFileSync,
+  LogMessageType,
+  writeToLogFile,
+  writeToLogFileSync,
 } from '$utils/log';
 import { CreateUserMessage } from '$utils/message';
 import {
+  changeMoProfile,
   setGameSettingsConfig,
   setGameSettingsOptions,
   setGameSettingsUsedFiles,
@@ -413,6 +422,13 @@ export function* initGameSettingsSaga(): SagaIterator {
   }
 }
 
+function* changeMOProfileSaga(
+  { payload: moProfile }: ReturnType<typeof changeMoProfile>,
+): SagaIterator {
+  yield put(setMoProfile(moProfile));
+  ///TODO Сделать сохранение профиля в МО ini
+}
+
 export default function* gameSetingsSaga(): SagaIterator {
-  // yield takeLatest(LOCATION_CHANGE, locationChangeSaga);
+  yield takeLatest(GAME_SETTINGS_TYPES.CHANGE_MO_PROFILE, changeMOProfileSaga);
 }
