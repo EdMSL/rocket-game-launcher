@@ -89,10 +89,7 @@ export const readFileDataSync = (
  * @returns Buffer с данными из файла.
 */
 export const readFileData = (pathToFile: string): Promise<Buffer> => fsPromises.readFile(pathToFile)
-  .then((data) => {
-    console.log(mime.getType(pathToFile));
-    return data;
-  })
+  .then((data) => data)
   .catch((error) => {
     const readWriteError = getReadWriteError(error);
 
