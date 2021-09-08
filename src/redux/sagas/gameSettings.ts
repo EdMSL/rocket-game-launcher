@@ -123,10 +123,6 @@ function* getMOProfilesSaga(): SagaIterator {
       errorMessage = `Unknown error. Message: ${error.message}`;
     }
 
-    yield put(addMessages([CreateUserMessage.error(
-      'Ошибка при попытке получения профилей Mod Organizer. Настройки из файлов, привязанных к профилю, будут недоступны. Подробности в файле лога.', //eslint-disable-line max-len
-    )]));
-
     throw new SagaError('Get Mod Organizer profiles', errorMessage);
   }
 }
@@ -418,7 +414,7 @@ export function* initGameSettingsSaga(): SagaIterator {
     let errorMessage = '';
 
     if (error instanceof SagaError) {
-      errorMessage = `An error occured during ${error.sagaName}. ${error.message}`;
+      errorMessage = `An error occured during "${error.sagaName}". ${error.message}`;
     } else if (error instanceof CustomError) {
       errorMessage = `${error.message}`;
     } else if (error instanceof ReadWriteError) {

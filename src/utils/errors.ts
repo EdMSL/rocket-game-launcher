@@ -20,6 +20,7 @@ export const ErrorName = {
   PATH_TO_FILE: 'NotDirectoryError',
   READ_WRITE: 'ReadWriteError',
   SAGA_ERROR: 'SagaError',
+  MIME_TYPE: 'IncorrectFileTypeError',
 };
 
 export const ErrorCode = {

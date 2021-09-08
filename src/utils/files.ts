@@ -3,6 +3,7 @@ import path from 'path';
 import iconv from 'iconv-lite';
 import { Ini } from 'ini-api';
 import xmlParser from 'fast-xml-parser';
+import mime from 'mime';
 
 import {
   LogMessageType,
@@ -88,7 +89,10 @@ export const readFileDataSync = (
  * @returns Buffer с данными из файла.
 */
 export const readFileData = (pathToFile: string): Promise<Buffer> => fsPromises.readFile(pathToFile)
-  .then((data) => data)
+  .then((data) => {
+    console.log(mime.getType(pathToFile));
+    return data;
+  })
   .catch((error) => {
     const readWriteError = getReadWriteError(error);
 
@@ -125,6 +129,13 @@ export const readDirectory = (
 */
 export const readJSONFileSync = <T>(pathToFile: string): T => {
   try {
+    if (!mime.getType(pathToFile)?.match(/application\/json/)) {
+      throw new CustomError(
+        'The file must have the extension .json',
+        ErrorName.MIME_TYPE,
+      );
+    }
+
     const JSONstring = readFileDataSync(pathToFile);
 
     return parseJSON<T>(JSONstring);
@@ -145,6 +156,13 @@ export const readJSONFileSync = <T>(pathToFile: string): T => {
 */
 export const readJSONFile = async <T>(pathToFile: string): Promise<T> => {
   try {
+    if (!mime.getType(pathToFile)?.match(/application\/json/)) {
+      throw new CustomError(
+        'The file must have the extension .json',
+        ErrorName.MIME_TYPE,
+      );
+    }
+
     const JSONstring = await readFileData(pathToFile)
       .then((dataBuffer) => dataBuffer.toString());
 
