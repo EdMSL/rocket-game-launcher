@@ -12,22 +12,9 @@ import { IUserMessage } from '$types/main';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';
-import { CreateUserMessage } from '$utils/message';
 import { defaultLauncherConfig } from '$constants/defaultParameters';
 import { ISystemRootState } from '$types/system';
 import { CustomError } from './errors';
-
-interface ICheckingResult {
-  newUserMessages: IUserMessage[],
-}
-
-interface ISettingsConfigCheckingResult extends ICheckingResult {
-  newSettingsConfigObj: IGameSettingsConfig,
-}
-
-interface IUsedFilesCheckingResult extends ICheckingResult {
-  newUsedFilesObj: IGameSettingsConfig['usedFiles'],
-}
 
 interface IUsedFileError {
   parent: string,
@@ -190,13 +177,21 @@ const settingParameterSchemaCombined = Joi.object({
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ).valid(Joi.ref('$availableSettingGroups', { in: true })),
-  controllerType: Joi.string().required().valid(...Object.values(SettingParameterControllerType)),
+  controllerType: Joi.string().required().valid(SettingParameterControllerType.SELECT),
+  separator: Joi.string().optional().default(':'),
   options: Joi.object().pattern(
     Joi.string(),
     Joi.string(),
   ).when(
     Joi.ref('controllerType'), { is: SettingParameterControllerType.SELECT, then: Joi.required() },
-  ),
+  ).custom((value, helpers) => {
+    Object.keys(value).forEach((element) => {
+      if (element.split(helpers.state.ancestors[0].separator).length !== helpers.state.ancestors[0].items) {
+        throw new Error('the number of parts of the option key is not equal to the number of "items" or incorrect "separator" used.'); //eslint-disable-line max-len
+      }
+      return value;
+    });
+  }),
   min: Joi.number().when(
     Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
   ),

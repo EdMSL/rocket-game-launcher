@@ -24,7 +24,10 @@ import {
 
 const getState = (state: IAppState): IAppState => state;
 
-export function* initLauncherSaga(): SagaIterator {
+/**
+ * Инициализация лаунчера при запуске.
+*/
+function* initLauncherSaga(): SagaIterator {
   yield put(setIsLauncherInitialised(false));
 
   try {
@@ -64,7 +67,7 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
     yield call(initLauncherSaga);
   }
 
-  if (location.pathname === `${Routes.GAME_SETTINGS_SCREEN}`) {
+  if (location.pathname.includes(`${Routes.GAME_SETTINGS_SCREEN}`)) {
     if (isLauncherInitialised) {
       yield call(initGameSettingsSaga);
     } else {

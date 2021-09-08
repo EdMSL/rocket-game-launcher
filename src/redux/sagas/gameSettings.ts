@@ -29,13 +29,10 @@ import { checkUsedFiles, checkGameSettingsConfigMainFields } from '$utils/check'
 import {
   GAME_SETTINGS_TYPES,
   IGameSettingsConfig,
-  IGameSettingsItemParameter,
   IGameSettingsOptions,
-  IGameSettingsParameter,
 } from '$types/gameSettings';
 import {
   LogMessageType,
-  writeToLogFile,
   writeToLogFileSync,
 } from '$utils/log';
 import { CreateUserMessage } from '$utils/message';
@@ -62,6 +59,10 @@ interface IGetDataFromFilesResult {
 
 const getState = (state: IAppState): IAppState => state;
 
+/**
+ * Получить данные из файла конфигурации лаунчера
+ * config.json, проверить основные поля и записать в `state`
+*/
 export function* setInitialGameSettingsConfigSaga(): SagaIterator {
   try {
     const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_FILE_PATH);
@@ -70,10 +71,6 @@ export function* setInitialGameSettingsConfigSaga(): SagaIterator {
     yield put(setGameSettingsConfig(newSettingsConfigObj));
     yield put(setIsGameSettingsAvailable(true));
   } catch (error: any) {
-    // writeToLogFile(
-    //   `An error occurred while processing the file settings.json. ${error.message}`,
-    //   LogMessageType.ERROR,
-    // );
     let errorMessage = '';
 
     if (error instanceof CustomError) {
@@ -90,6 +87,9 @@ export function* setInitialGameSettingsConfigSaga(): SagaIterator {
   }
 }
 
+/**
+ * Получить список профилей Mod Organizer и записать в `state`
+*/
 function* getMOProfilesSaga(): SagaIterator {
   const {
     system: {
@@ -131,6 +131,9 @@ function* getMOProfilesSaga(): SagaIterator {
   }
 }
 
+/**
+ * Получить данные из файла ModOrganizer.ini и записать нужные параметры в `state`
+*/
 function* getDataFromMOIniSaga(): SagaIterator {
   try {
     const {
@@ -197,6 +200,9 @@ function* getDataFromMOIniSaga(): SagaIterator {
   }
 }
 
+/**
+ * Считывает данные из файлов для генерации игровых опций
+*/
 function* getDataFromUsedFiles(): SagaIterator<IGetDataFromFilesResult> {
   try {
     const {
@@ -231,7 +237,9 @@ function* getDataFromUsedFiles(): SagaIterator<IGetDataFromFilesResult> {
   }
 }
 
-// Генерируем опции для каждого файла.
+/**
+ * Генерирует список игровых опций на основе параметров (`usedFiles`) из файлов в settings.json
+*/
 function* generateGameOptions(): SagaIterator {
   try {
     let optionsErrors: IUserMessage[] = [];
@@ -258,34 +266,37 @@ function* generateGameOptions(): SagaIterator {
             ) {
               let specParamsErrors: IUserMessage[] = [];
 
-              const optionsFromParameter = currentParameter.items!.reduce((options, currentOption) => {
-                const {
-                  paramName, paramValue, paramErrors,
-                } = getOptionData(
-                  currentFilesDataObj[currentUsedFile],
-                  currentOption,
-                  usedFiles[currentUsedFile].view,
-                  currentUsedFile,
-                  path.basename(usedFiles[currentUsedFile].path),
-                  moProfile,
-                );
+              const optionsFromParameter = currentParameter.items!.reduce(
+                (options, currentOption) => {
+                  const {
+                    paramName, paramValue, paramErrors,
+                  } = getOptionData(
+                    currentFilesDataObj[currentUsedFile],
+                    currentOption,
+                    usedFiles[currentUsedFile].view,
+                    currentUsedFile,
+                    path.basename(usedFiles[currentUsedFile].path),
+                    moProfile,
+                  );
 
-                if (paramErrors.length > 0) {
-                  specParamsErrors = [...paramErrors];
+                  if (paramErrors.length > 0) {
+                    specParamsErrors = [...paramErrors];
 
-                  return { ...options };
-                }
+                    return { ...options };
+                  }
 
-                return {
-                  ...options,
-                  [paramName]: {
-                    default: paramValue,
-                    value: paramValue,
-                    settingsGroup: currentParameter.settingGroup,
-                    parent: currentUsedFile,
-                  },
-                };
-              }, {});
+                  return {
+                    ...options,
+                    [paramName]: {
+                      default: paramValue,
+                      value: paramValue,
+                      settingsGroup: currentParameter.settingGroup,
+                      parent: currentUsedFile,
+                    },
+                  };
+                },
+                {},
+              );
 
               if (specParamsErrors.length > 0) {
                 optionsErrors = [...optionsErrors, ...specParamsErrors];
@@ -359,6 +370,11 @@ function* generateGameOptions(): SagaIterator {
   }
 }
 
+/**
+ * Инициализация игровых настроек. Осуществляется при первом переходе на экран настроек.
+ * Получаем данные МО, проверяем на валидность параметры игровых настроек (`usedFiles`)
+ * и переписываем их в случае невалидности некоторых полей, генерируем опции игровых настроек.
+*/
 export function* initGameSettingsSaga(): SagaIterator {
   try {
     yield put(setIsGameSettingsLoaded(false));
