@@ -39,9 +39,10 @@ export interface IGameSettingsItemParameter {
 }
 
 export interface IGameSettingsParameter {
+  id: string,
   parameterType: string,
   name?: string,
-  controllerType: string,
+  controllerType?: string,
   iniGroup?: string,
   settingGroup?: string,
   attributeName?: string,

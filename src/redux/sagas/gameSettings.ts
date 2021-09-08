@@ -265,7 +265,7 @@ function* generateGameOptions(): SagaIterator {
               const optionsFromParameter = currentParameter.items!.reduce(
                 (options, currentOption) => {
                   const {
-                    paramName, paramValue, paramErrors,
+                    optionName, optionValue, optionErrors,
                   } = getOptionData(
                     currentFilesDataObj[currentUsedFile],
                     currentOption,
@@ -275,17 +275,17 @@ function* generateGameOptions(): SagaIterator {
                     moProfile,
                   );
 
-                  if (paramErrors.length > 0) {
-                    specParamsErrors = [...paramErrors];
+                  if (optionErrors.length > 0) {
+                    specParamsErrors = [...optionErrors];
 
                     return { ...options };
                   }
 
                   return {
                     ...options,
-                    [paramName]: {
-                      default: paramValue,
-                      value: paramValue,
+                    [optionName]: {
+                      default: optionValue,
+                      value: optionValue,
                       settingsGroup: currentParameter.settingGroup,
                       parent: currentUsedFile,
                     },
@@ -307,7 +307,7 @@ function* generateGameOptions(): SagaIterator {
             }
 
             const {
-              paramName, paramValue, paramErrors,
+              optionName, optionValue, optionErrors,
             } = getOptionData(
               currentFilesDataObj[currentUsedFile],
               currentParameter,
@@ -317,17 +317,17 @@ function* generateGameOptions(): SagaIterator {
               moProfile,
             );
 
-            if (paramErrors.length > 0) {
-              optionsErrors = [...optionsErrors, ...paramErrors];
+            if (optionErrors.length > 0) {
+              optionsErrors = [...optionsErrors, ...optionErrors];
 
               return { ...currentOptions };
             }
 
             return {
               ...currentOptions,
-              [paramName]: {
-                default: paramValue,
-                value: paramValue,
+              [optionName]: {
+                default: optionValue,
+                value: optionValue,
                 settingsGroup: currentParameter.settingGroup,
                 parent: currentUsedFile,
               },

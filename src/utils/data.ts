@@ -8,7 +8,9 @@ import {
 } from './log';
 import { CreateUserMessage } from './message';
 import { getLineIniParameterValue } from './strings';
-import { IGameSettingsItemParameter, IGameSettingsParameter } from '$types/gameSettings';
+import {
+  IGameSettingsItemParameter, IGameSettingsParameter, IGameSettingsRootState,
+} from '$types/gameSettings';
 import { IUserMessage } from '$types/main';
 import { ISelectOption } from '$components/UI/Select';
 
@@ -84,11 +86,32 @@ export const getTypeOfElement = (element: unknown): string => {
 };
 
 export interface IGeneratedGameSettingsParam {
-  paramName: string,
-  paramGroup: string,
-  paramValue: string,
-  paramErrors: IUserMessage[],
+  optionName: string,
+  optionValue: string,
+  optionErrors: IUserMessage[],
 }
+
+const isIGameSettingsItemParameter = (
+  parameter: IGameSettingsParameter | IGameSettingsItemParameter,
+): parameter is IGameSettingsItemParameter => parameter.attributePath !== undefined && parameter.attributeName !== undefined;
+
+/**
+ * Сгенерировать имя игровой опции на основе параметра, который является основой для опции
+ * @param parameter Параметр-основа для игровой опции.
+*/
+export const getOptionName = (
+  parameter: IGameSettingsParameter|IGameSettingsItemParameter,
+): string => {
+  if (isIGameSettingsItemParameter(parameter)) {
+    return `${parameter.attributePath}/${parameter.name}/${parameter.attributeName}`;
+  }
+
+  if (parameter.iniGroup) {
+    return `${parameter.iniGroup}/${parameter.name}`;
+  }
+
+  return parameter.name!;
+};
 
 /**
  * Генерирует объект с полями, необходимыми для создания
@@ -108,43 +131,43 @@ export const getOptionData = (
   baseFileName: string,
   moProfileName = '',
 ): IGeneratedGameSettingsParam => {
-  const paramErrors: IUserMessage[] = [];
-  let paramName;
-  let paramGroup;
-  let paramValue = '';
+  const optionErrors: IUserMessage[] = [];
+  let optionName;
+  let optionSettingGroup;
+  let optionValue = '';
 
   if (fileView === UsedFileView.SECTIONAL) {
-    paramGroup = currentFileData.getSection(currentGameSettingParameter.iniGroup);
+    optionSettingGroup = currentFileData.getSection(currentGameSettingParameter.iniGroup);
 
-    if (!paramGroup) {
-      paramErrors.push(CreateUserMessage.warning(
+    if (!optionSettingGroup) {
+      optionErrors.push(CreateUserMessage.warning(
         `Файл ${baseFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит группы параметров "${currentGameSettingParameter.iniGroup}", указанной в параметре ${currentGameSettingParameter.name} из ${gameSettingsFileName}`, //eslint-disable-line max-len
       ));
     } else {
-      const parameterLine = paramGroup.getLine(currentGameSettingParameter.name);
+      const parameterLine = optionSettingGroup.getLine(currentGameSettingParameter.name);
 
       if (parameterLine) {
-        paramName = `${paramGroup.name}/${parameterLine.key}`;
-        paramValue = parameterLine.value;
+        optionName = `${optionSettingGroup.name}/${parameterLine.key}`;
+        optionValue = parameterLine.value;
       } else {
-        paramErrors.push(CreateUserMessage.warning(
+        optionErrors.push(CreateUserMessage.warning(
           `Файл ${baseFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} из группы "${currentGameSettingParameter.iniGroup}" не содержит параметра "${currentGameSettingParameter.name}", указанного в ${gameSettingsFileName}`, //eslint-disable-line max-len
         ));
       }
     }
   } else if (fileView === UsedFileView.LINE) {
     currentFileData.globals.lines.some((line) => {
-      paramValue = getLineIniParameterValue(line.text, currentGameSettingParameter.name!);
+      optionValue = getLineIniParameterValue(line.text, currentGameSettingParameter.name!);
 
-      if (paramValue) {
-        paramName = currentGameSettingParameter.name;
+      if (optionValue) {
+        optionName = currentGameSettingParameter.name;
       }
 
-      return Boolean(paramValue);
+      return Boolean(optionValue);
     });
 
-    if (!paramName) {
-      paramErrors.push(CreateUserMessage.warning(
+    if (!optionName) {
+      optionErrors.push(CreateUserMessage.warning(
         `Файл ${baseFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит параметра "${currentGameSettingParameter.name}", указанного в ${gameSettingsFileName}`, //eslint-disable-line max-len
       ));
     }
@@ -162,25 +185,24 @@ export const getOptionData = (
       if (typeof obj[key] === 'object') {
         getProp(obj[key], pathArr[index]);
       } else if (key === currentGameSettingParameter.attributeName) {
-        paramName = pathArr.join('/');
-        paramValue = obj[currentGameSettingParameter.attributeName!];
+        optionName = pathArr.join('/');
+        optionValue = obj[currentGameSettingParameter.attributeName!];
       }
     };
 
     getProp(currentFileData, pathArr[index]);
 
-    if (!paramName || !paramValue) {
-      paramErrors.push(CreateUserMessage.warning(
+    if (!optionName || !optionValue) {
+      optionErrors.push(CreateUserMessage.warning(
         `Файл ${baseFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит параметра "${currentGameSettingParameter.name}", указанного в ${gameSettingsFileName}, либо допущена ошибка в пути к параметру.`, //eslint-disable-line max-len
       ));
     }
   }
 
   return {
-    paramName,
-    paramGroup,
-    paramValue,
-    paramErrors,
+    optionName,
+    optionValue,
+    optionErrors,
   };
 };
 
@@ -195,3 +217,18 @@ export const generateSelectOptions = (
   label: obj[key],
   value: Array.isArray(obj) ? obj[key] : key,
 }));
+
+export const getParametersForOptionsGenerate = (
+  usedFiles: IGameSettingsRootState['usedFiles'],
+  fileName: string,
+  gameSettingGroups: IGameSettingsRootState['settingGroups'],
+  currentGameSettingGroup: string,
+): IGameSettingsParameter[] => {
+  if (gameSettingGroups.length > 0 && currentGameSettingGroup) {
+    return usedFiles[fileName].parameters.filter(
+      (currentParameter) => currentParameter.settingGroup === currentGameSettingGroup,
+    );
+  }
+
+  return usedFiles[fileName].parameters;
+};

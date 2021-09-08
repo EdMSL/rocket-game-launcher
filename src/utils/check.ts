@@ -15,6 +15,7 @@ import {
 import { defaultLauncherConfig } from '$constants/defaultParameters';
 import { ISystemRootState } from '$types/system';
 import { CustomError } from './errors';
+import { getRandomId } from './strings';
 
 interface IUsedFileError {
   parent: string,
@@ -83,7 +84,9 @@ const settingsMainSchema = Joi.object<IGameSettingsConfig>({
     ).required(),
 });
 
+// id для параметров не указываются в settings.json, вместо этого они генерируются автоматически.
 const settingParameterSchemaDefault = Joi.object({
+  id: Joi.string().optional().default(() => getRandomId('parameter')),
   parameterType: Joi.string().optional().default(SettingsParameterType.DEFAULT).valid(SettingsParameterType.DEFAULT),
   name: Joi.string().required(),
   label: Joi.string().optional().default(Joi.ref('name')),
@@ -126,6 +129,7 @@ const settingParameterSchemaDefault = Joi.object({
 });
 
 const settingParameterSchemaGroup = Joi.object({
+  id: Joi.string().optional().default(() => getRandomId('parameter')),
   parameterType: Joi.string().required().valid(SettingsParameterType.GROUP),
   settingGroup: Joi.string().when(
     Joi.ref('$isSettingGroupsExists'), {
@@ -171,6 +175,7 @@ const settingParameterSchemaGroup = Joi.object({
 });
 
 const settingParameterSchemaCombined = Joi.object({
+  id: Joi.string().optional().default(() => getRandomId('parameter')),
   parameterType: Joi.string().required().valid(SettingsParameterType.COMBINED),
   settingGroup: Joi.string().when(
     Joi.ref('$isSettingGroupsExists'), {
@@ -224,6 +229,7 @@ const settingParameterSchemaCombined = Joi.object({
 });
 
 const settingParameterSchemaRelated = Joi.object({
+  id: Joi.string().optional().default(() => getRandomId('parameter')),
   parameterType: Joi.string().required().valid(SettingsParameterType.RELATED),
   settingGroup: Joi.string().when(
     Joi.ref('$isSettingGroupsExists'), {

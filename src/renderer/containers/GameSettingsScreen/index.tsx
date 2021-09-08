@@ -13,14 +13,11 @@ import { GameSettingsBlock } from '$components/GameSettingsBlock';
 import { Select } from '$components/UI/Select';
 import { changeMoProfile } from '$actions/gameSettings';
 
-interface IProps {
-  props?: any,
-}
 /**
  * Контейнер, в котором располагаются блок (`GameSettingsBlock`) с контроллерами для изменения
  * игровых настроек и селектор выбора профиля Mod Organizer (если МО используется).
 */
-export const GameSettingsScreen: React.FC<IProps> = (props) => {
+export const GameSettingsScreen: React.FC = () => {
   const usedFiles = useSelector((state: IAppState) => state.gameSettings.usedFiles);
   const settingGroups = useSelector((state: IAppState) => state.gameSettings.settingGroups);
   const gameOptions = useSelector((state: IAppState) => state.gameSettings.gameOptions);
@@ -77,19 +74,22 @@ export const GameSettingsScreen: React.FC<IProps> = (props) => {
           </div>
         )
         }
-        <Switch>
-          <Route
-            path={`${Routes.GAME_SETTINGS_SCREEN}/:settingGroup/`}
-            render={(): React.ReactElement => (
-              <React.Fragment>
-                <GameSettingsBlock
-                  gameOptions={gameOptions}
-                  usedFiles={usedFiles}
-                />
-              </React.Fragment>
-            )}
-          />
-        </Switch>
+        <div className={styles['game-settings-screen__options']}>
+          <Switch>
+            <Route
+              path={`${Routes.GAME_SETTINGS_SCREEN}/:settingGroup/`}
+              render={(): React.ReactElement => (
+                <React.Fragment>
+                  <GameSettingsBlock
+                    gameOptions={gameOptions}
+                    usedFiles={usedFiles}
+                    settingGroups={settingGroups}
+                  />
+                </React.Fragment>
+              )}
+            />
+          </Switch>
+        </div>
       </div>
     </main>
   );

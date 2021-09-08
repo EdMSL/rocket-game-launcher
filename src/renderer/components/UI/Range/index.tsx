@@ -42,7 +42,7 @@ export const Range: React.FunctionComponent<IProps> = ({
   max,
   step,
   isDisabled,
-  label,
+  label = '',
   description = '',
   valueText = '',
   className = null,

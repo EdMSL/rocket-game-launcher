@@ -32,7 +32,7 @@ const defaultOptionsArr = [{
 }];
 
 export const Select: React.FunctionComponent<IProps> = ({
-  label = null,
+  label = '',
   description = '',
   id,
   name = id,

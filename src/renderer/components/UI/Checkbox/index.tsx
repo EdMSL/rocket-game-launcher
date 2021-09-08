@@ -26,7 +26,7 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
   name = id,
   parent = '',
   group = '',
-  label,
+  label = '',
   description = '',
   isChecked,
   isDisabled = false,
