@@ -216,10 +216,19 @@ export const getOptionData = (
 */
 export const generateSelectOptions = (
   obj: { [key: string]: string, } | string[],
-): ISelectOption[] => Object.keys(obj).map((key) => ({
-  label: obj[key],
-  value: Array.isArray(obj) ? obj[key] : key,
-}));
+): ISelectOption[] => {
+  if (Array.isArray(obj)) {
+    return obj.map((key) => ({
+      label: key,
+      value: key,
+    }));
+  }
+
+  return Object.keys(obj).map((key) => ({
+    label: obj[key],
+    value: key,
+  }));
+};
 
 export const getParametersForOptionsGenerate = (
   usedFile: IUsedFile,
