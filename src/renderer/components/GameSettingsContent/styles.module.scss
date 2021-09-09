@@ -1,4 +1,12 @@
-.game-settings-block__content {
+.game-settings-content__item {
+  align-self: stretch;
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: var(--space-m);
+
+  user-select: none;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }

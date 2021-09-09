@@ -40,6 +40,17 @@
               "iniGroup": "Display"
             }
           ]
+        },
+        {
+          "parameterType": "default",
+          "name": "bFull Screen",
+          "iniGroup": "Display",
+          "settingGroup": "Graphic",
+          "label": "Полный экран",
+          "controllerType": "range",
+          "min": 0,
+          "max": 10,
+          "step": 1
         }
       ]
     },
@@ -74,7 +85,7 @@
       "parameters": [
         {
           "name": "DMSMain.Name",
-          "settingGroup": "Control",
+          "settingGroup": "Graphic",
           "controllerType": "select",
           "label": "Неизвестный параметр",
           "options": {
