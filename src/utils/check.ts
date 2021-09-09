@@ -66,6 +66,7 @@ export const checkConfigFileData = (configObj: ISystemRootState): ISystemRootSta
   return validateResult.value;
 };
 
+///FIXME Добавить проверку на уникальность имени для settingGroups
 const settingsMainSchema = Joi.object<IGameSettingsConfig>({
   settingGroups: Joi.array()
     .items(Joi.object({

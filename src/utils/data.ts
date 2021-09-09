@@ -9,7 +9,10 @@ import {
 import { CreateUserMessage } from './message';
 import { getLineIniParameterValue } from './strings';
 import {
-  IGameSettingsItemParameter, IGameSettingsParameter, IGameSettingsRootState,
+  IGameSettingsItemParameter,
+  IGameSettingsParameter,
+  IGameSettingsRootState,
+  IUsedFile,
 } from '$types/gameSettings';
 import { IUserMessage } from '$types/main';
 import { ISelectOption } from '$components/UI/Select';
@@ -219,16 +222,15 @@ export const generateSelectOptions = (
 }));
 
 export const getParametersForOptionsGenerate = (
-  usedFiles: IGameSettingsRootState['usedFiles'],
-  fileName: string,
+  usedFile: IUsedFile,
   gameSettingGroups: IGameSettingsRootState['settingGroups'],
   currentGameSettingGroup: string,
 ): IGameSettingsParameter[] => {
   if (gameSettingGroups.length > 0 && currentGameSettingGroup) {
-    return usedFiles[fileName].parameters.filter(
+    return usedFile.parameters.filter(
       (currentParameter) => currentParameter.settingGroup === currentGameSettingGroup,
     );
   }
 
-  return usedFiles[fileName].parameters;
+  return usedFile.parameters;
 };

@@ -30,7 +30,7 @@ export const GameSettingsBlock: React.FunctionComponent<IProps> = ({
   settingGroups,
   gameOptions,
 }) => {
-  const { currentSettingGroup } = useParams<{ [key: string]: string, }>();
+  const { settingGroup: locationSettingGroup } = useParams<{ [key: string]: string, }>();
 
   const [hintParameter, setHintParameter] = useState<string>('');
 
@@ -64,22 +64,19 @@ export const GameSettingsBlock: React.FunctionComponent<IProps> = ({
     <React.Fragment>
       {
         /* eslint-disable */
-        Object.keys(usedFiles).map(
-          (fileName) => {
-            console.log(getParametersForOptionsGenerate(
-            usedFiles,
-            fileName,
+        Object.keys(usedFiles)
+          .map((fileName) => getParametersForOptionsGenerate(
+            usedFiles[fileName],
             settingGroups,
-            currentSettingGroup,
+            locationSettingGroup,
           ))
-            return getParametersForOptionsGenerate(
-            usedFiles,
-            fileName,
-            settingGroups,
-            currentSettingGroup,
-          ).map(
+          .reduce((parameters, curreentParameter) => [...parameters, ...curreentParameter], [])
+          .map(
             (parameter) => {
-              // console.log(getOptionName(parameter));
+              if (parameter.parameterType === 'default') {
+
+                console.log(getOptionName(parameter));
+              }
               // if (parameter.controllerType === SettingParameterControllerType.RANGE) {
               //   return (
               //     <Range
@@ -153,8 +150,6 @@ export const GameSettingsBlock: React.FunctionComponent<IProps> = ({
               return undefined;
             },
           )
-        },
-        )
       }
     </React.Fragment>
   );
