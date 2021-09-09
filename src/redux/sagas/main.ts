@@ -60,7 +60,7 @@ function* initLauncherSaga(): SagaIterator {
 
 function* locationChangeSaga({ payload: { location } }: LocationChangeAction): SagaIterator {
   const {
-    main: { isLauncherInitialised },
+    main: { isLauncherInitialised, isGameSettingsLoaded },
   }: IAppState = yield select(getState);
 
   if (!isLauncherInitialised && location.pathname === `${Routes.MAIN_SCREEN}`) {
@@ -68,9 +68,9 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
   }
 
   if (location.pathname.includes(`${Routes.GAME_SETTINGS_SCREEN}`)) {
-    if (isLauncherInitialised) {
+    if (isLauncherInitialised && !isGameSettingsLoaded) {
       yield call(initGameSettingsSaga);
-    } else {
+    } else if (!isLauncherInitialised) {
       yield put(push(`${Routes.MAIN_SCREEN}`));
     }
   }
