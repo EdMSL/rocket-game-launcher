@@ -3,12 +3,11 @@ import Joi from 'joi';
 
 import {
   Encoding,
-  SettingParameterControllerType,
+  GameSettingParameterControllerType,
   UsedFileView,
-  SettingsParameterType,
+  GameSettingParameterType,
 } from '$constants/misc';
 import { IGameSettingsConfig, IGameSettingsRootState } from '$types/gameSettings';
-import { IUserMessage } from '$types/main';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';
@@ -88,7 +87,7 @@ const settingsMainSchema = Joi.object<IGameSettingsConfig>({
 // id для параметров не указываются в settings.json, вместо этого они генерируются автоматически.
 const settingParameterSchemaDefault = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('parameter')),
-  parameterType: Joi.string().optional().default(SettingsParameterType.DEFAULT).valid(SettingsParameterType.DEFAULT),
+  parameterType: Joi.string().optional().default(GameSettingParameterType.DEFAULT).valid(GameSettingParameterType.DEFAULT),
   name: Joi.string().required(),
   label: Joi.string().optional().default(Joi.ref('name')),
   iniGroup: Joi.string().when(
@@ -111,47 +110,47 @@ const settingParameterSchemaDefault = Joi.object({
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ).valid(Joi.ref('$availableSettingGroups', { in: true })),
-  controllerType: Joi.string().required().valid(...Object.values(SettingParameterControllerType)),
+  controllerType: Joi.string().required().valid(...Object.values(GameSettingParameterControllerType)),
   options: Joi.object().pattern(
     Joi.string(),
     Joi.string(),
   ).when(
-    Joi.ref('controllerType'), { is: SettingParameterControllerType.SELECT, then: Joi.required() },
+    Joi.ref('controllerType'), { is: GameSettingParameterControllerType.SELECT, then: Joi.required() },
   ),
   min: Joi.number().when(
-    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: GameSettingParameterControllerType.RANGE, then: Joi.required() },
   ),
   max: Joi.number().when(
-    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: GameSettingParameterControllerType.RANGE, then: Joi.required() },
   ),
   step: Joi.number().when(
-    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: GameSettingParameterControllerType.RANGE, then: Joi.required() },
   ),
 });
 
 const settingParameterSchemaGroup = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('parameter')),
-  parameterType: Joi.string().required().valid(SettingsParameterType.GROUP),
+  parameterType: Joi.string().required().valid(GameSettingParameterType.GROUP),
   settingGroup: Joi.string().when(
     Joi.ref('$isSettingGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ).valid(Joi.ref('$availableSettingGroups', { in: true })),
-  controllerType: Joi.string().required().valid(...Object.values(SettingParameterControllerType)),
+  controllerType: Joi.string().required().valid(...Object.values(GameSettingParameterControllerType)),
   options: Joi.object().pattern(
     Joi.string(),
     Joi.string(),
   ).when(
-    Joi.ref('controllerType'), { is: SettingParameterControllerType.SELECT, then: Joi.required() },
+    Joi.ref('controllerType'), { is: GameSettingParameterControllerType.SELECT, then: Joi.required() },
   ),
   min: Joi.number().when(
-    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: GameSettingParameterControllerType.RANGE, then: Joi.required() },
   ),
   max: Joi.number().when(
-    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: GameSettingParameterControllerType.RANGE, then: Joi.required() },
   ),
   step: Joi.number().when(
-    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: GameSettingParameterControllerType.RANGE, then: Joi.required() },
   ),
   label: Joi.string().required(),
   items: Joi.array()
@@ -177,19 +176,19 @@ const settingParameterSchemaGroup = Joi.object({
 
 const settingParameterSchemaCombined = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('parameter')),
-  parameterType: Joi.string().required().valid(SettingsParameterType.COMBINED),
+  parameterType: Joi.string().required().valid(GameSettingParameterType.COMBINED),
   settingGroup: Joi.string().when(
     Joi.ref('$isSettingGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ).valid(Joi.ref('$availableSettingGroups', { in: true })),
-  controllerType: Joi.string().required().valid(SettingParameterControllerType.SELECT),
+  controllerType: Joi.string().required().valid(GameSettingParameterControllerType.SELECT),
   separator: Joi.string().optional().default(':'),
   options: Joi.object().pattern(
     Joi.string(),
     Joi.string(),
   ).when(
-    Joi.ref('controllerType'), { is: SettingParameterControllerType.SELECT, then: Joi.required() },
+    Joi.ref('controllerType'), { is: GameSettingParameterControllerType.SELECT, then: Joi.required() },
   ).custom((value, helpers) => {
     Object.keys(value).forEach((element) => {
       if (element.split(helpers.state.ancestors[0].separator).length !== helpers.state.ancestors[0].items.length) {
@@ -199,13 +198,13 @@ const settingParameterSchemaCombined = Joi.object({
     });
   }),
   min: Joi.number().when(
-    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: GameSettingParameterControllerType.RANGE, then: Joi.required() },
   ),
   max: Joi.number().when(
-    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: GameSettingParameterControllerType.RANGE, then: Joi.required() },
   ),
   step: Joi.number().when(
-    Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: GameSettingParameterControllerType.RANGE, then: Joi.required() },
   ),
   label: Joi.string().required(),
   items: Joi.array()
@@ -231,7 +230,7 @@ const settingParameterSchemaCombined = Joi.object({
 
 const settingParameterSchemaRelated = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('parameter')),
-  parameterType: Joi.string().required().valid(SettingsParameterType.RELATED),
+  parameterType: Joi.string().required().valid(GameSettingParameterType.RELATED),
   settingGroup: Joi.string().when(
     Joi.ref('$isSettingGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
@@ -256,21 +255,21 @@ const settingParameterSchemaRelated = Joi.object({
           is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
-      controllerType: Joi.string().required().valid(...Object.values(SettingParameterControllerType)),
+      controllerType: Joi.string().required().valid(...Object.values(GameSettingParameterControllerType)),
       options: Joi.object().pattern(
         Joi.string(),
         Joi.string(),
       ).when(
-        Joi.ref('controllerType'), { is: SettingParameterControllerType.SELECT, then: Joi.required() },
+        Joi.ref('controllerType'), { is: GameSettingParameterControllerType.SELECT, then: Joi.required() },
       ),
       min: Joi.number().when(
-        Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+        Joi.ref('controllerType'), { is: GameSettingParameterControllerType.RANGE, then: Joi.required() },
       ),
       max: Joi.number().when(
-        Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+        Joi.ref('controllerType'), { is: GameSettingParameterControllerType.RANGE, then: Joi.required() },
       ),
       step: Joi.number().when(
-        Joi.ref('controllerType'), { is: SettingParameterControllerType.RANGE, then: Joi.required() },
+        Joi.ref('controllerType'), { is: GameSettingParameterControllerType.RANGE, then: Joi.required() },
       ),
     })).required().min(2),
 });

@@ -15,13 +15,13 @@ export const UsedFileView = {
   TAG: 'tag',
 };
 
-export const SettingParameterControllerType = {
+export const GameSettingParameterControllerType = {
   CHECKBOX: 'checkbox',
   RANGE: 'range',
   SELECT: 'select',
 };
 
-export const SettingsParameterType = {
+export const GameSettingParameterType = {
   DEFAULT: 'default',
   GROUP: 'group',
   RELATED: 'related',

@@ -51,7 +51,7 @@ import {
 } from '$utils/errors';
 import { getOptionData } from '$utils/data';
 import { IUserMessage } from '$types/main';
-import { SettingsParameterType } from '$constants/misc';
+import { GameSettingParameterType } from '$constants/misc';
 
 interface IGetDataFromFilesResult {
   [key: string]: IIniObj|IXmlObj,
@@ -256,9 +256,9 @@ function* generateGameOptions(): SagaIterator {
             //Если опция с типом group или related,
             // то генерация производится для каждого параметра в items.
             if (
-              currentParameter.parameterType === SettingsParameterType.RELATED
-              || currentParameter.parameterType === SettingsParameterType.GROUP
-              || currentParameter.parameterType === SettingsParameterType.COMBINED
+              currentParameter.parameterType === GameSettingParameterType.RELATED
+              || currentParameter.parameterType === GameSettingParameterType.GROUP
+              || currentParameter.parameterType === GameSettingParameterType.COMBINED
             ) {
               let specParamsErrors: IUserMessage[] = [];
 
