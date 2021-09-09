@@ -23,6 +23,7 @@
           "parameterType": "combined",
           "settingGroup": "Graphic",
           "label": "Разрешение экрана",
+          "description": "Устанавливает разрешение экрана",
           "controllerType": "select",
           "separator": ":",
           "options": {
@@ -74,6 +75,7 @@
           "min": "0.1",
           "max": "1",
           "step": "0.1",
+          "description": "Изменяет скорость поворота чего-то",
           "label": "Скорость поворота"
         }
       ]
@@ -120,6 +122,7 @@
         {
           "parameterType": "group",
           "label": "Удалить предмет/заклинание",
+          "description": "Изменить клавишу удаления предметов/заклинаний",
           "settingGroup": "Control",
           "controllerType": "select",
           "options": {
@@ -152,6 +155,7 @@
           "parameterType": "related",
           "settingGroup": "Control",
           "label": "Показать информацию об объекте",
+          "description": "Изменить комбинацию",
           "items": [
             {
               "name": "FormIDFinderQuest.KeyModifier1",

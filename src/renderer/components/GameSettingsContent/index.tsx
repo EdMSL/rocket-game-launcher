@@ -16,6 +16,7 @@ import { GameSettingParameterControllerType, GameSettingParameterType } from '$c
 import { Checkbox } from '$components/UI/Checkbox';
 import { Select } from '$components/UI/Select';
 import { Range } from '$components/UI/Range';
+import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
 
 interface IProps {
   usedFiles: IGameSettingsRootState['usedFiles'],
@@ -41,8 +42,14 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
 
   const onParameterInputChange = useCallback(() => {}, []);
   const onParameterRangeButtonClick = useCallback(() => {}, []);
-  const onParameterHover = useCallback(() => {}, []);
-  const onParameterLeave = useCallback(() => {}, []);
+
+  const onParameterHover = useCallback((id: string) => {
+    setHintParameter(id);
+  }, []);
+
+  const onParameterLeave = useCallback(() => {
+    setHintParameter('');
+  }, []);
 
   const getValue = useCallback((
     parameter: IGameSettingsParameter|IGameSettingsItemParameter,
@@ -79,15 +86,15 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     >
                       <div className={styles['game-settings-content__label']}>
                         <span>{parameter.label}</span>
-                        {/* <SettingsHintBlock
+                        <GameSettingsHintBlock
                           id={parameter.label}
                           description={parameter.description}
                           hintParameter={hintParameter}
-                          iniName={iniName}
-                          parametersNames={parameter.parameters.map((param) => param.name)}
+                          iniName={fileName}
+                          parametersNames={parameter.items!.map((param) => param.name)}
                           onHover={() => onParameterHover(parameter.label)}
                           onLeave={onParameterLeave}
-                        /> */}
+                        />
                       </div>
                       <div className={styles['game-settings-content__subblock']}>
                         {
@@ -114,7 +121,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
 
                             return undefined;
                           })
-                    }
+                        }
                       </div>
                     </div>
                   );
@@ -135,7 +142,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         group={parameter.iniGroup}
                         multiparameters={parameter.items!.map((param) => getOptionName(param)).join()}
                         label={parameter.label}
-                        description={fileName}
+                        description={parameter.description}
                         value={(gameOptions[fileName] && getValue(parameter.items![0], fileName)) || 'None'}
                         isDisabled={!gameOptions[fileName]}
                         optionsArr={generateSelectOptions(parameter.options!)}
@@ -158,7 +165,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         group={parameter.iniGroup}
                         multiparameters={parameter.items!.map((param) => getOptionName(param)).join()}
                         label={parameter.label!}
-                        description={fileName}
+                        description={parameter.description}
                         isChecked={Boolean(gameOptions[fileName] && +getValue(parameter.items![0], fileName))}
                         isDisabled={!gameOptions[fileName]}
                         hintParameter={hintParameter}
@@ -184,7 +191,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         parent={fileName}
                         group={parameter.iniGroup}
                         label={parameter.label}
-                        description={fileName}
+                        description={parameter.description}
                         value={(gameOptions[fileName] && getValue(parameter, fileName)) || 'None'}
                         isDisabled={!gameOptions[fileName]}
                         optionsArr={generateSelectOptions(parameter.options!)}
@@ -213,7 +220,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         step={parameter.step!.toString()}
                         isDisabled={!gameOptions[fileName]}
                         label={parameter.label!}
-                        description={fileName}
+                        description={parameter.description}
                         valueText={getValue(parameter, fileName).toString()}
                         hintParameter={hintParameter}
                         onChange={onParameterInputChange}
@@ -235,7 +242,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         parent={fileName}
                         group={parameter.iniGroup}
                         label={parameter.label!}
-                        description={fileName}
+                        description={parameter.description}
                         isChecked={(gameOptions[fileName] && Boolean(+getValue(parameter, fileName))) || false}
                         isDisabled={!gameOptions[fileName]}
                         hintParameter={hintParameter}
@@ -259,7 +266,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         parent={fileName}
                         group={parameter.iniGroup}
                         label={parameter.label}
-                        description={fileName}
+                        description={parameter.description}
                         value={(gameOptions[fileName] && getValue(parameter, fileName)) || 'None'}
                         isDisabled={!gameOptions[fileName]}
                         hintParameter={hintParameter}

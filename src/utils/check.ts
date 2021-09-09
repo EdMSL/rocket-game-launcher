@@ -90,6 +90,7 @@ const settingParameterSchemaDefault = Joi.object({
   parameterType: Joi.string().optional().default(GameSettingParameterType.DEFAULT).valid(GameSettingParameterType.DEFAULT),
   name: Joi.string().required(),
   label: Joi.string().optional().default(Joi.ref('name')),
+  description: Joi.string().optional().default('').allow(''),
   iniGroup: Joi.string().when(
     Joi.ref('$view'), {
       is: UsedFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
@@ -153,6 +154,7 @@ const settingParameterSchemaGroup = Joi.object({
     Joi.ref('controllerType'), { is: GameSettingParameterControllerType.RANGE, then: Joi.required() },
   ),
   label: Joi.string().required(),
+  description: Joi.string().optional().default('').allow(''),
   items: Joi.array()
     .items(Joi.object({
       id: Joi.string().optional().default(() => getRandomId('item')),
@@ -208,6 +210,7 @@ const settingParameterSchemaCombined = Joi.object({
     Joi.ref('controllerType'), { is: GameSettingParameterControllerType.RANGE, then: Joi.required() },
   ),
   label: Joi.string().required(),
+  description: Joi.string().optional().default('').allow(''),
   items: Joi.array()
     .items(Joi.object({
       id: Joi.string().optional().default(() => getRandomId('item')),
@@ -238,6 +241,7 @@ const settingParameterSchemaRelated = Joi.object({
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ).valid(Joi.ref('$availableSettingGroups', { in: true })),
+  description: Joi.string().optional().default('').allow(''),
   label: Joi.string().required(),
   items: Joi.array()
     .items(Joi.object({
