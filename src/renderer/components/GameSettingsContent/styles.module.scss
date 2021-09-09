@@ -10,3 +10,13 @@
     margin-bottom: 0;
   }
 }
+
+.game-settings-content__label {
+  @include reset-indents;
+  display: flex;
+  align-items: center;
+}
+
+.game-settings-content__subblock {
+  display: flex;
+}

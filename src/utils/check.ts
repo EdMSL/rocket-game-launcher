@@ -155,6 +155,7 @@ const settingParameterSchemaGroup = Joi.object({
   label: Joi.string().required(),
   items: Joi.array()
     .items(Joi.object({
+      id: Joi.string().optional().default(() => getRandomId('item')),
       name: Joi.string().required(),
       iniGroup: Joi.string().when(
         Joi.ref('$view'), {
@@ -209,6 +210,7 @@ const settingParameterSchemaCombined = Joi.object({
   label: Joi.string().required(),
   items: Joi.array()
     .items(Joi.object({
+      id: Joi.string().optional().default(() => getRandomId('item')),
       name: Joi.string().required(),
       iniGroup: Joi.string().when(
         Joi.ref('$view'), {
@@ -239,6 +241,7 @@ const settingParameterSchemaRelated = Joi.object({
   label: Joi.string().required(),
   items: Joi.array()
     .items(Joi.object({
+      id: Joi.string().optional().default(() => getRandomId('item')),
       name: Joi.string().required(),
       iniGroup: Joi.string().when(
         Joi.ref('$view'), {

@@ -17,3 +17,8 @@
 .game-settings-screen__select {
   color: inherit;
 }
+
+.game-settings-screen__options {
+  display: flex;
+  flex-direction: column;
+}

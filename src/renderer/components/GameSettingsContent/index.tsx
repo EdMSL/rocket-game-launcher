@@ -61,6 +61,51 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
               locationSettingGroup,
             ).map(
               (parameter) => {
+                if (parameter.parameterType === GameSettingParameterType.RELATED) {
+                  return (
+                    <div
+                      key={parameter.label}
+                      className={styles['game-settings-content__item']}
+                    >
+                      <div className={styles['game-settings-content__label']}>
+                        <span>{parameter.label}</span>
+                        {/* <SettingsHintBlock
+                          id={parameter.label}
+                          description={parameter.description}
+                          hintParameter={hintParameter}
+                          iniName={iniName}
+                          parametersNames={parameter.parameters.map((param) => param.name)}
+                          onHover={() => onParameterHover(parameter.label)}
+                          onLeave={onParameterLeave}
+                        /> */}
+                      </div>
+                      <div className={styles['game-settings-content__subblock']}>
+                        {
+                      parameter.items!.map((relatedParameter) => {
+                        if (relatedParameter.controllerType === 'select') {
+                          return (
+                            <Select
+                              key={relatedParameter.id}
+                              className={styles['game-settings-content__item']}
+                              id={relatedParameter.id}
+                              name={getOptionName(parameter)}
+                              parent={fileName}
+                              group={relatedParameter.iniGroup}
+                              value={(gameOptions[fileName] && getValue(relatedParameter, fileName)) || 'None'}
+                              isDisabled={!gameOptions[fileName]}
+                              optionsArr={generateSelectOptions(relatedParameter.options!)}
+                              onChange={onParameterInputChange}
+                            />
+                          );
+                        }
+
+                        return undefined;
+                      })
+                    }
+                      </div>
+                    </div>
+                  );
+                }
                 if (parameter.parameterType === GameSettingParameterType.DEFAULT) {
                   if (parameter.controllerType === GameSettingParameterControllerType.RANGE) {
                     return (
@@ -114,7 +159,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     return (
                       <Select
                         key={parameter.id}
-                        className={classNames('setting', styles.setting__item, styles.setting__select)}
+                        className={styles['game-settings-content__item']}
                         id={parameter.id}
                         name={getOptionName(parameter)}
                         parent={fileName}

@@ -26,6 +26,7 @@ interface IGameSettingsGroup {
 }
 
 export interface IGameSettingsItemParameter {
+  id: string,
   name: string,
   controllerType?: string,
   iniGroup?: string,
