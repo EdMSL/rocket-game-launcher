@@ -14,7 +14,7 @@ interface IProps {
   isDisabled?: boolean,
   className?: string | null,
   classNameCheckbox?: string | null,
-  hintParameter?: string,
+  currentHintId?: string,
   multiparameters?: string,
   onChange: (event?: React.ChangeEvent<HTMLInputElement>) => void,
   onHover?: (id: string) => void,
@@ -32,7 +32,7 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
   isDisabled = false,
   className = null,
   classNameCheckbox = null,
-  hintParameter = '',
+  currentHintId = '',
   multiparameters = '',
   onChange,
   onHover = null,
@@ -65,10 +65,7 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
             <GameSettingsHintBlock
               id={id}
               description={description}
-              hintParameter={hintParameter}
-              iniName={parent}
-              parametersNames={multiparameters ? multiparameters.split(',') : [name]}
-              iniGroup={group}
+              currentHintId={currentHintId}
               onHover={onHover}
               onLeave={onLeave}
             />

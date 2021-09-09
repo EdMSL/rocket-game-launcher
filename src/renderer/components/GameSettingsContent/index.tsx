@@ -38,17 +38,17 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
 }) => {
   const { settingGroup: locationSettingGroup } = useParams<{ [key: string]: string, }>();
 
-  const [hintParameter, setHintParameter] = useState<string>('');
+  const [currentHintId, setCurrentHintId] = useState<string>('');
 
   const onParameterInputChange = useCallback(() => {}, []);
   const onParameterRangeButtonClick = useCallback(() => {}, []);
 
   const onParameterHover = useCallback((id: string) => {
-    setHintParameter(id);
+    setCurrentHintId(id);
   }, []);
 
   const onParameterLeave = useCallback(() => {
-    setHintParameter('');
+    setCurrentHintId('');
   }, []);
 
   const getValue = useCallback((
@@ -87,12 +87,10 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                       <div className={styles['game-settings-content__label']}>
                         <span>{parameter.label}</span>
                         <GameSettingsHintBlock
-                          id={parameter.label}
+                          id={parameter.id}
                           description={parameter.description}
-                          hintParameter={hintParameter}
-                          iniName={fileName}
-                          parametersNames={parameter.items!.map((param) => param.name)}
-                          onHover={() => onParameterHover(parameter.label)}
+                          currentHintId={currentHintId}
+                          onHover={onParameterHover}
                           onLeave={onParameterLeave}
                         />
                       </div>
@@ -146,7 +144,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         value={(gameOptions[fileName] && getValue(parameter.items![0], fileName)) || 'None'}
                         isDisabled={!gameOptions[fileName]}
                         optionsArr={generateSelectOptions(parameter.options!)}
-                        hintParameter={hintParameter}
+                        currentHintId={currentHintId}
                         onChange={onParameterInputChange}
                         onHover={onParameterHover}
                         onLeave={onParameterLeave}
@@ -168,7 +166,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         description={parameter.description}
                         isChecked={Boolean(gameOptions[fileName] && +getValue(parameter.items![0], fileName))}
                         isDisabled={!gameOptions[fileName]}
-                        hintParameter={hintParameter}
+                        currentHintId={currentHintId}
                         onChange={onParameterInputChange}
                         onHover={onParameterHover}
                         onLeave={onParameterLeave}
@@ -195,7 +193,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         value={(gameOptions[fileName] && getValue(parameter, fileName)) || 'None'}
                         isDisabled={!gameOptions[fileName]}
                         optionsArr={generateSelectOptions(parameter.options!)}
-                        hintParameter={hintParameter}
+                        currentHintId={currentHintId}
                         onChange={onParameterInputChange}
                         onHover={onParameterHover}
                         onLeave={onParameterLeave}
@@ -222,7 +220,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         label={parameter.label!}
                         description={parameter.description}
                         valueText={getValue(parameter, fileName).toString()}
-                        hintParameter={hintParameter}
+                        currentHintId={currentHintId}
                         onChange={onParameterInputChange}
                         onButtonClick={onParameterRangeButtonClick}
                         onHover={onParameterHover}
@@ -245,7 +243,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         description={parameter.description}
                         isChecked={(gameOptions[fileName] && Boolean(+getValue(parameter, fileName))) || false}
                         isDisabled={!gameOptions[fileName]}
-                        hintParameter={hintParameter}
+                        currentHintId={currentHintId}
                         onChange={onParameterInputChange}
                         onHover={onParameterHover}
                         onLeave={onParameterLeave}
@@ -269,7 +267,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         description={parameter.description}
                         value={(gameOptions[fileName] && getValue(parameter, fileName)) || 'None'}
                         isDisabled={!gameOptions[fileName]}
-                        hintParameter={hintParameter}
+                        currentHintId={currentHintId}
                         optionsArr={generateSelectOptions(parameter.options!)}
                         onChange={onParameterInputChange}
                         onHover={onParameterHover}

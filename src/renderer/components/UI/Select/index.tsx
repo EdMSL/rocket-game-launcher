@@ -20,7 +20,7 @@ interface IProps {
   isDisabled?: boolean,
   optionsArr: ISelectOption[],
   className?: string | null,
-  hintParameter?: string,
+  currentHintId?: string,
   onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void,
   onHover?: (id: string) => void,
   onLeave?: () => void,
@@ -43,7 +43,7 @@ export const Select: React.FunctionComponent<IProps> = ({
   isDisabled = false,
   optionsArr,
   className = null,
-  hintParameter = '',
+  currentHintId = '',
   onChange,
   onHover = null,
   onLeave = null,
@@ -67,10 +67,7 @@ export const Select: React.FunctionComponent<IProps> = ({
                 <GameSettingsHintBlock
                   id={id}
                   description={description}
-                  hintParameter={hintParameter}
-                  iniName={parent}
-                  iniGroup={group}
-                  parametersNames={multiparameters ? multiparameters.split(',') : [name]}
+                  currentHintId={currentHintId}
                   onHover={onHover}
                   onLeave={onLeave}
                 />

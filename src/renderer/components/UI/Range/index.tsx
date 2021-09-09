@@ -17,7 +17,7 @@ interface IProps {
   valueText: string,
   description?: string,
   className?: string | null,
-  hintParameter?: string,
+  currentHintId?: string,
   onChange: (e?: React.ChangeEvent<HTMLInputElement>) => void,
   onButtonClick?: (
     btnName: string,
@@ -46,7 +46,7 @@ export const Range: React.FunctionComponent<IProps> = ({
   description = '',
   valueText = '',
   className = null,
-  hintParameter = '',
+  currentHintId = '',
   onChange,
   onButtonClick = null,
   onHover = null,
@@ -70,11 +70,8 @@ export const Range: React.FunctionComponent<IProps> = ({
           && (
             <GameSettingsHintBlock
               id={id}
-              hintParameter={hintParameter}
+              currentHintId={currentHintId}
               description={description}
-              iniName={parent}
-              iniGroup={group}
-              parametersNames={[name]}
               onHover={onHover}
               onLeave={onLeave}
             />
