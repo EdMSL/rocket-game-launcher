@@ -9,12 +9,12 @@ import styles from './styles.module.scss';
 import { Routes } from '$constants/routes';
 import { IAppState } from '$store/store';
 import { generateSelectOptions } from '$utils/data';
-import { GameSettingsBlock } from '$components/GameSettingsBlock';
+import { GameSettingsContent } from '$components/GameSettingsContent';
 import { Select } from '$components/UI/Select';
 import { changeMoProfile } from '$actions/gameSettings';
 
 /**
- * Контейнер, в котором располагаются блок (`GameSettingsBlock`) с контроллерами для изменения
+ * Контейнер, в котором располагаются блок (`GameSettingsContent`) с контроллерами для изменения
  * игровых настроек и селектор выбора профиля Mod Organizer (если МО используется).
 */
 export const GameSettingsScreen: React.FC = () => {
@@ -80,11 +80,15 @@ export const GameSettingsScreen: React.FC = () => {
               path={`${Routes.GAME_SETTINGS_SCREEN}/:settingGroup/`}
               render={(): React.ReactElement => (
                 <React.Fragment>
-                  <GameSettingsBlock
-                    gameOptions={gameOptions}
-                    usedFiles={usedFiles}
-                    settingGroups={settingGroups}
-                  />
+                  {
+                    Object.keys(gameOptions).length > 0 && (
+                      <GameSettingsContent
+                        gameOptions={gameOptions}
+                        usedFiles={usedFiles}
+                        settingGroups={settingGroups}
+                      />
+                    )
+                  }
                 </React.Fragment>
               )}
             />
