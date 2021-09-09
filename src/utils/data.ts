@@ -94,7 +94,7 @@ export interface IGeneratedGameSettingsParam {
   optionErrors: IUserMessage[],
 }
 
-const isIGameSettingsItemParameter = (
+export const isIGameSettingsItemParameter = (
   parameter: IGameSettingsParameter | IGameSettingsItemParameter,
 ): parameter is IGameSettingsItemParameter => parameter.attributePath !== undefined && parameter.attributeName !== undefined;
 

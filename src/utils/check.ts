@@ -195,8 +195,8 @@ const settingParameterSchemaCombined = Joi.object({
       if (element.split(helpers.state.ancestors[0].separator).length !== helpers.state.ancestors[0].items.length) {
         throw new Error('the number of parts of the option key is not equal to the number of "items" or incorrect "separator" used.'); //eslint-disable-line max-len
       }
-      return value;
     });
+    return value;
   }),
   min: Joi.number().when(
     Joi.ref('controllerType'), { is: GameSettingParameterControllerType.RANGE, then: Joi.required() },

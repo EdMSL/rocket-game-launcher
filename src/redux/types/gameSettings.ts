@@ -53,6 +53,7 @@ export interface IGameSettingsParameter {
   max?: number,
   step?: number,
   options?: { [key: string]: string, },
+  separator?: string,
   items?: IGameSettingsItemParameter[],
 }
 
