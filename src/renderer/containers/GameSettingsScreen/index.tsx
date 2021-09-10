@@ -19,7 +19,7 @@ import { changeMoProfile } from '$actions/gameSettings';
 */
 export const GameSettingsScreen: React.FC = () => {
   const gameSettingsFiles = useSelector((state: IAppState) => state.gameSettings.gameSettingsFiles);
-  const settingGroups = useSelector((state: IAppState) => state.gameSettings.settingGroups);
+  const gameSettingsGroups = useSelector((state: IAppState) => state.gameSettings.gameSettingsGroups);
   const gameSettingsOptions = useSelector((state: IAppState) => state.gameSettings.gameSettingsOptions);
   const moProfile = useSelector((state: IAppState) => state.gameSettings.moProfile);
   const moProfiles = useSelector((state: IAppState) => state.gameSettings.moProfiles);
@@ -35,7 +35,7 @@ export const GameSettingsScreen: React.FC = () => {
     <main className={classNames('main', styles['game-settings-screen__main'])}>
       <div className={classNames('control-panel', styles['game-settings-screen__navigation'])}>
         {
-          settingGroups.map((group) => (
+          gameSettingsGroups.map((group) => (
             <NavLink
               key={group.name}
               className="control-panel__btn"
@@ -77,7 +77,7 @@ export const GameSettingsScreen: React.FC = () => {
         <div className={styles['game-settings-screen__options']}>
           <Switch>
             <Route
-              path={settingGroups.length > 0
+              path={gameSettingsGroups.length > 0
                 ? `${Routes.GAME_SETTINGS_SCREEN}/:settingGroup/`
                 : Routes.GAME_SETTINGS_SCREEN}
               render={(): React.ReactElement => (
@@ -87,7 +87,7 @@ export const GameSettingsScreen: React.FC = () => {
                       <GameSettingsContent
                         gameSettingsOptions={gameSettingsOptions}
                         gameSettingsFiles={gameSettingsFiles}
-                        settingGroups={settingGroups}
+                        gameSettingsGroups={gameSettingsGroups}
                       />
                     )
                   }

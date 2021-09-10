@@ -224,19 +224,19 @@ export const generateSelectOptions = (
 };
 
 /**
- * Получает список параметров для вывода в виде опций. Если есть `settingGroups`,
+ * Получает список параметров для вывода в виде опций. Если есть `gameSettingsGroups`,
  * то фильтрует по текущей группе.
  * @param GameSettingsFile Объект текущего обрабатываемого файла из `state`.
- * @param gameSettingGroups Список доступных групп настроек из `state`.
+ * @param gamegameSettingsGroups Список доступных групп настроек из `state`.
  * @param currentGameSettingGroup текущая группа настроек.
  * @returns Массив с параметрами для генерации игровый опций.
 */
 export const getParametersForOptionsGenerate = (
   GameSettingsFile: IGameSettingsFile,
-  gameSettingGroups: IGameSettingsRootState['settingGroups'],
+  gamegameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
   currentGameSettingGroup: string,
 ): IGameSettingsParameter[] => {
-  if (gameSettingGroups.length > 0 && currentGameSettingGroup) {
+  if (gamegameSettingsGroups.length > 0 && currentGameSettingGroup) {
     return GameSettingsFile.parameters.filter(
       (currentParameter) => currentParameter.settingGroup === currentGameSettingGroup,
     );

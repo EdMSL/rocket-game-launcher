@@ -20,7 +20,7 @@ import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
 
 interface IProps {
   gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
-  settingGroups: IGameSettingsRootState['settingGroups'],
+  gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
   gameSettingsOptions: IGameSettingsRootState['gameSettingsOptions'],
 }
 
@@ -28,12 +28,12 @@ interface IProps {
  * Компонент для отображения игровых опций в виде контроллеров.
  * @param gameSettingsFiles Объект с параметрами из `state`, на основе которых сгенерированы
  * опции игровых настроек.
- * @param settingGroups Массив доступных групп игровых настроек из `state`.
+ * @param gameSettingsGroups Массив доступных групп игровых настроек из `state`.
  * @param gameSettingsOptions Объект с обработанными опциями из `state`, готовыми для вывода.
 */
 export const GameSettingsContent: React.FunctionComponent<IProps> = ({
   gameSettingsFiles,
-  settingGroups,
+  gameSettingsGroups,
   gameSettingsOptions,
 }) => {
   const { settingGroup: locationSettingGroup } = useParams<{ [key: string]: string, }>();
@@ -74,7 +74,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
           .map(
             (fileName) => getParametersForOptionsGenerate(
               gameSettingsFiles[fileName],
-              settingGroups,
+              gameSettingsGroups,
               locationSettingGroup,
             ).map(
               (parameter) => {

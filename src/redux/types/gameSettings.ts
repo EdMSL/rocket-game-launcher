@@ -70,13 +70,13 @@ export interface IGameSettingsFiles {
 }
 
 export interface IGameSettingsConfig {
-  settingGroups?: IGameSettingsRootState['settingGroups'],
+  gameSettingsGroups?: IGameSettingsRootState['gameSettingsGroups'],
   baseFilesEncoding?: IGameSettingsRootState['baseFilesEncoding'],
   gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
 }
 
 export type IGameSettingsRootState = Readonly<{
-  settingGroups: IGameSettingsGroup[],
+  gameSettingsGroups: IGameSettingsGroup[],
   baseFilesEncoding: string,
   gameSettingsFiles: IGameSettingsFiles,
   moProfile: string,

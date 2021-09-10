@@ -380,7 +380,7 @@ export function* initGameSettingsSaga(): SagaIterator {
       gameSettings: {
         gameSettingsFiles,
         baseFilesEncoding,
-        settingGroups,
+        gameSettingsGroups,
       },
       system: {
         modOrganizer: {
@@ -398,7 +398,7 @@ export function* initGameSettingsSaga(): SagaIterator {
       checkGameSettingsFiles,
       gameSettingsFiles,
       baseFilesEncoding,
-      settingGroups,
+      gameSettingsGroups,
     );
 
     if (Object.keys(newGameSettingsFilesObj).length !== Object.keys(gameSettingsFiles).length) {

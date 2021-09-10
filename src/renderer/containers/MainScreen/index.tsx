@@ -15,7 +15,7 @@ import { CreateUserMessage } from '$utils/message';
 export const MainScreen: React.FC = () => {
   const isGameRunning = useSelector((state: IAppState) => state.main.isGameRunning);
   const isGameSettingsAvailable = useSelector((state: IAppState) => state.main.isGameSettingsAvailable); //eslint-disable-line max-len
-  const settingGroups = useSelector((state: IAppState) => state.gameSettings.settingGroups);
+  const gameSettingsGroups = useSelector((state: IAppState) => state.gameSettings.gameSettingsGroups);
 
   const dispatch = useDispatch();
 
@@ -60,8 +60,8 @@ export const MainScreen: React.FC = () => {
           isGameSettingsAvailable && (
             <NavLink
               exact
-              to={settingGroups.length > 0
-                ? `${Routes.GAME_SETTINGS_SCREEN}/${settingGroups[0].name}`
+              to={gameSettingsGroups.length > 0
+                ? `${Routes.GAME_SETTINGS_SCREEN}/${gameSettingsGroups[0].name}`
                 : Routes.GAME_SETTINGS_SCREEN}
               className="control-panel__btn"
             >
