@@ -8,7 +8,7 @@ export const ErrorMessage = {
   PATH_TO_DIRECTORY: 'Got path to directory, not file',
   PATH_TO_FILE: 'Got path to file, not directory',
   ARG_TYPE: 'Invalid data in path received',
-  MIME_TYPE: 'Invalid file mime type',
+  MIME_TYPE: 'Invalid file extension',
 };
 
 export const ErrorName = {

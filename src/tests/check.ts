@@ -85,8 +85,10 @@ describe('#Check', () => {
         const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
 
         // @ts-ignore
-        delete obj.gameSettingsGroups[0].name;
-        assert.throw(() => { checkGameSettingsConfigMainFields(obj); }, /"gameSettingsGroups\[0\].name" is required/);
+        obj.gameSettingsGroups[0].name = 'Any';
+        // @ts-ignore
+        obj.gameSettingsGroups[1].name = 'Any';
+        assert.throw(() => { checkGameSettingsConfigMainFields(obj); }, /"gameSettingsGroups\[1\]" contains a duplicate value/);
       });
     });
   });

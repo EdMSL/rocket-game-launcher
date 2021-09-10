@@ -66,7 +66,7 @@ export const checkConfigFileData = (configObj: ISystemRootState): ISystemRootSta
 };
 
 const settingsMainSchema = Joi.object<IGameSettingsConfig>({
-  settingGroups: Joi.array()
+  gameSettingsGroups: Joi.array()
     .items(Joi.object({
       name: Joi.string().required(),
       label: Joi.string().optional().default(Joi.ref('name')),
@@ -107,10 +107,10 @@ const settingParameterSchemaDefault = Joi.object({
     },
   ),
   settingGroup: Joi.string().when(
-    Joi.ref('$isSettingGroupsExists'), {
+    Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
-  ).valid(Joi.ref('$availableSettingGroups', { in: true })),
+  ).valid(Joi.ref('$availableGameSettingsGroups', { in: true })),
   controllerType: Joi.string().required().valid(...Object.values(GameSettingParameterControllerType)),
   options: Joi.object().pattern(
     Joi.string(),
@@ -133,10 +133,10 @@ const settingParameterSchemaGroup = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('parameter')),
   parameterType: Joi.string().required().valid(GameSettingParameterType.GROUP),
   settingGroup: Joi.string().when(
-    Joi.ref('$isSettingGroupsExists'), {
+    Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
-  ).valid(Joi.ref('$availableSettingGroups', { in: true })),
+  ).valid(Joi.ref('$availableGameSettingsGroups', { in: true })),
   controllerType: Joi.string().required().valid(...Object.values(GameSettingParameterControllerType)),
   options: Joi.object().pattern(
     Joi.string(),
@@ -181,10 +181,10 @@ const settingParameterSchemaCombined = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('parameter')),
   parameterType: Joi.string().required().valid(GameSettingParameterType.COMBINED),
   settingGroup: Joi.string().when(
-    Joi.ref('$isSettingGroupsExists'), {
+    Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
-  ).valid(Joi.ref('$availableSettingGroups', { in: true })),
+  ).valid(Joi.ref('$availableGameSettingsGroups', { in: true })),
   controllerType: Joi.string().required().valid(GameSettingParameterControllerType.SELECT),
   separator: Joi.string().optional().default(':'),
   options: Joi.object().pattern(
@@ -237,10 +237,10 @@ const settingParameterSchemaRelated = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('parameter')),
   parameterType: Joi.string().required().valid(GameSettingParameterType.RELATED),
   settingGroup: Joi.string().when(
-    Joi.ref('$isSettingGroupsExists'), {
+    Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
-  ).valid(Joi.ref('$availableSettingGroups', { in: true })),
+  ).valid(Joi.ref('$availableGameSettingsGroups', { in: true })),
   description: Joi.string().optional().default('').allow(''),
   label: Joi.string().required(),
   items: Joi.array()
@@ -324,22 +324,22 @@ export const checkGameSettingsConfigMainFields = (
 export const checkGameSettingsFiles = (
   gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
   baseFilesEncoding: IGameSettingsRootState['baseFilesEncoding'],
-  settingGroups: IGameSettingsRootState['settingGroups'],
+  gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
 ): IGameSettingsConfig['gameSettingsFiles'] => {
   writeToLogFileSync('Start checking of game settings files in settings.json.');
 
   const validationErrors: IGameSettingsFileError[] = [];
 
-  const availableSettingGroups = settingGroups.map((group) => group.name);
+  const availableGameSettingsGroups = gameSettingsGroups.map((group) => group.name);
   const newGameSettingsFilesObj = Object.keys(gameSettingsFiles).reduce((filesObj, fileName) => {
     const validationResult = gameSettingsFileSchema.validate(gameSettingsFiles[fileName], {
       abortEarly: false,
       stripUnknown: true,
       context: {
         encoding: baseFilesEncoding,
-        isSettingGroupsExists: settingGroups.length > 0,
+        isGameSettingsGroupsExists: gameSettingsGroups.length > 0,
         view: gameSettingsFiles[fileName].view,
-        availableSettingGroups,
+        availableGameSettingsGroups,
       },
     });
 

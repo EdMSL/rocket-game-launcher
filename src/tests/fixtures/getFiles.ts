@@ -6,6 +6,10 @@ export const createMockFilesForRead = (): void => {
     'folderName': {
       'index.md': '# Hello world!',
       'test.json': mock.load(path.resolve(__dirname, 'test.json'), { lazy: false }),
+      'writeOnly.json': mock.file({
+        content: '{"some": "content"}',
+        mode: 0o222,
+      }),
       'writeOnly.md': mock.file({
         content: 'Write only!',
         mode: 0o222,
