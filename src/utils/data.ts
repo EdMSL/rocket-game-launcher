@@ -21,13 +21,6 @@ const ONE_GB = 1073741824;
 const SYMBOLS_TO_TYPE = 8;
 
 /**
- * Получить объект сообщения для вывода пользователю.
- * @param content Текст сообщения.
- * @param status Статус сообщения: `info`, `error`, `warning` или `success`. По-умолчанию `error.`
- * @returns Объект сообщения.
-*/
-
-/**
  * Получить информацию о доступных дисплеях и записать их в файл лога.
 */
 export const getDisplaysInfo = (): void => {
@@ -211,8 +204,8 @@ export const getOptionData = (
 
 /**
  * Генерирует опции (`options`) для UI компонента `Select`.
- * @param obj Объект или массив строк, на основе которых будет сгенерирован список опций
- * @returns Массив с опциями
+ * @param obj Объект или массив строк, на основе которых будет сгенерирован список опций.
+ * @returns Массив с опциями.
 */
 export const generateSelectOptions = (
   obj: { [key: string]: string, } | string[],
@@ -230,6 +223,14 @@ export const generateSelectOptions = (
   }));
 };
 
+/**
+ * Получает список параметров для вывода в виде опций. Если есть `settingGroups`,
+ * то фильтрует по текущей группе.
+ * @param usedFile Объект текущего обрабатываемого файла из `state`.
+ * @param gameSettingGroups Список доступных групп настроек из `state`.
+ * @param currentGameSettingGroup текущая группа настроек.
+ * @returns Массив с параметрами для генерации игровый опций.
+*/
 export const getParametersForOptionsGenerate = (
   usedFile: IUsedFile,
   gameSettingGroups: IGameSettingsRootState['settingGroups'],

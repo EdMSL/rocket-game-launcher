@@ -414,7 +414,7 @@ export function* initGameSettingsSaga(): SagaIterator {
     let errorMessage = '';
 
     if (error instanceof SagaError) {
-      errorMessage = `An error occured during "${error.sagaName}". ${error.message}`;
+      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
     } else if (error instanceof CustomError) {
       errorMessage = `${error.message}`;
     } else if (error instanceof ReadWriteError) {

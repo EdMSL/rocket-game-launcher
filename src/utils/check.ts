@@ -65,14 +65,14 @@ export const checkConfigFileData = (configObj: ISystemRootState): ISystemRootSta
   return validateResult.value;
 };
 
-///FIXME Добавить проверку на уникальность имени для settingGroups
 const settingsMainSchema = Joi.object<IGameSettingsConfig>({
   settingGroups: Joi.array()
     .items(Joi.object({
       name: Joi.string().required(),
       label: Joi.string().optional().default(Joi.ref('name')),
     })).optional().min(1)
-    .default([]),
+    .default([])
+    .unique((a, b) => a.name === b.name),
   baseFilesEncoding: Joi.string().optional().default(Encoding.WIN1251),
   usedFiles: Joi.object()
     .pattern(

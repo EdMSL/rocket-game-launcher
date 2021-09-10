@@ -40,7 +40,7 @@ function* initLauncherSaga(): SagaIterator {
     let errorMessage = '';
 
     if (error instanceof SagaError) {
-      errorMessage = `Error with: "${error.sagaName}". ${error.message}`;
+      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
     } else if (error instanceof CustomError) {
       errorMessage = `${error.message}`;
     } else if (error instanceof ReadWriteError) {

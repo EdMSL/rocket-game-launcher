@@ -21,12 +21,16 @@ export const Messages: React.FC = () => {
       {
         messages.length > 0 && (
           <React.Fragment>
-            <Button
-              className={styles.messages__btn}
-              onClick={onDeleteAllMessagesBtnClick}
-            >
-              Close All
-            </Button>
+            {
+              messages.length > 1 && (
+                <Button
+                  className={styles.messages__btn}
+                  onClick={onDeleteAllMessagesBtnClick}
+                >
+                  Close All
+                </Button>
+              )
+            }
             <ul className={styles.messages__list}>
               {messages.map((currentMessage) => (
                 <Message
