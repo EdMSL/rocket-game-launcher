@@ -99,8 +99,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
         value,
       );
     }
-
-    if (value) {
+    if (value.toString()) {
       onSettingOptionChange(target.dataset.parent!, newGameOptions);
     }
   }, [gameSettingsOptions, onSettingOptionChange]);
