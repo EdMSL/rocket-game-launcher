@@ -18,9 +18,9 @@ import { changeMoProfile } from '$actions/gameSettings';
  * игровых настроек и селектор выбора профиля Mod Organizer (если МО используется).
 */
 export const GameSettingsScreen: React.FC = () => {
-  const usedFiles = useSelector((state: IAppState) => state.gameSettings.usedFiles);
+  const gameSettingsFiles = useSelector((state: IAppState) => state.gameSettings.gameSettingsFiles);
   const settingGroups = useSelector((state: IAppState) => state.gameSettings.settingGroups);
-  const gameOptions = useSelector((state: IAppState) => state.gameSettings.gameOptions);
+  const gameSettingsOptions = useSelector((state: IAppState) => state.gameSettings.gameSettingsOptions);
   const moProfile = useSelector((state: IAppState) => state.gameSettings.moProfile);
   const moProfiles = useSelector((state: IAppState) => state.gameSettings.moProfiles);
   const isModOrganizerUsed = useSelector((state: IAppState) => state.system.modOrganizer.isUsed);
@@ -59,7 +59,7 @@ export const GameSettingsScreen: React.FC = () => {
         isModOrganizerUsed
         && moProfile
         && moProfiles.length > 0
-        && gameOptions
+        && gameSettingsOptions
         && (
           <div className={styles['game-settings-screen__profiles']}>
             <Select
@@ -83,10 +83,10 @@ export const GameSettingsScreen: React.FC = () => {
               render={(): React.ReactElement => (
                 <React.Fragment>
                   {
-                    Object.keys(gameOptions).length > 0 && (
+                    Object.keys(gameSettingsOptions).length > 0 && (
                       <GameSettingsContent
-                        gameOptions={gameOptions}
-                        usedFiles={usedFiles}
+                        gameSettingsOptions={gameSettingsOptions}
+                        gameSettingsFiles={gameSettingsFiles}
                         settingGroups={settingGroups}
                       />
                     )

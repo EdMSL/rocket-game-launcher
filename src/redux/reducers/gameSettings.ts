@@ -7,10 +7,10 @@ import { IGameSettingsRootState } from '$types/gameSettings';
 const INITIAL_STATE: IGameSettingsRootState = {
   settingGroups: [],
   baseFilesEncoding: '',
-  usedFiles: {},
+  gameSettingsFiles: {},
   moProfile: '',
   moProfiles: [],
-  gameOptions: {},
+  gameSettingsOptions: {},
 };
 
 export const gameSettingsReducer = createReducer<IGameSettingsRootState>(

@@ -3,7 +3,7 @@ import { string } from 'joi';
 export const GAME_SETTINGS_TYPES = {
   SET_GAME_SETTINGS_OPTIONS: 'SET_GAME_SETTINGS_OPTIONS',
   SET_GAME_SETTINGS_CONFIG: 'SET_GAME_SETTINGS_CONFIG',
-  SET_GAME_SETTINGS_USED_FILES: 'SET_GAME_SETTINGS_USED_FILES',
+  SET_GAME_SETTINGS_FILES: 'SET_GAME_SETTINGS_FILES',
   SET_MO_PROFILE: 'SET_MO_PROFILE',
   CHANGE_MO_PROFILE: 'CHANGE_MO_PROFILE',
   SET_MO_PROFILES: 'SET_MO_PROFILES',
@@ -58,28 +58,28 @@ export interface IGameSettingsParameter {
   items?: IGameSettingsItemParameter[],
 }
 
-export interface IUsedFile {
+export interface IGameSettingsFile {
   path: string,
   view: string,
   parameters: IGameSettingsParameter[],
   encoding: string,
 }
 
-export interface IUsedFiles {
-  [key: string]: IUsedFile,
+export interface IGameSettingsFiles {
+  [key: string]: IGameSettingsFile,
 }
 
 export interface IGameSettingsConfig {
   settingGroups?: IGameSettingsRootState['settingGroups'],
   baseFilesEncoding?: IGameSettingsRootState['baseFilesEncoding'],
-  usedFiles: IGameSettingsRootState['usedFiles'],
+  gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
 }
 
 export type IGameSettingsRootState = Readonly<{
   settingGroups: IGameSettingsGroup[],
   baseFilesEncoding: string,
-  usedFiles: IUsedFiles,
+  gameSettingsFiles: IGameSettingsFiles,
   moProfile: string,
   moProfiles: string[],
-  gameOptions: IGameSettingsOptions,
+  gameSettingsOptions: IGameSettingsOptions,
 }>;

@@ -14,7 +14,7 @@
     }
   ],
   "baseFilesEncoding": "win1251",
-  "usedFiles": {
+  "gameSettingsFiles": {
     "OblivionIni": {
       "path": ".\\src\\tests\\fixtures\\oblivion.ini",
       "view": "sectional",

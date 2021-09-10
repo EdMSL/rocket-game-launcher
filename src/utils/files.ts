@@ -18,7 +18,7 @@ import {
   ErrorCode,
   ErrorName,
 } from '$utils/errors';
-import { Encoding, UsedFileView } from '$constants/misc';
+import { Encoding, GameSettingsFileView } from '$constants/misc';
 import { ISystemRootState } from '$types/system';
 
 interface IIniLine {
@@ -57,7 +57,6 @@ export interface IXmlObj {
  * @returns Строка с данными из файла.
 */
 ///TODO: Добавить проверку на тип файла: текстовый или нет
-///TODO: Добавить пакет для работы с файлами в другой кодировке
 export const readFileDataSync = (
   pathToFile: string,
   encoding: BufferEncoding = Encoding.UTF8 as BufferEncoding,
@@ -233,7 +232,7 @@ export const readXMLFile = async (
  * @param name Имя для определения файла при генерации опций.
  * @param encoding Кодировка файла.
 */
-export const readFileForGameOptions = async (
+export const readFileForGameSettingsOptions = async (
   pathToFile: string,
   fileView: string,
   name: string,
@@ -241,9 +240,9 @@ export const readFileForGameOptions = async (
 ): Promise<{ [key: string]: IIniObj|IXmlObj, }> => {
   let fileData: IIniObj|IXmlObj = {};
 
-  if (fileView === UsedFileView.LINE || fileView === UsedFileView.SECTIONAL) {
+  if (fileView === GameSettingsFileView.LINE || fileView === GameSettingsFileView.SECTIONAL) {
     fileData = await readINIFile(pathToFile, encoding);
-  } else if (fileView === UsedFileView.TAG) {
+  } else if (fileView === GameSettingsFileView.TAG) {
     fileData = await readXMLFile(pathToFile, encoding);
   }
 

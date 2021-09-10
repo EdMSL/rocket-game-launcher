@@ -1,7 +1,7 @@
 import { screen } from 'electron';
 import si from 'systeminformation';
 
-import { UsedFileView } from '$constants/misc';
+import { GameSettingsFileView } from '$constants/misc';
 import { IIniObj, IXmlObj } from './files';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
@@ -12,7 +12,7 @@ import {
   IGameSettingsItemParameter,
   IGameSettingsParameter,
   IGameSettingsRootState,
-  IUsedFile,
+  IGameSettingsFile,
 } from '$types/gameSettings';
 import { IUserMessage } from '$types/main';
 import { ISelectOption } from '$components/UI/Select';
@@ -132,7 +132,7 @@ export const getOptionData = (
   let optionSettingGroup;
   let optionValue = '';
 
-  if (fileView === UsedFileView.SECTIONAL) {
+  if (fileView === GameSettingsFileView.SECTIONAL) {
     optionSettingGroup = currentFileData.getSection(currentGameSettingParameter.iniGroup);
 
     if (!optionSettingGroup) {
@@ -151,7 +151,7 @@ export const getOptionData = (
         ));
       }
     }
-  } else if (fileView === UsedFileView.LINE) {
+  } else if (fileView === GameSettingsFileView.LINE) {
     currentFileData.globals.lines.some((line) => {
       optionValue = getLineIniParameterValue(line.text, currentGameSettingParameter.name!);
 
@@ -167,7 +167,7 @@ export const getOptionData = (
         `Файл ${baseFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит параметра "${currentGameSettingParameter.name}", указанного в ${gameSettingsFileName}`, //eslint-disable-line max-len
       ));
     }
-  } else if (fileView === UsedFileView.TAG) {
+  } else if (fileView === GameSettingsFileView.TAG) {
     const pathArr = [
       ...currentGameSettingParameter.attributePath!?.split('/'),
       currentGameSettingParameter.name,
@@ -226,21 +226,21 @@ export const generateSelectOptions = (
 /**
  * Получает список параметров для вывода в виде опций. Если есть `settingGroups`,
  * то фильтрует по текущей группе.
- * @param usedFile Объект текущего обрабатываемого файла из `state`.
+ * @param GameSettingsFile Объект текущего обрабатываемого файла из `state`.
  * @param gameSettingGroups Список доступных групп настроек из `state`.
  * @param currentGameSettingGroup текущая группа настроек.
  * @returns Массив с параметрами для генерации игровый опций.
 */
 export const getParametersForOptionsGenerate = (
-  usedFile: IUsedFile,
+  GameSettingsFile: IGameSettingsFile,
   gameSettingGroups: IGameSettingsRootState['settingGroups'],
   currentGameSettingGroup: string,
 ): IGameSettingsParameter[] => {
   if (gameSettingGroups.length > 0 && currentGameSettingGroup) {
-    return usedFile.parameters.filter(
+    return GameSettingsFile.parameters.filter(
       (currentParameter) => currentParameter.settingGroup === currentGameSettingGroup,
     );
   }
 
-  return usedFile.parameters;
+  return GameSettingsFile.parameters;
 };

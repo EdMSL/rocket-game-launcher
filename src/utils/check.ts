@@ -4,7 +4,7 @@ import Joi from 'joi';
 import {
   Encoding,
   GameSettingParameterControllerType,
-  UsedFileView,
+  GameSettingsFileView,
   GameSettingParameterType,
 } from '$constants/misc';
 import { IGameSettingsConfig, IGameSettingsRootState } from '$types/gameSettings';
@@ -16,7 +16,7 @@ import { ISystemRootState } from '$types/system';
 import { CustomError } from './errors';
 import { getRandomId } from './strings';
 
-interface IUsedFileError {
+interface IGameSettingsFileError {
   parent: string,
   error: string,
 }
@@ -74,7 +74,7 @@ const settingsMainSchema = Joi.object<IGameSettingsConfig>({
     .default([])
     .unique((a, b) => a.name === b.name),
   baseFilesEncoding: Joi.string().optional().default(Encoding.WIN1251),
-  usedFiles: Joi.object()
+  gameSettingsFiles: Joi.object()
     .pattern(
       Joi.string(),
       Joi.object().pattern(
@@ -93,17 +93,17 @@ const settingParameterSchemaDefault = Joi.object({
   description: Joi.string().optional().default('').allow(''),
   iniGroup: Joi.string().when(
     Joi.ref('$view'), {
-      is: UsedFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
+      is: GameSettingsFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ),
   attributeName: Joi.string().when(
     Joi.ref('$view'), {
-      is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+      is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ),
   attributePath: Joi.string().when(
     Joi.ref('$view'), {
-      is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+      is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ),
   settingGroup: Joi.string().when(
@@ -161,17 +161,17 @@ const settingParameterSchemaGroup = Joi.object({
       name: Joi.string().required(),
       iniGroup: Joi.string().when(
         Joi.ref('$view'), {
-          is: UsedFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
+          is: GameSettingsFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
       attributeName: Joi.string().when(
         Joi.ref('$view'), {
-          is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+          is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
       attributePath: Joi.string().when(
         Joi.ref('$view'), {
-          is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+          is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
     })).required().min(2),
@@ -217,17 +217,17 @@ const settingParameterSchemaCombined = Joi.object({
       name: Joi.string().required(),
       iniGroup: Joi.string().when(
         Joi.ref('$view'), {
-          is: UsedFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
+          is: GameSettingsFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
       attributeName: Joi.string().when(
         Joi.ref('$view'), {
-          is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+          is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
       attributePath: Joi.string().when(
         Joi.ref('$view'), {
-          is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+          is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
     })).required().min(2),
@@ -249,17 +249,17 @@ const settingParameterSchemaRelated = Joi.object({
       name: Joi.string().required(),
       iniGroup: Joi.string().when(
         Joi.ref('$view'), {
-          is: UsedFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
+          is: GameSettingsFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
       attributeName: Joi.string().when(
         Joi.ref('$view'), {
-          is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+          is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
       attributePath: Joi.string().when(
         Joi.ref('$view'), {
-          is: UsedFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+          is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
       controllerType: Joi.string().required().valid(...Object.values(GameSettingParameterControllerType)),
@@ -281,10 +281,10 @@ const settingParameterSchemaRelated = Joi.object({
     })).required().min(2),
 });
 
-const usedFileSchema = Joi.object({
+const gameSettingsFileSchema = Joi.object({
   encoding: Joi.string().optional().default(Joi.ref('$encoding')),
   path: Joi.string().required(),
-  view: Joi.string().required().valid(...Object.values(UsedFileView)),
+  view: Joi.string().required().valid(...Object.values(GameSettingsFileView)),
   parameters: Joi.array().items(Joi.alternatives().try(
     settingParameterSchemaDefault,
     settingParameterSchemaGroup,
@@ -317,28 +317,28 @@ export const checkGameSettingsConfigMainFields = (
 };
 
 /**
- * Проверка всех полей из `usedFiles` на соответствие шаблону.
+ * Проверка всех полей из `gameSettingsFiles` на соответствие шаблону.
  * Проверка на наличие необходимых и опциональных полей, а так же фильтрация некорректных.
  * На выходе получаем сообщение о результате проверки и итоговые настройки для каждого файла.
 */
-export const checkUsedFiles = (
-  usedFiles: IGameSettingsRootState['usedFiles'],
+export const checkGameSettingsFiles = (
+  gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
   baseFilesEncoding: IGameSettingsRootState['baseFilesEncoding'],
   settingGroups: IGameSettingsRootState['settingGroups'],
-): IGameSettingsConfig['usedFiles'] => {
-  writeToLogFileSync('Start checking of used files in settings.json.');
+): IGameSettingsConfig['gameSettingsFiles'] => {
+  writeToLogFileSync('Start checking of game settings files in settings.json.');
 
-  const validationErrors: IUsedFileError[] = [];
+  const validationErrors: IGameSettingsFileError[] = [];
 
   const availableSettingGroups = settingGroups.map((group) => group.name);
-  const newUsedFilesObj = Object.keys(usedFiles).reduce((filesObj, fileName) => {
-    const validationResult = usedFileSchema.validate(usedFiles[fileName], {
+  const newGameSettingsFilesObj = Object.keys(gameSettingsFiles).reduce((filesObj, fileName) => {
+    const validationResult = gameSettingsFileSchema.validate(gameSettingsFiles[fileName], {
       abortEarly: false,
       stripUnknown: true,
       context: {
         encoding: baseFilesEncoding,
         isSettingGroupsExists: settingGroups.length > 0,
-        view: usedFiles[fileName].view,
+        view: gameSettingsFiles[fileName].view,
         availableSettingGroups,
       },
     });
@@ -368,9 +368,9 @@ export const checkUsedFiles = (
     });
   }
 
-  if (Object.keys(newUsedFilesObj).length === 0) {
+  if (Object.keys(newGameSettingsFilesObj).length === 0) {
     throw new CustomError('No options available after game settings validation.');
   }
 
-  return newUsedFilesObj;
+  return newGameSettingsFilesObj;
 };

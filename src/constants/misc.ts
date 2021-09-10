@@ -9,7 +9,7 @@ export const Encoding = {
   CP866: 'cp866',
 };
 
-export const UsedFileView = {
+export const GameSettingsFileView = {
   SECTIONAL: 'sectional',
   LINE: 'line',
   TAG: 'tag',

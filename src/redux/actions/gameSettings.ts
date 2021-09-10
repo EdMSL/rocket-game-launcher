@@ -20,11 +20,11 @@ export const setGameSettingsConfig: IAction<IGameSettingsConfig> = (
   payload: gameSetingsConfig,
 });
 
-export const setGameSettingsUsedFiles: IAction<IGameSettingsConfig['usedFiles']> = (
-  gameSetingsUsedFiles,
+export const setGameSettingsFiles: IAction<IGameSettingsConfig['gameSettingsFiles']> = (
+  gameSetingsFiles,
 ) => ({
-  type: GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_USED_FILES,
-  payload: gameSetingsUsedFiles,
+  type: GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_FILES,
+  payload: gameSetingsFiles,
 });
 
 export const changeMoProfile: IAction<IGameSettingsRootState['moProfile']> = (
