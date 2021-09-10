@@ -77,7 +77,9 @@ export const GameSettingsScreen: React.FC = () => {
         <div className={styles['game-settings-screen__options']}>
           <Switch>
             <Route
-              path={`${Routes.GAME_SETTINGS_SCREEN}/:settingGroup/`}
+              path={settingGroups.length > 0
+                ? `${Routes.GAME_SETTINGS_SCREEN}/:settingGroup/`
+                : Routes.GAME_SETTINGS_SCREEN}
               render={(): React.ReactElement => (
                 <React.Fragment>
                   {
