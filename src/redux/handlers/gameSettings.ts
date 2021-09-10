@@ -13,6 +13,20 @@ const setGameSettingsOptions: IActionHandler<
   gameSettingsOptions,
 });
 
+const changeGameSettingsOption = (
+  state,
+  { payload: { parent, gameSettingsOptions } },
+) => ({
+  ...state,
+  gameSettingsOptions: {
+    ...state.gameSettingsOptions,
+    [parent]: {
+      ...state.gameSettingsOptions[parent],
+      ...gameSettingsOptions,
+    },
+  },
+});
+
 const setGameSettingsConfig: IActionHandler<
   IGameSettingsRootState,
   typeof GAME_SETTINGS_ACTIONS.setGameSettingsConfig
@@ -59,6 +73,7 @@ const setMoProfiles: IActionHandler<
 
 export const GAME_SETTINGS_HANDLERS = {
   [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_OPTIONS]: setGameSettingsOptions,
+  [GAME_SETTINGS_TYPES.CHANGE_GAME_SETTINGS_OPTION]: changeGameSettingsOption,
   [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_CONFIG]: setGameSettingsConfig,
   [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_FILES]: setGameSettingsFiles,
   [GAME_SETTINGS_TYPES.SET_MO_PROFILE]: setMoProfile,

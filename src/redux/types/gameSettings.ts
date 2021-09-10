@@ -1,7 +1,6 @@
-import { string } from 'joi';
-
 export const GAME_SETTINGS_TYPES = {
   SET_GAME_SETTINGS_OPTIONS: 'SET_GAME_SETTINGS_OPTIONS',
+  CHANGE_GAME_SETTINGS_OPTION: 'CHANGE_GAME_SETTINGS_OPTION',
   SET_GAME_SETTINGS_CONFIG: 'SET_GAME_SETTINGS_CONFIG',
   SET_GAME_SETTINGS_FILES: 'SET_GAME_SETTINGS_FILES',
   SET_MO_PROFILE: 'SET_MO_PROFILE',
@@ -9,15 +8,19 @@ export const GAME_SETTINGS_TYPES = {
   SET_MO_PROFILES: 'SET_MO_PROFILES',
 };
 
-interface IGameSettingsOption {
+interface IGameSettingsOptionContent {
   default: string,
   value: string,
   parent: string,
   settingGroup?: string,
 }
 
+export interface IGameSettingsOptionsItem {
+  [key: string]: IGameSettingsOptionContent,
+}
+
 export interface IGameSettingsOptions {
-  [key: string]: { [key: string]: IGameSettingsOption, },
+  [key: string]: IGameSettingsOptionsItem,
 }
 
 interface IGameSettingsGroup {

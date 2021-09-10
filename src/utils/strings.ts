@@ -43,3 +43,10 @@ export const getLineIniParameterValue = (ini: string, parameterName: string): st
 
   return '';
 };
+
+/**
+ * Получить число знаков после запятой.
+ * @param value Число, у которого нужно определить кол-во знаков.
+ * @returns Число знаков.
+*/
+export const getNumberOfDecimalPlaces = (value: string|number): number => value.toString().split('.')[1].length;

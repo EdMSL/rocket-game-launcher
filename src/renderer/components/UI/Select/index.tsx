@@ -16,6 +16,8 @@ interface IProps {
   parent?: string,
   group?: string,
   multiparameters?: string,
+  isCombined?: boolean,
+  separator?: string,
   value: string,
   isDisabled?: boolean,
   optionsArr: ISelectOption[],
@@ -38,7 +40,9 @@ export const Select: React.FunctionComponent<IProps> = ({
   name = id,
   parent = '',
   group = '',
+  separator = '',
   multiparameters = '',
+  isCombined = false,
   value,
   isDisabled = false,
   optionsArr,
@@ -82,6 +86,8 @@ export const Select: React.FunctionComponent<IProps> = ({
         name={name}
         data-parent={parent}
         data-group={group}
+        data-iscombined={isCombined}
+        data-separator={separator}
         data-multiparameters={multiparameters}
         onChange={onChange}
         value={value}

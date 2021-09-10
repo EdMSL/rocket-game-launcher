@@ -21,6 +21,12 @@ export const GameSettingParameterControllerType = {
   SELECT: 'select',
 };
 
+export const HTMLInputType = {
+  CHECKBOX: 'checkbox',
+  RANGE: 'range',
+  SELECT: 'select-one',
+};
+
 export const GameSettingParameterType = {
   DEFAULT: 'default',
   GROUP: 'group',

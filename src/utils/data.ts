@@ -13,6 +13,8 @@ import {
   IGameSettingsParameter,
   IGameSettingsRootState,
   IGameSettingsFile,
+  IGameSettingsOptions,
+  IGameSettingsOptionsItem,
 } from '$types/gameSettings';
 import { IUserMessage } from '$types/main';
 import { ISelectOption } from '$components/UI/Select';
@@ -244,3 +246,23 @@ export const getParametersForOptionsGenerate = (
 
   return GameSettingsFile.parameters;
 };
+
+/**
+ * Генерирует игровую опцию для `gameSettingsOptions` из `state` с новым значением `value`.
+ * @param gameSettingsOptions Опции игровых настроек из `state`.
+ * @param fileName Имя файла, из которого взят параметр для генерируемой опции.
+ * @param optionName Имя опции из `gameSettingsOptions`.
+ * @param newValue Новое значение `value` для опции.
+ * @returns Объект опции.
+*/
+export const generateNewGameSettingsOption = (
+  gameSettingsOptions: IGameSettingsOptions,
+  fileName: string,
+  optionName: string,
+  newValue: string|number,
+): IGameSettingsOptionsItem => ({
+  [optionName]: {
+    ...gameSettingsOptions[fileName][optionName],
+    value: String(newValue),
+  },
+});

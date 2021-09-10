@@ -16,7 +16,7 @@ interface IProps {
   classNameCheckbox?: string | null,
   currentHintId?: string,
   multiparameters?: string,
-  onChange: (event?: React.ChangeEvent<HTMLInputElement>) => void,
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
   onHover?: (id: string) => void,
   onLeave?: () => void,
 }

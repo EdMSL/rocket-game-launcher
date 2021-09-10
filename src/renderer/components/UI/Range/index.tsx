@@ -18,7 +18,7 @@ interface IProps {
   description?: string,
   className?: string | null,
   currentHintId?: string,
-  onChange: (e?: React.ChangeEvent<HTMLInputElement>) => void,
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
   onButtonClick?: (
     btnName: string,
     parent: string,

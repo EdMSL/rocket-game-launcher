@@ -4,24 +4,34 @@ import classNames from 'classnames';
 
 import styles from './styles.module.scss';
 import {
-  IGameSettingsItemParameter, IGameSettingsParameter, IGameSettingsRootState,
+  IGameSettingsItemParameter,
+  IGameSettingsOptionsItem,
+  IGameSettingsParameter,
+  IGameSettingsRootState,
 } from '$types/gameSettings';
 import {
+  generateNewGameSettingsOption,
   generateSelectOptions,
   getOptionName,
   getParametersForOptionsGenerate,
   isIGameSettingsItemParameter,
 } from '$utils/data';
-import { GameSettingParameterControllerType, GameSettingParameterType } from '$constants/misc';
+import {
+  GameSettingParameterControllerType,
+  GameSettingParameterType,
+  HTMLInputType,
+} from '$constants/misc';
 import { Checkbox } from '$components/UI/Checkbox';
 import { Select } from '$components/UI/Select';
 import { Range } from '$components/UI/Range';
 import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
+import { getNumberOfDecimalPlaces } from '$utils/strings';
 
 interface IProps {
   gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
   gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
   gameSettingsOptions: IGameSettingsRootState['gameSettingsOptions'],
+  onSettingOptionChange: (parent: string, options: IGameSettingsOptionsItem) => void,
 }
 
 /**
@@ -35,13 +45,65 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
   gameSettingsFiles,
   gameSettingsGroups,
   gameSettingsOptions,
+  onSettingOptionChange,
 }) => {
   const { settingGroup: locationSettingGroup } = useParams<{ [key: string]: string, }>();
 
   const [currentHintId, setCurrentHintId] = useState<string>('');
 
-  const onParameterInputChange = useCallback(() => {}, []);
   const onParameterRangeButtonClick = useCallback(() => {}, []);
+
+  const onParameterInputChange = useCallback((
+    { target }: React.ChangeEvent<HTMLInputElement|HTMLSelectElement>,
+  ) => {
+    let value: string|number = '';
+    let newGameOptions: IGameSettingsOptionsItem = {};
+
+    if (target.dataset.multiparameters) {
+      if (target.type === HTMLInputType.SELECT) {
+        value = target.value;
+      } else if (target.type === HTMLInputType.CHECKBOX) {
+        value = Number((target as HTMLInputElement).checked);
+      }
+
+      newGameOptions = target.dataset.multiparameters
+        .split(',')
+        .reduce((options, currentOptionName, index) => ({
+          ...options,
+          ...generateNewGameSettingsOption(
+            gameSettingsOptions,
+            target.dataset.parent!,
+            currentOptionName,
+            target.dataset.iscombined
+              ? value.toString().split(target.dataset.separator!)[index]
+              : value,
+          ),
+        }), {});
+    } else {
+      if (target.type === HTMLInputType.RANGE) {
+        const optionDefaultValue = gameSettingsOptions[target.dataset.parent!][target.name].default;
+
+        value = /\./g.test(optionDefaultValue)
+          ? (+target.value).toFixed(getNumberOfDecimalPlaces(optionDefaultValue))
+          : target.value;
+      } else if (target.type === HTMLInputType.CHECKBOX) {
+        value = +(target as HTMLInputElement).checked;
+      } else if (target.type === HTMLInputType.SELECT) {
+        value = target.value;
+      }
+
+      newGameOptions = generateNewGameSettingsOption(
+        gameSettingsOptions,
+        target.dataset.parent!,
+        target.name,
+        value,
+      );
+    }
+
+    if (value) {
+      onSettingOptionChange(target.dataset.parent!, newGameOptions);
+    }
+  }, [gameSettingsOptions, onSettingOptionChange]);
 
   const onParameterHover = useCallback((id: string) => {
     setCurrentHintId(id);
@@ -188,6 +250,9 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         name={getOptionName(parameter)}
                         parent={fileName}
                         group={parameter.iniGroup}
+                        multiparameters={parameter.items!.map((param) => getOptionName(param)).join()}
+                        isCombined
+                        separator={parameter.separator}
                         label={parameter.label}
                         description={parameter.description}
                         value={(gameSettingsOptions[fileName] && getValue(parameter, fileName)) || 'None'}

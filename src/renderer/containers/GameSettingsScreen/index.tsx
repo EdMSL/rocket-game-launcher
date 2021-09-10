@@ -11,7 +11,11 @@ import { IAppState } from '$store/store';
 import { generateSelectOptions } from '$utils/data';
 import { GameSettingsContent } from '$components/GameSettingsContent';
 import { Select } from '$components/UI/Select';
-import { changeMoProfile } from '$actions/gameSettings';
+import {
+  changeGameSettingsOption,
+  changeMoProfile,
+} from '$actions/gameSettings';
+import { IGameSettingsOptionsItem } from '$types/gameSettings';
 
 /**
  * Контейнер, в котором располагаются блок (`GameSettingsContent`) с контроллерами для изменения
@@ -29,6 +33,10 @@ export const GameSettingsScreen: React.FC = () => {
 
   const onMOProfilesSelectChange = useCallback(({ target }) => {
     dispatch(changeMoProfile(target.value));
+  }, [dispatch]);
+
+  const onSettingOptionChange = useCallback((parent: string, options: IGameSettingsOptionsItem) => {
+    dispatch(changeGameSettingsOption(parent, options));
   }, [dispatch]);
 
   return (
@@ -88,6 +96,7 @@ export const GameSettingsScreen: React.FC = () => {
                         gameSettingsOptions={gameSettingsOptions}
                         gameSettingsFiles={gameSettingsFiles}
                         gameSettingsGroups={gameSettingsGroups}
+                        onSettingOptionChange={onSettingOptionChange}
                       />
                     )
                   }
