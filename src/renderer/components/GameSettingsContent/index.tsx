@@ -76,13 +76,19 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
     let value: string|number = '';
     let newGameOptions: IGameSettingsOptionsItem = {};
 
-    if (target.dataset.multiparameters) {
-      if (target.type === HTMLInputType.SELECT) {
-        value = target.value;
-      } else if (target.type === HTMLInputType.CHECKBOX) {
-        value = Number((target as HTMLInputElement).checked);
-      }
+    if (target.type === HTMLInputType.RANGE) {
+      const optionDefaultValue = gameSettingsOptions[target.dataset.parent!][target.name].default;
 
+      value = /\./g.test(optionDefaultValue)
+        ? (+target.value).toFixed(getNumberOfDecimalPlaces(optionDefaultValue))
+        : target.value;
+    } else if (target.type === HTMLInputType.SELECT) {
+      value = target.value;
+    } else if (target.type === HTMLInputType.CHECKBOX) {
+      value = +(target as HTMLInputElement).checked;
+    }
+
+    if (target.dataset.multiparameters) {
       newGameOptions = target.dataset.multiparameters
         .split(',')
         .reduce((options, currentOptionName, index) => ({
@@ -97,18 +103,6 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
           ),
         }), {});
     } else {
-      if (target.type === HTMLInputType.RANGE) {
-        const optionDefaultValue = gameSettingsOptions[target.dataset.parent!][target.name].default;
-
-        value = /\./g.test(optionDefaultValue)
-          ? (+target.value).toFixed(getNumberOfDecimalPlaces(optionDefaultValue))
-          : target.value;
-      } else if (target.type === HTMLInputType.CHECKBOX) {
-        value = +(target as HTMLInputElement).checked;
-      } else if (target.type === HTMLInputType.SELECT) {
-        value = target.value;
-      }
-
       newGameOptions = generateNewGameSettingsOption(
         gameSettingsOptions,
         target.dataset.parent!,
@@ -175,7 +169,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                       <div className={styles['game-settings-content__subblock']}>
                         {
                           parameter.items!.map((item) => {
-                            if (item.controllerType === 'select') {
+                            if (item.controllerType === GameSettingParameterControllerType.SELECT) {
                               return (
                                 <Select
                                   key={item.id}
@@ -203,7 +197,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                 }
 
                 if (parameter.parameterType === GameSettingParameterType.GROUP) {
-                  if (parameter.controllerType === 'select') {
+                  if (parameter.controllerType === GameSettingParameterControllerType.SELECT) {
                     return (
                       <Select
                         key={parameter.id}
@@ -228,7 +222,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     );
                   }
 
-                  if (parameter.controllerType === 'checkbox') {
+                  if (parameter.controllerType === GameSettingParameterControllerType.CHECKBOX) {
                     return (
                       <Checkbox
                         key={parameter.id}
@@ -248,10 +242,36 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                       />
                     );
                   }
+
+                  if (parameter.controllerType === GameSettingParameterControllerType.RANGE) {
+                    return (
+                      <Range
+                        key={parameter.id}
+                        className={styles['game-settings-content__item']}
+                        id={parameter.id}
+                        name={getOptionName(parameter.items![0])}
+                        parent={fileName}
+                        multiparameters={parameter.items!.map((param) => getOptionName(param)).join()}
+                        label={parameter.label!}
+                        description={parameter.description}
+                        value={(gameSettingsOptions[fileName] && getValue(parameter.items![0], fileName)) || '0'}
+                        valueText={getValue(parameter.items![0], fileName).toString()}
+                        min={parameter.min!.toString()}
+                        max={parameter.max!.toString()}
+                        step={parameter.step!.toString()}
+                        isDisabled={!gameSettingsOptions[fileName]}
+                        currentHintId={currentHintId}
+                        onChange={onOptionInputChange}
+                        onButtonClick={onOptionRangeButtonClick}
+                        onHover={onParameterHover}
+                        onLeave={onParameterLeave}
+                      />
+                    );
+                  }
                 }
 
                 if (parameter.parameterType === GameSettingParameterType.COMBINED) {
-                  if (parameter.controllerType === 'select') {
+                  if (parameter.controllerType === GameSettingParameterControllerType.SELECT) {
                     return (
                       <Select
                         key={parameter.id}

@@ -7,6 +7,7 @@ interface IProps {
   id: string,
   name?: string,
   parent: string,
+  multiparameters?: string,
   value: string,
   min: string,
   max: string,
@@ -34,6 +35,7 @@ export const Range: React.FunctionComponent<IProps> = ({
   id,
   name = id,
   parent,
+  multiparameters = '',
   value,
   min,
   max,
@@ -92,6 +94,7 @@ export const Range: React.FunctionComponent<IProps> = ({
           type="range"
           name={name}
           data-parent={parent}
+          data-multiparameters={multiparameters}
           id={id}
           value={value}
           min={min}
