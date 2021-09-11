@@ -14,7 +14,6 @@ interface IProps {
   id: string,
   name?: string,
   parent?: string,
-  group?: string,
   multiparameters?: string,
   isCombined?: boolean,
   separator?: string,
@@ -39,7 +38,6 @@ export const Select: React.FunctionComponent<IProps> = ({
   id,
   name = id,
   parent = '',
-  group = '',
   separator = '',
   multiparameters = '',
   isCombined = false,
@@ -85,7 +83,6 @@ export const Select: React.FunctionComponent<IProps> = ({
         id={id}
         name={name}
         data-parent={parent}
-        data-group={group}
         data-iscombined={isCombined}
         data-separator={separator}
         data-multiparameters={multiparameters}

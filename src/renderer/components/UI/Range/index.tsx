@@ -6,7 +6,6 @@ import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
 interface IProps {
   id: string,
   name?: string,
-  group?: string,
   parent: string,
   value: string,
   min: string,
@@ -35,7 +34,6 @@ export const Range: React.FunctionComponent<IProps> = ({
   id,
   name = id,
   parent,
-  group = '',
   value,
   min,
   max,
@@ -93,7 +91,6 @@ export const Range: React.FunctionComponent<IProps> = ({
           className="range__input"
           type="range"
           name={name}
-          data-group={group}
           data-parent={parent}
           id={id}
           value={value}

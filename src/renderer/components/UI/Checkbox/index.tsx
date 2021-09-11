@@ -7,7 +7,6 @@ interface IProps {
   id: string,
   name?: string,
   parent?: string,
-  group?: string,
   label: string,
   description?: string,
   isChecked: boolean,
@@ -25,7 +24,6 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
   id,
   name = id,
   parent = '',
-  group = '',
   label = '',
   description = '',
   isChecked,
@@ -45,7 +43,6 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
       id={id}
       name={name}
       data-parent={parent}
-      data-group={group}
       data-multiparameters={multiparameters}
       checked={isChecked}
       disabled={isDisabled}
