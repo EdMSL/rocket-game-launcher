@@ -24,3 +24,10 @@
   display: flex;
   flex-direction: column;
 }
+
+.game-settings-screen__form {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}

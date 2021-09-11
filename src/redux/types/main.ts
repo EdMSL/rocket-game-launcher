@@ -5,6 +5,7 @@ export const MAIN_TYPES = {
   SET_IS_LAUNCHER_INITIALISED: 'SET_IS_LAUNCHER_INITIALISED',
   SET_IS_GAME_SETTINGS_LOADED: 'SET_IS_GAME_SETTINGS_LOADED',
   SET_IS_GAME_SETTINGS_AVAILABLE: 'SET_IS_GAME_SETTINGS_AVAILABLE',
+  SET_IS_GAME_SETTINGS_FILES_BACKUPING: 'SET_IS_GAME_SETTINGS_FILES_BACKUPING',
   SET_MESSAGES: 'SET_MESSAGES',
   ADD_MESSAGES: 'ADD_MESSAGES',
   DELETE_MESSAGES: 'DELETE_MESSAGES',
@@ -19,5 +20,6 @@ export type IMainRootState = Readonly<{
   isGameRunning: boolean,
   isGameSettingsLoaded: boolean,
   isGameSettingsAvailable: boolean,
+  isGameSettingsFilesBackuping: boolean,
   messages: IUserMessage[],
 }>;

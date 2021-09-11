@@ -15,6 +15,7 @@ import {
   IGameSettingsFile,
   IGameSettingsOptions,
   IGameSettingsOptionsItem,
+  IGameSettingsOptionContent,
 } from '$types/gameSettings';
 import { IUserMessage } from '$types/main';
 import { ISelectOption } from '$components/UI/Select';
@@ -266,3 +267,70 @@ export const generateNewGameSettingsOption = (
     value: String(newValue),
   },
 });
+
+/**
+ * Получить опции игровых настроек, которые были изменены пользователем.
+ * @param gameSettingsOptions Игровые опции из `state`.
+*/
+export const getChangedGameSettingsOptions = (
+  gameSettingsOptions: IGameSettingsOptions,
+): IGameSettingsOptions => Object.keys(gameSettingsOptions)
+  .reduce<IGameSettingsOptions>((totalOptions, fileName) => {
+    const currentOptions = Object.keys(gameSettingsOptions[fileName])
+      .reduce<IGameSettingsOptionsItem>((options, optionName) => {
+        const parameter = gameSettingsOptions[fileName][optionName];
+
+        if (parameter.value !== parameter.default) {
+          return {
+            ...options,
+            [optionName]: {
+              ...gameSettingsOptions[fileName][optionName],
+            },
+          };
+        }
+
+        return {
+          ...options,
+        };
+      }, {});
+
+    if (Object.keys(currentOptions).length > 0) {
+      return {
+        ...totalOptions,
+        [fileName]: {
+          ...totalOptions[fileName],
+          ...currentOptions,
+        },
+      };
+    }
+
+    return {
+      ...totalOptions,
+    };
+  }, {});
+
+/**
+ * Получить опции игровых настроек со стандартными значениями (последними сохраненными).
+ * @param gameSettingsOptions Игровые опции из `state`.
+*/
+export const getGameSettingsOptionsWithDefaultValues = (
+  gameSettingsOptions: IGameSettingsOptions,
+): IGameSettingsOptions => {
+  const newOptionsObj = { ...gameSettingsOptions };
+
+  const getProp = (
+    obj: IGameSettingsOptions|IGameSettingsOptionsItem|IGameSettingsOptionContent,
+  ): void => {
+    Object.keys(obj).forEach((key) => {
+      if (typeof obj[key] === 'object') {
+        getProp(obj[key]);
+      } else if (obj.value !== obj.default) {
+        obj.value = obj.default; //eslint-disable-line no-param-reassign
+      }
+    });
+  };
+
+  getProp(newOptionsObj);
+
+  return newOptionsObj;
+};

@@ -8,6 +8,7 @@ const INITIAL_STATE: IMainRootState = {
   isGameRunning: false,
   isGameSettingsLoaded: false,
   isGameSettingsAvailable: false,
+  isGameSettingsFilesBackuping: false,
   messages: [],
 };
 

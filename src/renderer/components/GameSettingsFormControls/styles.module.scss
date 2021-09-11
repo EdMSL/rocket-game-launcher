@@ -1,0 +1,18 @@
+.game-settings-form__buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.game-settings-form__btn {
+  margin-right: 10px;
+
+  background-color: $border-color;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &:disabled {
+    background-color: darken($color: $border-color, $amount: 50);
+  }
+}
