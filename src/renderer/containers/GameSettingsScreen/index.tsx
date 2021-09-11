@@ -23,17 +23,19 @@ import { IGameSettingsOptionsItem } from '$types/gameSettings';
 */
 export const GameSettingsScreen: React.FC = () => {
   const gameSettingsFiles = useSelector((state: IAppState) => state.gameSettings.gameSettingsFiles);
-  const gameSettingsGroups = useSelector((state: IAppState) => state.gameSettings.gameSettingsGroups);
-  const gameSettingsOptions = useSelector((state: IAppState) => state.gameSettings.gameSettingsOptions);
+  const gameSettingsGroups = useSelector((state: IAppState) => state.gameSettings.gameSettingsGroups); //eslint-disable-line max-len
+  const gameSettingsOptions = useSelector((state: IAppState) => state.gameSettings.gameSettingsOptions); //eslint-disable-line max-len
   const moProfile = useSelector((state: IAppState) => state.gameSettings.moProfile);
   const moProfiles = useSelector((state: IAppState) => state.gameSettings.moProfiles);
   const isModOrganizerUsed = useSelector((state: IAppState) => state.system.modOrganizer.isUsed);
 
   const dispatch = useDispatch();
 
-  const onMOProfilesSelectChange = useCallback(({ target }) => {
-    dispatch(changeMoProfile(target.value));
-  }, [dispatch]);
+  const onMOProfilesSelectChange = useCallback(
+    ({ target }: React.ChangeEvent<HTMLSelectElement>) => {
+      dispatch(changeMoProfile(target.value));
+    }, [dispatch],
+  );
 
   const onSettingOptionChange = useCallback((parent: string, options: IGameSettingsOptionsItem) => {
     dispatch(changeGameSettingsOption(parent, options));
@@ -73,7 +75,6 @@ export const GameSettingsScreen: React.FC = () => {
             <Select
               className={styles['game-settings-screen__select']}
               id="profiles-select"
-              name="profiles-select"
               label="Выберите профиль Mod Organizer"
               value={moProfile}
               optionsArr={generateSelectOptions(moProfiles)}

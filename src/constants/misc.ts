@@ -33,3 +33,8 @@ export const GameSettingParameterType = {
   RELATED: 'related',
   COMBINED: 'combined',
 };
+
+export const RangeButtonName = {
+  DECREASE: 'decrease',
+  INCREASE: 'increase',
+};

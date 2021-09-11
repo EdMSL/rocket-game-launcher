@@ -2,22 +2,11 @@ import React from 'react';
 import classNames from 'classnames';
 
 import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
+import { IUIElementProps } from '$types/gameSettings';
 
-interface IProps {
-  id: string,
-  name?: string,
-  parent?: string,
-  label: string,
-  description?: string,
+interface IProps extends IUIElementProps<HTMLInputElement> {
   isChecked: boolean,
-  isDisabled?: boolean,
-  className?: string | null,
   classNameCheckbox?: string | null,
-  currentHintId?: string,
-  multiparameters?: string,
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
-  onHover?: (id: string) => void,
-  onLeave?: () => void,
 }
 
 export const Checkbox: React.FunctionComponent<IProps> = ({

@@ -20,6 +20,7 @@ import {
   GameSettingParameterControllerType,
   GameSettingParameterType,
   HTMLInputType,
+  RangeButtonName,
 } from '$constants/misc';
 import { Checkbox } from '$components/UI/Checkbox';
 import { Select } from '$components/UI/Select';
@@ -51,8 +52,15 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
 
   const [currentHintId, setCurrentHintId] = useState<string>('');
 
-  const onOptionRangeButtonClick = useCallback((btnName, parent, name, step, max, min) => {
-    const newStep = btnName === 'plus' ? +step : 0 - +step;
+  const onOptionRangeButtonClick = useCallback((
+    btnName: string,
+    parent: string,
+    name: string,
+    min: number,
+    max: number,
+    step: number,
+  ) => {
+    const newStep = btnName === RangeButtonName.INCREASE ? step : 0 - step;
     const currentOption = gameSettingsOptions[parent][name];
 
     const isOptionDefaultValueFloat = /\./g.test(currentOption.default);
@@ -180,6 +188,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                                   id={item.id}
                                   name={getOptionName(item)}
                                   parent={fileName}
+                                  description={parameter.description}
                                   value={(gameSettingsOptions[fileName] && getValue(item, fileName)) || 'None'}
                                   isDisabled={!gameSettingsOptions[fileName]}
                                   optionsArr={generateSelectOptions(item.options!)}
@@ -256,9 +265,9 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         description={parameter.description}
                         value={(gameSettingsOptions[fileName] && getValue(parameter.items![0], fileName)) || '0'}
                         valueText={getValue(parameter.items![0], fileName).toString()}
-                        min={parameter.min!.toString()}
-                        max={parameter.max!.toString()}
-                        step={parameter.step!.toString()}
+                        min={parameter.min!}
+                        max={parameter.max!}
+                        step={parameter.step!}
                         isDisabled={!gameSettingsOptions[fileName]}
                         currentHintId={currentHintId}
                         onChange={onOptionInputChange}
@@ -309,9 +318,9 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         name={getOptionName(parameter)}
                         parent={fileName}
                         value={(gameSettingsOptions[fileName] && getValue(parameter, fileName)) || '0'}
-                        min={parameter.min!.toString()}
-                        max={parameter.max!.toString()}
-                        step={parameter.step!.toString()}
+                        min={parameter.min!}
+                        max={parameter.max!}
+                        step={parameter.step!}
                         isDisabled={!gameSettingsOptions[fileName]}
                         label={parameter.label!}
                         description={parameter.description}

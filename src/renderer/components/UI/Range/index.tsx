@@ -2,39 +2,29 @@ import React, { useCallback } from 'react';
 import classNames from 'classnames';
 
 import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
+import { RangeButtonName } from '$constants/misc';
+import { IUIElementProps } from '$types/gameSettings';
 
-interface IProps {
-  id: string,
-  name?: string,
-  parent: string,
-  multiparameters?: string,
+interface IProps extends IUIElementProps<HTMLInputElement> {
   value: string,
-  min: string,
-  max: string,
-  step: string,
-  isDisabled: boolean,
-  label: string,
+  min: number,
+  max: number,
+  step: number,
   valueText: string,
-  description?: string,
-  className?: string | null,
-  currentHintId?: string,
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
   onButtonClick?: (
     btnName: string,
     parent: string,
     name: string,
-    step: string,
-    max: string,
-    min: string,
+    min: number,
+    max: number,
+    step: number,
   ) => void,
-  onHover?: (id: string) => void,
-  onLeave?: () => void,
 }
 
 export const Range: React.FunctionComponent<IProps> = ({
   id,
   name = id,
-  parent,
+  parent = '',
   multiparameters = '',
   value,
   min,
@@ -53,7 +43,7 @@ export const Range: React.FunctionComponent<IProps> = ({
 }) => {
   const onRangeBtnClick = useCallback(({ currentTarget }) => {
     if (onButtonClick) {
-      onButtonClick(currentTarget.name, parent, name, step, max, min);
+      onButtonClick(currentTarget.name, parent, name, min, max, step);
     }
   }, [onButtonClick, parent, name, step, max, min]);
 
@@ -82,7 +72,7 @@ export const Range: React.FunctionComponent<IProps> = ({
             <button
               type="button"
               className={classNames('button', 'range__button', 'range__button--decrease')}
-              name="minus"
+              name={RangeButtonName.DECREASE}
               onClick={onRangeBtnClick}
             >
               <span className="range__button-text">-</span>
@@ -108,7 +98,7 @@ export const Range: React.FunctionComponent<IProps> = ({
             <button
               type="button"
               className={classNames('button', 'range__button', 'range__button--increase')}
-              name="plus"
+              name={RangeButtonName.INCREASE}
               onClick={onRangeBtnClick}
             >
               <span className="range__button-text">+</span>
