@@ -26,7 +26,6 @@ interface IProps {
     step: string,
     max: string,
     min: string,
-    group: string,
   ) => void,
   onHover?: (id: string) => void,
   onLeave?: () => void,
@@ -54,9 +53,9 @@ export const Range: React.FunctionComponent<IProps> = ({
 }) => {
   const onRangeBtnClick = useCallback(({ currentTarget }) => {
     if (onButtonClick) {
-      onButtonClick(currentTarget.name, parent, name, step, max, min, group);
+      onButtonClick(currentTarget.name, parent, name, step, max, min);
     }
-  }, [onButtonClick, parent, name, step, max, min, group]);
+  }, [onButtonClick, parent, name, step, max, min]);
 
   return (
     <div className={classNames('range__block', className)}>
@@ -64,7 +63,6 @@ export const Range: React.FunctionComponent<IProps> = ({
         <span>{label}</span>
         {
           description
-          && id !== 'resolutionRange'
           && onHover
           && onLeave
           && (

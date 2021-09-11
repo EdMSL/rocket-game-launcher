@@ -49,4 +49,35 @@ export const getLineIniParameterValue = (ini: string, parameterName: string): st
  * @param value Число, у которого нужно определить кол-во знаков.
  * @returns Число знаков.
 */
-export const getNumberOfDecimalPlaces = (value: string|number): number => value.toString().split('.')[1].length;
+export const getNumberOfDecimalPlaces = (value: string|number): number => {
+  const valueParts = value.toString().split('.');
+
+  if (valueParts.length > 1) {
+    return valueParts[valueParts.length - 1].length;
+  }
+
+  return 0;
+};
+
+/**
+ * Получить значение с учетом доступного диапазона чисел.
+ * @param value Текущее значение.
+ * @param min Минимально допустимое значение.
+ * @param max Максимально допустимое значение.
+ * @returns Число из диапазона.
+*/
+export const getValueFromRange = (
+  value: string|number,
+  min: string|number,
+  max: string|number,
+): number => {
+  if (+value >= +min && +value <= +max) {
+    return +value;
+  }
+
+  if (+value < +min) {
+    return +min;
+  }
+
+  return +max;
+};
