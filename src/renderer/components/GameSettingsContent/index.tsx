@@ -41,6 +41,8 @@ interface IProps {
  * опции игровых настроек.
  * @param gameSettingsGroups Массив доступных групп игровых настроек из `state`.
  * @param gameSettingsOptions Объект с обработанными опциями из `state`, готовыми для вывода.
+ * @param onSettingOptionChange callback функция, вызываемая при изменении значения опции
+ * через контроллер.
 */
 export const GameSettingsContent: React.FunctionComponent<IProps> = ({
   gameSettingsFiles,

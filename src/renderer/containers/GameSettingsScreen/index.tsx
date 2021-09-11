@@ -16,12 +16,14 @@ import {
   changeMoProfile,
 } from '$actions/gameSettings';
 import { IGameSettingsOptionsItem } from '$types/gameSettings';
+import { Loader } from '$components/UI/Loader';
 
 /**
  * Контейнер, в котором располагаются блок (`GameSettingsContent`) с контроллерами для изменения
  * игровых настроек и селектор выбора профиля Mod Organizer (если МО используется).
 */
 export const GameSettingsScreen: React.FC = () => {
+  const isGameSettingsLoaded = useSelector((state: IAppState) => state.main.isGameSettingsLoaded);
   const gameSettingsFiles = useSelector((state: IAppState) => state.gameSettings.gameSettingsFiles);
   const gameSettingsGroups = useSelector((state: IAppState) => state.gameSettings.gameSettingsGroups); //eslint-disable-line max-len
   const gameSettingsOptions = useSelector((state: IAppState) => state.gameSettings.gameSettingsOptions); //eslint-disable-line max-len
@@ -70,6 +72,7 @@ export const GameSettingsScreen: React.FC = () => {
         && moProfile
         && moProfiles.length > 0
         && gameSettingsOptions
+        && isGameSettingsLoaded
         && (
           <div className={styles['game-settings-screen__profiles']}>
             <Select
@@ -83,29 +86,32 @@ export const GameSettingsScreen: React.FC = () => {
           </div>
         )
         }
-        <div className={styles['game-settings-screen__options']}>
-          <Switch>
-            <Route
-              path={gameSettingsGroups.length > 0
-                ? `${Routes.GAME_SETTINGS_SCREEN}/:settingGroup/`
-                : Routes.GAME_SETTINGS_SCREEN}
-              render={(): React.ReactElement => (
-                <React.Fragment>
-                  {
-                    Object.keys(gameSettingsOptions).length > 0 && (
+        {
+          isGameSettingsLoaded && Object.keys(gameSettingsOptions).length > 0 && (
+            <div className={styles['game-settings-screen__options']}>
+              <Switch>
+                <Route
+                  path={gameSettingsGroups.length > 0
+                    ? `${Routes.GAME_SETTINGS_SCREEN}/:settingGroup/`
+                    : Routes.GAME_SETTINGS_SCREEN}
+                  render={(): React.ReactElement => (
+                    <React.Fragment>
                       <GameSettingsContent
                         gameSettingsOptions={gameSettingsOptions}
                         gameSettingsFiles={gameSettingsFiles}
                         gameSettingsGroups={gameSettingsGroups}
                         onSettingOptionChange={onSettingOptionChange}
                       />
-                    )
-                  }
-                </React.Fragment>
-              )}
-            />
-          </Switch>
-        </div>
+                    </React.Fragment>
+                  )}
+                />
+              </Switch>
+            </div>
+          )
+          }
+        {
+          !isGameSettingsLoaded && <Loader />
+        }
       </div>
     </main>
   );
