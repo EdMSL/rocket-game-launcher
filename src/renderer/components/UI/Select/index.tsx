@@ -29,7 +29,7 @@ export const Select: (React.FunctionComponent<IProps>) = ({
   parent,
   separator = '',
   multiparameters = '',
-  isCombined = false,
+  isCombined,
   value,
   isDisabled = false,
   optionsArr,
