@@ -59,7 +59,7 @@ import {
 } from '$utils/data';
 import { IUserMessage } from '$types/main';
 import { GameSettingParameterType, GameSettingsFileView } from '$constants/misc';
-import { getParameterRegExp } from '$utils/strings';
+import { getParameterFullStringRegExp, getParameterRegExp } from '$utils/strings';
 
 interface IGetDataFromFilesResult {
   [key: string]: IIniObj|IXmlObj,
@@ -513,7 +513,9 @@ function* saveGameSettingsSaga(
           currWriteFileData.globals.lines.some((line) => {
             if (getParameterRegExp(optionName).test(line.text)) {
               line.text = line.text.replace(//eslint-disable-line no-param-reassign
-                getParameterRegExp(optionName),
+                // Другая регулярка используется для предотвращения
+                // удаления комментария в конце строки параметра.
+                getParameterFullStringRegExp(optionName),
                 `set ${optionName} to ${changedGameSettingsOptions[fileName][optionName].value}`,
               );
 
