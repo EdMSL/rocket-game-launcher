@@ -112,6 +112,22 @@ export const getOptionName = (
   return parameter.name!;
 };
 
+export const getValueFromObjectDeepKey = <T>(lib, keys): T => {
+  const key = keys.shift();
+
+  return keys.length ? getValueFromObjectDeepKey(lib[key], keys) : lib[key];
+};
+
+export const setValueForObjectDeepKey = (lib, keys, newValue): void => {
+  const key = keys.shift();
+
+  if (keys.length) {
+    setValueForObjectDeepKey(lib[key], keys, newValue);
+  } else {
+    lib[key] = newValue; //eslint-disable-line no-param-reassign
+  }
+};
+
 /**
  * Генерирует объект с полями, необходимыми для создания
  * объекта игровой опции для записи в state.
@@ -315,6 +331,7 @@ export const getChangedGameSettingsOptions = (
 */
 export const getGameSettingsOptionsWithDefaultValues = (
   gameSettingsOptions: IGameSettingsOptions,
+  isWithDefaultValue = true,
 ): IGameSettingsOptions => {
   const newOptionsObj = { ...gameSettingsOptions };
 
@@ -324,8 +341,10 @@ export const getGameSettingsOptionsWithDefaultValues = (
     Object.keys(obj).forEach((key) => {
       if (typeof obj[key] === 'object') {
         getProp(obj[key]);
-      } else if (obj.value !== obj.default) {
+      } else if (obj.value !== obj.default && isWithDefaultValue) {
         obj.value = obj.default; //eslint-disable-line no-param-reassign
+      } else if (obj.default !== obj.value && !isWithDefaultValue) {
+        obj.default = obj.value; //eslint-disable-line no-param-reassign
       }
     });
   };

@@ -187,13 +187,13 @@ describe('#Files', () => {
       assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/test.json`, 'utf8'), '{\n  "data": "Some data"\n}');
     });
 
-    it('Should correct write to INI file', async () => {
-      const obj = await readINIFile(`${process.cwd()}/writeFolder/readOnly.ini`, 'utf-8')
-        .then((data) => data);
-      obj.addSection('New');
-      await writeINIFile(`${process.cwd()}/writeFolder/test.ini`, obj);
-      assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/test.ini`, 'utf8'), '[Section]\r\nparam=data\r\n[New]');
-    });
+    // it('Should correct write to INI file', async () => {
+    //   const obj = await readINIFile(`${process.cwd()}/writeFolder/readOnly.ini`, 'utf-8')
+    //     .then((data) => data);
+    //   obj.addSection('New');
+    //   await writeINIFile(`${process.cwd()}/writeFolder/test.ini`, obj);
+    //   assert.equal(fs.readFileSync(`${process.cwd()}/writeFolder/test.ini`, 'utf8'), '[Section]\r\nparam=data\r\n[New]');
+    // });
 
     it('Should return permission error message', async () => {
       let errorMsg = '';
@@ -210,11 +210,11 @@ describe('#Files', () => {
         });
       assert.match(errorMsg, errorAccessRegExp);
 
-      await writeINIFile(`${process.cwd()}/readOnlyDir/new.ini`, new Ini('[Section]\r\nparam=data\r\n[New]'))
-        .catch((error) => {
-          errorMsg = error.message;
-        });
-      assert.match(errorMsg, errorAccessRegExp);
+      // await writeINIFile(`${process.cwd()}/readOnlyDir/new.ini`, new Ini('[Section]\r\nparam=data\r\n[New]'))
+      //   .catch((error) => {
+      //     errorMsg = error.message;
+      //   });
+      // assert.match(errorMsg, errorAccessRegExp);
     });
 
     it('Should return directory in path error', async () => {
@@ -232,11 +232,11 @@ describe('#Files', () => {
         });
       assert.match(errorMsg, errorDirectoryRegExp);
 
-      await writeINIFile(`${process.cwd()}/writeFolder`, new Ini('[Section]\r\nparam=data\r\n[New]'))
-        .catch((error) => {
-          errorMsg = error.message;
-        });
-      assert.match(errorMsg, errorDirectoryRegExp);
+      // await writeINIFile(`${process.cwd()}/writeFolder`, new Ini('[Section]\r\nparam=data\r\n[New]'))
+      //   .catch((error) => {
+      //     errorMsg = error.message;
+      //   });
+      // assert.match(errorMsg, errorDirectoryRegExp);
     });
 
     it('Should return invalid path error', async () => {

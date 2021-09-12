@@ -2,7 +2,7 @@ import fs, { promises as fsPromises } from 'fs';
 import path from 'path';
 import iconv from 'iconv-lite';
 import { Ini } from 'ini-api';
-import xmlParser from 'fast-xml-parser';
+import xmlParser, { j2xParser as XMLParserForWrite } from 'fast-xml-parser';
 import mime from 'mime';
 
 import {
@@ -297,7 +297,7 @@ export const writeJSONFile = (
 export const writeINIFile = (
   pathToFile: string,
   iniDataObj: IIniObj,
-  encoding = Encoding.WIN1251,
+  encoding: string,
 ): Promise<void> => writeFileData(pathToFile, iconv.encode(iniDataObj.stringify(), encoding))
   .catch((error) => {
     writeToLogFile(
@@ -307,6 +307,50 @@ export const writeINIFile = (
 
     throw error;
   });
+
+/**
+ * Асинхронно записать XML файл.
+ * @param pathToFile Путь к файлу.
+ * @param xmlDataObj Данные для записи в файл.
+ * @param encoding Кодировка записываемого файла.
+*/
+export const writeXMLFile = (
+  pathToFile: string,
+  xmlDataObj: IXmlObj,
+  encoding: string,
+): Promise<void> => writeFileData(
+  pathToFile,
+  iconv.encode(new XMLParserForWrite({}).parse(xmlDataObj), encoding),
+)
+  .catch((error) => {
+    writeToLogFile(
+      `Message: ${error.message}. Path: '${pathToFile}'`,
+      LogMessageType.ERROR,
+    );
+
+    throw error;
+  });
+
+export const writeGameSettingsFile = async (
+  pathToFile: string,
+  dataObj: IIniObj|IXmlObj,
+  fileView: string,
+  encoding: string,
+): Promise<void> => {
+  if (fileView === GameSettingsFileView.LINE || fileView === GameSettingsFileView.SECTIONAL) {
+    await writeINIFile(
+      pathToFile,
+      dataObj as IIniObj,
+      encoding,
+    );
+  } else if (fileView === GameSettingsFileView.TAG) {
+    await writeXMLFile(
+      pathToFile,
+      dataObj,
+      encoding,
+    );
+  }
+};
 
 export const iconvDecode = (str: string, encoding = Encoding.CP866): string => iconv.decode(
   Buffer.from(str, 'binary'),

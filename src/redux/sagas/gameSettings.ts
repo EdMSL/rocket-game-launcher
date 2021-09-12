@@ -17,6 +17,7 @@ import {
   readFileForGameSettingsOptions,
   readINIFile,
   readJSONFile,
+  writeGameSettingsFile,
 } from '$utils/files';
 import { IUnwrap, IUnwrapSync } from '$types/common';
 import {
@@ -29,7 +30,9 @@ import { checkGameSettingsFiles, checkGameSettingsConfigMainFields } from '$util
 import {
   GAME_SETTINGS_TYPES,
   IGameSettingsConfig,
+  IGameSettingsFiles,
   IGameSettingsOptions,
+  IGameSettingsOptionsItem,
 } from '$types/gameSettings';
 import {
   LogMessageType,
@@ -43,15 +46,20 @@ import {
   setGameSettingsFiles,
   setMoProfile,
   setMoProfiles,
+  saveGameSettingsFiles,
+  changeGameSettingsOption,
 } from '$actions/gameSettings';
 import {
   CustomError,
   ReadWriteError,
   SagaError,
 } from '$utils/errors';
-import { getOptionData } from '$utils/data';
+import {
+  getGameSettingsOptionsWithDefaultValues, getOptionData, setValueForObjectDeepKey,
+} from '$utils/data';
 import { IUserMessage } from '$types/main';
-import { GameSettingParameterType } from '$constants/misc';
+import { GameSettingParameterType, GameSettingsFileView } from '$constants/misc';
+import { getParameterRegExp } from '$utils/strings';
 
 interface IGetDataFromFilesResult {
   [key: string]: IIniObj|IXmlObj,
@@ -199,11 +207,13 @@ function* getDataFromMOIniSaga(): SagaIterator {
 /**
  * Считывает данные из файлов для генерации игровых опций
 */
-function* getDataFromGameSettingsFiles(): SagaIterator<IGetDataFromFilesResult> {
+function* getDataFromGameSettingsFilesSaga(
+  filesForRead: IGameSettingsFiles,
+): SagaIterator<IGetDataFromFilesResult> {
   try {
     const {
       gameSettings: {
-        gameSettingsFiles,
+        // gameSettingsFiles,
         moProfile,
       },
       system: {
@@ -212,12 +222,12 @@ function* getDataFromGameSettingsFiles(): SagaIterator<IGetDataFromFilesResult> 
     }: IAppState = yield select(getState);
 
     const currentFilesData: IUnwrap<typeof readFileForGameSettingsOptions>[] = yield all(
-      Object.keys(gameSettingsFiles).map((fileName) => call(
+      Object.keys(filesForRead).map((fileName) => call(
         readFileForGameSettingsOptions,
-        getPathToFile(gameSettingsFiles[fileName].path, customPaths, moProfile),
-        gameSettingsFiles[fileName].view,
+        getPathToFile(filesForRead[fileName].path, customPaths, moProfile),
+        filesForRead[fileName].view,
         fileName,
-        gameSettingsFiles[fileName].encoding,
+        filesForRead[fileName].encoding,
       )),
     );
 
@@ -234,13 +244,12 @@ function* getDataFromGameSettingsFiles(): SagaIterator<IGetDataFromFilesResult> 
 }
 
 /**
- * Генерирует список игровых опций на основе параметров (`gameSettingsFiles`) из файлов в settings.json
+ * Генерирует список игровых опций на основе параметров
+ * (`gameSettingsFiles`) из файлов, указанных в settings.json
 */
-function* generateGameSettingsOptions(): SagaIterator {
+function* generateGameSettingsOptionsSaga(): SagaIterator {
   try {
     let optionsErrors: IUserMessage[] = [];
-
-    const currentFilesDataObj: IUnwrap<IGetDataFromFilesResult> = yield call(getDataFromGameSettingsFiles);
 
     const {
       gameSettings: {
@@ -248,6 +257,11 @@ function* generateGameSettingsOptions(): SagaIterator {
         moProfile,
       },
     }: IAppState = yield select(getState);
+
+    const currentFilesDataObj: IUnwrap<IGetDataFromFilesResult> = yield call(
+      getDataFromGameSettingsFilesSaga,
+      gameSettingsFiles,
+    );
 
     const totalGameSettingsOptions: IGameSettingsOptions = Object.keys(gameSettingsFiles).reduce(
       (gameSettingsOptions, currentGameSettingsFile) => {
@@ -407,7 +421,7 @@ export function* initGameSettingsSaga(): SagaIterator {
 
     yield put(setGameSettingsFiles(newGameSettingsFilesObj));
 
-    yield call(generateGameSettingsOptions);
+    yield call(generateGameSettingsOptionsSaga);
 
     writeToLogFileSync('Game settings initialisation completed.');
   } catch (error: any) {
@@ -441,6 +455,142 @@ function* changeMOProfileSaga(
   ///TODO Сделать сохранение профиля в МО ini
 }
 
+function* saveGameSettingsSaga(
+  { payload: changedGameSettingsOptions }: ReturnType<typeof saveGameSettingsFiles>,
+): SagaIterator {
+  try {
+    const {
+      main: { messages },
+      gameSettings: {
+        moProfile, gameSettingsFiles, gameSettingsOptions,
+      },
+      system: { customPaths },
+    }: IAppState = yield select(getState);
+    const changedFilesNames = Object.keys(changedGameSettingsOptions);
+
+    const changedGameSettingsFiles = Object.keys(gameSettingsFiles)
+      .reduce<IGameSettingsFiles>((acc, fileName) => {
+        if (changedFilesNames.includes(fileName)) {
+          return {
+            ...acc,
+            [fileName]: gameSettingsFiles[fileName],
+          };
+        }
+
+        return { ...acc };
+      }, {});
+
+    const currentFilesData: IUnwrap<IGetDataFromFilesResult> = yield call(
+      getDataFromGameSettingsFilesSaga,
+      changedGameSettingsFiles,
+    );
+
+    const filesForWrite = Object.keys(changedGameSettingsFiles).map((fileName) => {
+      const changedGameSettingsOptionsNames = Object.keys(changedGameSettingsOptions[fileName]);
+      const currWriteFileData = currentFilesData[fileName];
+      const currWriteFileView = changedGameSettingsFiles[fileName].view;
+
+      changedGameSettingsOptionsNames.forEach((optionName) => {
+        if (currWriteFileView === GameSettingsFileView.SECTIONAL) {
+          const parameterNameParts = optionName.split('/');
+          const defaultLineText: string = currWriteFileData.getSection(parameterNameParts[0]).getLine(parameterNameParts[1]).text;
+          const spacesBefore = defaultLineText.match(/(\s*)=/gm)![0];
+          const spacesAfter = defaultLineText.match(/(?<==)\s*(?<!\S)/);
+
+          currWriteFileData
+            .getSection(parameterNameParts[0])
+            .setValue(parameterNameParts[1], changedGameSettingsOptions[fileName][optionName].value);
+
+          const currLineText = currWriteFileData
+            .getSection(parameterNameParts[0])
+            .getLine(parameterNameParts[1])
+            .text
+            .split('=')
+            .join(`${spacesBefore}${spacesAfter ? spacesAfter.join('') : []}`);
+
+          currWriteFileData.getSection(parameterNameParts[0]).getLine(parameterNameParts[1]).text = currLineText;
+        } else if (currWriteFileView === GameSettingsFileView.LINE) {
+          currWriteFileData.globals.lines.some((line) => {
+            if (getParameterRegExp(optionName).test(line.text)) {
+              line.text = line.text.replace(//eslint-disable-line no-param-reassign
+                getParameterRegExp(optionName),
+                `set ${optionName} to ${changedGameSettingsOptions[fileName][optionName].value}`,
+              );
+
+              return true;
+            }
+
+            return false;
+          });
+        } else if (currWriteFileView === GameSettingsFileView.TAG) {
+          setValueForObjectDeepKey(
+            currWriteFileView,
+            [...optionName.split('/')],
+            changedGameSettingsOptions[fileName][optionName].value,
+          );
+        }
+      });
+
+      return { [fileName]: currWriteFileData };
+    });
+
+    yield all(
+      filesForWrite.map((file) => {
+        const fileName = Object.keys(file)[0];
+
+        return call(
+          writeGameSettingsFile,
+          getPathToFile(changedGameSettingsFiles[fileName].path, customPaths, moProfile),
+          file[fileName],
+          changedGameSettingsFiles[fileName].view,
+          changedGameSettingsFiles[fileName].encoding,
+        );
+      }),
+    );
+
+    const newChangedGameoptions = changedFilesNames.reduce<IGameSettingsOptions>((totalOptions, fileName) => {
+      const fileOtions = {
+        ...gameSettingsOptions[fileName],
+        ...getGameSettingsOptionsWithDefaultValues(changedGameSettingsOptions, false)[fileName],
+      };
+
+      return {
+        ...totalOptions,
+        [fileName]: fileOtions,
+      };
+    }, {});
+
+    const newGameOptions = {
+      ...gameSettingsOptions,
+      ...newChangedGameoptions,
+    };
+
+    yield put(setGameSettingsOptions(newGameOptions));
+  } catch (error: any) {
+    let errorMessage = '';
+
+    if (error instanceof SagaError) {
+      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
+    } else if (error instanceof CustomError) {
+      errorMessage = `${error.message}`;
+    } else if (error instanceof ReadWriteError) {
+      errorMessage = `${error.message}. Path '${error.path}'.`;
+    } else {
+      errorMessage = `Unknown error. Message: ${error.message}`;
+    }
+
+    writeToLogFileSync(
+      `Game settings saving failed. Reason: ${errorMessage}`,
+      LogMessageType.ERROR,
+    );
+
+    yield put(addMessages([CreateUserMessage.error('Произошла ошибка в процессе генерации игровых настроек. Подробности в файле лога.')]));//eslint-disable-line max-len
+  } finally {
+    // yield put(setIsGameSettingsLoaded(true));
+  }
+}
+
 export default function* gameSetingsSaga(): SagaIterator {
   yield takeLatest(GAME_SETTINGS_TYPES.CHANGE_MO_PROFILE, changeMOProfileSaga);
+  yield takeLatest(GAME_SETTINGS_TYPES.SAVE_GAME_SETTINGS_FILES, saveGameSettingsSaga);
 }
