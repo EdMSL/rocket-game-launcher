@@ -94,6 +94,11 @@ export const isIGameSettingsItemParameter = (
   parameter: IGameSettingsParameter | IGameSettingsItemParameter,
 ): parameter is IGameSettingsItemParameter => parameter.attributePath !== undefined && parameter.attributeName !== undefined;
 
+export const isDataFromIniFile = (
+  fileView: string,
+  obj: IIniObj|IXmlObj,
+): obj is IIniObj => fileView === GameSettingsFileView.LINE || fileView === GameSettingsFileView.SECTIONAL;
+
 /**
  * Сгенерировать имя игровой опции на основе параметра, который является основой для опции
  * @param parameter Параметр-основа для игровой опции.

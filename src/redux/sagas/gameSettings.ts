@@ -18,6 +18,7 @@ import {
   readINIFile,
   readJSONFile,
   writeGameSettingsFile,
+  xmlAttributePrefix,
 } from '$utils/files';
 import { IUnwrap, IUnwrapSync } from '$types/common';
 import {
@@ -32,7 +33,6 @@ import {
   IGameSettingsConfig,
   IGameSettingsFiles,
   IGameSettingsOptions,
-  IGameSettingsOptionsItem,
 } from '$types/gameSettings';
 import {
   LogMessageType,
@@ -47,7 +47,6 @@ import {
   setMoProfile,
   setMoProfiles,
   saveGameSettingsFiles,
-  changeGameSettingsOption,
 } from '$actions/gameSettings';
 import {
   CustomError,
@@ -55,11 +54,14 @@ import {
   SagaError,
 } from '$utils/errors';
 import {
-  getGameSettingsOptionsWithDefaultValues, getOptionData, setValueForObjectDeepKey,
+  getGameSettingsOptionsWithDefaultValues,
+  getOptionData,
+  isDataFromIniFile,
+  setValueForObjectDeepKey,
 } from '$utils/data';
 import { IUserMessage } from '$types/main';
 import { GameSettingParameterType, GameSettingsFileView } from '$constants/misc';
-import { getParameterFullStringRegExp, getParameterRegExp } from '$utils/strings';
+import { getParameterRegExp, getStringPartFromIniLineParameterForReplace } from '$utils/strings';
 
 interface IGetDataFromFilesResult {
   [key: string]: IIniObj|IXmlObj,
@@ -489,14 +491,17 @@ function* saveGameSettingsSaga(
       changedGameSettingsFiles,
       true,
     );
-    console.log('currentFilesData: ', currentFilesData);
+
     const filesForWrite = Object.keys(changedGameSettingsFiles).map((fileName) => {
       const changedGameSettingsOptionsNames = Object.keys(changedGameSettingsOptions[fileName]);
       const currWriteFileData = currentFilesData[fileName];
       const currWriteFileView = changedGameSettingsFiles[fileName].view;
 
       changedGameSettingsOptionsNames.forEach((optionName) => {
-        if (currWriteFileView === GameSettingsFileView.SECTIONAL) {
+        if (
+          currWriteFileView === GameSettingsFileView.SECTIONAL
+          && isDataFromIniFile(currWriteFileView, currWriteFileData)
+        ) {
           const parameterNameParts = optionName.split('/');
           const defaultLineText: string = currWriteFileData.getSection(parameterNameParts[0]).getLine(parameterNameParts[1]).text;
           const spacesBefore = defaultLineText.match(/(\s*)=/gm)![0];
@@ -514,13 +519,14 @@ function* saveGameSettingsSaga(
             .join(`${spacesBefore}${spacesAfter ? spacesAfter.join('') : []}`);
 
           currWriteFileData.getSection(parameterNameParts[0]).getLine(parameterNameParts[1]).text = currLineText;
-        } else if (currWriteFileView === GameSettingsFileView.LINE) {
+        } else if (
+          currWriteFileView === GameSettingsFileView.LINE
+          && isDataFromIniFile(currWriteFileView, currWriteFileData)
+        ) {
           currWriteFileData.globals.lines.some((line) => {
             if (getParameterRegExp(optionName).test(line.text)) {
               line.text = line.text.replace(//eslint-disable-line no-param-reassign
-                // Другая регулярка используется для предотвращения
-                // удаления комментария в конце строки параметра.
-                getParameterFullStringRegExp(optionName),
+                getStringPartFromIniLineParameterForReplace(line.text, optionName),
                 `set ${optionName} to ${changedGameSettingsOptions[fileName][optionName].value}`,
               );
 
@@ -529,9 +535,13 @@ function* saveGameSettingsSaga(
 
             return false;
           });
-        } else if (currWriteFileView === GameSettingsFileView.TAG) {
+        } else if (
+          currWriteFileView === GameSettingsFileView.TAG
+          && !isDataFromIniFile(currWriteFileView, currWriteFileData)
+        ) {
           const pathArr = [...optionName.split('/')];
-          pathArr[pathArr.length - 1] = `@_${pathArr[pathArr.length - 1]}`;
+          pathArr[pathArr.length - 1] = `${xmlAttributePrefix}${pathArr[pathArr.length - 1]}`;
+
           setValueForObjectDeepKey(
             currWriteFileData,
             pathArr,

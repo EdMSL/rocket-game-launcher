@@ -27,11 +27,29 @@ export const getRandomId = (
   word: string,
 ): string => `${word}-f${((Math.random() * HEXADECIMAL_FACTOR)).toString(HEXADECIMAL)}-${new Date().getMilliseconds()}`; //eslint-disable-line max-len
 
-export const getParameterRegExp = (parameterName): RegExp => new RegExp(`set\\s+${parameterName}\\s+to\\s+(.+)$`, 'i');
-export const getParameterFullStringRegExp = (parameterName): RegExp => new RegExp(`set[\\s]+${parameterName}[\\s]+to[\\s]+[-0-9]+`, 'i');
+export const getParameterRegExp = (
+  parameterName: string,
+): RegExp => new RegExp(`set\\s+${parameterName}\\s+to\\s+(.+)$`, 'i');
 
-export const getLineIniParameterValue = (ini: string, parameterName: string): string => {
-  const paramResult = ini.match(getParameterRegExp(parameterName.trim()));
+/**
+ * Получить часть строки параметра из файла вида `line`.
+ * @param lineText Строка, в которой осуществляется поиск.
+ * @param parameterName Имя параметра, который ищем.
+ * @returns Найденная часть строки.
+*/
+export const getStringPartFromIniLineParameterForReplace = (
+  lineText: string,
+  parameterName: string,
+): string => lineText.match(new RegExp(`set\\s+${parameterName}\\s+to\\s+([^;]+)`, 'i'))![0].trim();
+
+/**
+ * Получить значение параметра из файла вида `line`.
+ * @param lineText Строка, в которой осуществляется поиск.
+ * @param parameterName Имя параметра, который ищем.
+ * @returns Найденная значение.
+*/
+export const getLineIniParameterValue = (lineText: string, parameterName: string): string => {
+  const paramResult = lineText.match(getParameterRegExp(parameterName.trim()));
 
   if (paramResult!?.length > 0) {
     // @ts-ignore

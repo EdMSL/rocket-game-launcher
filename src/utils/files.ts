@@ -35,6 +35,8 @@ interface IIniSection {
   lines: IIniLine[],
   name: string,
   getValue: (key: string) => string,
+  setValue: (key: string, value: string|number) => void,
+  getLine: (key: string) => IIniLine,
 }
 
 export interface IIniObj {
@@ -334,7 +336,7 @@ export const writeXMLFile = (
     format: true,
     ignoreAttributes: false,
     attributeNamePrefix: xmlAttributePrefix,
-    indentBy: '\t\t',
+    indentBy: '\t',
     supressEmptyNode: true,
   }).parse(xmlDataObj), encoding),
 )

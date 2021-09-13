@@ -91,9 +91,9 @@
           "controllerType": "select",
           "label": "Неизвестный параметр",
           "options": {
-            "1": "sv_Construct\t\"Dialog & Pause\"",
-            "2": "sv_Construct\t\"Some Value\"",
-            "3": "sv_Construct\t\"Other text value\""
+            "sv_Construct\t\"Dialog & Pause\"": "sv_Construct\t\"Dialog & Pause\"",
+            "sv_Construct\t\"Some Value\"": "sv_Construct\t\"Some Value\"",
+            "sv_Construct\t\"Other text value\"": "sv_Construct\t\"Other text value\""
           }
         }
       ]
