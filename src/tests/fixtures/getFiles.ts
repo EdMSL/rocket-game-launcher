@@ -5,7 +5,7 @@ export const createMockFilesForRead = (): void => {
   mock({
     'folderName': {
       'index.md': '# Hello world!',
-      'test.json': mock.load(path.resolve(__dirname, 'test.json'), { lazy: false }),
+      'test.json': mock.load(path.resolve(__dirname, './files/test.json'), { lazy: false }),
       'writeOnly.json': mock.file({
         content: '{"some": "content"}',
         mode: 0o222,
@@ -53,6 +53,6 @@ export const createMockFilesForWrite = (): void => {
 
 export const createMockFilesForCheck = (): void => {
   mock({
-    'settings.json': mock.load(path.resolve(__dirname, 'settings.json'), { lazy: false }),
+    'settings.json': mock.load(path.resolve(__dirname, './files/settings.json'), { lazy: false }),
   });
 };
