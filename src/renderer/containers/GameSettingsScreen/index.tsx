@@ -22,6 +22,7 @@ import {
 import { IGameSettingsOptionsItem } from '$types/gameSettings';
 import { Loader } from '$components/UI/Loader';
 import { GameSettingsFormControls } from '$components/GameSettingsFormControls';
+import { createGameSettingsFilesBackup } from '$actions/main';
 
 /**
  * Контейнер, в котором располагаются блок (`GameSettingsContent`) с контроллерами для изменения
@@ -85,8 +86,8 @@ export const GameSettingsScreen: React.FC = () => {
   [gameSettingsOptions, isGameOptionsChanged, isGameSettingsFilesBackuping]);
 
   const onCreateBackupBtnClick = useCallback(() => {
-    // dispatch(createIniBackup());
-  }, [/* dispatch */]);
+    dispatch(createGameSettingsFilesBackup());
+  }, [dispatch]);
 
   return (
     <main className={classNames('main', styles['game-settings-screen__main'])}>

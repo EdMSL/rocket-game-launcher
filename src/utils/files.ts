@@ -264,6 +264,47 @@ export const readFileForGameSettingsOptions = async (
 };
 
 /**
+ * Синхронно скопировать файл в указанную папку.
+ * @param pathToFile Путь к файлу.
+ * @param destinationPath Путь к папке, куда требуется копировать файл.
+*/
+export const createCopyFileSync = (pathToFile: string, destinationPath: string): void => {
+  try {
+    fs.copyFileSync(
+      pathToFile,
+      destinationPath,
+    );
+  } catch (error: any) {
+    const readWriteError = getReadWriteError(error);
+
+    throw new ReadWriteError(
+      `Can't copy file. ${readWriteError.message}`,
+      readWriteError,
+      pathToFile,
+    );
+  }
+};
+
+/**
+ * Синхронно записать файл.
+ * @param pathToFile Путь к файлу.
+ * @param data Данные для записи в файл, строка или буфер.
+*/
+export const writeFileDataSync = (pathToFile: string, data: string|Buffer): void => {
+  try {
+    fs.writeFileSync(pathToFile, data);
+  } catch (error: any) {
+    const readWriteError = getReadWriteError(error);
+
+    throw new ReadWriteError(
+      `Can't write file. ${readWriteError.message}`,
+      readWriteError,
+      pathToFile,
+    );
+  }
+};
+
+/**
  * Асинхронно записать файл.
  * @param pathToFile Путь к файлу.
  * @param data Данные для записи в файл, строка или буфер.

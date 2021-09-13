@@ -8,6 +8,7 @@ import { createLogFile, writeToLogFileSync } from '$utils/log';
 import { showErrorBox } from '$utils/errors';
 import { getSystemInfo } from '$utils/data';
 import { GAME_DIR } from '$constants/paths';
+import { createBackupFolders } from '$utils/backup';
 
 require('@electron/remote/main').initialize();
 
@@ -23,6 +24,8 @@ const start = async (): Promise<void> => {
   const store = createStorage();
 
   createWindow(store.getState().system);
+
+  createBackupFolders();
 
   globalShortcut.register('Alt+Q', () => {
     app.quit();

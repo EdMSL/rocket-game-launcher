@@ -358,3 +358,13 @@ export const getGameSettingsOptionsWithDefaultValues = (
 
   return newOptionsObj;
 };
+
+/**
+ * Сгенерировать имя папки для бэкапа файлов.
+ * @returns Строка с именем для папки.
+*/
+export const getBackupFolderName = (): string => {
+  const date = new Date();
+
+  return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}_${date.toTimeString().split(' ')[0].split(':').join('.')}`; // eslint-disable-line max-len
+};
