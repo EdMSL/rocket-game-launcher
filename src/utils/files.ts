@@ -21,6 +21,8 @@ import {
 import { Encoding, GameSettingsFileView } from '$constants/misc';
 import { ISystemRootState } from '$types/system';
 
+export const xmlAttributePrefix = '@_';
+
 interface IIniLine {
   text: string,
   comment: string,
@@ -200,20 +202,26 @@ export const readINIFile = async (
 /**
  * Асинхронно получить данные из XML файла или файла со схожей структурой.
  * @param pathToFile Путь к файлу.
+ * @param isWithPrefix Добавлять ли префикс к именам атрибутов.
+ * Для последующей правильной записи файла ставим `true`.
  * @param encoding Кодировка файла. По умолчанию `win1251`.
  * @returns Объект с данными из файла.
 */
 export const readXMLFile = async (
   pathToFile: string,
+  isWithPrefix: boolean,
   encoding = Encoding.WIN1251,
 ): Promise<IXmlObj> => {
   try {
     const XMLDataStr = await readFileData(pathToFile);
 
     return xmlParser.parse(iconv.decode(XMLDataStr, encoding), {
-      attributeNamePrefix: '',
+      attributeNamePrefix: isWithPrefix ? xmlAttributePrefix : '',
       ignoreAttributes: false,
-      parseAttributeValue: true,
+      parseAttributeValue: false,
+      parseTrueNumberOnly: true,
+      allowBooleanAttributes: true,
+      parseNodeValue: false,
     });
   } catch (error: any) {
     writeToLogFileSync(
@@ -231,19 +239,21 @@ export const readXMLFile = async (
  * @param fileView Структура(вид) файла. На его основе определяется метод для чтения файла.
  * @param name Имя для определения файла при генерации опций.
  * @param encoding Кодировка файла.
+ * @param isWithPrefix Нужно ли добавлять префикс к именам атрибутов.
 */
 export const readFileForGameSettingsOptions = async (
   pathToFile: string,
   fileView: string,
   name: string,
   encoding: string,
+  isWithPrefix: boolean,
 ): Promise<{ [key: string]: IIniObj|IXmlObj, }> => {
   let fileData: IIniObj|IXmlObj = {};
 
   if (fileView === GameSettingsFileView.LINE || fileView === GameSettingsFileView.SECTIONAL) {
     fileData = await readINIFile(pathToFile, encoding);
   } else if (fileView === GameSettingsFileView.TAG) {
-    fileData = await readXMLFile(pathToFile, encoding);
+    fileData = await readXMLFile(pathToFile, isWithPrefix, encoding);
   }
 
   return {
@@ -320,7 +330,13 @@ export const writeXMLFile = (
   encoding: string,
 ): Promise<void> => writeFileData(
   pathToFile,
-  iconv.encode(new XMLParserForWrite({}).parse(xmlDataObj), encoding),
+  iconv.encode(new XMLParserForWrite({
+    format: true,
+    ignoreAttributes: false,
+    attributeNamePrefix: xmlAttributePrefix,
+    indentBy: '\t\t',
+    supressEmptyNode: true,
+  }).parse(xmlDataObj), encoding),
 )
   .catch((error) => {
     writeToLogFile(

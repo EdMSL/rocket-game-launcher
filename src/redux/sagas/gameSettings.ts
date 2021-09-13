@@ -206,9 +206,12 @@ function* getDataFromMOIniSaga(): SagaIterator {
 
 /**
  * Считывает данные из файлов для генерации игровых опций
+ * @param filesForRead Игровые файлы, из которых нужно получить данные.
+ * @param isWithPrefix Нужно ли добавлять префикс к именам атрибутов. По умолчанию `false`.
 */
 function* getDataFromGameSettingsFilesSaga(
   filesForRead: IGameSettingsFiles,
+  isWithPrefix = false,
 ): SagaIterator<IGetDataFromFilesResult> {
   try {
     const {
@@ -228,6 +231,7 @@ function* getDataFromGameSettingsFilesSaga(
         filesForRead[fileName].view,
         fileName,
         filesForRead[fileName].encoding,
+        isWithPrefix,
       )),
     );
 
@@ -483,8 +487,9 @@ function* saveGameSettingsSaga(
     const currentFilesData: IUnwrap<IGetDataFromFilesResult> = yield call(
       getDataFromGameSettingsFilesSaga,
       changedGameSettingsFiles,
+      true,
     );
-
+    console.log('currentFilesData: ', currentFilesData);
     const filesForWrite = Object.keys(changedGameSettingsFiles).map((fileName) => {
       const changedGameSettingsOptionsNames = Object.keys(changedGameSettingsOptions[fileName]);
       const currWriteFileData = currentFilesData[fileName];
@@ -525,9 +530,11 @@ function* saveGameSettingsSaga(
             return false;
           });
         } else if (currWriteFileView === GameSettingsFileView.TAG) {
+          const pathArr = [...optionName.split('/')];
+          pathArr[pathArr.length - 1] = `@_${pathArr[pathArr.length - 1]}`;
           setValueForObjectDeepKey(
-            currWriteFileView,
-            [...optionName.split('/')],
+            currWriteFileData,
+            pathArr,
             changedGameSettingsOptions[fileName][optionName].value,
           );
         }
