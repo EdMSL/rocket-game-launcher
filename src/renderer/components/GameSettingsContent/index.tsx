@@ -32,7 +32,10 @@ interface IProps {
   gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
   gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
   gameSettingsOptions: IGameSettingsRootState['gameSettingsOptions'],
-  onSettingOptionChange: (parent: string, options: IGameSettingsOptionsItem) => void,
+  onSettingOptionChange: (
+    parent: string,
+    options: IGameSettingsOptionsItem,
+  ) => void,
 }
 
 /**
@@ -70,14 +73,17 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
       ? (+currentOption.value + newStep).toFixed(getNumberOfDecimalPlaces(currentOption.default))
       : (+currentOption.value + newStep).toFixed(getNumberOfDecimalPlaces(step));
 
-    onSettingOptionChange(parent, generateNewGameSettingsOption(
-      gameSettingsOptions,
+    onSettingOptionChange(
       parent,
-      name,
-      isOptionDefaultValueFloat
-        ? getValueFromRange(value, min, max).toFixed(getNumberOfDecimalPlaces(value))
-        : getValueFromRange(value, min, max),
-    ));
+      generateNewGameSettingsOption(
+        gameSettingsOptions,
+        parent,
+        name,
+        isOptionDefaultValueFloat
+          ? getValueFromRange(value, min, max).toFixed(getNumberOfDecimalPlaces(value))
+          : getValueFromRange(value, min, max),
+      ),
+    );
   }, [gameSettingsOptions, onSettingOptionChange]);
 
   const onOptionInputChange = useCallback((

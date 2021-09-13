@@ -30,6 +30,7 @@ import { GameSettingsFormControls } from '$components/GameSettingsFormControls';
 export const GameSettingsScreen: React.FC = () => {
   const isGameSettingsLoaded = useSelector((state: IAppState) => state.main.isGameSettingsLoaded);
   const isGameSettingsFilesBackuping = useSelector((state: IAppState) => state.main.isGameSettingsFilesBackuping); //eslint-disable-line max-len
+  const isGameSettingsSaving = useSelector((state: IAppState) => state.main.isGameSettingsSaving);
   const gameSettingsFiles = useSelector((state: IAppState) => state.gameSettings.gameSettingsFiles);
   const gameSettingsGroups = useSelector((state: IAppState) => state.gameSettings.gameSettingsGroups); //eslint-disable-line max-len
   const gameSettingsOptions = useSelector((state: IAppState) => state.gameSettings.gameSettingsOptions); //eslint-disable-line max-len
@@ -47,7 +48,10 @@ export const GameSettingsScreen: React.FC = () => {
     }, [dispatch],
   );
 
-  const onSettingOptionChange = useCallback((parent: string, options: IGameSettingsOptionsItem) => {
+  const onSettingOptionChange = useCallback((
+    parent: string,
+    options: IGameSettingsOptionsItem,
+  ) => {
     dispatch(changeGameSettingsOption(parent, options));
   }, [dispatch]);
 
@@ -64,7 +68,8 @@ export const GameSettingsScreen: React.FC = () => {
     setIsGameOptionsChanged(false);
   }, [dispatch, gameSettingsOptions]);
 
-  const getIsSettingsButtonsDisabled = useCallback(() => {
+  ///TODO Пересмотреть механиз отслеживания изменения параметров для кнопок
+  const getIsSaveResetSettingsButtonsDisabled = useCallback(() => {
     if (
       Object.keys(getChangedGameSettingsOptions(gameSettingsOptions)).length > 0
       && !isGameSettingsFilesBackuping
@@ -152,8 +157,9 @@ export const GameSettingsScreen: React.FC = () => {
                 </Switch>
               </div>
               <GameSettingsFormControls
-                isDisabled={getIsSettingsButtonsDisabled()}
-                isGameSettingsFilesBackuping={isGameSettingsFilesBackuping}
+                isGameOptionsChanged={getIsSaveResetSettingsButtonsDisabled()}
+                isBackuping={isGameSettingsFilesBackuping}
+                isSaving={isGameSettingsSaving}
                 onCancelSettingsBtnClick={onCancelSettingsBtnClick}
                 onCreateBackupBtnClick={onCreateBackupBtnClick}
               />

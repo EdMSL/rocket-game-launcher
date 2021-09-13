@@ -4,15 +4,17 @@ import styles from './styles.module.scss';
 import { Button } from '$components/UI/Button';
 
 interface IProps {
-  isDisabled: boolean,
-  isGameSettingsFilesBackuping: boolean,
+  isGameOptionsChanged: boolean,
+  isBackuping: boolean,
+  isSaving: boolean,
   onCancelSettingsBtnClick: () => void,
   onCreateBackupBtnClick: () => void,
 }
 
 export const GameSettingsFormControls: React.FunctionComponent<IProps> = ({
-  isDisabled,
-  isGameSettingsFilesBackuping,
+  isGameOptionsChanged,
+  isBackuping,
+  isSaving,
   onCancelSettingsBtnClick,
   onCreateBackupBtnClick,
 }) => (
@@ -20,13 +22,13 @@ export const GameSettingsFormControls: React.FunctionComponent<IProps> = ({
     <Button
       className={styles['game-settings-form__btn']}
       isSubmit
-      isDisabled={isDisabled}
+      isDisabled={isGameOptionsChanged || isBackuping || isSaving}
     >
       Сохранить
     </Button>
     <Button
       className={styles['game-settings-form__btn']}
-      isDisabled={isDisabled}
+      isDisabled={isGameOptionsChanged || isBackuping || isSaving}
       onClick={onCancelSettingsBtnClick}
     >
       Сбросить
@@ -34,7 +36,7 @@ export const GameSettingsFormControls: React.FunctionComponent<IProps> = ({
     <Button
       className={styles['game-settings-form__btn']}
       onClick={onCreateBackupBtnClick}
-      isDisabled={isGameSettingsFilesBackuping}
+      isDisabled={isBackuping || isSaving}
     >
       Создать бэкап
     </Button>

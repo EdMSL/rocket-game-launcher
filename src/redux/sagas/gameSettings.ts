@@ -25,6 +25,7 @@ import {
   addMessages,
   setIsGameSettingsAvailable,
   setIsGameSettingsLoaded,
+  setIsGameSettingsSaving,
 } from '$actions/main';
 import { GAME_DIR, GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import { checkGameSettingsFiles, checkGameSettingsConfigMainFields } from '$utils/check';
@@ -465,8 +466,9 @@ function* saveGameSettingsSaga(
   { payload: changedGameSettingsOptions }: ReturnType<typeof saveGameSettingsFiles>,
 ): SagaIterator {
   try {
+    yield put(setIsGameSettingsSaving(true));
+
     const {
-      main: { messages },
       gameSettings: {
         moProfile, gameSettingsFiles, gameSettingsOptions,
       },
@@ -585,6 +587,7 @@ function* saveGameSettingsSaga(
     };
 
     yield put(setGameSettingsOptions(newGameOptions));
+    yield put(addMessages([CreateUserMessage.success('Настройки успешно сохранены.')]));
   } catch (error: any) {
     let errorMessage = '';
 
@@ -603,9 +606,9 @@ function* saveGameSettingsSaga(
       LogMessageType.ERROR,
     );
 
-    yield put(addMessages([CreateUserMessage.error('Произошла ошибка в процессе генерации игровых настроек. Подробности в файле лога.')]));//eslint-disable-line max-len
+    yield put(addMessages([CreateUserMessage.error('Произошла ошибка в процессе сохранения игровых настроек. Подробности в файле лога.')]));//eslint-disable-line max-len
   } finally {
-    // yield put(setIsGameSettingsLoaded(true));
+    yield put(setIsGameSettingsSaving(false));
   }
 }
 
