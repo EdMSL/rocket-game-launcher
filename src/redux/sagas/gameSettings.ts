@@ -10,7 +10,6 @@ import path from 'path';
 
 import { IAppState } from '$store/store';
 import {
-  getPathToFile,
   IIniObj,
   IXmlObj,
   readDirectory,
@@ -66,7 +65,9 @@ import { IUserMessage } from '$types/main';
 import {
   Encoding, GameSettingParameterType, GameSettingsFileView,
 } from '$constants/misc';
-import { getParameterRegExp, getStringPartFromIniLineParameterForReplace } from '$utils/strings';
+import {
+  getParameterRegExp, getPathToFile, getStringPartFromIniLineParameterForReplace,
+} from '$utils/strings';
 
 interface IGetDataFromFilesResult {
   [key: string]: IIniObj|IXmlObj,
@@ -218,17 +219,12 @@ function* getDataFromMOIniSaga(): SagaIterator {
 */
 function* getDataFromGameSettingsFilesSaga(
   filesForRead: IGameSettingsFiles,
+  moProfile: string,
   isWithPrefix = false,
 ): SagaIterator<IGetDataFromFilesResult> {
   try {
     const {
-      gameSettings: {
-        // gameSettingsFiles,
-        moProfile,
-      },
-      system: {
-        customPaths,
-      },
+      system: { customPaths },
     }: IAppState = yield select(getState);
 
     const currentFilesData: IUnwrap<typeof readFileForGameSettingsOptions>[] = yield all(
@@ -272,6 +268,7 @@ function* generateGameSettingsOptionsSaga(): SagaIterator {
     const currentFilesDataObj: IUnwrap<IGetDataFromFilesResult> = yield call(
       getDataFromGameSettingsFilesSaga,
       gameSettingsFiles,
+      moProfile,
     );
 
     const totalGameSettingsOptions: IGameSettingsOptions = Object.keys(gameSettingsFiles).reduce(
@@ -459,11 +456,16 @@ export function* initGameSettingsSaga(): SagaIterator {
   }
 }
 
+/**
+ * Изменяет текущий профиль Mod Organizer на другой, записывая изменения в файл.
+ * @param moProfile Имя профиля.
+*/
 function* changeMOProfileSaga(
   { payload: moProfile }: ReturnType<typeof changeMoProfile>,
 ): SagaIterator {
   try {
-    yield put(setIsGameSettingsLoaded(true));
+    yield put(setIsGameSettingsLoaded(false));
+
     const {
       system: {
         modOrganizer: {
@@ -492,6 +494,8 @@ function* changeMOProfileSaga(
     );
 
     yield put(setMoProfile(moProfile));
+
+    yield call(generateGameSettingsOptionsSaga);
   } catch (error: any) {
     let errorMessage = '';
 
@@ -512,11 +516,15 @@ function* changeMOProfileSaga(
 
     yield put(addMessages([CreateUserMessage.error('Произошла ошибка при изменении профиля Mod Organizer. Подробности в файле лога.')]));//eslint-disable-line max-len
   } finally {
-    yield put(setIsGameSettingsLoaded(false));
+    yield put(setIsGameSettingsLoaded(true));
   }
 }
 
-function* saveGameSettingsSaga(
+/**
+ * Сохранить изменения в файлах игровых настроек.
+ * @param changedGameSettingsOptions Измененные опции для параметров из файлов.
+*/
+function* saveGameSettingsFilesSaga(
   { payload: changedGameSettingsOptions }: ReturnType<typeof saveGameSettingsFiles>,
 ): SagaIterator {
   try {
@@ -545,6 +553,7 @@ function* saveGameSettingsSaga(
     const currentFilesData: IUnwrap<IGetDataFromFilesResult> = yield call(
       getDataFromGameSettingsFilesSaga,
       changedGameSettingsFiles,
+      moProfile,
       true,
     );
 
@@ -613,17 +622,20 @@ function* saveGameSettingsSaga(
       }),
     );
 
-    const newChangedGameoptions = changedFilesNames.reduce<IGameSettingsOptions>((totalOptions, fileName) => {
-      const fileOtions = {
-        ...gameSettingsOptions[fileName],
-        ...getGameSettingsOptionsWithDefaultValues(changedGameSettingsOptions, false)[fileName],
-      };
+    const newChangedGameoptions = changedFilesNames.reduce<IGameSettingsOptions>(
+      (totalOptions, fileName) => {
+        const fileOtions = {
+          ...gameSettingsOptions[fileName],
+          ...getGameSettingsOptionsWithDefaultValues(changedGameSettingsOptions, false)[fileName],
+        };
 
-      return {
-        ...totalOptions,
-        [fileName]: fileOtions,
-      };
-    }, {});
+        return {
+          ...totalOptions,
+          [fileName]: fileOtions,
+        };
+      },
+      {},
+    );
 
     const newGameOptions = {
       ...gameSettingsOptions,
@@ -658,5 +670,5 @@ function* saveGameSettingsSaga(
 
 export default function* gameSetingsSaga(): SagaIterator {
   yield takeLatest(GAME_SETTINGS_TYPES.CHANGE_MO_PROFILE, changeMOProfileSaga);
-  yield takeLatest(GAME_SETTINGS_TYPES.SAVE_GAME_SETTINGS_FILES, saveGameSettingsSaga);
+  yield takeLatest(GAME_SETTINGS_TYPES.SAVE_GAME_SETTINGS_FILES, saveGameSettingsFilesSaga);
 }

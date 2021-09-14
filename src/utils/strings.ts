@@ -1,3 +1,8 @@
+import path from 'path';
+
+import { ISystemRootState } from '$types/system';
+import { CustomError } from './errors';
+
 const HEXADECIMAL = 16;
 const HEXADECIMAL_FACTOR = 1e8;
 
@@ -100,4 +105,22 @@ export const getValueFromRange = (
   }
 
   return +max;
+};
+
+export const getPathToFile = (
+  pathToFile: string,
+  customPaths: ISystemRootState['customPaths'],
+  profile: string,
+): string => {
+  if (/%MO%/.test(pathToFile)) {
+    if (profile) {
+      return path.resolve(customPaths['%MO%'], profile, path.basename(pathToFile));
+    }
+
+    throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
+  } else if (/%DOCUMENTS%/.test(pathToFile)) {
+    return path.resolve(customPaths['%DOCUMENTS%'], pathToFile);
+  }
+
+  return pathToFile;
 };

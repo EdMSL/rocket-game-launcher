@@ -26,7 +26,7 @@ import {
 import { MAIN_TYPES } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
 import { GameSettingsFilesBackup } from '$utils/backup';
-import { getPathToFile } from '$utils/files';
+import { getPathToFile } from '$utils/strings';
 
 const getState = (state: IAppState): IAppState => state;
 
