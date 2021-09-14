@@ -447,7 +447,7 @@ export function* initGameSettingsSaga(): SagaIterator {
     }
 
     writeToLogFileSync(
-      `Game settings initialization failed. Reason: ${errorMessage}`,
+      `Failed to initialize game settings. Reason: ${errorMessage}`,
       LogMessageType.ERROR,
     );
 
@@ -511,7 +511,7 @@ function* changeMOProfileSaga(
     }
 
     writeToLogFileSync(
-      `Change cerrent Mod Organizer profile failed. Reason: ${errorMessage}`,
+      `Failed to change current Mod Organizer profile . Reason: ${errorMessage}`,
       LogMessageType.ERROR,
     );
 
@@ -659,7 +659,7 @@ function* saveGameSettingsFilesSaga(
     }
 
     writeToLogFileSync(
-      `Game settings saving failed. Reason: ${errorMessage}`,
+      `Failed to save game settings. Reason: ${errorMessage}`,
       LogMessageType.ERROR,
     );
 
