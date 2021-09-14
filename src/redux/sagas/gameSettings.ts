@@ -2,6 +2,7 @@ import { SagaIterator } from 'redux-saga';
 import {
   call,
   put,
+  take,
   takeLatest,
   select,
   all,
@@ -428,7 +429,7 @@ export function* initGameSettingsSaga(): SagaIterator {
     }
 
     yield put(setGameSettingsFiles(newGameSettingsFilesObj));
-
+    yield take(GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_FILES);
     yield call(generateGameSettingsOptionsSaga);
 
     writeToLogFileSync('Game settings initialisation completed.');
@@ -494,7 +495,7 @@ function* changeMOProfileSaga(
     );
 
     yield put(setMoProfile(moProfile));
-
+    yield take(GAME_SETTINGS_TYPES.SET_MO_PROFILE);
     yield call(generateGameSettingsOptionsSaga);
   } catch (error: any) {
     let errorMessage = '';
