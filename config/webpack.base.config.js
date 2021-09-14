@@ -55,7 +55,7 @@ const configuration = merge([
     },
     plugins,
   },
-  js(),
+  js(process.env),
   images(),
 ]);
 

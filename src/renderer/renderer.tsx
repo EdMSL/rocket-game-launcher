@@ -11,10 +11,6 @@ import { Scope } from '$constants/misc';
 
 const remote = require('@electron/remote');
 
-if (module.hot) {
-  module.hot.accept();
-}
-
 const initialState = remote.getGlobal('state');
 const { store, history } = configureStore(initialState, Scope.RENDERER);
 

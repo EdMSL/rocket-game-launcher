@@ -1,4 +1,4 @@
-module.exports = function() {
+module.exports = function (env) {
   return {
     module: {
       rules: [
@@ -6,7 +6,17 @@ module.exports = function() {
           test: /\.(ts|js)(x?)$/,
           exclude: /node_modules/,
           use: [
-            'ts-loader',
+            {
+              loader: 'babel-loader',
+              options: {
+                plugins: [
+                  env.FAST_REFRESH && require.resolve('react-refresh/babel'),
+                ].filter(Boolean),
+              },
+            },
+            {
+              loader: 'ts-loader',
+            },
           ],
         },
       ],

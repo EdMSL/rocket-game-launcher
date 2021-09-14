@@ -15,10 +15,6 @@ require('@electron/remote/main').initialize();
 createLogFile();
 
 const start = async (): Promise<void> => {
-  if (module.hot) {
-    module.hot.accept();
-  }
-
   getSystemInfo();
 
   const store = createStorage();

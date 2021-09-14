@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 const css = require('./webpack/rules/css');
 const baseWebpackConfig = require('./webpack.base.config');
@@ -39,8 +40,9 @@ const devWebpackConfig = (env) => {
       plugins: [
         ...!MAIN ? [
           new webpack.HotModuleReplacementPlugin(),
+          process.env.FAST_REFRESH && new ReactRefreshWebpackPlugin(),
         ] : [],
-      ],
+      ].filter(Boolean),
     },
     css('development', `${baseWebpackConfig.externals.paths.src}/renderer/styles/resources`),
   ]);
