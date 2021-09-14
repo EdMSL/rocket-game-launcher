@@ -15,8 +15,7 @@ import {
 import createSagaMiddleware from 'redux-saga';
 
 import { getRootReducer } from '$reducers/root';
-import mainSaga from '$sagas/main';
-import gameSetingsSaga from '$sagas/gameSettings';
+import { SagaManager } from '$sagas/SagaManager';
 import { Scope } from '$constants/misc';
 
 ///FIXME Выглядит не особо изящно, попробовать переделать
@@ -64,8 +63,7 @@ export const configureStore = (
   if (scope === Scope.MAIN) {
     replayActionMain(store);
   } else {
-    sagaMiddleware.run(mainSaga);
-    sagaMiddleware.run(gameSetingsSaga);
+    SagaManager.startSagas(sagaMiddleware);
 
     replayActionRenderer(store);
   }

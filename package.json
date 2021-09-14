@@ -84,6 +84,7 @@
     "npm-run-all": "4.1.5",
     "react-refresh": "0.10.0",
     "react-refresh-webpack-plugin": "0.1.0",
+    "redbox-react": "1.6.0",
     "reduxsauce": "1.2.0",
     "sass": "1.32.8",
     "sass-loader": "11.0.1",
