@@ -368,3 +368,42 @@ export const getBackupFolderName = (): string => {
 
   return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}_${date.toTimeString().split(' ')[0].split(':').join('.')}`; // eslint-disable-line max-len
 };
+
+/**
+ * Изменить строку с указанным параметром на строку с новым значением параметра.
+ * Изменяет(мутирует) входные данные `iniData`.
+ * @param iniData Входные данные файла, в котором находится изменяемый параметр.
+ * @param sectionName Секция файла, в которой лежит изменяемый параметр.
+ * @param parameterName Изменяемый параметр.
+ * @param newValue Новое значение для параметра.
+*/
+export const changeSectionalIniParameter = (
+  iniData: IIniObj,
+  sectionName: string,
+  parameterName: string,
+  newValue: string,
+): void => {
+  const defaultLineText: string = iniData
+    .getSection(sectionName)
+    .getLine(parameterName).text;
+  const spacesBefore = defaultLineText.match(/(\s*)=/gm)![0];
+  const spacesAfter = defaultLineText.match(/(?<==)\s*(?<!\S)/);
+
+  iniData
+    .getSection(sectionName)
+    .setValue(
+      parameterName,
+      newValue,
+    );
+
+  const currLineText = iniData
+    .getSection(sectionName)
+    .getLine(parameterName)
+    .text
+    .split('=')
+    .join(`${spacesBefore}${spacesAfter ? spacesAfter.join('') : []}`);
+
+  iniData //eslint-disable-line no-param-reassign
+    .getSection(sectionName)
+    .getLine(parameterName).text = currLineText;
+};

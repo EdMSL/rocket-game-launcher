@@ -18,6 +18,7 @@ import {
   readINIFile,
   readJSONFile,
   writeGameSettingsFile,
+  writeINIFile,
   xmlAttributePrefix,
 } from '$utils/files';
 import { IUnwrap, IUnwrapSync } from '$types/common';
@@ -55,13 +56,16 @@ import {
   SagaError,
 } from '$utils/errors';
 import {
+  changeSectionalIniParameter,
   getGameSettingsOptionsWithDefaultValues,
   getOptionData,
   isDataFromIniFile,
   setValueForObjectDeepKey,
 } from '$utils/data';
 import { IUserMessage } from '$types/main';
-import { GameSettingParameterType, GameSettingsFileView } from '$constants/misc';
+import {
+  Encoding, GameSettingParameterType, GameSettingsFileView,
+} from '$constants/misc';
 import { getParameterRegExp, getStringPartFromIniLineParameterForReplace } from '$utils/strings';
 
 interface IGetDataFromFilesResult {
@@ -458,8 +462,58 @@ export function* initGameSettingsSaga(): SagaIterator {
 function* changeMOProfileSaga(
   { payload: moProfile }: ReturnType<typeof changeMoProfile>,
 ): SagaIterator {
-  yield put(setMoProfile(moProfile));
-  ///TODO Сделать сохранение профиля в МО ini
+  try {
+    yield put(setIsGameSettingsLoaded(true));
+    const {
+      system: {
+        modOrganizer: {
+          pathToINI, profileSection, profileParam,
+        },
+      },
+    }: IAppState = yield select(getState);
+
+    const iniData: IUnwrap<typeof readINIFile> = yield call(
+      readINIFile,
+      path.resolve(GAME_DIR, pathToINI),
+    );
+
+    changeSectionalIniParameter(
+      iniData,
+      profileSection,
+      profileParam,
+      moProfile,
+    );
+
+    yield call(
+      writeINIFile,
+      path.resolve(GAME_DIR, pathToINI),
+      iniData,
+      Encoding.WIN1251,
+    );
+
+    yield put(setMoProfile(moProfile));
+  } catch (error: any) {
+    let errorMessage = '';
+
+    if (error instanceof SagaError) {
+      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
+    } else if (error instanceof CustomError) {
+      errorMessage = `${error.message}`;
+    } else if (error instanceof ReadWriteError) {
+      errorMessage = `${error.message}. Path '${error.path}'.`;
+    } else {
+      errorMessage = `Unknown error. Message: ${error.message}`;
+    }
+
+    writeToLogFileSync(
+      `Change cerrent Mod Organizer profile failed. Reason: ${errorMessage}`,
+      LogMessageType.ERROR,
+    );
+
+    yield put(addMessages([CreateUserMessage.error('Произошла ошибка при изменении профиля Mod Organizer. Подробности в файле лога.')]));//eslint-disable-line max-len
+  } finally {
+    yield put(setIsGameSettingsLoaded(false));
+  }
 }
 
 function* saveGameSettingsSaga(
@@ -505,22 +559,12 @@ function* saveGameSettingsSaga(
           && isDataFromIniFile(currWriteFileView, currWriteFileData)
         ) {
           const parameterNameParts = optionName.split('/');
-          const defaultLineText: string = currWriteFileData.getSection(parameterNameParts[0]).getLine(parameterNameParts[1]).text;
-          const spacesBefore = defaultLineText.match(/(\s*)=/gm)![0];
-          const spacesAfter = defaultLineText.match(/(?<==)\s*(?<!\S)/);
-
-          currWriteFileData
-            .getSection(parameterNameParts[0])
-            .setValue(parameterNameParts[1], changedGameSettingsOptions[fileName][optionName].value);
-
-          const currLineText = currWriteFileData
-            .getSection(parameterNameParts[0])
-            .getLine(parameterNameParts[1])
-            .text
-            .split('=')
-            .join(`${spacesBefore}${spacesAfter ? spacesAfter.join('') : []}`);
-
-          currWriteFileData.getSection(parameterNameParts[0]).getLine(parameterNameParts[1]).text = currLineText;
+          changeSectionalIniParameter(
+            currWriteFileData,
+            parameterNameParts[0],
+            parameterNameParts[1],
+            changedGameSettingsOptions[fileName][optionName].value,
+          );
         } else if (
           currWriteFileView === GameSettingsFileView.LINE
           && isDataFromIniFile(currWriteFileView, currWriteFileData)
