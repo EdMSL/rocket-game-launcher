@@ -5,44 +5,33 @@ import {
   BACKUP_DIR, BACKUP_DIR_GAME_SETTINGS_FILES, GAME_DIR,
 } from '$constants/paths';
 import { getBackupFolderName } from './data';
-import { getReadWriteError, ReadWriteError } from './errors';
+import { LogMessageType, writeToLogFile } from './log';
 import {
-  LogMessageType, writeToLogFileSync,
-} from './log';
-import { createCopyFileSync, writeFileDataSync } from './files';
+  createCopyFileSync, createFolderSync, writeFileDataSync,
+} from './files';
+import { CustomError, ReadWriteError } from './errors';
 
-export const createBackupFolder = (directoryPath: string): void => {
+export const createBackupFolders = (isThrowError = false): void => {
   try {
-    if (!fs.existsSync(directoryPath)) {
-      fs.mkdirSync(directoryPath);
+    createFolderSync(BACKUP_DIR);
+    createFolderSync(path.join(BACKUP_DIR, 'game_settings_files', 'sdf'));
+  } catch (error: any) {
+    let errorMsg = error.message;
+
+    if (error instanceof ReadWriteError) {
+      errorMsg = `Failed to create backup folders. ${error.message}. Path: '${error.path}'.`;
     }
-  } catch (error: any) {
-    const readWriteError = getReadWriteError(error, true);
 
-    throw new ReadWriteError(
-      `Can't create backup folder. ${readWriteError.message}`,
-      readWriteError,
-      directoryPath,
-    );
-  }
-};
-
-export const createBackupFolders = (): void => {
-  try {
-    createBackupFolder(BACKUP_DIR);
-    createBackupFolder(path.join(BACKUP_DIR, 'game_settings_files'));
-  } catch (error: any) {
-    writeToLogFileSync(
-      `Message: ${error.message}. Path: '${error.path}'.`,
-      LogMessageType.ERROR,
-    );
-
-    throw error;
+    if (isThrowError) {
+      throw new CustomError(errorMsg);
+    } else {
+      writeToLogFile(errorMsg, LogMessageType.WARNING);
+    }
   }
 };
 
 export const GameSettingsFilesBackup = (files: string[]): void => {
-  createBackupFolders();
+  createBackupFolders(true);
   const folderName = getBackupFolderName();
 
   fs.mkdirSync(path.join(BACKUP_DIR_GAME_SETTINGS_FILES, folderName));

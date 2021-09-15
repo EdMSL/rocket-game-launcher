@@ -15,6 +15,8 @@ export const launcherLogPath = path.resolve(
     : './launcher.log',
 );
 
+/* eslint-disable no-console */
+
 /**
   * Создать файл лога.
   * @param pathToLogFile Путь до файла.
@@ -33,7 +35,6 @@ export const createLogFile = (pathToLogFile = launcherLogPath): void => {
   * @param messageType Определяет тип сообщения, ошибка, предупреждение или информация.
   * По умолчанию `info`.
 */
-//TODO Переделать перехват ошибок для методов
 export const writeToLogFileSync = (message: string, messageType = LogMessageType.INFO): void => {
   try {
     fs.appendFileSync(
@@ -41,7 +42,7 @@ export const writeToLogFileSync = (message: string, messageType = LogMessageType
       `\n[${messageType}][${new Date().toLocaleString()}]: ${message}`,
     );
   } catch (error: any) {
-    showErrorBox(error.message, "Can't write to log file.");
+    console.warn(`Can't write to log file. ${error.message}`);
   }
 };
 
@@ -57,7 +58,7 @@ export const writeToLogFile = (message: string, messageType = LogMessageType.INF
     `\n[${messageType.toUpperCase()}][${new Date().toLocaleString()}]: ${message}`,
     (error) => {
       if (error) {
-        showErrorBox(error.message, "Can't write to log file.");
+        console.warn(`Can't write to log file. ${error.message}`);
       }
     },
   );

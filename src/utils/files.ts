@@ -123,6 +123,26 @@ export const readDirectory = (
   });
 
 /**
+ * Синхронно создать папку.
+ * @param pathToDirectory Путь к папке.
+*/
+export const createFolderSync = (directoryPath: string): void => {
+  try {
+    if (!fs.existsSync(directoryPath)) {
+      fs.mkdirSync(directoryPath);
+    }
+  } catch (error: any) {
+    const readWriteError = getReadWriteError(error, true);
+
+    throw new ReadWriteError(
+      `Can't create folder. ${readWriteError.message}`,
+      readWriteError,
+      directoryPath,
+    );
+  }
+};
+
+/**
  * Синхронно получить данные из JSON файла.
  * @param pathToFile Путь к файлу.
  * @returns Объект с данными из файла.

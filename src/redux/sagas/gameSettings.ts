@@ -397,7 +397,7 @@ function* generateGameSettingsOptionsSaga(): SagaIterator {
 export function* initGameSettingsSaga(): SagaIterator {
   try {
     yield put(setIsGameSettingsLoaded(false));
-    writeToLogFileSync('Start game settings initialisation.');
+    writeToLogFileSync('Game settings initialization started.');
 
     const {
       gameSettings: {

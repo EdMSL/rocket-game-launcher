@@ -14,8 +14,8 @@ export const GAME_DIR = process.env.NODE_ENV === 'development'
 export const DOCUMENTS_DIR = path.resolve(os.homedir(), 'Documents');
 
 export const BACKUP_DIR = process.env.NODE_ENV === 'development'
-  ? path.resolve('./backup')
-  : path.resolve('./app/backup');
+  ? path.resolve('./app/backup')
+  : path.resolve('./backup');
 
 export const BACKUP_DIR_GAME_SETTINGS_FILES = process.env.NODE_ENV === 'development'
   ? path.resolve('./backup/game_settings_files')
