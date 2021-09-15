@@ -14,6 +14,8 @@ import {
   writeINIFile,
   readXMLFile,
   writeXMLFile,
+  readJSONFile,
+  readDirectory,
 } from '$utils/files';
 import { ErrorMessage, ReadWriteError } from '$utils/errors';
 import { createMockFilesForRead, createMockFilesForWrite } from './fixtures/getFiles';
@@ -23,6 +25,7 @@ const errorAccessRegExp = new RegExp(ErrorMessage.ACCESS);
 const errorNotFoundRegExp = new RegExp(ErrorMessage.FILE_NOT_FOUND);
 const errorArgTypeRegExp = new RegExp(ErrorMessage.ARG_TYPE);
 const errorDirectoryRegExp = new RegExp(ErrorMessage.PATH_TO_DIRECTORY);
+const errorPathFileRegExp = new RegExp(ErrorMessage.PATH_TO_FILE);
 
 /* eslint-disable max-len, @typescript-eslint/ban-ts-comment */
 describe('#Files', () => {
@@ -193,6 +196,27 @@ describe('#Files', () => {
     it('Should return parse error', async () => {
       assert.throw(() => { readJSONFileSync(`${process.cwd()}/folderName/incorrect.json`); }, Error);
       assert.throw(() => { readJSONFileSync(`${process.cwd()}/folderName/incorrect.json`); }, /JSON parse error/);
+    });
+
+    it('Should return wrong extension error', async () => {
+      assert.throw(() => { readJSONFileSync(`${process.cwd()}/folderName/index.md`); }, Error);
+      assert.throw(() => { readJSONFileSync(`${process.cwd()}/folderName/index.md`); }, /file must have the extension .json/);
+
+      let errorMsg = '';
+      await readJSONFile(`${process.cwd()}/folderName/index.md`)
+        .catch((error) => {
+          errorMsg = error.message;
+        });
+      assert.match(errorMsg, /file must have the extension .json/);
+    });
+
+    it('Should return path to file error', async () => {
+      let errorMsg = '';
+      await readDirectory(`${process.cwd()}/folderName/index.md`)
+        .catch((error) => {
+          errorMsg = error.message;
+        });
+      assert.match(errorMsg, errorPathFileRegExp);
     });
 
     it('Should return correct object', async () => {
