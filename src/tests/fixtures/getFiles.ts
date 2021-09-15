@@ -6,6 +6,8 @@ export const createMockFilesForRead = (): void => {
     'folderName': {
       'index.md': '# Hello world!',
       'test.json': mock.load(path.resolve(__dirname, './files/test.json'), { lazy: false }),
+      'test.xml': mock.load(path.resolve(__dirname, './files/test.xml'), { lazy: false }),
+      'incorrect.json': '{some": "content"}',
       'writeOnly.json': mock.file({
         content: '{"some": "content"}',
         mode: 0o222,
@@ -22,8 +24,16 @@ export const createMockFilesForRead = (): void => {
         content: '[Section]\r\nparam=data',
         mode: 0o222,
       }),
+      'writeOnly.xml': mock.file({
+        content: '<Content />',
+        mode: 0o222,
+      }),
       'readOnly.ini': mock.file({
         content: '[Section]\r\nparam=data',
+        mode: 0o444,
+      }),
+      'readOnly.xml': mock.file({
+        content: '<Content>\n<Data Value="3"/>\n</Content>',
         mode: 0o444,
       }),
     },
@@ -43,7 +53,12 @@ export const createMockFilesForWrite = (): void => {
         content: '[Section]\r\nparam=data',
         mode: 0o444,
       }),
+      'readOnly.xml': mock.file({
+        content: '<Content>\n<Data Value="3"/>\n</Content>',
+        mode: 0o444,
+      }),
       'test.ini': '',
+      'test.xml': '<>',
     },
     'readOnlyDir': mock.directory({
       mode: 0o444,
