@@ -23,25 +23,30 @@ import { IGameSettingsOptionsItem } from '$types/gameSettings';
 import { Loader } from '$components/UI/Loader';
 import { GameSettingsFormControls } from '$components/GameSettingsFormControls';
 import { createGameSettingsFilesBackup } from '$actions/main';
+import { Modal } from '$components/UI/Modal';
+import { GameSettingsBackup } from '$containers/GameSettingsBackup';
 
 /**
  * Контейнер, в котором располагаются блок (`GameSettingsContent`) с контроллерами для изменения
  * игровых настроек и селектор выбора профиля Mod Organizer (если МО используется).
 */
 export const GameSettingsScreen: React.FC = () => {
+  /* eslint-disable max-len */
   const isGameSettingsLoaded = useSelector((state: IAppState) => state.main.isGameSettingsLoaded);
-  const isGameSettingsFilesBackuping = useSelector((state: IAppState) => state.main.isGameSettingsFilesBackuping); //eslint-disable-line max-len
+  const isGameSettingsFilesBackuping = useSelector((state: IAppState) => state.main.isGameSettingsFilesBackuping);
   const isGameSettingsSaving = useSelector((state: IAppState) => state.main.isGameSettingsSaving);
   const gameSettingsFiles = useSelector((state: IAppState) => state.gameSettings.gameSettingsFiles);
-  const gameSettingsGroups = useSelector((state: IAppState) => state.gameSettings.gameSettingsGroups); //eslint-disable-line max-len
-  const gameSettingsOptions = useSelector((state: IAppState) => state.gameSettings.gameSettingsOptions); //eslint-disable-line max-len
+  const gameSettingsGroups = useSelector((state: IAppState) => state.gameSettings.gameSettingsGroups);
+  const gameSettingsOptions = useSelector((state: IAppState) => state.gameSettings.gameSettingsOptions);
   const moProfile = useSelector((state: IAppState) => state.gameSettings.moProfile);
   const moProfiles = useSelector((state: IAppState) => state.gameSettings.moProfiles);
   const isModOrganizerUsed = useSelector((state: IAppState) => state.system.modOrganizer.isUsed);
+  /* eslint-enable max-len */
 
   const dispatch = useDispatch();
 
   const [isGameOptionsChanged, setIsGameOptionsChanged] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const onMOProfilesSelectChange = useCallback(
     ({ target }: React.ChangeEvent<HTMLSelectElement>) => {
@@ -88,6 +93,14 @@ export const GameSettingsScreen: React.FC = () => {
   const onCreateBackupBtnClick = useCallback(() => {
     dispatch(createGameSettingsFilesBackup());
   }, [dispatch]);
+
+  const onRestoreBackupBtnClick = useCallback(() => {
+    setIsModalOpen(true);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setIsModalOpen(false);
+  }, []);
 
   return (
     <main className={classNames('main', styles['game-settings-screen__main'])}>
@@ -163,10 +176,21 @@ export const GameSettingsScreen: React.FC = () => {
                 isSaving={isGameSettingsSaving}
                 onCancelSettingsBtnClick={onCancelSettingsBtnClick}
                 onCreateBackupBtnClick={onCreateBackupBtnClick}
+                onRestoreBackupBtnClick={onRestoreBackupBtnClick}
               />
             </form>
           )
-          }
+        }
+        {
+          isModalOpen && (
+            <Modal
+              isCanClose={false}
+              onCloseBtnClick={closeModal}
+            >
+              <GameSettingsBackup />
+            </Modal>
+          )
+        }
         {
           !isGameSettingsLoaded && <Loader />
         }

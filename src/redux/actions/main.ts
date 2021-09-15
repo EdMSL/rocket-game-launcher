@@ -47,6 +47,13 @@ export const setIsGameSettingsFilesBackuping: IAction<IMainRootState['isGameSett
   payload: isGameSettingsFilesBackuping,
 });
 
+export const setGameSettingsFilesBackup: IAction<IMainRootState['gameSettingsFilesBackup']> = (
+  gameSettingsFilesBackup,
+) => ({
+  type: MAIN_TYPES.SET_GAME_SETTINGS_FILES_BACKUP,
+  payload: gameSettingsFilesBackup,
+});
+
 export const setMessages: IAction<IMainRootState['messages']> = (
   messages,
 ) => ({

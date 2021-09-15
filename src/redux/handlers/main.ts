@@ -68,6 +68,17 @@ const setIsGameSettingsFilesBackuping: IActionHandler<
   isGameSettingsFilesBackuping,
 });
 
+const setGameSettingsFilesBackup: IActionHandler<
+  IMainRootState,
+  typeof MAIN_ACTIONS.setGameSettingsFilesBackup
+> = (
+  state,
+  { payload: gameSettingsFilesBackup },
+) => ({
+  ...state,
+  gameSettingsFilesBackup,
+});
+
 const setMessages: IActionHandler<
   IMainRootState,
   typeof MAIN_ACTIONS.setMessages
@@ -111,6 +122,7 @@ export const MAIN_HANDLERS = {
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_AVAILABLE]: setIsGameSettingsAvailable,
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_SAVING]: setIsGameSettingsSaving,
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_FILES_BACKUPING]: setIsGameSettingsFilesBackuping,
+  [MAIN_TYPES.SET_GAME_SETTINGS_FILES_BACKUP]: setGameSettingsFilesBackup,
   [MAIN_TYPES.SET_MESSAGES]: setMessages,
   [MAIN_TYPES.ADD_MESSAGES]: addMessages,
   [MAIN_TYPES.DELETE_MESSAGES]: deleteMessages,

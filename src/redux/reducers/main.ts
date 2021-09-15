@@ -10,6 +10,7 @@ const INITIAL_STATE: IMainRootState = {
   isGameSettingsAvailable: false,
   isGameSettingsSaving: false,
   isGameSettingsFilesBackuping: false,
+  gameSettingsFilesBackup: [],
   messages: [],
 };
 

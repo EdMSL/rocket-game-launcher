@@ -7,6 +7,7 @@ export const MAIN_TYPES = {
   SET_IS_GAME_SETTINGS_AVAILABLE: 'SET_IS_GAME_SETTINGS_AVAILABLE',
   SET_IS_GAME_SETTINGS_SAVING: 'SET_IS_GAME_SETTINGS_SAVING',
   CREATE_GAME_SETTING_BACKUP: 'CREATE_GAME_SETTING_BACKUP',
+  SET_GAME_SETTINGS_FILES_BACKUP: 'SET_GAME_SETTINGS_FILES_BACKUP',
   SET_IS_GAME_SETTINGS_FILES_BACKUPING: 'SET_IS_GAME_SETTINGS_FILES_BACKUPING',
   SET_MESSAGES: 'SET_MESSAGES',
   ADD_MESSAGES: 'ADD_MESSAGES',
@@ -17,6 +18,16 @@ export interface IUserMessage extends IMessage {
   id: string,
 }
 
+interface IBackupFile {
+  name: string,
+  path: string,
+}
+
+export interface IBackupFiles {
+  name: string,
+  files: IBackupFile[],
+}
+
 export type IMainRootState = Readonly<{
   isLauncherInitialised: boolean,
   isGameRunning: boolean,
@@ -24,5 +35,6 @@ export type IMainRootState = Readonly<{
   isGameSettingsAvailable: boolean,
   isGameSettingsSaving: boolean,
   isGameSettingsFilesBackuping: boolean,
+  gameSettingsFilesBackup: IBackupFiles[],
   messages: IUserMessage[],
 }>;
