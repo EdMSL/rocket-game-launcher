@@ -39,6 +39,7 @@ import {
 } from '$types/gameSettings';
 import {
   LogMessageType,
+  writeToLogFile,
   writeToLogFileSync,
 } from '$utils/log';
 import { CreateUserMessage } from '$utils/message';
@@ -408,18 +409,19 @@ function* generateGameSettingsOptionsSaga(
     );
 
     if (optionsErrors.length > 0) {
-      yield put(addMessages(optionsErrors));
+      optionsErrors.forEach((message) => {
+        writeToLogFile(message.text, message.type);
+      });
     }
 
-    if (Object.keys(totalGameSettingsOptions).length > 0) {
-      return {
-        totalGameSettingsOptions,
-        incorrectGameSettingsFiles,
-      };
+    if (Object.keys(totalGameSettingsOptions).length === 0) {
+      yield put(addMessages([CreateUserMessage.error('Нет доступных настроек для вывода.')]));
     }
-    yield put(addMessages([CreateUserMessage.error('Нет доступных настроек для вывода.')]));
 
-    throw new CustomError('No game options to show.', 'NoOptions');
+    return {
+      totalGameSettingsOptions,
+      incorrectGameSettingsFiles,
+    };
   } catch (error: any) {
     throw new SagaError('Generate game options', error.message);
   }

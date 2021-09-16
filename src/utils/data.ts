@@ -163,7 +163,7 @@ export const getOptionData = (
 
     if (!optionSettingGroup) {
       optionErrors.push(CreateUserMessage.warning(
-        `Файл ${baseFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит группы параметров "${currentGameSettingParameter.iniGroup}", указанной в параметре ${currentGameSettingParameter.name} из ${gameSettingsFileName}`, //eslint-disable-line max-len
+        `The ${baseFileName} file ${moProfileName ? `from the ${moProfileName} profile` : ''} does not contain the "${currentGameSettingParameter.iniGroup}" group specified in ${currentGameSettingParameter.name} from "${gameSettingsFileName}"`, //eslint-disable-line max-len
       ));
     } else {
       const parameterLine = optionSettingGroup.getLine(currentGameSettingParameter.name);
@@ -173,7 +173,7 @@ export const getOptionData = (
         optionValue = parameterLine.value;
       } else {
         optionErrors.push(CreateUserMessage.warning(
-          `Файл ${baseFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} из группы "${currentGameSettingParameter.iniGroup}" не содержит параметра "${currentGameSettingParameter.name}", указанного в ${gameSettingsFileName}`, //eslint-disable-line max-len
+          `The ${baseFileName} file ${moProfileName ? `from the ${moProfileName} profile` : ''} from the "${currentGameSettingParameter.iniGroup}" group does not contain the "${currentGameSettingParameter.name}" parameter specified in "${gameSettingsFileName}"`, //eslint-disable-line max-len
         ));
       }
     }
@@ -190,7 +190,7 @@ export const getOptionData = (
 
     if (!optionName) {
       optionErrors.push(CreateUserMessage.warning(
-        `Файл ${baseFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит параметра "${currentGameSettingParameter.name}", указанного в ${gameSettingsFileName}`, //eslint-disable-line max-len
+        `The ${baseFileName} file ${moProfileName ? `from the  ${moProfileName} profile` : ''} does not contain the "${currentGameSettingParameter.name}" parameter, specified in "${gameSettingsFileName}"`, //eslint-disable-line max-len
       ));
     }
   } else if (fileView === GameSettingsFileView.TAG) {
