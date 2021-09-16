@@ -17,9 +17,9 @@ import {
   CustomError,
   ErrorCode,
   ErrorName,
+  ErrorMessage,
 } from '$utils/errors';
 import { Encoding, GameSettingsFileView } from '$constants/misc';
-import { ISystemRootState } from '$types/system';
 
 export const xmlAttributePrefix = '@_';
 
@@ -68,7 +68,7 @@ export const readFileDataSync = (
   try {
     if (typeof pathToFile === 'number') {
       throw new CustomError(
-        'The argument in path must not be a number',
+        ErrorMessage.ARG_TYPE,
         ErrorName.ARG_TYPE,
         ErrorCode.ARG_TYPE,
       );
@@ -91,7 +91,9 @@ export const readFileDataSync = (
  * @param pathToFile Путь к файлу.
  * @returns Buffer с данными из файла.
 */
-export const readFileData = (pathToFile: string): Promise<Buffer> => fsPromises.readFile(pathToFile)
+export const readFileData = (
+  pathToFile: string,
+): Promise<Buffer> => fsPromises.readFile(pathToFile)
   .then((data) => data)
   .catch((error) => {
     const readWriteError = getReadWriteError(error);
@@ -149,7 +151,12 @@ export const createFolderSync = (directoryPath: string): void => {
 */
 export const readJSONFileSync = <T>(pathToFile: string): T => {
   try {
-    if (!mime.getType(pathToFile)?.match(/application\/json/)) {
+    if (
+      pathToFile !== null
+      && pathToFile !== undefined
+      && path.extname(pathToFile.toString())
+      && !mime.getType(pathToFile)?.match(/application\/json/)
+    ) {
       throw new CustomError(
         'The file must have the extension .json',
         ErrorName.MIME_TYPE,
@@ -176,7 +183,12 @@ export const readJSONFileSync = <T>(pathToFile: string): T => {
 */
 export const readJSONFile = async <T>(pathToFile: string): Promise<T> => {
   try {
-    if (!mime.getType(pathToFile)?.match(/application\/json/)) {
+    if (
+      pathToFile !== null
+      && pathToFile !== undefined
+      && path.extname(pathToFile.toString())
+      && !mime.getType(pathToFile)?.match(/application\/json/)
+    ) {
       throw new CustomError(
         'The file must have the extension .json',
         ErrorName.MIME_TYPE,
