@@ -16,9 +16,11 @@ import {
   IGameSettingsOptions,
   IGameSettingsOptionsItem,
   IGameSettingsOptionContent,
+  IGameSettingsFiles,
 } from '$types/gameSettings';
 import { IUserMessage } from '$types/main';
 import { ISelectOption } from '$components/UI/Select';
+import { IIncorrectGameSettingsFiles } from '$sagas/gameSettings';
 
 const ONE_GB = 1073741824;
 const SYMBOLS_TO_TYPE = 8;
@@ -247,26 +249,54 @@ export const generateSelectOptions = (
   }));
 };
 
+export const filterIncorrectGameSettingsFiles = (
+  gameSettingsFiles: IGameSettingsFiles,
+  incorrectGameSettingsFiles: IIncorrectGameSettingsFiles,
+): IGameSettingsFiles => Object.keys(gameSettingsFiles)
+  .reduce<IGameSettingsFiles>((newGameSettingsFiles, gameSettingsFileName) => {
+    if (incorrectGameSettingsFiles.hasOwnProperty(gameSettingsFileName)) { //eslint-disable-line no-prototype-builtins
+      if (gameSettingsFiles[gameSettingsFileName].parameters.length === incorrectGameSettingsFiles[gameSettingsFileName].length) {
+        return { ...newGameSettingsFiles };
+      }
+
+      return {
+        ...newGameSettingsFiles,
+        [gameSettingsFileName]: {
+          ...gameSettingsFiles[gameSettingsFileName],
+          parameters: {
+            ...gameSettingsFiles[gameSettingsFileName].parameters
+              .filter((parameter, index) => !incorrectGameSettingsFiles[gameSettingsFileName]
+                .includes(index)),
+          },
+        },
+      };
+    }
+    return {
+      ...newGameSettingsFiles,
+      [gameSettingsFileName]: { ...gameSettingsFiles[gameSettingsFileName] },
+    };
+  }, {});
+
 /**
  * Получает список параметров для вывода в виде опций. Если есть `gameSettingsGroups`,
  * то фильтрует по текущей группе.
  * @param GameSettingsFile Объект текущего обрабатываемого файла из `state`.
- * @param gamegameSettingsGroups Список доступных групп настроек из `state`.
+ * @param gameSettingsGroups Список доступных групп настроек из `state`.
  * @param currentGameSettingGroup текущая группа настроек.
  * @returns Массив с параметрами для генерации игровый опций.
 */
 export const getParametersForOptionsGenerate = (
-  GameSettingsFile: IGameSettingsFile,
-  gamegameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
+  gameSettingsFile: IGameSettingsFile,
+  gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
   currentGameSettingGroup: string,
 ): IGameSettingsParameter[] => {
-  if (gamegameSettingsGroups.length > 0 && currentGameSettingGroup) {
-    return GameSettingsFile.parameters.filter(
+  if (gameSettingsGroups.length > 0 && currentGameSettingGroup) {
+    return gameSettingsFile.parameters.filter(
       (currentParameter) => currentParameter.settingGroup === currentGameSettingGroup,
     );
   }
 
-  return GameSettingsFile.parameters;
+  return gameSettingsFile.parameters;
 };
 
 /**

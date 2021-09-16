@@ -35,6 +35,7 @@ import {
   IGameSettingsConfig,
   IGameSettingsFiles,
   IGameSettingsOptions,
+  IGameSettingsOptionsItem,
 } from '$types/gameSettings';
 import {
   LogMessageType,
@@ -57,21 +58,31 @@ import {
 } from '$utils/errors';
 import {
   changeSectionalIniParameter,
+  filterIncorrectGameSettingsFiles,
+  /* filterIncorrectGameSettingsFiles, */
   getGameSettingsOptionsWithDefaultValues,
   getOptionData,
   isDataFromIniFile,
   setValueForObjectDeepKey,
 } from '$utils/data';
-import { IUserMessage } from '$types/main';
+import { IUserMessage, MAIN_TYPES } from '$types/main';
 import {
-  Encoding, GameSettingParameterType, GameSettingsFileView,
+  Encoding,
+  GameSettingParameterType,
+  GameSettingsFileView,
 } from '$constants/misc';
 import {
-  getParameterRegExp, getPathToFile, getStringPartFromIniLineParameterForReplace,
+  getParameterRegExp,
+  getPathToFile,
+  getStringPartFromIniLineParameterForReplace,
 } from '$utils/strings';
 
 interface IGetDataFromFilesResult {
   [key: string]: IIniObj|IXmlObj,
+}
+
+export interface IIncorrectGameSettingsFiles {
+  [key: string]: number[],
 }
 
 const getState = (state: IAppState): IAppState => state;
@@ -257,6 +268,7 @@ function* getDataFromGameSettingsFilesSaga(
 */
 function* generateGameSettingsOptionsSaga(): SagaIterator {
   try {
+    let incorrectGameSettingsFiles: IIncorrectGameSettingsFiles = {};
     let optionsErrors: IUserMessage[] = [];
 
     const {
@@ -274,8 +286,10 @@ function* generateGameSettingsOptionsSaga(): SagaIterator {
 
     const totalGameSettingsOptions: IGameSettingsOptions = Object.keys(gameSettingsFiles).reduce(
       (gameSettingsOptions, currentGameSettingsFile) => {
+        const incorrectIndexes: number[] = [];
+
         const optionsFromFile = gameSettingsFiles[currentGameSettingsFile].parameters.reduce(
-          (currentOptions, currentParameter) => {
+          (currentOptions, currentParameter, index) => {
             //Если опция с типом group или related,
             // то генерация производится для каждого параметра в items.
             if (
@@ -285,7 +299,7 @@ function* generateGameSettingsOptionsSaga(): SagaIterator {
             ) {
               let specParamsErrors: IUserMessage[] = [];
 
-              const optionsFromParameter = currentParameter.items!.reduce(
+              const optionsFromParameter = currentParameter.items!.reduce<IGameSettingsOptionsItem>(
                 (options, currentOption) => {
                   const {
                     optionName, optionValue, optionErrors,
@@ -300,6 +314,7 @@ function* generateGameSettingsOptionsSaga(): SagaIterator {
 
                   if (optionErrors.length > 0) {
                     specParamsErrors = [...optionErrors];
+                    incorrectIndexes.push(index);
 
                     return { ...options };
                   }
@@ -309,7 +324,8 @@ function* generateGameSettingsOptionsSaga(): SagaIterator {
                     [optionName]: {
                       default: optionValue,
                       value: optionValue,
-                      settingsGroup: currentParameter.settingGroup,
+                      settingGroup: currentParameter.settingGroup,
+                      parameterId: currentParameter.id,
                       parent: currentGameSettingsFile,
                     },
                   };
@@ -342,6 +358,7 @@ function* generateGameSettingsOptionsSaga(): SagaIterator {
 
             if (optionErrors.length > 0) {
               optionsErrors = [...optionsErrors, ...optionErrors];
+              incorrectIndexes.push(index);
 
               return { ...currentOptions };
             }
@@ -351,13 +368,21 @@ function* generateGameSettingsOptionsSaga(): SagaIterator {
               [optionName]: {
                 default: optionValue,
                 value: optionValue,
-                settingsGroup: currentParameter.settingGroup,
+                settingGroup: currentParameter.settingGroup,
+                parameterId: currentParameter.id,
                 parent: currentGameSettingsFile,
               },
             };
           },
           {},
         );
+
+        if (incorrectIndexes.length > 0) {
+          incorrectGameSettingsFiles = {
+            ...incorrectGameSettingsFiles,
+            [currentGameSettingsFile]: incorrectIndexes,
+          };
+        }
 
         if (Object.keys(optionsFromFile).length > 0) {
           return {
@@ -379,6 +404,16 @@ function* generateGameSettingsOptionsSaga(): SagaIterator {
 
     if (Object.keys(totalGameSettingsOptions).length > 0) {
       yield put(setGameSettingsOptions(totalGameSettingsOptions));
+
+      if (Object.keys(incorrectGameSettingsFiles).length > 0) {
+        const newGameSettingsFilesObj = filterIncorrectGameSettingsFiles(
+          gameSettingsFiles,
+          incorrectGameSettingsFiles,
+        );
+
+        yield put(setGameSettingsFiles(newGameSettingsFilesObj));
+        yield take(GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_FILES);
+      }
     } else {
       yield put(addMessages([CreateUserMessage.error('Нет доступных настроек для вывода.')]));
 
