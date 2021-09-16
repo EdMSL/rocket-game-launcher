@@ -14,7 +14,7 @@ import { CustomError, ReadWriteError } from './errors';
 export const createBackupFolders = (isThrowError = false): void => {
   try {
     createFolderSync(BACKUP_DIR);
-    createFolderSync(path.join(BACKUP_DIR, 'game_settings_files', 'sdf'));
+    createFolderSync(path.join(BACKUP_DIR, 'game_settings_files'));
   } catch (error: any) {
     let errorMsg = error.message;
 
