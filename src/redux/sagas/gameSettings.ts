@@ -523,7 +523,7 @@ function* changeMOProfileSaga(
     yield put(setIsGameSettingsLoaded(false));
 
     const {
-      gameSettings: { gameSettingsFiles },
+      gameSettings: { gameSettingsFiles, gameSettingsOptions },
       system: {
         modOrganizer: {
           pathToINI, profileSection, profileParam,
@@ -550,14 +550,31 @@ function* changeMOProfileSaga(
       Encoding.WIN1251,
     );
 
+    const constMOProfileGameSettingsOnly = Object.keys(gameSettingsFiles)
+      .reduce<IGameSettingsFiles>((acc, curr) => {
+        if (/%MO%/.test(gameSettingsFiles[curr].path)) {
+          return {
+            ...acc,
+            [curr]: {
+              ...gameSettingsFiles[curr],
+            },
+          };
+        }
+
+        return { ...acc };
+      }, {});
+
     const { totalGameSettingsOptions }: IUnwrap<IGenerateGameSettingsOptionsResult> = yield call(
       generateGameSettingsOptionsSaga,
-      gameSettingsFiles,
+      constMOProfileGameSettingsOnly,
       moProfile,
     );
 
     yield put(setMoProfile(moProfile));
-    yield put(setGameSettingsOptions(totalGameSettingsOptions));
+    yield put(setGameSettingsOptions({
+      ...gameSettingsOptions,
+      ...totalGameSettingsOptions,
+    }));
   } catch (error: any) {
     let errorMessage = '';
 
