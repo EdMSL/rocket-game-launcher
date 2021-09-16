@@ -85,6 +85,11 @@ export interface IIncorrectGameSettingsFiles {
   [key: string]: number[],
 }
 
+export interface IGenerateGameSettingsOptionsResult {
+  totalGameSettingsOptions: IGameSettingsOptions,
+  incorrectGameSettingsFiles: IIncorrectGameSettingsFiles,
+}
+
 const getState = (state: IAppState): IAppState => state;
 
 /**
@@ -157,8 +162,9 @@ function* getMOProfilesSaga(): SagaIterator {
 
 /**
  * Получить данные из файла ModOrganizer.ini и записать нужные параметры в `state`
+ * @returns Строка с профилем ModOrganizer
 */
-function* getDataFromMOIniSaga(): SagaIterator {
+function* getDataFromMOIniSaga(): SagaIterator<string> {
   try {
     const {
       system: {
@@ -197,9 +203,11 @@ function* getDataFromMOIniSaga(): SagaIterator {
         }
 
         yield put(setMoProfile(name.toString()));// Если вдруг будет число
-      } else {
-        throw new CustomError('profileName');
+
+        return name.toString();
       }
+
+      throw new CustomError('profileName');
     } else {
       throw new CustomError('profileSection');
     }
@@ -265,18 +273,19 @@ function* getDataFromGameSettingsFilesSaga(
 /**
  * Генерирует список игровых опций на основе параметров
  * (`gameSettingsFiles`) из файлов, указанных в settings.json
+ * @param gameSettingsFiles Объект-основа для генерации опций.
+ * @param moProfile Профиль Mod Organizer.
 */
-function* generateGameSettingsOptionsSaga(): SagaIterator {
+function* generateGameSettingsOptionsSaga(
+  gameSettingsFiles: IGameSettingsFiles,
+  moProfile: string,
+): SagaIterator<{
+  totalGameSettingsOptions: IGameSettingsOptions,
+  incorrectGameSettingsFiles: IIncorrectGameSettingsFiles,
+}> {
   try {
     let incorrectGameSettingsFiles: IIncorrectGameSettingsFiles = {};
     let optionsErrors: IUserMessage[] = [];
-
-    const {
-      gameSettings: {
-        gameSettingsFiles,
-        moProfile,
-      },
-    }: IAppState = yield select(getState);
 
     const currentFilesDataObj: IUnwrap<IGetDataFromFilesResult> = yield call(
       getDataFromGameSettingsFilesSaga,
@@ -403,22 +412,14 @@ function* generateGameSettingsOptionsSaga(): SagaIterator {
     }
 
     if (Object.keys(totalGameSettingsOptions).length > 0) {
-      yield put(setGameSettingsOptions(totalGameSettingsOptions));
-
-      if (Object.keys(incorrectGameSettingsFiles).length > 0) {
-        const newGameSettingsFilesObj = filterIncorrectGameSettingsFiles(
-          gameSettingsFiles,
-          incorrectGameSettingsFiles,
-        );
-
-        yield put(setGameSettingsFiles(newGameSettingsFilesObj));
-        yield take(GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_FILES);
-      }
-    } else {
-      yield put(addMessages([CreateUserMessage.error('Нет доступных настроек для вывода.')]));
-
-      throw new CustomError('No game options to show.');
+      return {
+        totalGameSettingsOptions,
+        incorrectGameSettingsFiles,
+      };
     }
+    yield put(addMessages([CreateUserMessage.error('Нет доступных настроек для вывода.')]));
+
+    throw new CustomError('No game options to show.', 'NoOptions');
   } catch (error: any) {
     throw new SagaError('Generate game options', error.message);
   }
@@ -447,25 +448,42 @@ export function* initGameSettingsSaga(): SagaIterator {
       },
     }: IAppState = yield select(getState);
 
+    let moProfile: string = '';
+
     if (isMOUsed) {
       yield call(getMOProfilesSaga);
-      yield call(getDataFromMOIniSaga);
+      moProfile = yield call(getDataFromMOIniSaga);
     }
 
-    const newGameSettingsFilesObj: IUnwrapSync<typeof checkGameSettingsFiles> = yield call(
+    let newGameSettingsFilesObj: IUnwrapSync<typeof checkGameSettingsFiles> = yield call(
       checkGameSettingsFiles,
       gameSettingsFiles,
       baseFilesEncoding,
       gameSettingsGroups,
     );
 
-    if (Object.keys(newGameSettingsFilesObj).length !== Object.keys(gameSettingsFiles).length) {
+    const {
+      totalGameSettingsOptions,
+      incorrectGameSettingsFiles,
+    }: IUnwrap<IGenerateGameSettingsOptionsResult> = yield call(
+      generateGameSettingsOptionsSaga,
+      newGameSettingsFilesObj,
+      moProfile,
+    );
+
+    newGameSettingsFilesObj = filterIncorrectGameSettingsFiles(
+      newGameSettingsFilesObj,
+      incorrectGameSettingsFiles,
+    );
+
+    if (
+      Object.keys(newGameSettingsFilesObj).length !== Object.keys(gameSettingsFiles).length
+      || Object.keys(incorrectGameSettingsFiles).length > 0
+    ) {
       yield put(addMessages([CreateUserMessage.warning('Обнаружены ошибки в файле игровых настроек settings.json. Некоторые настройки будут недоступны. Подробности в файле лога.')])); //eslint-disable-line max-len
     }
-
+    yield put(setGameSettingsOptions(totalGameSettingsOptions));
     yield put(setGameSettingsFiles(newGameSettingsFilesObj));
-    yield take(GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_FILES);
-    yield call(generateGameSettingsOptionsSaga);
 
     writeToLogFileSync('Game settings initialisation completed.');
   } catch (error: any) {
@@ -503,6 +521,7 @@ function* changeMOProfileSaga(
     yield put(setIsGameSettingsLoaded(false));
 
     const {
+      gameSettings: { gameSettingsFiles },
       system: {
         modOrganizer: {
           pathToINI, profileSection, profileParam,
@@ -529,9 +548,14 @@ function* changeMOProfileSaga(
       Encoding.WIN1251,
     );
 
+    const { totalGameSettingsOptions }: IUnwrap<IGenerateGameSettingsOptionsResult> = yield call(
+      generateGameSettingsOptionsSaga,
+      gameSettingsFiles,
+      moProfile,
+    );
+
     yield put(setMoProfile(moProfile));
-    yield take(GAME_SETTINGS_TYPES.SET_MO_PROFILE);
-    yield call(generateGameSettingsOptionsSaga);
+    yield put(setGameSettingsOptions(totalGameSettingsOptions));
   } catch (error: any) {
     let errorMessage = '';
 

@@ -249,31 +249,39 @@ export const generateSelectOptions = (
   }));
 };
 
+/**
+ * Фильтрует файлы с ошибками в параметрах.
+ * @param gameSettingsFiles Игровые файлы.
+ * @param incorrectGameSettingsFiles Объект с массивами некорректных параметров файлов.
+ * @returns Объект `gameSettingsFiles`, содержащий только корректные значения.
+*/
 export const filterIncorrectGameSettingsFiles = (
   gameSettingsFiles: IGameSettingsFiles,
   incorrectGameSettingsFiles: IIncorrectGameSettingsFiles,
 ): IGameSettingsFiles => Object.keys(gameSettingsFiles)
   .reduce<IGameSettingsFiles>((newGameSettingsFiles, gameSettingsFileName) => {
-    if (incorrectGameSettingsFiles.hasOwnProperty(gameSettingsFileName)) { //eslint-disable-line no-prototype-builtins
-      if (gameSettingsFiles[gameSettingsFileName].parameters.length === incorrectGameSettingsFiles[gameSettingsFileName].length) {
+    const currentFile = gameSettingsFiles[gameSettingsFileName];
+    const currentFileIncorrectIndexes = incorrectGameSettingsFiles[gameSettingsFileName];
+
+    if (Object.keys(incorrectGameSettingsFiles).includes(gameSettingsFileName)) {
+      if (currentFile.parameters.length === currentFileIncorrectIndexes.length) {
         return { ...newGameSettingsFiles };
       }
 
       return {
         ...newGameSettingsFiles,
         [gameSettingsFileName]: {
-          ...gameSettingsFiles[gameSettingsFileName],
-          parameters: {
-            ...gameSettingsFiles[gameSettingsFileName].parameters
-              .filter((parameter, index) => !incorrectGameSettingsFiles[gameSettingsFileName]
-                .includes(index)),
-          },
+          ...currentFile,
+          parameters: [
+            ...currentFile.parameters
+              .filter((parameter, index) => !currentFileIncorrectIndexes.includes(index)),
+          ],
         },
       };
     }
     return {
       ...newGameSettingsFiles,
-      [gameSettingsFileName]: { ...gameSettingsFiles[gameSettingsFileName] },
+      [gameSettingsFileName]: { ...currentFile },
     };
   }, {});
 
@@ -290,6 +298,7 @@ export const getParametersForOptionsGenerate = (
   gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
   currentGameSettingGroup: string,
 ): IGameSettingsParameter[] => {
+  console.log(gameSettingsFile);
   if (gameSettingsGroups.length > 0 && currentGameSettingGroup) {
     return gameSettingsFile.parameters.filter(
       (currentParameter) => currentParameter.settingGroup === currentGameSettingGroup,
