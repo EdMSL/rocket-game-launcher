@@ -7,7 +7,9 @@ import { Button } from '$components/UI/Button';
 import { Checkbox } from '$components/UI/Checkbox';
 import { BACKUP_DIR } from '$constants/paths';
 import { openFolder } from '$utils/process';
-import { addMessages, createGameSettingsFilesBackup } from '$actions/main';
+import {
+  addMessages, createGameSettingsFilesBackup, getGameSettingsFilesBackup,
+} from '$actions/main';
 import { CreateUserMessage } from '$utils/message';
 import { IMainRootState } from '$types/main';
 import { Loader } from '$components/UI/Loader';
@@ -39,9 +41,39 @@ export const GameSettingsBackup: React.FC<IProps> = ({
 
   const onRestoreBackupBtnClick = useCallback(() => {}, []);
   const onBackupDeleteBtn = useCallback(() => {}, []);
-  const onSelectAllFilesInputChange = useCallback(() => {}, []);
-  const onRefreshBackupsBtnClick = useCallback(() => {}, []);
-  const onFileInputChange = useCallback(() => {}, []);
+
+  const onRefreshBackupsBtnClick = useCallback(() => {
+    dispatch(getGameSettingsFilesBackup());
+  }, [dispatch]);
+
+  const onSelectAllFilesInputChange = useCallback(({ target }) => {
+    const selectedFilesFolder: string = target.id.split('-')[1];
+    const newFilesArr = target.checked
+      ? gameSettingsFilesBackup.find((backup) => backup.name === selectedFilesFolder)!.files.map((file) => file.name)
+      : [];
+
+    const newSelectedFiles = {
+      ...selectedBackupFiles,
+      [selectedFilesFolder]: newFilesArr,
+    };
+
+    setSelectedBackupFiles(newSelectedFiles);
+  }, [selectedBackupFiles, gameSettingsFilesBackup]);
+
+  const onFileInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    const fileArr = target.id.split('&');
+    const newFilesArr = target.checked
+      ? [...selectedBackupFiles[fileArr[0]] ? selectedBackupFiles[fileArr[0]] : [], fileArr[1]]
+      : selectedBackupFiles[fileArr[0]].filter((file) => file !== fileArr[1]);
+
+    const newSelectedFiles = {
+      ...selectedBackupFiles,
+      [fileArr[0]]: newFilesArr,
+    };
+
+    setSelectedBackupFiles(newSelectedFiles);
+  }, [selectedBackupFiles]);
+
   const onCancelBtnClick = useCallback(() => {
     if (onCancelBtnClickProp) {
       onCancelBtnClickProp();
@@ -132,6 +164,12 @@ export const GameSettingsBackup: React.FC<IProps> = ({
                 onClick={onCreateBackupWithRefreshBtnClick}
               >
                 Создать бэкап
+              </Button>
+              <Button
+                className={classNames('button', 'main-btn', styles['settings__main-btn'])}
+                onClick={onRefreshBackupsBtnClick}
+              >
+                Обновить
               </Button>
               <Button
                 className={classNames('button', 'main-btn', styles['settings__main-btn'])}
