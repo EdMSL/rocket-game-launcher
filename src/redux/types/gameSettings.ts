@@ -13,8 +13,6 @@ export interface IGameSettingsOptionContent {
   default: string,
   value: string,
   parent: string,
-  ///TODO Возможно, ключ не нужен
-  settingGroup?: string,
 }
 
 export interface IGameSettingsOptionsItem {

@@ -336,8 +336,6 @@ function* generateGameSettingsOptionsSaga(
                     [optionName]: {
                       default: optionValue,
                       value: optionValue,
-                      settingGroup: currentParameter.settingGroup,
-                      parameterId: currentParameter.id,
                       parent: currentGameSettingsFileName,
                     },
                   };
@@ -380,8 +378,6 @@ function* generateGameSettingsOptionsSaga(
               [optionName]: {
                 default: optionValue,
                 value: optionValue,
-                settingGroup: currentParameter.settingGroup,
-                parameterId: currentParameter.id,
                 parent: currentGameSettingsFileName,
               },
             };
