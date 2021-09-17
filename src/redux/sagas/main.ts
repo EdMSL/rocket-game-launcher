@@ -18,6 +18,7 @@ import {
   setIsGameSettingsFilesBackuping,
   setIsLauncherInitialised,
   createGameSettingsFilesBackup as createGameSettingsFilesBackupAction,
+  deleteGameSettingsFilesBackup as deleteGameSettingsFilesBackupAction,
 } from '$actions/main';
 import { initGameSettingsSaga, setInitialGameSettingsConfigSaga } from '$sagas/gameSettings';
 import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
@@ -29,7 +30,9 @@ import {
 } from '$utils/errors';
 import { MAIN_TYPES } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
-import { createGameSettingsFilesBackup, getGameSettingsFilesBackups } from '$utils/backup';
+import {
+  createGameSettingsFilesBackup, deleteGameSettingsFilesBackup, getGameSettingsFilesBackups,
+} from '$utils/backup';
 import { getPathToFile } from '$utils/strings';
 import { IUnwrap } from '$types/common';
 
@@ -69,32 +72,40 @@ function* initLauncherSaga(): SagaIterator {
   }
 }
 
-function* getGameSettingsFilesBackupSaga(): SagaIterator {
+function* getGameSettingsFilesBackupSaga(isExternalCall = true): SagaIterator {
   try {
-    yield put(setIsGameSettingsFilesBackuping(true));
+    if (isExternalCall) {
+      yield put(setIsGameSettingsFilesBackuping(true));
+    }
 
     const result: IUnwrap<typeof getGameSettingsFilesBackups> = yield call(getGameSettingsFilesBackups);
 
     yield put(setGameSettingsFilesBackup(result));
   } catch (error: any) {
-    let errorMessage = '';
-
-    if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
+    if (isExternalCall) {
+      throw error;
     } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
+      let errorMessage = '';
+
+      if (error instanceof CustomError) {
+        errorMessage = `${error.message}`;
+      } else if (error instanceof ReadWriteError) {
+        errorMessage = `${error.message}. Path '${error.path}'.`;
+      } else {
+        errorMessage = `Unknown error. Message: ${error.message}`;
+      }
+
+      writeToLogFileSync(
+        `Failed to get game settings files backup. Reason: ${errorMessage}`,
+        LogMessageType.ERROR,
+      );
+
+      yield put(addMessages([CreateUserMessage.error('Произошла ошибка при получении списка бэкапов файлов игровых настроек. Подробности в файле лога.')])); //eslint-disable-line max-len
     }
-
-    writeToLogFileSync(
-      `Failed to get game settings files backup. Reason: ${errorMessage}`,
-      LogMessageType.ERROR,
-    );
-
-    yield put(addMessages([CreateUserMessage.error('Произошла ошибка при получении списка бэкапов файлов игровых настроек. Подробности в файле лога.')])); //eslint-disable-line max-len
   } finally {
-    yield put(setIsGameSettingsFilesBackuping(false));
+    if (isExternalCall) {
+      yield put(setIsGameSettingsFilesBackuping(false));
+    }
   }
 }
 
@@ -114,8 +125,9 @@ function* createGameSettingsBackupSaga(
     yield call(createGameSettingsFilesBackup, filesForBackupPaths);
 
     yield put(addMessages([CreateUserMessage.success('Бэкап файлов успешно создан.')]));
+
     if (isGetBackup) {
-      yield call(getGameSettingsFilesBackupSaga);
+      yield call(getGameSettingsFilesBackupSaga, false);
     }
   } catch (error: any) {
     let errorMessage = '';
@@ -139,21 +151,42 @@ function* createGameSettingsBackupSaga(
   }
 }
 
-// function* deleteGameSettingsFilesBackupSaga({
-//   payload: iniBackupId,
-// }: ReturnType<typeof MAIN_ACTIONS.deleteIniBackup>): SagaIterator {
-//   const deleteResult: IMessage = yield call(deleteInisBackup, iniBackupId.split('-')[1]);
+function* deleteGameSettingsFilesBackupSaga({
+  payload: iniBackupId,
+}: ReturnType<typeof deleteGameSettingsFilesBackupAction>): SagaIterator {
+  try {
+    yield put(setIsGameSettingsFilesBackuping(true));
 
-//   if (deleteResult.status === SUCCESS_STATUS) {
-//     yield call(getBackupSaga);
-//   } else {
-//     const {
-//       main: { messages },
-//     }: IAppState = yield select(getState);
+    const deleteResultMessage: IUnwrap<typeof deleteGameSettingsFilesBackup> = yield call(
+      deleteGameSettingsFilesBackup, iniBackupId,
+    );
 
-//     yield put(MAIN_ACTIONS.setMessages([...messages, deleteResult]));
-//   }
-// }
+    if (deleteResultMessage.length > 0) {
+      yield put(addMessages(deleteResultMessage));
+    }
+
+    yield call(getGameSettingsFilesBackupSaga, false);
+  } catch (error: any) {
+    let errorMessage = '';
+
+    if (error instanceof CustomError) {
+      errorMessage = `${error.message}`;
+    } else if (error instanceof ReadWriteError) {
+      errorMessage = `${error.message}. Path '${error.path}'.`;
+    } else {
+      errorMessage = `Unknown error. Message: ${error.message}`;
+    }
+
+    writeToLogFileSync(
+      `Failed to create game settings files backup. Reason: ${errorMessage}`,
+      LogMessageType.ERROR,
+    );
+
+    yield put(addMessages([CreateUserMessage.error('Произошла критическая ошибка в процессе удаления файлов бэкапа. Подробности в файле лога.')])); //eslint-disable-line max-len
+  } finally {
+    yield put(setIsGameSettingsFilesBackuping(false));
+  }
+}
 
 // function* restoreGameSettingsFilesBackupSaga({
 //   payload: iniBackupFiles,
@@ -197,6 +230,6 @@ export default function* mainSaga(): SagaIterator {
   yield takeLatest(LOCATION_CHANGE, locationChangeSaga);
   yield takeLatest(MAIN_TYPES.CREATE_GAME_SETTINGS_FILES_BACKUP, createGameSettingsBackupSaga);
   yield takeLatest(MAIN_TYPES.GET_GAME_SETTINGS_FILES_BACKUP, getGameSettingsFilesBackupSaga);
-  // yield takeLatest(MAIN_TYPES.DELETE_GAME_SETTINGS_FILES_BACKUP, deleteGameSettingsFilesBackupSaga);
+  yield takeLatest(MAIN_TYPES.DELETE_GAME_SETTINGS_FILES_BACKUP, deleteGameSettingsFilesBackupSaga);
   // yield takeLatest(MAIN_TYPES.RESTORE_GAME_SETTINGS_FILES_BACKUP, restoreGameSettingsFilesBackupSaga);
 }

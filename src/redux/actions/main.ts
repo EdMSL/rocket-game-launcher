@@ -41,6 +41,13 @@ export const createGameSettingsFilesBackup: IAction<boolean> = (isGetBackup = fa
   payload: isGetBackup,
 });
 
+export const deleteGameSettingsFilesBackup: IAction<string> = (
+  backupId,
+) => ({
+  type: MAIN_TYPES.DELETE_GAME_SETTINGS_FILES_BACKUP,
+  payload: backupId,
+});
+
 export const getGameSettingsFilesBackup: IAction<void> = () => ({
   type: MAIN_TYPES.GET_GAME_SETTINGS_FILES_BACKUP,
 });

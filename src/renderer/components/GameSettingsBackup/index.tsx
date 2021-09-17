@@ -8,7 +8,10 @@ import { Checkbox } from '$components/UI/Checkbox';
 import { BACKUP_DIR } from '$constants/paths';
 import { openFolder } from '$utils/process';
 import {
-  addMessages, createGameSettingsFilesBackup, getGameSettingsFilesBackup,
+  addMessages,
+  createGameSettingsFilesBackup,
+  deleteGameSettingsFilesBackup,
+  getGameSettingsFilesBackup,
 } from '$actions/main';
 import { CreateUserMessage } from '$utils/message';
 import { IMainRootState } from '$types/main';
@@ -40,7 +43,13 @@ export const GameSettingsBackup: React.FC<IProps> = ({
   }, [dispatch]);
 
   const onRestoreBackupBtnClick = useCallback(() => {}, []);
-  const onBackupDeleteBtn = useCallback(() => {}, []);
+
+  const onBackupDeleteBtn = useCallback((event: React.SyntheticEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    dispatch(deleteGameSettingsFilesBackup(event.currentTarget.id.split('-')[1]));
+  }, [dispatch]);
 
   const onRefreshBackupsBtnClick = useCallback(() => {
     dispatch(getGameSettingsFilesBackup());

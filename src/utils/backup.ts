@@ -11,12 +11,15 @@ import { LogMessageType, writeToLogFile } from './log';
 import {
   createCopyFileSync,
   createFolderSync,
+  deleteFile,
+  deleteFolder,
   readDirectory,
   readFileData,
   writeFileDataSync,
 } from './files';
 import { CustomError, ReadWriteError } from './errors';
-import { IBackupFiles } from '$types/main';
+import { IBackupFiles, IUserMessage } from '$types/main';
+import { CreateUserMessage } from './message';
 
 export const createBackupFolders = (isThrowError = false): void => {
   try {
@@ -120,4 +123,35 @@ export const getGameSettingsFilesBackups = async (): Promise<IBackupFiles[]> => 
   }
 
   return [];
+};
+
+export const deleteGameSettingsFilesBackup = async (
+  backupFolderName: string,
+): Promise<IUserMessage[]> => {
+  const resultMessage: IUserMessage[] = [];
+  const pathToFolder = path.join(BACKUP_DIR_GAME_SETTINGS_FILES, backupFolderName);
+
+  const backupFolderFiles = await readDirectory(pathToFolder);
+
+  const deleteResult = await Promise.allSettled(
+    backupFolderFiles.map(
+      (fileName) => deleteFile(
+        path.join(pathToFolder, fileName),
+      ),
+    ),
+  );
+
+  const deleteResultsWithError = deleteResult.filter((result) => result.status === 'rejected');
+
+  if (deleteResultsWithError.length > 0) {
+    const errorsMessages = deleteResultsWithError.map((result) => (result as PromiseRejectedResult).status);
+
+    writeToLogFile(errorsMessages.join('\n'), LogMessageType.ERROR);
+
+    resultMessage.push(CreateUserMessage.error('Возникла ошибка в процессе удаления файлов бэкапа. Подробности в файле лога.')); //eslint-disable-line max-len
+  }
+
+  await deleteFolder(pathToFolder);
+
+  return resultMessage;
 };

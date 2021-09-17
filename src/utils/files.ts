@@ -145,6 +145,36 @@ export const createFolderSync = (directoryPath: string): void => {
 };
 
 /**
+ * Асинхронно удалить файл.
+ * @param pathToFile Путь до удаляемого файла.
+*/
+export const deleteFile = (pathToFile: string): Promise<void> => fsPromises.unlink(pathToFile)
+  .catch((error) => {
+    const readWriteError = getReadWriteError(error);
+
+    throw new ReadWriteError(
+      `Can't delete file. ${readWriteError.message}`,
+      readWriteError,
+      pathToFile,
+    );
+  });
+
+/**
+ * Асинхронно удалить папку.
+ * @param pathToFolder Путь до удаляемой папки.
+*/
+export const deleteFolder = (pathToFolder: string): Promise<void> => fsPromises.rmdir(pathToFolder)
+  .catch((error) => {
+    const readWriteError = getReadWriteError(error);
+
+    throw new ReadWriteError(
+      `Can't delete folder. ${readWriteError.message}`,
+      readWriteError,
+      pathToFolder,
+    );
+  });
+
+/**
  * Синхронно получить данные из JSON файла.
  * @param pathToFile Путь к файлу.
  * @returns Объект с данными из файла.
