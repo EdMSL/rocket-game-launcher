@@ -278,7 +278,7 @@ function* getDataFromGameSettingsFilesSaga(
  * @param gameSettingsFiles Объект-основа для генерации опций.
  * @param moProfile Профиль Mod Organizer.
 */
-function* generateGameSettingsOptionsSaga(
+export function* generateGameSettingsOptionsSaga(
   gameSettingsFiles: IGameSettingsFiles,
   moProfile: string,
 ): SagaIterator<IGenerateGameSettingsOptionsResult> {
@@ -418,7 +418,7 @@ function* generateGameSettingsOptionsSaga(
       incorrectGameSettingsFiles,
     };
   } catch (error: any) {
-    throw new SagaError('Generate game options', error.message);
+    throw new SagaError('Generate game settings options', error.message);
   }
 }
 

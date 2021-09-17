@@ -9,6 +9,7 @@ import {
 import { getBackupFolderName } from './data';
 import { LogMessageType, writeToLogFile } from './log';
 import {
+  createCopyFile,
   createCopyFileSync,
   createFolderSync,
   deleteFile,
@@ -18,7 +19,7 @@ import {
   writeFileDataSync,
 } from './files';
 import { CustomError, ReadWriteError } from './errors';
-import { IBackupFiles, IUserMessage } from '$types/main';
+import { IGameSettingsBackup, IUserMessage } from '$types/main';
 import { CreateUserMessage } from './message';
 
 export const createBackupFolders = (isThrowError = false): void => {
@@ -47,8 +48,12 @@ export const createGameSettingsFilesBackup = (files: string[]): void => {
   fs.mkdirSync(path.join(BACKUP_DIR_GAME_SETTINGS_FILES, folderName));
 
   const filePaths = files.map((file) => {
-    if (!path.isAbsolute(file) && process.env.NODE_ENV === 'production') {
-      return path.join(GAME_DIR, file);
+    if (!path.isAbsolute(file)) {
+      if (process.env.NODE_ENV === 'production') {
+        return path.join(GAME_DIR, file);
+      }
+
+      return path.join(process.cwd(), file);
     }
 
     return file;
@@ -67,18 +72,19 @@ export const createGameSettingsFilesBackup = (files: string[]): void => {
   });
 };
 
-export const readBackupFolder = async (folderName: string): Promise<IBackupFiles> => {
+export const readBackupFolder = async (folderName: string): Promise<IGameSettingsBackup> => {
   const files = await readDirectory(path.join(BACKUP_DIR_GAME_SETTINGS_FILES, folderName));
 
   // > 1 т.к. в папке есть path.txt со списком файлов.
   if (files.length > 1) {
     if (fs.existsSync(path.join(BACKUP_DIR_GAME_SETTINGS_FILES, folderName, 'path.txt'))) {
-      const fileDataResult = readFileData(path.join(
+      const fileDataResult = await readFileData(path.join(
         BACKUP_DIR_GAME_SETTINGS_FILES,
         folderName,
         'path.txt',
       ));
       const pathFileData = fileDataResult.toString().split('\n');
+      console.log('pathFileData: ', pathFileData);
       const newFiles = files.filter((file) => file !== 'path.txt').map((file) => {
         const pathToFile = pathFileData.find((currFile) => currFile.includes(file));
 
@@ -110,14 +116,14 @@ export const readBackupFolder = async (folderName: string): Promise<IBackupFiles
   throw new Error();
 };
 
-export const getGameSettingsFilesBackups = async (): Promise<IBackupFiles[]> => {
+export const getGameSettingsFilesBackups = async (): Promise<IGameSettingsBackup[]> => {
   const backupFolders = await readDirectory(BACKUP_DIR_GAME_SETTINGS_FILES);
 
   if (backupFolders.length > 0) {
     const readFolderResult = await Promise.allSettled(backupFolders.map((file) => readBackupFolder(path.join(file))));
     const files = readFolderResult
       .filter((result) => result.status === 'fulfilled')
-      .map((folderResult) => (folderResult as PromiseFulfilledResult<IBackupFiles>).value);
+      .map((folderResult) => (folderResult as PromiseFulfilledResult<IGameSettingsBackup>).value);
 
     return files;
   }
@@ -154,4 +160,13 @@ export const deleteGameSettingsFilesBackup = async (
   await deleteFolder(pathToFolder);
 
   return resultMessage;
+};
+
+export const restoreBackupFiles = async (
+  filesBackup: IGameSettingsBackup,
+): Promise<void> => {
+  await Promise.all(filesBackup.files
+    .map((file) => createCopyFile(path.join(
+      BACKUP_DIR_GAME_SETTINGS_FILES, filesBackup.name, file.name,
+    ), file.path)));
 };

@@ -1,5 +1,7 @@
 import { IAction } from '$types/common';
-import { MAIN_TYPES, IMainRootState } from '$types/main';
+import {
+  MAIN_TYPES, IMainRootState, IGameSettingsBackup,
+} from '$types/main';
 
 export const setIsGameRunning: IAction<IMainRootState['isGameRunning']> = (
   isGameRunning,
@@ -46,6 +48,13 @@ export const deleteGameSettingsFilesBackup: IAction<string> = (
 ) => ({
   type: MAIN_TYPES.DELETE_GAME_SETTINGS_FILES_BACKUP,
   payload: backupId,
+});
+
+export const restoreGameSettingsFilesBackup: IAction<IGameSettingsBackup> = (
+  filesBackup,
+) => ({
+  type: MAIN_TYPES.RESTORE_GAME_SETTINGS_FILES_BACKUP,
+  payload: filesBackup,
 });
 
 export const getGameSettingsFilesBackup: IAction<void> = () => ({

@@ -12,6 +12,7 @@ import {
   createGameSettingsFilesBackup,
   deleteGameSettingsFilesBackup,
   getGameSettingsFilesBackup,
+  restoreGameSettingsFilesBackup,
 } from '$actions/main';
 import { CreateUserMessage } from '$utils/message';
 import { IMainRootState } from '$types/main';
@@ -42,7 +43,25 @@ export const GameSettingsBackup: React.FC<IProps> = ({
     dispatch(addMessages([CreateUserMessage.error(message)]));
   }, [dispatch]);
 
-  const onRestoreBackupBtnClick = useCallback(() => {}, []);
+  const onRestoreBackupBtnClick = useCallback(({ currentTarget }: React.SyntheticEvent) => {
+    const folderName = currentTarget.id.split('-')[1];
+
+    const filesPathForRestore = selectedBackupFiles[folderName].map((file) => {
+      const backup = gameSettingsFilesBackup.find((backupFolder) => backupFolder.name === folderName)!;
+
+      return backup.files.find((backupFile) => backupFile.name === file)!;
+    });
+
+    dispatch(restoreGameSettingsFilesBackup({
+      name: folderName,
+      files: filesPathForRestore,
+    }));
+
+    setSelectedBackupFiles({
+      ...selectedBackupFiles,
+      [folderName]: [],
+    });
+  }, [dispatch, selectedBackupFiles, gameSettingsFilesBackup]);
 
   const onBackupDeleteBtn = useCallback((event: React.SyntheticEvent) => {
     event.preventDefault();

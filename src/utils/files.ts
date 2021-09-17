@@ -54,6 +54,123 @@ export interface IXmlObj {
   [key: string]: any,
 }
 
+export const iconvDecode = (str: string, encoding = Encoding.CP866): string => iconv.decode(
+  Buffer.from(str, 'binary'),
+  encoding,
+);
+
+/**
+ * Асинхронно получить содержимое папки.
+ * @param pathToDirectory Путь к папке.
+ * @returns Массив с именами файлов\папок.
+*/
+export const readDirectory = (
+  pathToDirectory: string,
+): Promise<string[]> => fsPromises.readdir(pathToDirectory)
+  .then((data) => data)
+  .catch((error) => {
+    const readWriteError = getReadWriteError(error, true);
+
+    throw new ReadWriteError(
+      `Can't read directory. ${readWriteError.message}`,
+      readWriteError,
+      pathToDirectory,
+    );
+  });
+
+/**
+ * Синхронно создать папку.
+ * @param pathToDirectory Путь к папке.
+*/
+export const createFolderSync = (directoryPath: string): void => {
+  try {
+    if (!fs.existsSync(directoryPath)) {
+      fs.mkdirSync(directoryPath);
+    }
+  } catch (error: any) {
+    const readWriteError = getReadWriteError(error, true);
+
+    throw new ReadWriteError(
+      `Can't create folder. ${readWriteError.message}`,
+      readWriteError,
+      directoryPath,
+    );
+  }
+};
+
+/**
+ * Асинхронно удалить папку.
+ * @param pathToFolder Путь до удаляемой папки.
+*/
+export const deleteFolder = (pathToFolder: string): Promise<void> => fsPromises.rmdir(pathToFolder)
+  .catch((error) => {
+    const readWriteError = getReadWriteError(error);
+
+    throw new ReadWriteError(
+      `Can't delete folder. ${readWriteError.message}`,
+      readWriteError,
+      pathToFolder,
+    );
+  });
+
+/**
+ * Синхронно скопировать файл в указанную папку.
+ * @param pathToFile Путь к файлу.
+ * @param destinationPath Путь к папке, куда требуется копировать файл.
+*/
+export const createCopyFileSync = (pathToFile: string, destinationPath: string): void => {
+  try {
+    fs.copyFileSync(
+      pathToFile,
+      destinationPath,
+    );
+  } catch (error: any) {
+    const readWriteError = getReadWriteError(error);
+
+    throw new ReadWriteError(
+      `Can't copy file. ${readWriteError.message}`,
+      readWriteError,
+      pathToFile,
+    );
+  }
+};
+
+/**
+ * Асинхронно скопировать файл в указанную папку.
+ * @param pathToFile Путь к файлу.
+ * @param destinationPath Путь к папке, куда требуется копировать файл.
+*/
+export const createCopyFile = (
+  pathToFile: string,
+  destinationPath: string,
+): Promise<void> => fsPromises.copyFile(pathToFile, destinationPath)
+  .catch((error) => {
+    console.log('pathToFile: ', pathToFile);
+    console.log('destinationPath: ', destinationPath);
+    const readWriteError = getReadWriteError(error);
+
+    throw new ReadWriteError(
+      `Can't copy file. ${readWriteError.message}`,
+      readWriteError,
+      pathToFile,
+    );
+  });
+
+/**
+ * Асинхронно удалить файл.
+ * @param pathToFile Путь до удаляемого файла.
+*/
+export const deleteFile = (pathToFile: string): Promise<void> => fsPromises.unlink(pathToFile)
+  .catch((error) => {
+    const readWriteError = getReadWriteError(error);
+
+    throw new ReadWriteError(
+      `Can't delete file. ${readWriteError.message}`,
+      readWriteError,
+      pathToFile,
+    );
+  });
+
 /**
  * Синхронно считать данные из файла.
  * @param pathToFile Путь к файлу.
@@ -102,75 +219,6 @@ export const readFileData = (
       `Can't read file. ${readWriteError.message}`,
       readWriteError,
       pathToFile,
-    );
-  });
-
-/**
- * Асинхронно получить содержимое папки.
- * @param pathToDirectory Путь к папке.
- * @returns Массив с именами файлов\папок.
-*/
-export const readDirectory = (
-  pathToDirectory: string,
-): Promise<string[]> => fsPromises.readdir(pathToDirectory)
-  .then((data) => data)
-  .catch((error) => {
-    const readWriteError = getReadWriteError(error, true);
-
-    throw new ReadWriteError(
-      `Can't read directory. ${readWriteError.message}`,
-      readWriteError,
-      pathToDirectory,
-    );
-  });
-
-/**
- * Синхронно создать папку.
- * @param pathToDirectory Путь к папке.
-*/
-export const createFolderSync = (directoryPath: string): void => {
-  try {
-    if (!fs.existsSync(directoryPath)) {
-      fs.mkdirSync(directoryPath);
-    }
-  } catch (error: any) {
-    const readWriteError = getReadWriteError(error, true);
-
-    throw new ReadWriteError(
-      `Can't create folder. ${readWriteError.message}`,
-      readWriteError,
-      directoryPath,
-    );
-  }
-};
-
-/**
- * Асинхронно удалить файл.
- * @param pathToFile Путь до удаляемого файла.
-*/
-export const deleteFile = (pathToFile: string): Promise<void> => fsPromises.unlink(pathToFile)
-  .catch((error) => {
-    const readWriteError = getReadWriteError(error);
-
-    throw new ReadWriteError(
-      `Can't delete file. ${readWriteError.message}`,
-      readWriteError,
-      pathToFile,
-    );
-  });
-
-/**
- * Асинхронно удалить папку.
- * @param pathToFolder Путь до удаляемой папки.
-*/
-export const deleteFolder = (pathToFolder: string): Promise<void> => fsPromises.rmdir(pathToFolder)
-  .catch((error) => {
-    const readWriteError = getReadWriteError(error);
-
-    throw new ReadWriteError(
-      `Can't delete folder. ${readWriteError.message}`,
-      readWriteError,
-      pathToFolder,
     );
   });
 
@@ -326,28 +374,6 @@ export const readFileForGameSettingsOptions = async (
 };
 
 /**
- * Синхронно скопировать файл в указанную папку.
- * @param pathToFile Путь к файлу.
- * @param destinationPath Путь к папке, куда требуется копировать файл.
-*/
-export const createCopyFileSync = (pathToFile: string, destinationPath: string): void => {
-  try {
-    fs.copyFileSync(
-      pathToFile,
-      destinationPath,
-    );
-  } catch (error: any) {
-    const readWriteError = getReadWriteError(error);
-
-    throw new ReadWriteError(
-      `Can't copy file. ${readWriteError.message}`,
-      readWriteError,
-      pathToFile,
-    );
-  }
-};
-
-/**
  * Синхронно записать файл.
  * @param pathToFile Путь к файлу.
  * @param data Данные для записи в файл, строка или буфер.
@@ -472,8 +498,3 @@ export const writeGameSettingsFile = async (
     );
   }
 };
-
-export const iconvDecode = (str: string, encoding = Encoding.CP866): string => iconv.decode(
-  Buffer.from(str, 'binary'),
-  encoding,
-);

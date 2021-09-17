@@ -26,7 +26,7 @@ interface IBackupFile {
   path: string,
 }
 
-export interface IBackupFiles {
+export interface IGameSettingsBackup {
   name: string,
   files: IBackupFile[],
 }
@@ -38,6 +38,6 @@ export type IMainRootState = Readonly<{
   isGameSettingsAvailable: boolean,
   isGameSettingsSaving: boolean,
   isGameSettingsFilesBackuping: boolean,
-  gameSettingsFilesBackup: IBackupFiles[],
+  gameSettingsFilesBackup: IGameSettingsBackup[],
   messages: IUserMessage[],
 }>;
