@@ -163,7 +163,7 @@ export const getOptionData = (
 
     if (!optionSettingGroup) {
       optionErrors.push(CreateUserMessage.warning(
-        `The ${baseFileName} file ${moProfileName ? `from the ${moProfileName} profile` : ''} does not contain the "${currentGameSettingParameter.iniGroup}" group specified in ${currentGameSettingParameter.name} from "${gameSettingsFileName}"`, //eslint-disable-line max-len
+        `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain the "${currentGameSettingParameter.iniGroup}" group specified in ${currentGameSettingParameter.name} from "${gameSettingsFileName}"`, //eslint-disable-line max-len
       ));
     } else {
       const parameterLine = optionSettingGroup.getLine(currentGameSettingParameter.name);
@@ -173,7 +173,7 @@ export const getOptionData = (
         optionValue = parameterLine.value;
       } else {
         optionErrors.push(CreateUserMessage.warning(
-          `The ${baseFileName} file ${moProfileName ? `from the ${moProfileName} profile` : ''} from the "${currentGameSettingParameter.iniGroup}" group does not contain the "${currentGameSettingParameter.name}" parameter specified in "${gameSettingsFileName}"`, //eslint-disable-line max-len
+          `The "${currentGameSettingParameter.iniGroup}" group from the ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain the "${currentGameSettingParameter.name}" parameter specified in "${gameSettingsFileName}"`, //eslint-disable-line max-len
         ));
       }
     }
@@ -190,14 +190,15 @@ export const getOptionData = (
 
     if (!optionName) {
       optionErrors.push(CreateUserMessage.warning(
-        `The ${baseFileName} file ${moProfileName ? `from the  ${moProfileName} profile` : ''} does not contain the "${currentGameSettingParameter.name}" parameter, specified in "${gameSettingsFileName}"`, //eslint-disable-line max-len
+        `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain the "${currentGameSettingParameter.name}" parameter, specified in "${gameSettingsFileName}"`, //eslint-disable-line max-len
       ));
     }
   } else if (fileView === GameSettingsFileView.TAG) {
+    const attributePathArr = [...currentGameSettingParameter.attributePath!?.split('/')];
     const pathArr = [
-      ...currentGameSettingParameter.attributePath!?.split('/'),
-      currentGameSettingParameter.name,
-      currentGameSettingParameter.attributeName,
+      ...attributePathArr,
+      currentGameSettingParameter.name!,
+      currentGameSettingParameter.attributeName!,
     ];
 
     let index = 0;
@@ -215,9 +216,15 @@ export const getOptionData = (
     getProp(currentFileData, pathArr[index]);
 
     if (!optionName || !optionValue) {
-      optionErrors.push(CreateUserMessage.warning(
-        `Файл ${baseFileName} ${moProfileName ? `из профиля ${moProfileName}` : ''} не содержит параметра "${currentGameSettingParameter.name}", указанного в ${gameSettingsFileName}, либо допущена ошибка в пути к параметру.`, //eslint-disable-line max-len
-      ));
+      let errorMsg = '';
+      if (index === pathArr.length) {
+        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingParameter.attributeName}" attribute in "${currentGameSettingParameter.name}" parameter specified in "${gameSettingsFileName}".`; //eslint-disable-line max-len
+      } else if (index === pathArr.length - 1) {
+        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingParameter.name}" parameter specified in "${gameSettingsFileName}".`; //eslint-disable-line max-len
+      } else {
+        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${pathArr[index - 1]}" tag specified in "attributePath" in "${gameSettingsFileName}".`; //eslint-disable-line max-len
+      }
+      optionErrors.push(CreateUserMessage.warning(errorMsg));
     }
   }
 
@@ -298,7 +305,6 @@ export const getParametersForOptionsGenerate = (
   gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
   currentGameSettingGroup: string,
 ): IGameSettingsParameter[] => {
-  console.log(gameSettingsFile);
   if (gameSettingsGroups.length > 0 && currentGameSettingGroup) {
     return gameSettingsFile.parameters.filter(
       (currentParameter) => currentParameter.settingGroup === currentGameSettingGroup,

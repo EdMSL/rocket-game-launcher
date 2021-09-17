@@ -68,6 +68,7 @@ import {
 } from '$utils/data';
 import { IUserMessage, MAIN_TYPES } from '$types/main';
 import {
+  CustomPathName,
   Encoding,
   GameSettingParameterType,
   GameSettingsFileView,
@@ -295,10 +296,11 @@ function* generateGameSettingsOptionsSaga(
     );
 
     const totalGameSettingsOptions: IGameSettingsOptions = Object.keys(gameSettingsFiles).reduce(
-      (gameSettingsOptions, currentGameSettingsFile) => {
+      (gameSettingsOptions, currentGameSettingsFileName) => {
         const incorrectIndexes: number[] = [];
+        const currentGameSettingsFile = gameSettingsFiles[currentGameSettingsFileName];
 
-        const optionsFromFile = gameSettingsFiles[currentGameSettingsFile].parameters.reduce(
+        const optionsFromFile = currentGameSettingsFile.parameters.reduce<IGameSettingsOptionsItem>(
           (currentOptions, currentParameter, index) => {
             //Если опция с типом group или related,
             // то генерация производится для каждого параметра в items.
@@ -314,11 +316,11 @@ function* generateGameSettingsOptionsSaga(
                   const {
                     optionName, optionValue, optionErrors,
                   } = getOptionData(
-                    currentFilesDataObj[currentGameSettingsFile],
+                    currentFilesDataObj[currentGameSettingsFileName],
                     currentOption,
-                    gameSettingsFiles[currentGameSettingsFile].view,
-                    currentGameSettingsFile,
-                    path.basename(gameSettingsFiles[currentGameSettingsFile].path),
+                    currentGameSettingsFile.view,
+                    currentGameSettingsFileName,
+                    path.basename(currentGameSettingsFile.path),
                     moProfile,
                   );
 
@@ -336,7 +338,7 @@ function* generateGameSettingsOptionsSaga(
                       value: optionValue,
                       settingGroup: currentParameter.settingGroup,
                       parameterId: currentParameter.id,
-                      parent: currentGameSettingsFile,
+                      parent: currentGameSettingsFileName,
                     },
                   };
                 },
@@ -358,11 +360,11 @@ function* generateGameSettingsOptionsSaga(
             const {
               optionName, optionValue, optionErrors,
             } = getOptionData(
-              currentFilesDataObj[currentGameSettingsFile],
+              currentFilesDataObj[currentGameSettingsFileName],
               currentParameter,
-              gameSettingsFiles[currentGameSettingsFile].view,
-              currentGameSettingsFile,
-              path.basename(gameSettingsFiles[currentGameSettingsFile].path),
+              currentGameSettingsFile.view,
+              currentGameSettingsFileName,
+              path.basename(currentGameSettingsFile.path),
               moProfile,
             );
 
@@ -380,7 +382,7 @@ function* generateGameSettingsOptionsSaga(
                 value: optionValue,
                 settingGroup: currentParameter.settingGroup,
                 parameterId: currentParameter.id,
-                parent: currentGameSettingsFile,
+                parent: currentGameSettingsFileName,
               },
             };
           },
@@ -390,14 +392,14 @@ function* generateGameSettingsOptionsSaga(
         if (incorrectIndexes.length > 0) {
           incorrectGameSettingsFiles = {
             ...incorrectGameSettingsFiles,
-            [currentGameSettingsFile]: incorrectIndexes,
+            [currentGameSettingsFileName]: incorrectIndexes,
           };
         }
 
         if (Object.keys(optionsFromFile).length > 0) {
           return {
             ...gameSettingsOptions,
-            [currentGameSettingsFile]: optionsFromFile,
+            [currentGameSettingsFileName]: optionsFromFile,
           };
         }
 
@@ -550,9 +552,9 @@ function* changeMOProfileSaga(
       Encoding.WIN1251,
     );
 
-    const constMOProfileGameSettingsOnly = Object.keys(gameSettingsFiles)
+    const MOProfileGameSettingsOnly = Object.keys(gameSettingsFiles)
       .reduce<IGameSettingsFiles>((acc, curr) => {
-        if (/%MO%/.test(gameSettingsFiles[curr].path)) {
+        if (new RegExp(CustomPathName.MO).test(gameSettingsFiles[curr].path)) {
           return {
             ...acc,
             [curr]: {
@@ -566,7 +568,7 @@ function* changeMOProfileSaga(
 
     const { totalGameSettingsOptions }: IUnwrap<IGenerateGameSettingsOptionsResult> = yield call(
       generateGameSettingsOptionsSaga,
-      constMOProfileGameSettingsOnly,
+      MOProfileGameSettingsOnly,
       moProfile,
     );
 

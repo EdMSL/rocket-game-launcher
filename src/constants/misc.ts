@@ -38,3 +38,10 @@ export const RangeButtonName = {
   DECREASE: 'decrease',
   INCREASE: 'increase',
 };
+
+export const CustomPathName = {
+  MO: '%MO%',
+  DOCUMENTS: '%DOCUMENTS%',
+  MO_REGEXP: new RegExp('%MO%'),
+  DOCUMENTS_REGEXP: new RegExp('%DOCUMENTS%'),
+};

@@ -2,6 +2,7 @@ import path from 'path';
 
 import { ISystemRootState } from '$types/system';
 import { CustomError } from './errors';
+import { CustomPathName } from '$constants/misc';
 
 const HEXADECIMAL = 16;
 const HEXADECIMAL_FACTOR = 1e8;
@@ -107,19 +108,26 @@ export const getValueFromRange = (
   return +max;
 };
 
+/**
+ * Получить путь до файла с учетом кастомных путей.
+ * @param pathToFile Путь до файла из settings.json.
+ * @param customPaths Кастомные пути из `state`.
+ * @param profileMO Профиль Mod Organizer.
+ * @returns Строка с абсолютным путем к файлу.
+*/
 export const getPathToFile = (
   pathToFile: string,
   customPaths: ISystemRootState['customPaths'],
-  profile: string,
+  profileMO: string,
 ): string => {
-  if (/%MO%/.test(pathToFile)) {
-    if (profile) {
-      return path.resolve(customPaths['%MO%'], profile, path.basename(pathToFile));
+  if (CustomPathName.MO_REGEXP.test(pathToFile)) {
+    if (profileMO) {
+      return path.resolve(customPaths[CustomPathName.MO], profileMO, path.basename(pathToFile));
     }
 
     throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
-  } else if (/%DOCUMENTS%/.test(pathToFile)) {
-    return path.resolve(customPaths['%DOCUMENTS%'], pathToFile);
+  } else if (CustomPathName.DOCUMENTS_REGEXP.test(pathToFile)) {
+    return path.resolve(customPaths[CustomPathName.DOCUMENTS], pathToFile);
   }
 
   return pathToFile;
