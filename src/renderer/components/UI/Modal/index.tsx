@@ -5,13 +5,11 @@ import { Button } from '$components/UI/Button';
 
 interface IProps {
   children: React.ReactNode,
-  isCanClose?: boolean,
-  onCloseBtnClick: () => void,
+  onCloseBtnClick?: () => void,
 }
 
 export const Modal: React.FC<IProps> = ({
   children,
-  isCanClose = true,
   onCloseBtnClick,
 }) => (
   <FocusLock
@@ -22,7 +20,7 @@ export const Modal: React.FC<IProps> = ({
     <div className="modal__block">
       <div className="modal__header">
         {
-          isCanClose && (
+          onCloseBtnClick && (
           <Button
             className="modal__btn"
             onClick={onCloseBtnClick}

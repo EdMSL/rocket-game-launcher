@@ -36,8 +36,9 @@ export const setIsGameSettingsAvailable: IAction<IMainRootState['isGameSettingsA
   payload: isGameSettingsAvailable,
 });
 
-export const createGameSettingsFilesBackup: IAction<void> = () => ({
+export const createGameSettingsFilesBackup: IAction<boolean> = (isGetBackup = false) => ({
   type: MAIN_TYPES.CREATE_GAME_SETTINGS_FILES_BACKUP,
+  payload: isGetBackup,
 });
 
 export const getGameSettingsFilesBackup: IAction<void> = () => ({

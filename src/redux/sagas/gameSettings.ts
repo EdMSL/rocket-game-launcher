@@ -281,10 +281,7 @@ function* getDataFromGameSettingsFilesSaga(
 function* generateGameSettingsOptionsSaga(
   gameSettingsFiles: IGameSettingsFiles,
   moProfile: string,
-): SagaIterator<{
-  totalGameSettingsOptions: IGameSettingsOptions,
-  incorrectGameSettingsFiles: IIncorrectGameSettingsFiles,
-}> {
+): SagaIterator<IGenerateGameSettingsOptionsResult> {
   try {
     let incorrectGameSettingsFiles: IIncorrectGameSettingsFiles = {};
     let optionsErrors: IUserMessage[] = [];

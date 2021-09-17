@@ -17,6 +17,7 @@ import {
   setGameSettingsFilesBackup,
   setIsGameSettingsFilesBackuping,
   setIsLauncherInitialised,
+  createGameSettingsFilesBackup as createGameSettingsFilesBackupAction,
 } from '$actions/main';
 import { initGameSettingsSaga, setInitialGameSettingsConfigSaga } from '$sagas/gameSettings';
 import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
@@ -28,7 +29,7 @@ import {
 } from '$utils/errors';
 import { MAIN_TYPES } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
-import { createGameSettingsFilesBackup, getGameSettingsFilesBackup } from '$utils/backup';
+import { createGameSettingsFilesBackup, getGameSettingsFilesBackups } from '$utils/backup';
 import { getPathToFile } from '$utils/strings';
 import { IUnwrap } from '$types/common';
 
@@ -68,47 +69,11 @@ function* initLauncherSaga(): SagaIterator {
   }
 }
 
-function* createGameSettingsBackupSaga(): SagaIterator {
-  try {
-    yield put(setIsGameSettingsFilesBackuping(true));
-
-    const {
-      system: { customPaths },
-      gameSettings: { gameSettingsFiles, moProfile },
-    }: IAppState = yield select(getState);
-
-    const filesForBackupPaths = Object.keys(gameSettingsFiles).map((fileName) => getPathToFile(gameSettingsFiles[fileName].path, customPaths, moProfile));
-
-    yield call(createGameSettingsFilesBackup, filesForBackupPaths);
-
-    yield put(addMessages([CreateUserMessage.success('Бэкап файлов успешно создан.')]));
-  } catch (error: any) {
-    let errorMessage = '';
-
-    if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
-    writeToLogFileSync(
-      `Failed to create game settings files backup. Reason: ${errorMessage}`,
-      LogMessageType.ERROR,
-    );
-
-    yield put(addMessages([CreateUserMessage.error('Произошла ошибка при создании бэкапа файлов игровых настроек. Подробности в файле лога.')])); //eslint-disable-line max-len
-  } finally {
-    yield put(setIsGameSettingsFilesBackuping(false));
-  }
-}
-
 function* getGameSettingsFilesBackupSaga(): SagaIterator {
   try {
     yield put(setIsGameSettingsFilesBackuping(true));
 
-    const result: IUnwrap<typeof getGameSettingsFilesBackup> = yield call(getGameSettingsFilesBackup);
+    const result: IUnwrap<typeof getGameSettingsFilesBackups> = yield call(getGameSettingsFilesBackups);
 
     yield put(setGameSettingsFilesBackup(result));
   } catch (error: any) {
@@ -128,6 +93,47 @@ function* getGameSettingsFilesBackupSaga(): SagaIterator {
     );
 
     yield put(addMessages([CreateUserMessage.error('Произошла ошибка при получении списка бэкапов файлов игровых настроек. Подробности в файле лога.')])); //eslint-disable-line max-len
+  } finally {
+    yield put(setIsGameSettingsFilesBackuping(false));
+  }
+}
+
+function* createGameSettingsBackupSaga(
+  { payload: isGetBackup }: ReturnType<typeof createGameSettingsFilesBackupAction>,
+): SagaIterator {
+  try {
+    yield put(setIsGameSettingsFilesBackuping(true));
+
+    const {
+      system: { customPaths },
+      gameSettings: { gameSettingsFiles, moProfile },
+    }: IAppState = yield select(getState);
+
+    const filesForBackupPaths = Object.keys(gameSettingsFiles).map((fileName) => getPathToFile(gameSettingsFiles[fileName].path, customPaths, moProfile));
+
+    yield call(createGameSettingsFilesBackup, filesForBackupPaths);
+
+    yield put(addMessages([CreateUserMessage.success('Бэкап файлов успешно создан.')]));
+    if (isGetBackup) {
+      yield call(getGameSettingsFilesBackupSaga);
+    }
+  } catch (error: any) {
+    let errorMessage = '';
+
+    if (error instanceof CustomError) {
+      errorMessage = `${error.message}`;
+    } else if (error instanceof ReadWriteError) {
+      errorMessage = `${error.message}. Path '${error.path}'.`;
+    } else {
+      errorMessage = `Unknown error. Message: ${error.message}`;
+    }
+
+    writeToLogFileSync(
+      `Failed to create game settings files backup. Reason: ${errorMessage}`,
+      LogMessageType.ERROR,
+    );
+
+    yield put(addMessages([CreateUserMessage.error('Произошла ошибка при создании бэкапа файлов игровых настроек. Подробности в файле лога.')])); //eslint-disable-line max-len
   } finally {
     yield put(setIsGameSettingsFilesBackuping(false));
   }

@@ -7,7 +7,7 @@ import { Button } from '$components/UI/Button';
 import { Checkbox } from '$components/UI/Checkbox';
 import { BACKUP_DIR } from '$constants/paths';
 import { openFolder } from '$utils/process';
-import { addMessages } from '$actions/main';
+import { addMessages, createGameSettingsFilesBackup } from '$actions/main';
 import { CreateUserMessage } from '$utils/message';
 import { IMainRootState } from '$types/main';
 import { Loader } from '$components/UI/Loader';
@@ -19,13 +19,15 @@ interface ISelectedFiles {
 interface IProps {
   gameSettingsFilesBackup: IMainRootState['gameSettingsFilesBackup'],
   isGameSettingsFilesBackuping: IMainRootState['isGameSettingsFilesBackuping'],
-  onCloseBtnClick: () => void,
+  onCreateBackupBtnClick?: () => void,
+  onCancelBtnClick?: () => void,
 }
 
 export const GameSettingsBackup: React.FC<IProps> = ({
   gameSettingsFilesBackup,
   isGameSettingsFilesBackuping,
-  onCloseBtnClick,
+  onCreateBackupBtnClick,
+  onCancelBtnClick: onCancelBtnClickProp,
 }) => {
   const [selectedBackupFiles, setSelectedBackupFiles] = useState<ISelectedFiles>({});
 
@@ -40,6 +42,19 @@ export const GameSettingsBackup: React.FC<IProps> = ({
   const onSelectAllFilesInputChange = useCallback(() => {}, []);
   const onRefreshBackupsBtnClick = useCallback(() => {}, []);
   const onFileInputChange = useCallback(() => {}, []);
+  const onCancelBtnClick = useCallback(() => {
+    if (onCancelBtnClickProp) {
+      onCancelBtnClickProp();
+    }
+  }, [onCancelBtnClickProp]);
+
+  const onCreateBackupWithRefreshBtnClick = useCallback(() => {
+    if (onCreateBackupBtnClick) {
+      onCreateBackupBtnClick();
+    } else {
+      dispatch(createGameSettingsFilesBackup(true));
+    }
+  }, [dispatch, onCreateBackupBtnClick]);
 
   const onOpenBackupFolderBtnClick = useCallback(() => {
     openFolder(BACKUP_DIR, sendErrorMessage);
@@ -114,6 +129,12 @@ export const GameSettingsBackup: React.FC<IProps> = ({
             <div>
               <Button
                 className={classNames('button', 'main-btn', styles['settings__main-btn'])}
+                onClick={onCreateBackupWithRefreshBtnClick}
+              >
+                Создать бэкап
+              </Button>
+              <Button
+                className={classNames('button', 'main-btn', styles['settings__main-btn'])}
                 onClick={onOpenBackupFolderBtnClick}
               >
                 Открыть папку с бэкапами
@@ -127,7 +148,7 @@ export const GameSettingsBackup: React.FC<IProps> = ({
               </Button>
               <Button
                 className={classNames(styles['settings__backup-btn'], isGameSettingsFilesBackuping && styles['settings__backup-btn--refresh'])}
-                onClick={onCloseBtnClick}
+                onClick={onCancelBtnClick}
                 isDisabled={isGameSettingsFilesBackuping}
               >
                 Отмена

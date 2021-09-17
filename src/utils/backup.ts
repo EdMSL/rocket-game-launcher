@@ -107,7 +107,7 @@ export const readBackupFolder = async (folderName: string): Promise<IBackupFiles
   throw new Error();
 };
 
-export const getGameSettingsFilesBackup = async (): Promise<IBackupFiles[]> => {
+export const getGameSettingsFilesBackups = async (): Promise<IBackupFiles[]> => {
   const backupFolders = await readDirectory(BACKUP_DIR_GAME_SETTINGS_FILES);
 
   if (backupFolders.length > 0) {

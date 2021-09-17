@@ -48,6 +48,7 @@ export const GameSettingsScreen: React.FC = () => {
 
   const [isGameOptionsChanged, setIsGameOptionsChanged] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isBackupsModalFirstOpen, setIsBackupsModalFirstOpen] = useState<boolean>(true);
 
   const onMOProfilesSelectChange = useCallback(
     ({ target }: React.ChangeEvent<HTMLSelectElement>) => {
@@ -92,13 +93,17 @@ export const GameSettingsScreen: React.FC = () => {
   [gameSettingsOptions, isGameOptionsChanged, isGameSettingsFilesBackuping]);
 
   const onCreateBackupBtnClick = useCallback(() => {
-    dispatch(createGameSettingsFilesBackup());
+    setIsBackupsModalFirstOpen(true);
+    dispatch(createGameSettingsFilesBackup(false));
   }, [dispatch]);
 
-  const onRestoreBackupBtnClick = useCallback(() => {
-    dispatch(getGameSettingsFilesBackup());
+  const onBackupsBtnClick = useCallback(() => {
+    if (isBackupsModalFirstOpen) {
+      setIsBackupsModalFirstOpen(false);
+      dispatch(getGameSettingsFilesBackup());
+    }
     setIsModalOpen(true);
-  }, [dispatch]);
+  }, [dispatch, isBackupsModalFirstOpen]);
 
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
@@ -178,7 +183,7 @@ export const GameSettingsScreen: React.FC = () => {
                 isSaving={isGameSettingsSaving}
                 onCancelSettingsBtnClick={onCancelSettingsBtnClick}
                 onCreateBackupBtnClick={onCreateBackupBtnClick}
-                onRestoreBackupBtnClick={onRestoreBackupBtnClick}
+                onBackupsBtnClick={onBackupsBtnClick}
               />
             </form>
           )
@@ -186,13 +191,12 @@ export const GameSettingsScreen: React.FC = () => {
         {
           isModalOpen && (
             <Modal
-              isCanClose
               onCloseBtnClick={closeModal}
             >
               <GameSettingsBackup
                 gameSettingsFilesBackup={gameSettingsFilesBackup}
                 isGameSettingsFilesBackuping={isGameSettingsFilesBackuping}
-                onCloseBtnClick={closeModal}
+                onCancelBtnClick={closeModal}
               />
             </Modal>
           )
