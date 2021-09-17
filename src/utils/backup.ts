@@ -2,19 +2,26 @@ import fs from 'fs';
 import path from 'path';
 
 import {
-  BACKUP_DIR, BACKUP_DIR_GAME_SETTINGS_FILES, GAME_DIR,
+  GAME_DIR,
+  BACKUP_DIR,
+  BACKUP_DIR_GAME_SETTINGS_FILES,
 } from '$constants/paths';
 import { getBackupFolderName } from './data';
 import { LogMessageType, writeToLogFile } from './log';
 import {
-  createCopyFileSync, createFolderSync, writeFileDataSync,
+  createCopyFileSync,
+  createFolderSync,
+  readDirectory,
+  readFileData,
+  writeFileDataSync,
 } from './files';
 import { CustomError, ReadWriteError } from './errors';
+import { IBackupFiles } from '$types/main';
 
 export const createBackupFolders = (isThrowError = false): void => {
   try {
     createFolderSync(BACKUP_DIR);
-    createFolderSync(path.join(BACKUP_DIR, 'game_settings_files'));
+    createFolderSync(BACKUP_DIR_GAME_SETTINGS_FILES);
   } catch (error: any) {
     let errorMsg = error.message;
 
@@ -30,7 +37,7 @@ export const createBackupFolders = (isThrowError = false): void => {
   }
 };
 
-export const GameSettingsFilesBackup = (files: string[]): void => {
+export const createGameSettingsFilesBackup = (files: string[]): void => {
   createBackupFolders(true);
   const folderName = getBackupFolderName();
 
@@ -44,7 +51,10 @@ export const GameSettingsFilesBackup = (files: string[]): void => {
     return file;
   });
 
-  writeFileDataSync(path.join(BACKUP_DIR_GAME_SETTINGS_FILES, folderName, 'path.txt'), filePaths.join('\n'));
+  writeFileDataSync(
+    path.join(BACKUP_DIR_GAME_SETTINGS_FILES, folderName, 'path.txt'),
+    filePaths.join('\n'),
+  );
 
   filePaths.forEach((file) => {
     createCopyFileSync(
@@ -52,4 +62,62 @@ export const GameSettingsFilesBackup = (files: string[]): void => {
       path.join(BACKUP_DIR_GAME_SETTINGS_FILES, folderName, path.basename(file)),
     );
   });
+};
+
+export const readBackupFolder = async (folderName: string): Promise<IBackupFiles> => {
+  const files = await readDirectory(path.join(BACKUP_DIR_GAME_SETTINGS_FILES, folderName));
+
+  // > 1 т.к. в папке есть path.txt со списком файлов.
+  if (files.length > 1) {
+    if (fs.existsSync(path.join(BACKUP_DIR_GAME_SETTINGS_FILES, folderName, 'path.txt'))) {
+      const fileDataResult = readFileData(path.join(
+        BACKUP_DIR_GAME_SETTINGS_FILES,
+        folderName,
+        'path.txt',
+      ));
+      const pathFileData = fileDataResult.toString().split('\n');
+      const newFiles = files.filter((file) => file !== 'path.txt').map((file) => {
+        const pathToFile = pathFileData.find((currFile) => currFile.includes(file));
+
+        return {
+          name: file,
+          path: pathToFile!,
+        };
+      });
+
+      return {
+        name: folderName,
+        files: newFiles,
+      };
+    }
+
+    writeToLogFile(
+      `Can't find "path.txt" file in "${folderName}" backup folder.`,
+      LogMessageType.WARNING,
+    );
+
+    throw new Error();
+  }
+
+  writeToLogFile(
+    `There are no files in the "${folderName}" backup folder.`,
+    LogMessageType.WARNING,
+  );
+
+  throw new Error();
+};
+
+export const getGameSettingsFilesBackup = async (): Promise<IBackupFiles[]> => {
+  const backupFolders = await readDirectory(BACKUP_DIR_GAME_SETTINGS_FILES);
+
+  if (backupFolders.length > 0) {
+    const readFolderResult = await Promise.allSettled(backupFolders.map((file) => readBackupFolder(path.join(file))));
+    const files = readFolderResult
+      .filter((result) => result.status === 'fulfilled')
+      .map((folderResult) => (folderResult as PromiseFulfilledResult<IBackupFiles>).value);
+
+    return files;
+  }
+
+  return [];
 };

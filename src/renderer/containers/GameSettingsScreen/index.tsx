@@ -22,9 +22,9 @@ import {
 import { IGameSettingsOptionsItem } from '$types/gameSettings';
 import { Loader } from '$components/UI/Loader';
 import { GameSettingsFormControls } from '$components/GameSettingsFormControls';
-import { createGameSettingsFilesBackup } from '$actions/main';
+import { createGameSettingsFilesBackup, getGameSettingsFilesBackup } from '$actions/main';
 import { Modal } from '$components/UI/Modal';
-import { GameSettingsBackup } from '$containers/GameSettingsBackup';
+import { GameSettingsBackup } from '$components/GameSettingsBackup';
 
 /**
  * Контейнер, в котором располагаются блок (`GameSettingsContent`) с контроллерами для изменения
@@ -34,6 +34,7 @@ export const GameSettingsScreen: React.FC = () => {
   /* eslint-disable max-len */
   const isGameSettingsLoaded = useSelector((state: IAppState) => state.main.isGameSettingsLoaded);
   const isGameSettingsFilesBackuping = useSelector((state: IAppState) => state.main.isGameSettingsFilesBackuping);
+  const gameSettingsFilesBackup = useSelector((state: IAppState) => state.main.gameSettingsFilesBackup);
   const isGameSettingsSaving = useSelector((state: IAppState) => state.main.isGameSettingsSaving);
   const gameSettingsFiles = useSelector((state: IAppState) => state.gameSettings.gameSettingsFiles);
   const gameSettingsGroups = useSelector((state: IAppState) => state.gameSettings.gameSettingsGroups);
@@ -95,8 +96,9 @@ export const GameSettingsScreen: React.FC = () => {
   }, [dispatch]);
 
   const onRestoreBackupBtnClick = useCallback(() => {
+    dispatch(getGameSettingsFilesBackup());
     setIsModalOpen(true);
-  }, []);
+  }, [dispatch]);
 
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
@@ -184,10 +186,14 @@ export const GameSettingsScreen: React.FC = () => {
         {
           isModalOpen && (
             <Modal
-              isCanClose={false}
+              isCanClose
               onCloseBtnClick={closeModal}
             >
-              <GameSettingsBackup />
+              <GameSettingsBackup
+                gameSettingsFilesBackup={gameSettingsFilesBackup}
+                isGameSettingsFilesBackuping={isGameSettingsFilesBackuping}
+                onCloseBtnClick={closeModal}
+              />
             </Modal>
           )
         }
