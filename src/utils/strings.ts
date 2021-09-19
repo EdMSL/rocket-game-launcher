@@ -3,6 +3,7 @@ import path from 'path';
 import { ISystemRootState } from '$types/system';
 import { CustomError } from './errors';
 import { CustomPathName } from '$constants/misc';
+import { GAME_DIR } from '$constants/paths';
 
 const HEXADECIMAL = 16;
 const HEXADECIMAL_FACTOR = 1e8;
@@ -120,6 +121,7 @@ export const getPathToFile = (
   customPaths: ISystemRootState['customPaths'],
   profileMO: string,
 ): string => {
+  console.log(customPaths);
   if (CustomPathName.MO_REGEXP.test(pathToFile)) {
     if (profileMO) {
       return path.resolve(customPaths[CustomPathName.MO], profileMO, path.basename(pathToFile));
@@ -127,7 +129,10 @@ export const getPathToFile = (
 
     throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
   } else if (CustomPathName.DOCUMENTS_REGEXP.test(pathToFile)) {
-    return path.resolve(customPaths[CustomPathName.DOCUMENTS], pathToFile);
+    return path.resolve(customPaths[CustomPathName.DOCUMENTS], pathToFile.replace(CustomPathName.DOCUMENTS, ''));
+  } else if (CustomPathName.GAMEDIR_REGEXP.test(pathToFile)) {
+    console.log(path.resolve(customPaths[CustomPathName.GAMEDIR], pathToFile.replace(CustomPathName.GAMEDIR, '')));
+    return path.resolve(customPaths[CustomPathName.GAMEDIR], pathToFile.replace(CustomPathName.GAMEDIR, ''));
   }
 
   return pathToFile;

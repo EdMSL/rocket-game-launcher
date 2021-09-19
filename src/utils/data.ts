@@ -452,3 +452,15 @@ export const changeSectionalIniParameter = (
     .getSection(sectionName)
     .getLine(parameterName).text = currLineText;
 };
+
+export const getArgsFromShortcut = (argsStr: string): string[] => {
+  const argsArr = argsStr.split(' ');
+
+  return argsArr.map((arg) => {
+    if (/"(.+)"/.test(arg)) {
+      return arg.match(/"(.+)"/)![1]!;
+    }
+
+    return arg;
+  });
+};

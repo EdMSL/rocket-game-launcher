@@ -16,6 +16,8 @@ const INITIAL_STATE: ISystemRootState = {
   modOrganizer: defaultLauncherConfig.modOrganizer,
   documentsPath: defaultLauncherConfig.documentsPath,
   customPaths: defaultLauncherConfig.customPaths,
+  playButton: defaultLauncherConfig.playButton,
+  buttons: defaultLauncherConfig.buttons,
 };
 
 export const systemReducer = createReducer<ISystemRootState>(INITIAL_STATE, SYSTEM_HANDLERS);

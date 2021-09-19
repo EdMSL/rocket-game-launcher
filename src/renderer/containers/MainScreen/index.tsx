@@ -11,8 +11,13 @@ import { Button } from '$components/UI/Button';
 import { setIsGameRunning, addMessages } from '$actions/main';
 import { IAppState } from '$store/store';
 import { CreateUserMessage } from '$utils/message';
+import { LauncherButtonAction } from '$constants/misc';
+import { getPathToFile } from '$utils/strings';
 
 export const MainScreen: React.FC = () => {
+  const playButton = useSelector((state: IAppState) => state.system.playButton);
+  const appButtons = useSelector((state: IAppState) => state.system.buttons);
+  const customPaths = useSelector((state: IAppState) => state.system.customPaths);
   const isGameRunning = useSelector((state: IAppState) => state.main.isGameRunning);
   const isGameSettingsAvailable = useSelector((state: IAppState) => state.main.isGameSettingsAvailable); //eslint-disable-line max-len
   const gameSettingsGroups = useSelector((state: IAppState) => state.gameSettings.gameSettingsGroups);
@@ -33,12 +38,22 @@ export const MainScreen: React.FC = () => {
 
   const onPlayGameBtnClick = useCallback(() => {
     dispatch(setIsGameRunning(true));
-    runApplication('D:\\Oblivion\\Oblivion.exe', 'Oblivion', changeGameState);
+    runApplication(playButton, 'Game', changeGameState);
+  }, [dispatch, playButton, changeGameState]);
+
+  const onRunApplicationBtnClick = useCallback(({ target }) => {
+    dispatch(setIsGameRunning(true));
+    runApplication(target.dataset.path!, target.dataset.label!, changeGameState);
   }, [dispatch, changeGameState]);
 
-  const onGameFolderBtnClick = useCallback(() => {
-    openFolder(GAME_DIR, sendErrorMessage);
+  const onOpenFolderBtnClick = useCallback(({ target }) => {
+    console.log(target.dataset.path);
+    openFolder(target.dataset.path!, sendErrorMessage);
   }, [sendErrorMessage]);
+
+  // const onGameFolderBtnClick = useCallback(() => {
+  //   openFolder(GAME_DIR, sendErrorMessage);
+  // }, [sendErrorMessage]);
 
   return (
     <main className={classNames('main', styles['main-screen__main'])}>
@@ -50,12 +65,27 @@ export const MainScreen: React.FC = () => {
         >
           Играть
         </Button>
-        <Button
+        {/* <Button
           className="control-panel__btn"
           onClick={onGameFolderBtnClick}
         >
           Открыть папку игры
-        </Button>
+        </Button> */}
+        {
+          appButtons.map((button) => (
+            <Button
+              className="control-panel__btn"
+              // isDisabled={isGameRunning}
+              data-path={getPathToFile(button.path, customPaths, '') || ''}
+              data-label={button.label}
+              onClick={button.action === LauncherButtonAction.RUN
+                ? onRunApplicationBtnClick
+                : onOpenFolderBtnClick}
+            >
+              {button.label}
+            </Button>
+          ))
+        }
         {
           isGameSettingsAvailable && (
             <NavLink

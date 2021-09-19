@@ -42,6 +42,13 @@ export const RangeButtonName = {
 export const CustomPathName = {
   MO: '%MO%',
   DOCUMENTS: '%DOCUMENTS%',
+  GAMEDIR: '$GAMEDIR%',
   MO_REGEXP: new RegExp('%MO%'),
   DOCUMENTS_REGEXP: new RegExp('%DOCUMENTS%'),
+  GAMEDIR_REGEXP: new RegExp('%GAMEDIR%'),
+};
+
+export const LauncherButtonAction = {
+  RUN: 'run',
+  OPEN: 'open',
 };

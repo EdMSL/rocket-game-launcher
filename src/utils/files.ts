@@ -145,8 +145,6 @@ export const createCopyFile = (
   destinationPath: string,
 ): Promise<void> => fsPromises.copyFile(pathToFile, destinationPath)
   .catch((error) => {
-    console.log('pathToFile: ', pathToFile);
-    console.log('destinationPath: ', destinationPath);
     const readWriteError = getReadWriteError(error);
 
     throw new ReadWriteError(

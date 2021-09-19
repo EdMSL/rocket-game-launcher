@@ -12,6 +12,12 @@ interface IModOrganizerParams {
   profileParamValueRegExp: string,
 }
 
+interface ILauncherAppsButton {
+  action: string,
+  path: string,
+  label: string,
+}
+
 export type ISystemRootState = Readonly<{
   isResizable: boolean,
   minWidth: number,
@@ -24,4 +30,6 @@ export type ISystemRootState = Readonly<{
   modOrganizer: IModOrganizerParams,
   documentsPath: string,
   customPaths: { [label: string]: string, },
+  playButton: string,
+  buttons: ILauncherAppsButton[],
 }>;

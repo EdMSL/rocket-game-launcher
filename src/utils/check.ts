@@ -6,6 +6,7 @@ import {
   GameSettingParameterControllerType,
   GameSettingsFileView,
   GameSettingParameterType,
+  LauncherButtonAction,
 } from '$constants/misc';
 import { IGameSettingsConfig, IGameSettingsRootState } from '$types/gameSettings';
 import {
@@ -47,8 +48,15 @@ const configFileDataSchema = Joi.object({
   customPaths: Joi.object().pattern(
     Joi.string(),
     Joi.string(),
-  ),
-}).optional().default(defaultLauncherConfig.customPaths);
+  ).optional().default(defaultLauncherConfig.customPaths),
+  playButton: Joi.string().required(),
+  buttons: Joi.array()
+    .items(Joi.object({
+      action: Joi.string().required().valid(...Object.values(LauncherButtonAction)),
+      path: Joi.string().required(),
+      label: Joi.string().required(),
+    })).min(1).optional(),
+});
 
 export const checkConfigFileData = (configObj: ISystemRootState): ISystemRootState => {
   writeToLogFileSync('Started checking the config.json file.');

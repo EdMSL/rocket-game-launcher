@@ -4,8 +4,8 @@
   "minHeight": 400,
   "width": 800,
   "height": 600,
-  "maxWidth": 1680,
-  "maxHeight": 1050,
+  "maxWidth": 0,
+  "maxHeight": 0,
   "modOrganizer": {
     "isUsed": true,
     "path": ".\\Mod Organizer",
@@ -17,5 +17,13 @@
   },
   "documentsPath": ".\\My Games\\Oblivion",
   "isFirstLaunch": false,
-  "customPaths": {}
+  "customPaths": {},
+  "playButton": "%GAMEDIR%\\Play.lnk",
+  "buttons": [
+    {
+      "action": "open",
+      "path": "%GAMEDIR%",
+      "label": "Открыть папку игры"
+    }
+  ]
 }

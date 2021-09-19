@@ -29,6 +29,7 @@ interface IStorage {
 
 interface ICustomPaths {
   '%DOCUMENTS%': string,
+  '%GAMEDIR%': string,
   //@ts-ignore
   '%MO%'?: string|undefined,
   [label: string]: string,
@@ -85,6 +86,7 @@ const getConfigurationData = (): ISystemRootState => {
 */
 const createCustomPaths = (configData: ISystemRootState): ICustomPaths => ({
   '%DOCUMENTS%': path.resolve(DOCUMENTS_DIR, configData.documentsPath),
+  '%GAMEDIR%': GAME_DIR,
   ...configData.modOrganizer.isUsed ? {
     '%MO%': path.resolve(GAME_DIR, configData.modOrganizer.pathToProfiles),
   } : {},

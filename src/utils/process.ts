@@ -1,4 +1,5 @@
 import { execFile } from 'child_process';
+import { shell } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import mime from 'mime';
@@ -7,6 +8,7 @@ import { LogMessageType, writeToLogFile } from '$utils/log';
 import { iconvDecode } from '$utils/files';
 import { GAME_DIR } from '$constants/paths';
 import { ErrorCode, ErrorMessage } from '$utils/errors';
+import { getArgsFromShortcut } from './data';
 
 /**
  * Запустить приложение (.exe).
@@ -19,6 +21,9 @@ export const runApplication = (
   appName = path.basename(pathToApp),
   cb?,
 ): void => {
+  let execTarget = pathToApp;
+  let execArgs: string[] = [];
+
   if (fs.existsSync(pathToApp)) {
     if (fs.statSync(pathToApp).isDirectory()) {
       writeToLogFile(
@@ -31,9 +36,23 @@ export const runApplication = (
       return;
     }
 
+    const pathToAppExtname = path.extname(pathToApp);
+
+    if (pathToAppExtname === '.lnk') {
+      const parsed = shell.readShortcutLink(pathToApp);
+
+      if (parsed.args) {
+        console.log(parsed);
+        execArgs = getArgsFromShortcut(parsed.args);
+        console.log(execArgs);
+      }
+
+      execTarget = parsed.target;
+    }
+
     if (
-      path.extname(pathToApp) !== '.exe'
-      || !mime.getType(pathToApp)?.match(/application\/octet-stream/)
+      path.extname(execTarget) !== '.exe'
+      || !mime.getType(execTarget)?.match(/application\/octet-stream/)
     ) {
       writeToLogFile(
         `Message: Can't run application. ${ErrorMessage.MIME_TYPE}, received: ${mime.getType(pathToApp)}. App: ${appName}, path: ${pathToApp}.`, //eslint-disable-line max-len
@@ -57,10 +76,12 @@ export const runApplication = (
     writeToLogFile(`Try to start ${appName}.`);
 
     const process = execFile(
-      pathToApp,
+      `"${execTarget}"`,
+      execArgs,
       {
         encoding: 'binary',
         cwd: GAME_DIR,
+        shell: true,
       },
       (error): void => {
         if (error) {
