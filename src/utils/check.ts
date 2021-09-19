@@ -25,6 +25,8 @@ const configFileDataSchema = Joi.object({
   isResizable: Joi.bool().optional().default(defaultLauncherConfig.isResizable),
   minWidth: Joi.number().optional().default(defaultLauncherConfig.minWidth),
   minHeight: Joi.number().optional().default(defaultLauncherConfig.minHeight),
+  maxWidth: Joi.number().optional().default(defaultLauncherConfig.maxWidth),
+  maxHeight: Joi.number().optional().default(defaultLauncherConfig.maxHeight),
   width: Joi.number().optional().default(defaultLauncherConfig.width),
   height: Joi.number().optional().default(defaultLauncherConfig.height),
   modOrganizer: {

@@ -26,6 +26,8 @@ export const createWindow = (systemConfig: ISystemRootState): void => {
     y: mainWindowState.y,
     minWidth: systemConfig.isResizable ? systemConfig.minWidth : 0,
     minHeight: systemConfig.isResizable ? systemConfig.minHeight : 0,
+    maxWidth: systemConfig.isResizable ? systemConfig.maxWidth : 0,
+    maxHeight: systemConfig.isResizable ? systemConfig.maxHeight : 0,
     width: systemConfig.isResizable ? mainWindowState.width : systemConfig.width,
     height: systemConfig.isResizable ? mainWindowState.height : systemConfig.height,
     resizable: systemConfig.isResizable,

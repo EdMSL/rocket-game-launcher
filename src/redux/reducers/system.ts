@@ -8,6 +8,8 @@ const INITIAL_STATE: ISystemRootState = {
   isResizable: defaultLauncherConfig.isResizable,
   minWidth: defaultLauncherConfig.minWidth,
   minHeight: defaultLauncherConfig.minHeight,
+  maxWidth: defaultLauncherConfig.maxWidth,
+  maxHeight: defaultLauncherConfig.maxHeight,
   width: defaultLauncherConfig.width,
   height: defaultLauncherConfig.height,
   isFirstLaunch: defaultLauncherConfig.isFirstLaunch,

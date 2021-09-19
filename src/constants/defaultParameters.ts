@@ -13,12 +13,16 @@ export const defaultLauncherResolution = {
   height: 768,
   minWidth: 800,
   minHeight: 600,
+  maxWidth: 1280,
+  maxHeight: 1024,
 };
 
 export const defaultLauncherConfig: ISystemRootState = {
   isResizable: false,
   minWidth: defaultLauncherResolution.minWidth,
   minHeight: defaultLauncherResolution.minHeight,
+  maxWidth: defaultLauncherResolution.maxWidth,
+  maxHeight: defaultLauncherResolution.maxHeight,
   width: defaultLauncherResolution.width,
   height: defaultLauncherResolution.height,
   isFirstLaunch: true,

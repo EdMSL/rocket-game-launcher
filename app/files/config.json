@@ -1,9 +1,11 @@
 {
-  "isResizable": false,
+  "isResizable": true,
   "minWidth": 400,
   "minHeight": 400,
   "width": 800,
   "height": 600,
+  "maxWidth": 1680,
+  "maxHeight": 1050,
   "modOrganizer": {
     "isUsed": true,
     "path": ".\\Mod Organizer",
