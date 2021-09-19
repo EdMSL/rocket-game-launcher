@@ -36,6 +36,25 @@
   overflow-y: auto;
 }
 
+.game-settings-screen__modal {
+  color: inherit;
+}
+
+.game-settings-screen__modal-overlay {
+  color: inherit;
+}
+
 .game-settings-screen__modal-block {
+  flex-grow: 1;
+  min-width: 95%;
   min-height: 95%;
+  max-height: 95%;
+}
+
+.game-settings-screen__modal-header {
+  color: inherit;
+}
+
+.game-settings-screen__modal-content {
+  color: inherit;
 }

@@ -130,52 +130,65 @@ export const GameSettingsBackup: React.FC<IProps> = ({
                 gameSettingsFilesBackup.length > 0
                   ? gameSettingsFilesBackup.map((backupFolder) => (
                     <React.Fragment key={backupFolder.name}>
-                      <li className={styles['game-settings-backup__item']}>
-                        <details>
-                          <summary className={styles['settings__backup-title']}>
-                            {backupFolder.name}
+                      <li className={styles['game-settings-backup__item-container']}>
+                        <details className={styles['game-settings-backup__item']}>
+                          <summary className={styles['game-settings-backup__title']}>
+                            <span className={styles['game-settings-backup__title-text']}>
+                              {backupFolder.name}
+                            </span>
                             <Button
-                              className={styles['game-settings-backup__btn']}
+                              className={styles['game-settings-backup__delete-btn']}
                               id={`delete-${backupFolder.name}`}
                               onClick={onBackupDeleteBtn}
                             >
                               Удалить
                             </Button>
                           </summary>
-                          <ul className={styles['settings__backup-list']}>
-                            <li
-                              className={styles['settings__backup-item']}
-                            >
+                          <ul className={styles['game-settings-backup__item-list']}>
+                            <li className={styles['game-settings-backup__file']}>
                               <Checkbox
                                 classNameCheckbox={styles.setting__checkbox}
                                 id={`selectall-${backupFolder.name}`}
                                 label="Выбрать все"
-                                isChecked={(selectedBackupFiles[backupFolder.name] && selectedBackupFiles[backupFolder.name].length === backupFolder.files.length) || false}
+                                isChecked={(
+                                  selectedBackupFiles[backupFolder.name]
+                                  && selectedBackupFiles[backupFolder.name].length === backupFolder.files.length)
+                                  || false}
                                 onChange={onSelectAllFilesInputChange}
                               />
                             </li>
                             {
-                          backupFolder.files.map((file) => (
-                            <li
-                              key={`key-${file.name}`}
-                              className={styles['settings__backup-item']}
-                            >
-                              <Checkbox
-                                classNameCheckbox={styles.setting__checkbox}
-                                id={`${backupFolder.name}&${file.name}`}
-                                label={file.name}
-                                isChecked={(selectedBackupFiles[backupFolder.name] && selectedBackupFiles[backupFolder.name].includes(file.name)) || false}
-                                onChange={onFileInputChange}
-                              />
-                            </li>
-                          ))
-                        }
+                              backupFolder.files.map((file) => (
+                                <li
+                                  key={`key-${file.name}`}
+                                  className={styles['game-settings-backup__file']}
+                                >
+                                  <Checkbox
+                                    className={styles['game-settings-backup__checkbox-block']}
+                                    classNameCheckbox={styles['game-settings-backup__checkbox']}
+                                    id={`${backupFolder.name}&${file.name}`}
+                                    label={file.name}
+                                    isChecked={(selectedBackupFiles[backupFolder.name]
+                                      && selectedBackupFiles[backupFolder.name].includes(file.name))
+                                      || false}
+                                    onChange={onFileInputChange}
+                                  />
+                                </li>
+                              ))
+                            }
                           </ul>
                           <Button
-                            className={classNames('button', 'main-btn')}
-                            onClick={onRestoreBackupBtnClick}
+                            className={classNames(
+                              'main-btn',
+                              styles['game-settings-backup__restore-btn'],
+                            )}
                             id={`restore-${backupFolder.name}`}
-                            isDisabled={isGameSettingsFilesBackuping || !selectedBackupFiles[backupFolder.name] || selectedBackupFiles[backupFolder.name].length === 0}
+                            isDisabled={
+                              isGameSettingsFilesBackuping
+                              || !selectedBackupFiles[backupFolder.name]
+                              || selectedBackupFiles[backupFolder.name].length === 0
+                            }
+                            onClick={onRestoreBackupBtnClick}
                           >
                             Восстановить выбранное
                           </Button>
@@ -196,13 +209,6 @@ export const GameSettingsBackup: React.FC<IProps> = ({
               <Button
                 className={classNames('main-btn', styles['game-settings-backup__btn'])}
                 onClick={onRefreshBackupsBtnClick}
-                isDisabled={isGameSettingsFilesBackuping}
-              >
-                Восстановить из бэкапа
-              </Button>
-              <Button
-                className={classNames('main-btn', styles['game-settings-backup__btn'])}
-                onClick={onRefreshBackupsBtnClick}
               >
                 Обновить
               </Button>
@@ -214,8 +220,8 @@ export const GameSettingsBackup: React.FC<IProps> = ({
               </Button>
               <Button
                 className={classNames('main-btn', styles['settings__main-btn'])}
-                onClick={onCancelBtnClick}
                 isDisabled={isGameSettingsFilesBackuping}
+                onClick={onCancelBtnClick}
               >
                 Отмена
               </Button>

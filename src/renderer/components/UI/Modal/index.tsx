@@ -6,6 +6,8 @@ import { Button } from '$components/UI/Button';
 
 interface IProps {
   children: React.ReactNode,
+  modalClassname?: string,
+  modalOverlayClassname?: string,
   modalBlockClassname?: string,
   modalHeaderClassname?: string,
   modalContentClassname?: string,
@@ -14,16 +16,18 @@ interface IProps {
 
 export const Modal: React.FC<IProps> = ({
   children,
+  modalClassname = '',
+  modalOverlayClassname = '',
   modalBlockClassname = '',
   modalHeaderClassname = '',
   modalContentClassname = '',
   onCloseBtnClick,
 }) => (
   <FocusLock
-    className="modal"
+    className={classNames('modal', modalClassname)}
     as="section"
   >
-    <div className="modal__overlay" />
+    <div className={classNames('modal__overlay', modalOverlayClassname)} />
     <div className={classNames('modal__block', modalBlockClassname)}>
       <div className={classNames('modal__header', modalHeaderClassname)}>
         {
