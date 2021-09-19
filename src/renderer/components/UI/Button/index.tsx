@@ -18,20 +18,31 @@ export const Button: React.FunctionComponent<IButtonProps> = memo(({
   isDisabled,
   tabIndex = 0,
   onClick,
-}) => (
+}) => {
+  let textClassname = '';
+
+  const classNameArr = className.split(' ');
+  if (classNameArr.length > 1) {
+    textClassname = classNameArr[classNameArr.length - 1];
+  } else {
+    textClassname = className;
+  }
+
+  return (
   /* eslint-disable react/button-has-type */
-  <button
-    type={isSubmit ? 'submit' : 'button'}
-    className={classNames('button', className)}
-    disabled={isDisabled}
-    id={id}
-    tabIndex={tabIndex}
-    onClick={isSubmit ? undefined : onClick}
-  >
-    {
+    <button
+      type={isSubmit ? 'submit' : 'button'}
+      className={classNames('button', className)}
+      disabled={isDisabled}
+      id={id}
+      tabIndex={tabIndex}
+      onClick={isSubmit ? undefined : onClick}
+    >
+      {
       typeof children === 'string'
-        ? <span className={`${className}-text`}>{children}</span>
+        ? <span className={`${textClassname}-text`}>{children}</span>
         : children
     }
-  </button>
-));
+    </button>
+  );
+});

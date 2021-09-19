@@ -132,7 +132,7 @@ export const GameSettingsScreen: React.FC = () => {
           Назад
         </NavLink>
       </div>
-      <div className={classNames('content', styles['game-settings-screen__content'])}>
+      <div className={styles['game-settings-screen__content']}>
         {
         isModOrganizerUsed
         && moProfile
@@ -155,7 +155,7 @@ export const GameSettingsScreen: React.FC = () => {
         {
           isGameSettingsLoaded && Object.keys(gameSettingsOptions).length > 0 && (
             <form
-              className={styles['game-settings-screen']}
+              className={styles['game-settings-screen__form']}
               onSubmit={onGameSettingsFormSubmit}
             >
               <div className={styles['game-settings-screen__options']}>
@@ -191,6 +191,7 @@ export const GameSettingsScreen: React.FC = () => {
         {
           isModalOpen && (
             <Modal
+              modalBlockClassname={styles['game-settings-screen__modal-block']}
               onCloseBtnClick={closeModal}
             >
               <GameSettingsBackup

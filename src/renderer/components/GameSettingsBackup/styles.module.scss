@@ -1,5 +1,6 @@
 .game-settings-backup__container {
   display: flex;
+  flex-direction: column;
 }
 
 .game-settings-backup__list {
@@ -10,6 +11,15 @@
   color: inherit;
 }
 
+.game-settings-backup__controls {
+  display: flex;
+  justify-content: center;
+}
+
 .game-settings-backup__btn {
-  color: inherit;
+  margin-right: 10px;
+
+  &:last-child {
+    margin-right: 0;
+  }
 }

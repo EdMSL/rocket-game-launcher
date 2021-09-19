@@ -1,15 +1,22 @@
 import FocusLock from 'react-focus-lock';
 import React from 'react';
+import classNames from 'classnames';
 
 import { Button } from '$components/UI/Button';
 
 interface IProps {
   children: React.ReactNode,
+  modalBlockClassname?: string,
+  modalHeaderClassname?: string,
+  modalContentClassname?: string,
   onCloseBtnClick?: () => void,
 }
 
 export const Modal: React.FC<IProps> = ({
   children,
+  modalBlockClassname = '',
+  modalHeaderClassname = '',
+  modalContentClassname = '',
   onCloseBtnClick,
 }) => (
   <FocusLock
@@ -17,20 +24,20 @@ export const Modal: React.FC<IProps> = ({
     as="section"
   >
     <div className="modal__overlay" />
-    <div className="modal__block">
-      <div className="modal__header">
+    <div className={classNames('modal__block', modalBlockClassname)}>
+      <div className={classNames('modal__header', modalHeaderClassname)}>
         {
           onCloseBtnClick && (
-          <Button
-            className="modal__btn"
-            onClick={onCloseBtnClick}
-          >
-            Закрыть
-          </Button>
+            <Button
+              className="modal__btn"
+              onClick={onCloseBtnClick}
+            >
+              Закрыть
+            </Button>
           )
     }
       </div>
-      <div className="modal__content">
+      <div className={classNames('modal__content', modalContentClassname)}>
         {children}
       </div>
     </div>

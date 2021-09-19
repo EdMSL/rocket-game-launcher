@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import styles from './styles.module.scss';
 import { Button } from '$components/UI/Button';
 import { Checkbox } from '$components/UI/Checkbox';
-import { BACKUP_DIR } from '$constants/paths';
+import { BACKUP_DIR_GAME_SETTINGS_FILES } from '$constants/paths';
 import { openFolder } from '$utils/process';
 import {
   addMessages,
@@ -117,7 +117,7 @@ export const GameSettingsBackup: React.FC<IProps> = ({
   }, [dispatch, onCreateBackupBtnClick]);
 
   const onOpenBackupFolderBtnClick = useCallback(() => {
-    openFolder(BACKUP_DIR, sendErrorMessage);
+    openFolder(BACKUP_DIR_GAME_SETTINGS_FILES, sendErrorMessage);
   }, [sendErrorMessage]);
 
   return (
@@ -186,34 +186,34 @@ export const GameSettingsBackup: React.FC<IProps> = ({
                   : <li className={styles['game-settings-backup__item']}>Нет доступных бэкапов</li>
               }
             </ul>
-            <div>
+            <div className={styles['game-settings-backup__controls']}>
               <Button
-                className={classNames('button', 'main-btn', styles['settings__main-btn'])}
+                className={classNames('main-btn', styles['game-settings-backup__btn'])}
                 onClick={onCreateBackupWithRefreshBtnClick}
               >
                 Создать бэкап
               </Button>
               <Button
-                className={classNames('button', 'main-btn', styles['settings__main-btn'])}
-                onClick={onRefreshBackupsBtnClick}
-              >
-                Обновить
-              </Button>
-              <Button
-                className={classNames('button', 'main-btn', styles['settings__main-btn'])}
-                onClick={onOpenBackupFolderBtnClick}
-              >
-                Открыть папку с бэкапами
-              </Button>
-              <Button
-                className={classNames(styles['settings__backup-btn'], isGameSettingsFilesBackuping && styles['settings__backup-btn--refresh'])}
+                className={classNames('main-btn', styles['game-settings-backup__btn'])}
                 onClick={onRefreshBackupsBtnClick}
                 isDisabled={isGameSettingsFilesBackuping}
               >
                 Восстановить из бэкапа
               </Button>
               <Button
-                className={classNames(styles['settings__backup-btn'], isGameSettingsFilesBackuping && styles['settings__backup-btn--refresh'])}
+                className={classNames('main-btn', styles['game-settings-backup__btn'])}
+                onClick={onRefreshBackupsBtnClick}
+              >
+                Обновить
+              </Button>
+              <Button
+                className={classNames('main-btn', styles['game-settings-backup__btn'])}
+                onClick={onOpenBackupFolderBtnClick}
+              >
+                Открыть папку с бэкапами
+              </Button>
+              <Button
+                className={classNames('main-btn', styles['settings__main-btn'])}
                 onClick={onCancelBtnClick}
                 isDisabled={isGameSettingsFilesBackuping}
               >

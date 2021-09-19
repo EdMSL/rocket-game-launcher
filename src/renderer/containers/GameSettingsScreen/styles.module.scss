@@ -1,5 +1,5 @@
 .game-settings-screen__main {
-  color: inherit;
+  position: relative;
 }
 
 .game-settings-screen__navigation {
@@ -7,27 +7,35 @@
 }
 
 .game-settings-screen__content {
-  color: inherit;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 10px 0;
 }
 
 .game-settings-screen__profiles {
-  color: inherit;
+  margin-bottom: 30px;
 }
 
 .game-settings-screen__select {
   color: inherit;
 }
 
-.game-settings-screen__options {
-  position: relative;
-
-  display: flex;
-  flex-direction: column;
-}
-
 .game-settings-screen__form {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+}
+
+.game-settings-screen__options {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
+}
+
+.game-settings-screen__modal-block {
+  min-height: 95%;
 }
