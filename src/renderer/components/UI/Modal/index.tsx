@@ -6,30 +6,34 @@ import { Button } from '$components/UI/Button';
 
 interface IProps {
   children: React.ReactNode,
-  modalClassname?: string,
-  modalOverlayClassname?: string,
-  modalBlockClassname?: string,
-  modalHeaderClassname?: string,
-  modalContentClassname?: string,
+  modalParentClassname?: string,
   onCloseBtnClick?: () => void,
 }
 
 export const Modal: React.FC<IProps> = ({
   children,
-  modalClassname = '',
-  modalOverlayClassname = '',
-  modalBlockClassname = '',
-  modalHeaderClassname = '',
-  modalContentClassname = '',
+  modalParentClassname = '',
   onCloseBtnClick,
 }) => (
   <FocusLock
-    className={classNames('modal', modalClassname)}
+    className={classNames('modal', modalParentClassname && `${modalParentClassname}__modal`)}
     as="section"
   >
-    <div className={classNames('modal__overlay', modalOverlayClassname)} />
-    <div className={classNames('modal__block', modalBlockClassname)}>
-      <div className={classNames('modal__header', modalHeaderClassname)}>
+    <div className={classNames(
+      'modal__overlay',
+      modalParentClassname && `${modalParentClassname}__modal-overlay`,
+    )}
+    />
+    <div className={classNames(
+      'modal__block',
+      modalParentClassname && `${modalParentClassname}__modal-block`,
+    )}
+    >
+      <div className={classNames(
+        'modal__header',
+        modalParentClassname && `${modalParentClassname}__modal-header`,
+      )}
+      >
         {
           onCloseBtnClick && (
             <Button
@@ -41,7 +45,11 @@ export const Modal: React.FC<IProps> = ({
           )
     }
       </div>
-      <div className={classNames('modal__content', modalContentClassname)}>
+      <div className={classNames(
+        'modal__content',
+        modalParentClassname && `${modalParentClassname}__modal-content`,
+      )}
+      >
         {children}
       </div>
     </div>

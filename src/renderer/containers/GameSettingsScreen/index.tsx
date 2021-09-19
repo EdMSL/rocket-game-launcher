@@ -191,11 +191,7 @@ export const GameSettingsScreen: React.FC = () => {
         {
           isModalOpen && (
             <Modal
-              modalClassname={styles['game-settings-screen__modal']}
-              modalOverlayClassname={styles['game-settings-screen__modal-overlay']}
-              modalHeaderClassname={styles['game-settings-screen__modal-header']}
-              modalContentClassname={styles['game-settings-screen__modal-content']}
-              modalBlockClassname={styles['game-settings-screen__modal-block']}
+              modalParentClassname="game-settings-screen"
               onCloseBtnClick={closeModal}
             >
               <GameSettingsBackup
