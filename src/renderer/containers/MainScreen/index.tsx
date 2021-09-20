@@ -38,22 +38,21 @@ export const MainScreen: React.FC = () => {
 
   const onPlayGameBtnClick = useCallback(() => {
     dispatch(setIsGameRunning(true));
-    runApplication(playButton, 'Game', changeGameState);
-  }, [dispatch, playButton, changeGameState]);
+    runApplication(getPathToFile(playButton, customPaths, ''), 'Game', changeGameState);
+  }, [dispatch, playButton, customPaths, changeGameState]);
 
-  const onRunApplicationBtnClick = useCallback(({ target }) => {
+  const onRunApplicationBtnClick = useCallback(({ currentTarget }) => {
     dispatch(setIsGameRunning(true));
-    runApplication(target.dataset.path!, target.dataset.label!, changeGameState);
+    runApplication(
+      currentTarget.dataset.path!,
+       currentTarget.dataset.label!,
+       changeGameState,
+    );
   }, [dispatch, changeGameState]);
 
-  const onOpenFolderBtnClick = useCallback(({ target }) => {
-    console.log(target.dataset.path);
-    openFolder(target.dataset.path!, sendErrorMessage);
+  const onOpenFolderBtnClick = useCallback(({ currentTarget }) => {
+    openFolder(currentTarget.dataset.path!, sendErrorMessage);
   }, [sendErrorMessage]);
-
-  // const onGameFolderBtnClick = useCallback(() => {
-  //   openFolder(GAME_DIR, sendErrorMessage);
-  // }, [sendErrorMessage]);
 
   return (
     <main className={classNames('main', styles['main-screen__main'])}>
@@ -65,19 +64,13 @@ export const MainScreen: React.FC = () => {
         >
           Играть
         </Button>
-        {/* <Button
-          className="control-panel__btn"
-          onClick={onGameFolderBtnClick}
-        >
-          Открыть папку игры
-        </Button> */}
         {
           appButtons.map((button) => (
             <Button
+              key={button.path}
               className="control-panel__btn"
-              // isDisabled={isGameRunning}
-              data-path={getPathToFile(button.path, customPaths, '') || ''}
-              data-label={button.label}
+              btnPath={getPathToFile(button.path, customPaths, '') || ''}
+              btnLabel={button.label}
               onClick={button.action === LauncherButtonAction.RUN
                 ? onRunApplicationBtnClick
                 : onOpenFolderBtnClick}

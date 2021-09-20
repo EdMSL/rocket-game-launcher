@@ -7,7 +7,7 @@
   "maxWidth": 0,
   "maxHeight": 0,
   "modOrganizer": {
-    "isUsed": true,
+    "isUsed": false,
     "path": ".\\Mod Organizer",
     "pathToINI": ".\\Mod Organizer\\ModOrganizer.ini",
     "pathToProfiles": ".\\Mod Organizer\\profiles",

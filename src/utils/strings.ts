@@ -121,7 +121,6 @@ export const getPathToFile = (
   customPaths: ISystemRootState['customPaths'],
   profileMO: string,
 ): string => {
-  console.log(customPaths);
   if (CustomPathName.MO_REGEXP.test(pathToFile)) {
     if (profileMO) {
       return path.resolve(customPaths[CustomPathName.MO], profileMO, path.basename(pathToFile));
@@ -131,7 +130,6 @@ export const getPathToFile = (
   } else if (CustomPathName.DOCUMENTS_REGEXP.test(pathToFile)) {
     return path.resolve(customPaths[CustomPathName.DOCUMENTS], pathToFile.replace(CustomPathName.DOCUMENTS, ''));
   } else if (CustomPathName.GAMEDIR_REGEXP.test(pathToFile)) {
-    console.log(path.resolve(customPaths[CustomPathName.GAMEDIR], pathToFile.replace(CustomPathName.GAMEDIR, '')));
     return path.resolve(customPaths[CustomPathName.GAMEDIR], pathToFile.replace(CustomPathName.GAMEDIR, ''));
   }
 

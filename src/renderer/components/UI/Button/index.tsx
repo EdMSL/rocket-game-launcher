@@ -8,6 +8,8 @@ interface IButtonProps {
   isSubmit?: boolean,
   isDisabled?: boolean,
   tabIndex?: number,
+  btnPath?: string,
+  btnLabel?: string,
   onClick?: (e: React.SyntheticEvent) => void,
 }
 export const Button: React.FunctionComponent<IButtonProps> = memo(({
@@ -17,6 +19,8 @@ export const Button: React.FunctionComponent<IButtonProps> = memo(({
   isSubmit,
   isDisabled,
   tabIndex = 0,
+  btnPath,
+  btnLabel,
   onClick,
 }) => {
   let textClassname = '';
@@ -36,6 +40,8 @@ export const Button: React.FunctionComponent<IButtonProps> = memo(({
       disabled={isDisabled}
       id={id}
       tabIndex={tabIndex}
+      data-path={btnPath}
+      data-label={btnLabel}
       onClick={isSubmit ? undefined : onClick}
     >
       {
