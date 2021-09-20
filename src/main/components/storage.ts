@@ -84,14 +84,21 @@ const getConfigurationData = (): ISystemRootState => {
  * @param configData Данные из файла config.json
  * @returns Объект с пользовательскими путями.
 */
-const createCustomPaths = (configData: ISystemRootState): ICustomPaths => ({
-  '%DOCUMENTS%': path.resolve(DOCUMENTS_DIR, configData.documentsPath),
-  '%GAMEDIR%': GAME_DIR,
-  ...configData.modOrganizer.isUsed ? {
-    '%MO%': path.resolve(GAME_DIR, configData.modOrganizer.pathToProfiles),
-  } : {},
-  ...configData.customPaths,
-});
+const createCustomPaths = (configData: ISystemRootState): ICustomPaths => {
+  const newCustomPaths = Object.keys(configData.customPaths).reduce((paths, currentPathKey) => ({
+    ...paths,
+    [currentPathKey]: path.join(GAME_DIR, configData.customPaths[currentPathKey]),
+  }), {});
+
+  return {
+    '%DOCUMENTS%': path.resolve(DOCUMENTS_DIR, configData.documentsPath),
+    '%GAMEDIR%': GAME_DIR,
+    ...configData.modOrganizer.isUsed ? {
+      '%MO%': path.resolve(GAME_DIR, configData.modOrganizer.pathToProfiles),
+    } : {},
+    ...newCustomPaths,
+  };
+};
 
 /**
   * Функция для создания файла настроек пользователя и хранилища Redux.
