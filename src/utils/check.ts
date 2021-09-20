@@ -45,8 +45,9 @@ const configFileDataSchema = Joi.object({
   },
   documentsPath: Joi.string().optional().default(defaultLauncherConfig.documentsPath),
   isFirstLaunch: Joi.bool().optional().default(defaultLauncherConfig.isFirstLaunch),
+  ///FIXME Проверка не работает
   customPaths: Joi.object().pattern(
-    Joi.string(),
+    /%.+%/,
     Joi.string(),
   ).optional().default(defaultLauncherConfig.customPaths),
   playButton: Joi.string().required(),

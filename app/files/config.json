@@ -17,13 +17,25 @@
   },
   "documentsPath": ".\\My Games\\Oblivion",
   "isFirstLaunch": false,
-  "customPaths": {},
+  "customPaths": {
+    "%CUSTOM%": "Data\\OBSE\\Plugins"
+  },
   "playButton": "%GAMEDIR%\\Play.lnk",
   "buttons": [
+    {
+      "action": "run",
+      "path": "%GAMEDIR%\\Editor2.lnk",
+      "label": "CSE"
+    },
     {
       "action": "open",
       "path": "%GAMEDIR%",
       "label": "Открыть папку игры"
+    },
+    {
+      "action": "open",
+      "path": "%CUSTOM%\\CSE",
+      "label": "Открыть"
     }
   ]
 }

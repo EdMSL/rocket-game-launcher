@@ -58,6 +58,16 @@ export const MainScreen: React.FC = () => {
     openFolder(currentTarget.dataset.path!, sendErrorMessage);
   }, [sendErrorMessage]);
 
+  const getPathForCustomBtn = useCallback((path) => {
+    try {
+      return getPathToFile(path, customPaths, '');
+    } catch (error) {
+      console.log(error);
+      // dispatch(addMessages([CreateUserMessage.error(error.message)]));
+      return '';
+    }
+  }, [customPaths]);
+
   return (
     <main className={classNames('main', styles['main-screen__main'])}>
       <div className={classNames('control-panel', styles['main-screen__control-panel'])}>
@@ -73,7 +83,7 @@ export const MainScreen: React.FC = () => {
             <Button
               key={button.path}
               className="control-panel__btn"
-              btnPath={getPathToFile(button.path, customPaths, '') || ''}
+              btnPath={getPathForCustomBtn(button.path)}
               btnLabel={button.label}
               onClick={button.action === LauncherButtonAction.RUN
                 ? onRunApplicationBtnClick

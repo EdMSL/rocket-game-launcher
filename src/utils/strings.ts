@@ -3,7 +3,7 @@ import path from 'path';
 import { ISystemRootState } from '$types/system';
 import { CustomError } from './errors';
 import { CustomPathName } from '$constants/misc';
-import { GAME_DIR } from '$constants/paths';
+import { DOCUMENTS_DIR, GAME_DIR } from '$constants/paths';
 
 const HEXADECIMAL = 16;
 const HEXADECIMAL_FACTOR = 1e8;
@@ -116,22 +116,39 @@ export const getValueFromRange = (
  * @param profileMO Профиль Mod Organizer.
  * @returns Строка с абсолютным путем к файлу.
 */
+///TODO Добавить проверку, что путь в пределах папки игры или Documents
 export const getPathToFile = (
   pathToFile: string,
   customPaths: ISystemRootState['customPaths'],
   profileMO: string,
 ): string => {
+  let newPath = pathToFile;
+  console.log(pathToFile);
   if (CustomPathName.MO_REGEXP.test(pathToFile)) {
     if (profileMO) {
-      return path.resolve(customPaths[CustomPathName.MO], profileMO, path.basename(pathToFile));
+      newPath = path.join(customPaths[CustomPathName.MO], profileMO, path.basename(pathToFile));
+    } else {
+      throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
     }
-
-    throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
   } else if (CustomPathName.DOCUMENTS_REGEXP.test(pathToFile)) {
-    return path.resolve(customPaths[CustomPathName.DOCUMENTS], pathToFile.replace(CustomPathName.DOCUMENTS, ''));
+    newPath = path.join(customPaths[CustomPathName.DOCUMENTS], pathToFile.replace(CustomPathName.DOCUMENTS, ''));
   } else if (CustomPathName.GAMEDIR_REGEXP.test(pathToFile)) {
-    return path.resolve(customPaths[CustomPathName.GAMEDIR], pathToFile.replace(CustomPathName.GAMEDIR, ''));
+    newPath = path.join(customPaths[CustomPathName.GAMEDIR], pathToFile.replace(CustomPathName.GAMEDIR, ''));
+  } else if (/%.+%/.test(pathToFile)) {
+    const customPathName = pathToFile.match(/%.+%/)![0];
+
+    // console.log(customPathName);
+    if (customPaths[customPathName]) {
+      newPath = path.join(customPaths[customPathName], pathToFile.replace(customPathName, ''));
+    }
+  } else {
+    newPath = path.join(GAME_DIR, pathToFile);
+  }
+  console.log(newPath);
+  if (!new RegExp(GAME_DIR.replace('\\', '\\\\')).test(newPath)
+  && !new RegExp(DOCUMENTS_DIR.replace('\\', '\\\\')).test(newPath)) {
+    throw new CustomError('Путь ведет за пределы допустимой папки.');
   }
 
-  return pathToFile;
+  return newPath;
 };
