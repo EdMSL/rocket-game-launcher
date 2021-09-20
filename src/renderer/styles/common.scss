@@ -342,7 +342,8 @@
 
   background-color: $text-main;
 
-  &:disabled {
+  &:disabled,
+  &--disabled, {
     background-color: darken($color: $text-secondary, $amount: 40);
   }
 

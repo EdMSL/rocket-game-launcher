@@ -36,6 +36,10 @@ export const MainScreen: React.FC = () => {
     dispatch(addMessages([CreateUserMessage.error(message)]));
   }, [dispatch]);
 
+  const onDisabledNavLinkClick = useCallback((event) => {
+    if (isGameRunning || !isGameSettingsAvailable) event.preventDefault();
+  }, [isGameRunning, isGameSettingsAvailable]);
+
   const onPlayGameBtnClick = useCallback(() => {
     dispatch(setIsGameRunning(true));
     runApplication(getPathToFile(playButton, customPaths, ''), 'Game', changeGameState);
@@ -86,7 +90,12 @@ export const MainScreen: React.FC = () => {
               to={gameSettingsGroups.length > 0
                 ? `${Routes.GAME_SETTINGS_SCREEN}/${gameSettingsGroups[0].name}`
                 : Routes.GAME_SETTINGS_SCREEN}
-              className="control-panel__btn"
+              className={classNames(
+                'control-panel__btn',
+                (isGameRunning || !isGameSettingsAvailable) && 'control-panel__btn--disabled',
+                styles['main-screen__btn'],
+              )}
+              onClick={onDisabledNavLinkClick}
             >
               Настройки
             </NavLink>
