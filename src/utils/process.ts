@@ -42,9 +42,7 @@ export const runApplication = (
       const parsed = shell.readShortcutLink(pathToApp);
 
       if (parsed.args) {
-        console.log(parsed);
         execArgs = getArgsFromShortcut(parsed.args);
-        console.log(execArgs);
       }
 
       execTarget = parsed.target;

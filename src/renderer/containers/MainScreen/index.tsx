@@ -45,13 +45,12 @@ export const MainScreen: React.FC = () => {
   }, [dispatch, playButton, changeGameState]);
 
   const onRunApplicationBtnClick = useCallback(({ currentTarget }) => {
-    dispatch(setIsGameRunning(true));
     runApplication(
       currentTarget.dataset.path!,
-       currentTarget.dataset.label!,
-       changeGameState,
+      currentTarget.dataset.label!,
+      changeGameState,
     );
-  }, [dispatch, changeGameState]);
+  }, [changeGameState]);
 
   const onOpenFolderBtnClick = useCallback(({ currentTarget }) => {
     openFolder(currentTarget.dataset.path!, sendErrorMessage);

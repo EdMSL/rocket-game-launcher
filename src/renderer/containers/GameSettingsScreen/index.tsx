@@ -9,7 +9,9 @@ import styles from './styles.module.scss';
 import { Routes } from '$constants/routes';
 import { IAppState } from '$store/store';
 import {
-  generateSelectOptions, getChangedGameSettingsOptions, getGameSettingsOptionsWithDefaultValues,
+  generateSelectOptions,
+  getChangedGameSettingsOptions,
+  getGameSettingsOptionsWithDefaultValues,
 } from '$utils/data';
 import { GameSettingsContent } from '$components/GameSettingsContent';
 import { Select } from '$components/UI/Select';

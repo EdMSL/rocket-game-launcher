@@ -55,8 +55,8 @@ export const getStringPartFromIniLineParameterForReplace = (
  * @param parameterName Имя параметра, который ищем.
  * @returns Найденная значение.
 */
-export const getLineIniParameterValue = (lineText: string, parameterName: string): string => {
-  const paramResult = lineText.match(getParameterRegExp(parameterName.trim()));
+export const getLineIniParameterValue = (lineText: string, parameterNameRegexp: RegExp): string => {
+  const paramResult = lineText.match(parameterNameRegexp);
 
   if (paramResult!?.length > 0) {
     // @ts-ignore

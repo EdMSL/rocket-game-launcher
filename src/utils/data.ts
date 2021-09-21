@@ -7,7 +7,7 @@ import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from './log';
 import { CreateUserMessage } from './message';
-import { getLineIniParameterValue } from './strings';
+import { getLineIniParameterValue, getParameterRegExp } from './strings';
 import {
   IGameSettingsItemParameter,
   IGameSettingsParameter,
@@ -179,7 +179,9 @@ export const getOptionData = (
     }
   } else if (fileView === GameSettingsFileView.LINE) {
     currentFileData.globals.lines.some((line) => {
-      optionValue = getLineIniParameterValue(line.text, currentGameSettingParameter.name!);
+      const searchRegexp = getParameterRegExp(currentGameSettingParameter.name!.trim());
+
+      optionValue = getLineIniParameterValue(line.text, searchRegexp);
 
       if (optionValue) {
         optionName = currentGameSettingParameter.name;

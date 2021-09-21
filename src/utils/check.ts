@@ -369,6 +369,7 @@ export const checkGameSettingsFiles = (
         ...filesObj,
       };
     }
+
     return {
       ...filesObj,
       [fileName]: validationResult.value,
