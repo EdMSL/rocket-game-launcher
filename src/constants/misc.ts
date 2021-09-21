@@ -39,14 +39,19 @@ export const RangeButtonName = {
   INCREASE: 'increase',
 };
 
-export const CustomPathName = {
+export const DefaultCustomPathName = {
   MO: '%MO%',
   DOCUMENTS: '%DOCUMENTS%',
   GAMEDIR: '%GAMEDIR%',
+};
+
+export const CustomPathName = {
+  ...DefaultCustomPathName,
   MO_REGEXP: new RegExp('%MO%'),
   DOCUMENTS_REGEXP: new RegExp('%DOCUMENTS%'),
   GAMEDIR_REGEXP: new RegExp('%GAMEDIR%'),
   CUSTOM_NAME_REGEXP: /^%[A-Z]+%$/,
+  CUSTOM_PATH_REGEXP: /^%[A-Z]+%/,
 };
 
 export const LauncherButtonAction = {

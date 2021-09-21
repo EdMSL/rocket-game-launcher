@@ -15,12 +15,14 @@ import { LauncherButtonAction } from '$constants/misc';
 import { getPathToFile } from '$utils/strings';
 
 export const MainScreen: React.FC = () => {
+  /* eslint-disable max-len */
   const playButton = useSelector((state: IAppState) => state.system.playButton);
-  const appButtons = useSelector((state: IAppState) => state.system.buttons);
+  const appButtons = useSelector((state: IAppState) => state.system.customButtons);
   const customPaths = useSelector((state: IAppState) => state.system.customPaths);
   const isGameRunning = useSelector((state: IAppState) => state.main.isGameRunning);
-  const isGameSettingsAvailable = useSelector((state: IAppState) => state.main.isGameSettingsAvailable); //eslint-disable-line max-len
+  const isGameSettingsAvailable = useSelector((state: IAppState) => state.main.isGameSettingsAvailable);
   const gameSettingsGroups = useSelector((state: IAppState) => state.gameSettings.gameSettingsGroups);
+  /* eslint-enable max-len */
 
   const dispatch = useDispatch();
 

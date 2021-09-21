@@ -21,6 +21,7 @@ export const ErrorName = {
   READ_WRITE: 'ReadWriteError',
   SAGA_ERROR: 'SagaError',
   MIME_TYPE: 'IncorrectFileTypeError',
+  VALIDATION: 'ValidationTypeError',
 };
 
 export const ErrorCode = {

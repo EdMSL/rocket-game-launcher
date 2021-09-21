@@ -38,5 +38,5 @@ export const defaultLauncherConfig: ISystemRootState = {
   documentsPath: '.\\My Games\\Oblivion',
   customPaths: {},
   playButton: '',
-  buttons: [],
+  customButtons: [],
 };

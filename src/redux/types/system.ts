@@ -31,5 +31,5 @@ export type ISystemRootState = Readonly<{
   documentsPath: string,
   customPaths: { [label: string]: string, },
   playButton: string,
-  buttons: ILauncherAppsButton[],
+  customButtons: ILauncherAppsButton[],
 }>;

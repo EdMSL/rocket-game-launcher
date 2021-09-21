@@ -21,7 +21,7 @@
     "%CUSTOM%": "Data\\OBSE\\Plugins"
   },
   "playButton": "%GAMEDIR%\\Play.lnk",
-  "buttons": [
+  "customButtons": [
     {
       "action": "run",
       "path": "%GAMEDIR%\\Editor2.lnk",
