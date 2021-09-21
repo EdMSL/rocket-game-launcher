@@ -52,6 +52,7 @@ export const CustomPathName = {
   GAMEDIR_REGEXP: new RegExp('%GAMEDIR%'),
   CUSTOM_NAME_REGEXP: /^%[A-Z]+%$/,
   CUSTOM_PATH_REGEXP: /^%[A-Z]+%/,
+  CORRECT_PATH_REGEXP: /^[^.]/,
 };
 
 export const LauncherButtonAction = {

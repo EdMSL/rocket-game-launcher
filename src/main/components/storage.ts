@@ -30,8 +30,9 @@ interface IStorage {
 }
 
 interface ICustomPaths {
-  '%DOCUMENTS%': string,
   '%GAMEDIR%': string,
+  //@ts-ignore
+  '%DOCUMENTS%'?: string|undefined,
   //@ts-ignore
   '%MO%'?: string|undefined,
   [label: string]: string,
@@ -97,10 +98,10 @@ const createCustomPaths = (configData: ISystemRootState): ICustomPaths => {
   }), {});
 
   return {
-    '%DOCUMENTS%': path.resolve(DOCUMENTS_DIR, configData.documentsPath),
+    '%DOCUMENTS%': path.join(DOCUMENTS_DIR, configData.documentsPath),
     '%GAMEDIR%': GAME_DIR,
     ...configData.modOrganizer.isUsed ? {
-      '%MO%': path.resolve(GAME_DIR, configData.modOrganizer.pathToProfiles),
+      '%MO%': path.join(GAME_DIR, configData.modOrganizer.pathToProfiles),
     } : {},
     ...newCustomPaths,
   };
@@ -172,6 +173,7 @@ export const createStorage = (): Store<IAppState> => {
   });
 
   writeToLogFileSync(`Working directory: ${GAME_DIR}`);
+  writeToLogFileSync(`Custom paths: ${customPaths}`);
 
   if (configurationData.modOrganizer.isUsed) {
     writeToLogFileSync(`MO information.\n  Path: ${configurationData.modOrganizer.path}\n  Path to INI: ${configurationData.modOrganizer.pathToINI}\n  Path to profiles: ${configurationData.modOrganizer.pathToProfiles}\n  Profile parameter on INI: ${configurationData.modOrganizer.profileParam}\n  Profile parameter regExp: ${configurationData.modOrganizer.profileParamValueRegExp}`); //eslint-disable-line max-len

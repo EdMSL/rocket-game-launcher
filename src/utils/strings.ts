@@ -116,13 +116,12 @@ export const getValueFromRange = (
  * @param profileMO Профиль Mod Organizer.
  * @returns Строка с абсолютным путем к файлу.
 */
-///TODO Добавить проверку, что путь в пределах папки игры или Documents
 export const getPathToFile = (
   pathToFile: string,
   customPaths: ISystemRootState['customPaths'],
   profileMO: string,
 ): string => {
-  let newPath = path.normalize(pathToFile);
+  let newPath = pathToFile;
 
   if (CustomPathName.MO_REGEXP.test(pathToFile)) {
     if (profileMO) {
@@ -131,10 +130,14 @@ export const getPathToFile = (
       throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
     }
   } else if (CustomPathName.DOCUMENTS_REGEXP.test(pathToFile)) {
-    newPath = path.join(
-      customPaths[CustomPathName.DOCUMENTS],
-      pathToFile.replace(CustomPathName.DOCUMENTS, ''),
-    );
+    if (customPaths[CustomPathName.DOCUMENTS]) {
+      newPath = path.join(
+        customPaths[CustomPathName.DOCUMENTS],
+        pathToFile.replace(CustomPathName.DOCUMENTS, ''),
+      );
+    } else {
+      throw new CustomError('The path to a file in the Documents folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
+    }
   } else if (CustomPathName.GAMEDIR_REGEXP.test(pathToFile)) {
     newPath = path.join(
       customPaths[CustomPathName.GAMEDIR],
@@ -152,11 +155,13 @@ export const getPathToFile = (
     newPath = path.join(GAME_DIR, pathToFile);
   }
 
+  newPath = path.normalize(newPath);
+
   if (
-    !new RegExp(GAME_DIR.replace('\\', '\\\\')).test(newPath)
-    && !new RegExp(DOCUMENTS_DIR.replace('\\', '\\\\')).test(newPath)
+    !new RegExp(GAME_DIR.replaceAll('\\', '\\\\')).test(newPath)
+    && !new RegExp(customPaths[CustomPathName.DOCUMENTS].replaceAll('\\', '\\\\')).test(newPath)
   ) {
-    throw new CustomError('The path is outside of a valid folder.');
+    throw new CustomError(`The path is outside of a valid folder. Path: ${newPath}`);
   }
 
   return newPath;
