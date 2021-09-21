@@ -7,6 +7,8 @@ import {
   GameSettingsFileView,
   GameSettingParameterType,
   LauncherButtonAction,
+  CustomPathName,
+  DefaultCustomPathName,
 } from '$constants/misc';
 import { IGameSettingsConfig, IGameSettingsRootState } from '$types/gameSettings';
 import {
@@ -14,7 +16,7 @@ import {
 } from '$utils/log';
 import { defaultLauncherConfig } from '$constants/defaultParameters';
 import { ISystemRootState } from '$types/system';
-import { CustomError } from './errors';
+import { CustomError, ErrorName } from './errors';
 import { getRandomId } from './strings';
 
 interface IGameSettingsFileError {
@@ -45,9 +47,8 @@ const configFileDataSchema = Joi.object({
   },
   documentsPath: Joi.string().optional().default(defaultLauncherConfig.documentsPath),
   isFirstLaunch: Joi.bool().optional().default(defaultLauncherConfig.isFirstLaunch),
-  ///FIXME Проверка не работает
   customPaths: Joi.object().pattern(
-    /%.+%/,
+    Joi.string().pattern(CustomPathName.CUSTOM_NAME_REGEXP, 'custom path name').not(...Object.values(DefaultCustomPathName)),
     Joi.string(),
   ).optional().default(defaultLauncherConfig.customPaths),
   playButton: Joi.string().required(),
@@ -56,7 +57,7 @@ const configFileDataSchema = Joi.object({
       action: Joi.string().required().valid(...Object.values(LauncherButtonAction)),
       path: Joi.string().required(),
       label: Joi.string().required(),
-    })).min(1).optional(),
+    })).optional(),
 });
 
 export const checkConfigFileData = (configObj: ISystemRootState): ISystemRootState => {
@@ -64,13 +65,14 @@ export const checkConfigFileData = (configObj: ISystemRootState): ISystemRootSta
 
   const validateResult = configFileDataSchema.validate(configObj, {
     abortEarly: false,
-    stripUnknown: true,
   });
 
   if (validateResult.error && validateResult.error?.details?.length > 0) {
     validateResult.error.details.forEach((currentMsg) => {
-      writeToLogFile(currentMsg.message, LogMessageType.ERROR);
+      writeToLogFileSync(currentMsg.message, LogMessageType.ERROR);
     });
+
+    throw new CustomError('Failed to validate the config.json file.', ErrorName.VALIDATION);
   }
 
   return validateResult.value;

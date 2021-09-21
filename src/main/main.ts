@@ -40,7 +40,7 @@ app.on('ready', () => {
   start()
     .catch((error: Error) => {
       writeToLogFileSync(error.message, LogMessageType.ERROR);
-      showErrorBox(`${error.message}\nApplication will be closed.`, "Can't run application.");
+      showErrorBox(`${error.message} See log for more details\nApplication will be closed.`, "Can't run application."); //eslint-disable-line max-len
       app.quit();
     });
 });

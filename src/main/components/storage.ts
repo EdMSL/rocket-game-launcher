@@ -16,6 +16,7 @@ import {
 } from '$constants/paths';
 import { ISystemRootState } from '$types/system';
 import {
+  CustomError,
   ErrorName, ReadWriteError, showMessageBox,
 } from '$utils/errors';
 import { Scope } from '$constants/misc';
@@ -70,10 +71,14 @@ const getConfigurationData = (): ISystemRootState => {
         return defaultLauncherConfig;
       }
 
-      throw new Error('Found problems with config.json. See log for more details.');
+      throw new Error('Found problems with config.json.');
+    } else if (error instanceof CustomError) {
+      if (error.name === ErrorName.VALIDATION) {
+        writeToLogFileSync(error.message, LogMessageType.ERROR);
+      }
     }
 
-    throw new Error('Found problems with config.json. See log for more details.');
+    throw new Error('Found problems with config.json.');
   }
 };
 
