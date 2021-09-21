@@ -5,20 +5,17 @@ import classNames from 'classnames';
 
 import styles from './styles.module.scss';
 import { Routes } from '$constants/routes';
-import { GAME_DIR } from '$constants/paths';
 import { runApplication, openFolder } from '$utils/process';
 import { Button } from '$components/UI/Button';
 import { setIsGameRunning, addMessages } from '$actions/main';
 import { IAppState } from '$store/store';
 import { CreateUserMessage } from '$utils/message';
 import { LauncherButtonAction } from '$constants/misc';
-import { getPathToFile } from '$utils/strings';
 
 export const MainScreen: React.FC = () => {
   /* eslint-disable max-len */
   const playButton = useSelector((state: IAppState) => state.system.playButton);
   const appButtons = useSelector((state: IAppState) => state.system.customButtons);
-  const customPaths = useSelector((state: IAppState) => state.system.customPaths);
   const isGameRunning = useSelector((state: IAppState) => state.main.isGameRunning);
   const isGameSettingsAvailable = useSelector((state: IAppState) => state.main.isGameSettingsAvailable);
   const gameSettingsGroups = useSelector((state: IAppState) => state.gameSettings.gameSettingsGroups);
@@ -44,8 +41,8 @@ export const MainScreen: React.FC = () => {
 
   const onPlayGameBtnClick = useCallback(() => {
     dispatch(setIsGameRunning(true));
-    runApplication(getPathToFile(playButton, customPaths, ''), 'Game', changeGameState);
-  }, [dispatch, playButton, customPaths, changeGameState]);
+    runApplication(playButton, 'Game', changeGameState);
+  }, [dispatch, playButton, changeGameState]);
 
   const onRunApplicationBtnClick = useCallback(({ currentTarget }) => {
     dispatch(setIsGameRunning(true));
@@ -59,16 +56,6 @@ export const MainScreen: React.FC = () => {
   const onOpenFolderBtnClick = useCallback(({ currentTarget }) => {
     openFolder(currentTarget.dataset.path!, sendErrorMessage);
   }, [sendErrorMessage]);
-
-  const getPathForCustomBtn = useCallback((path) => {
-    try {
-      return getPathToFile(path, customPaths, '');
-    } catch (error) {
-      console.log(error);
-      // dispatch(addMessages([CreateUserMessage.error(error.message)]));
-      return '';
-    }
-  }, [customPaths]);
 
   return (
     <main className={classNames('main', styles['main-screen__main'])}>
@@ -85,7 +72,7 @@ export const MainScreen: React.FC = () => {
             <Button
               key={button.path}
               className="control-panel__btn"
-              btnPath={getPathForCustomBtn(button.path)}
+              btnPath={button.path}
               btnLabel={button.label}
               onClick={button.action === LauncherButtonAction.RUN
                 ? onRunApplicationBtnClick

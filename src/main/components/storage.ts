@@ -21,6 +21,7 @@ import {
 } from '$utils/errors';
 import { Scope } from '$constants/misc';
 import { checkConfigFileData } from '$utils/check';
+import { getPathToFile } from '$utils/strings';
 
 interface IStorage {
   settings: {
@@ -125,6 +126,20 @@ export const createStorage = (): Store<IAppState> => {
 
   const storageSettings = storage.get('settings');
   const customPaths = createCustomPaths(configurationData);
+
+  // Это не сам state, поэтому игнорируем перезапись readonly
+  //@ts-ignore
+  configurationData.playButton = getPathToFile(configurationData.playButton, customPaths, '');
+
+  if (configurationData.customButtons.length > 0) {
+    const newButtons = configurationData.customButtons.map((btn) => ({
+      ...btn,
+      path: getPathToFile(btn.path, customPaths, ''),
+    }));
+
+    //@ts-ignore
+    configurationData.customButtons = newButtons;
+  }
 
   const newStore = {
     ...storageSettings,

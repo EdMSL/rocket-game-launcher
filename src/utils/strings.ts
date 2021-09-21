@@ -122,8 +122,8 @@ export const getPathToFile = (
   customPaths: ISystemRootState['customPaths'],
   profileMO: string,
 ): string => {
-  let newPath = pathToFile;
-  console.log(pathToFile);
+  let newPath = path.normalize(pathToFile);
+
   if (CustomPathName.MO_REGEXP.test(pathToFile)) {
     if (profileMO) {
       newPath = path.join(customPaths[CustomPathName.MO], profileMO, path.basename(pathToFile));
@@ -131,23 +131,32 @@ export const getPathToFile = (
       throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
     }
   } else if (CustomPathName.DOCUMENTS_REGEXP.test(pathToFile)) {
-    newPath = path.join(customPaths[CustomPathName.DOCUMENTS], pathToFile.replace(CustomPathName.DOCUMENTS, ''));
+    newPath = path.join(
+      customPaths[CustomPathName.DOCUMENTS],
+      pathToFile.replace(CustomPathName.DOCUMENTS, ''),
+    );
   } else if (CustomPathName.GAMEDIR_REGEXP.test(pathToFile)) {
-    newPath = path.join(customPaths[CustomPathName.GAMEDIR], pathToFile.replace(CustomPathName.GAMEDIR, ''));
-  } else if (/%.+%/.test(pathToFile)) {
-    const customPathName = pathToFile.match(/%.+%/)![0];
+    newPath = path.join(
+      customPaths[CustomPathName.GAMEDIR],
+      pathToFile.replace(CustomPathName.GAMEDIR, ''),
+    );
+  } else if (CustomPathName.CUSTOM_PATH_REGEXP.test(pathToFile)) {
+    const customPathName = pathToFile.match(CustomPathName.CUSTOM_PATH_REGEXP)![0];
 
-    // console.log(customPathName);
     if (customPaths[customPathName]) {
       newPath = path.join(customPaths[customPathName], pathToFile.replace(customPathName, ''));
+    } else {
+      throw new CustomError(`Custom path name "${customPathName}" does not exists in config.json.`);
     }
   } else {
     newPath = path.join(GAME_DIR, pathToFile);
   }
-  console.log(newPath);
-  if (!new RegExp(GAME_DIR.replace('\\', '\\\\')).test(newPath)
-  && !new RegExp(DOCUMENTS_DIR.replace('\\', '\\\\')).test(newPath)) {
-    throw new CustomError('Путь ведет за пределы допустимой папки.');
+
+  if (
+    !new RegExp(GAME_DIR.replace('\\', '\\\\')).test(newPath)
+    && !new RegExp(DOCUMENTS_DIR.replace('\\', '\\\\')).test(newPath)
+  ) {
+    throw new CustomError('The path is outside of a valid folder.');
   }
 
   return newPath;
