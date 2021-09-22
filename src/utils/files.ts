@@ -20,6 +20,7 @@ import {
   ErrorMessage,
 } from '$utils/errors';
 import { Encoding, GameSettingsFileView } from '$constants/misc';
+import { USER_THEMES_PATH } from '$constants/paths';
 
 export const xmlAttributePrefix = '@_';
 
@@ -497,19 +498,31 @@ export const writeGameSettingsFile = async (
   }
 };
 
-export const getUserThemesFolders = async (pathToThemes: string): Promise<string[]> => {
-  const themesFolderContent = await readDirectory(pathToThemes);
+/**
+ * Получить список папок пользовательских тем.
+*/
+export const getUserThemesFolders = async (): Promise<string[]> => {
+  const themesFolderContent = await readDirectory(USER_THEMES_PATH);
 
   if (themesFolderContent.length > 0) {
     const themesFolders = themesFolderContent.filter((item) => !path.extname(item));
 
     if (themesFolders.length > 0) {
-      const foldersReadResults = await Promise.allSettled(themesFolders.map((folder) => readDirectory(folder)));
+      const foldersReadResults = await Promise.allSettled(
+        themesFolders.map((folder) => readDirectory(path.join(USER_THEMES_PATH, folder))),
+      );
 
-      // return foldersReadResults
-      //   .filter((result) => result.status === 'fulfilled')
-      //   .filter((folder) => (folder as PromiseFulfilledResult<string[]>).value.includes('styles.css'))
-      //   .map((folder) => (folder as PromiseFulfilledResult<string[]>).value);
+      return foldersReadResults.reduce<string[]>((folders, currentResult, index) => {
+        if (currentResult.status === 'fulfilled') {
+          if (currentResult.value.includes('styles.css')) {
+            return [...folders, themesFolders[index]];
+          }
+
+          return [...folders];
+        }
+
+        return [...folders];
+      }, []);
     }
   }
 
