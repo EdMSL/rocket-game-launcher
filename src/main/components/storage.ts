@@ -4,7 +4,7 @@ import path from 'path';
 
 import { configureStore, IAppState } from '$store/store';
 import { IUserSettingsRootState } from '$types/userSettings';
-import { defaultLauncherConfig, defaultLauncherResolution } from '$constants/defaultParameters';
+import { defaultLauncherConfig } from '$constants/defaultParameters';
 import {
   LogMessageType,
   writeToLogFile,
@@ -24,9 +24,7 @@ import { checkConfigFileData } from '$utils/check';
 import { getPathToFile } from '$utils/strings';
 
 interface IStorage {
-  settings: {
-    userSettings: IUserSettingsRootState,
-  },
+  userSettings: IUserSettingsRootState,
 }
 
 interface ICustomPaths {
@@ -117,15 +115,13 @@ export const createStorage = (): Store<IAppState> => {
   // Хранилище располагается в файле config.json в папке AppData/ (app.getPath('userData')).
   const storage = new Storage<IStorage>({
     defaults: {
-      settings: {
-        userSettings: {
-          resolution: defaultLauncherResolution,
-        },
+      userSettings: {
+        theme: '',
       },
     },
   });
 
-  const storageSettings = storage.get('settings');
+  const userSettings = storage.get('userSettings');
   const customPaths = createCustomPaths(configurationData);
 
   // Это не сам state, поэтому игнорируем перезапись readonly
@@ -143,7 +139,7 @@ export const createStorage = (): Store<IAppState> => {
   }
 
   const newStore = {
-    ...storageSettings,
+    userSettings,
     system: {
       ...defaultLauncherConfig,
       ...configurationData,

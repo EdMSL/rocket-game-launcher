@@ -496,3 +496,22 @@ export const writeGameSettingsFile = async (
     );
   }
 };
+
+export const getUserThemesFolders = async (pathToThemes: string): Promise<string[]> => {
+  const themesFolderContent = await readDirectory(pathToThemes);
+
+  if (themesFolderContent.length > 0) {
+    const themesFolders = themesFolderContent.filter((item) => !path.extname(item));
+
+    if (themesFolders.length > 0) {
+      const foldersReadResults = await Promise.allSettled(themesFolders.map((folder) => readDirectory(folder)));
+
+      // return foldersReadResults
+      //   .filter((result) => result.status === 'fulfilled')
+      //   .filter((folder) => (folder as PromiseFulfilledResult<string[]>).value.includes('styles.css'))
+      //   .map((folder) => (folder as PromiseFulfilledResult<string[]>).value);
+    }
+  }
+
+  return [];
+};

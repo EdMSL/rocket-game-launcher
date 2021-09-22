@@ -11,6 +11,7 @@ const INITIAL_STATE: IMainRootState = {
   isGameSettingsSaving: false,
   isGameSettingsFilesBackuping: false,
   gameSettingsFilesBackup: [],
+  userThemes: {},
   messages: [],
 };
 

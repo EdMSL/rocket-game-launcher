@@ -9,6 +9,7 @@ import {
   select,
 } from 'redux-saga/effects';
 import fs from 'fs';
+import path from 'path';
 
 import { IAppState } from '$store/store';
 import { Routes } from '$constants/routes';
@@ -20,6 +21,7 @@ import {
   createGameSettingsFilesBackup as createGameSettingsFilesBackupAction,
   deleteGameSettingsFilesBackup as deleteGameSettingsFilesBackupAction,
   restoreGameSettingsFilesBackup,
+  setUserThemes,
 } from '$actions/main';
 import {
   generateGameSettingsOptionsSaga,
@@ -27,12 +29,12 @@ import {
   initGameSettingsSaga,
   setInitialGameSettingsConfigSaga,
 } from '$sagas/gameSettings';
-import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
+import { GAME_SETTINGS_FILE_PATH, USER_THEMES_PATH } from '$constants/paths';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';
 import {
-  CustomError, ReadWriteError, SagaError,
+  CustomError, ErrorName, ReadWriteError, SagaError,
 } from '$utils/errors';
 import { MAIN_TYPES } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
@@ -45,8 +47,49 @@ import {
 import { getPathToFile } from '$utils/strings';
 import { IUnwrap } from '$types/common';
 import { setGameSettingsOptions } from '$actions/gameSettings';
+import { getUserThemesFolders, readDirectory } from '$utils/files';
 
 const getState = (state: IAppState): IAppState => state;
+
+/**
+ * Получить список пользовательских тем.
+*/
+function* getUserThemesSaga(): SagaIterator {
+  let themesFolders: string[] = [];
+
+  if (fs.existsSync(USER_THEMES_PATH)) {
+    themesFolders = yield call(getUserThemesFolders, USER_THEMES_PATH);
+  }
+  // try {
+  //   const themesFolderContent: IUnwrap<typeof readDirectory> = yield call(
+  //     readDirectory,
+  //     USER_THEMES_PATH,
+  //   );
+
+  //   if (themesContent.length > 0) {
+  //   }
+  // } catch (error: any) {
+  //   if (error instanceof ReadWriteError) {
+  //     if (error.name === ErrorName.NOT_FOUND) {
+  //       writeToLogFile('No user themes found.');
+  //     } else {
+  //       throw error;
+  //     }
+  //   } else {
+  //     throw error;
+  //   }
+  // }
+
+  const themesObjects = themesFolders.reduce((themes, theme) => ({
+    ...themes,
+    [theme]: theme,
+  }), {});
+
+  yield put(setUserThemes({
+    '': 'default',
+    ...themesObjects,
+  }));
+}
 
 /**
  * Инициализация лаунчера при запуске.
@@ -60,6 +103,8 @@ function* initLauncherSaga(): SagaIterator {
     } else {
       writeToLogFile('Game settings file settings.json not found.');
     }
+
+    yield call(getUserThemesSaga);
   } catch (error: any) {
     let errorMessage = '';
 

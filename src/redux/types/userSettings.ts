@@ -1,12 +1,7 @@
 export const USER_SETTINGS_TYPES = {
-  SET_RESOLUTION: 'SET_RESOLUTION',
+  SET_USER_THEME: 'SET_USER_THEME',
 };
 
-interface IResolution {
-  width: number,
-  height: number,
-}
-
 export type IUserSettingsRootState = Readonly<{
-  resolution: IResolution,
+  theme: string,
 }>;

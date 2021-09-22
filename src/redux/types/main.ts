@@ -12,6 +12,7 @@ export const MAIN_TYPES = {
   DELETE_GAME_SETTINGS_FILES_BACKUP: 'DELETE_GAME_SETTINGS_FILES_BACKUP',
   RESTORE_GAME_SETTINGS_FILES_BACKUP: 'RESTORE_GAME_SETTINGS_FILES_BACKUP',
   SET_IS_GAME_SETTINGS_FILES_BACKUPING: 'SET_IS_GAME_SETTINGS_FILES_BACKUPING',
+  SET_USER_THEMES: 'SET_USER_THEMES',
   SET_MESSAGES: 'SET_MESSAGES',
   ADD_MESSAGES: 'ADD_MESSAGES',
   DELETE_MESSAGES: 'DELETE_MESSAGES',
@@ -39,5 +40,6 @@ export type IMainRootState = Readonly<{
   isGameSettingsSaving: boolean,
   isGameSettingsFilesBackuping: boolean,
   gameSettingsFilesBackup: IGameSettingsBackup[],
+  userThemes: { [key: string]: string, },
   messages: IUserMessage[],
 }>;

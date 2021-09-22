@@ -11,12 +11,17 @@ import { setIsGameRunning, addMessages } from '$actions/main';
 import { IAppState } from '$store/store';
 import { CreateUserMessage } from '$utils/message';
 import { LauncherButtonAction } from '$constants/misc';
+import { Select } from '$components/UI/Select';
+import { generateSelectOptions } from '$utils/data';
+import { setUserTheme } from '$actions/userSettings';
 
 export const MainScreen: React.FC = () => {
   /* eslint-disable max-len */
   const playButton = useSelector((state: IAppState) => state.system.playButton);
   const appButtons = useSelector((state: IAppState) => state.system.customButtons);
   const isGameRunning = useSelector((state: IAppState) => state.main.isGameRunning);
+  const userThemes = useSelector((state: IAppState) => state.main.userThemes);
+  const userTheme = useSelector((state: IAppState) => state.userSettings.theme);
   const isGameSettingsAvailable = useSelector((state: IAppState) => state.main.isGameSettingsAvailable);
   const gameSettingsGroups = useSelector((state: IAppState) => state.gameSettings.gameSettingsGroups);
   /* eslint-enable max-len */
@@ -55,6 +60,14 @@ export const MainScreen: React.FC = () => {
   const onOpenFolderBtnClick = useCallback(({ currentTarget }) => {
     openFolder(currentTarget.dataset.path!, sendErrorMessage);
   }, [sendErrorMessage]);
+
+  const onUserThemeSelectChange = useCallback((
+    { target }: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    document.getElementById('theme')?.setAttribute('href', `../../../themes/${target.value}/styles.css`);
+
+    dispatch(setUserTheme(target.value));
+  }, [dispatch]);
 
   return (
     <main className={classNames('main', styles['main-screen__main'])}>
@@ -102,6 +115,12 @@ export const MainScreen: React.FC = () => {
       </div>
       <div className={classNames('content', styles['main-screen__content'])}>
         <p>Content</p>
+        <Select
+          optionsArr={generateSelectOptions(userThemes)}
+          id="user-themes"
+          value={userTheme}
+          onChange={onUserThemeSelectChange}
+        />
       </div>
     </main>
   );

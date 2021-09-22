@@ -2,17 +2,17 @@ import { IActionHandler } from '$types/common';
 import { USER_SETTINGS_TYPES, IUserSettingsRootState } from '$types/userSettings';
 import * as USER_SETTINGS_ACTIONS from '$actions/userSettings';
 
-const setLauncherResolution: IActionHandler<
+const setUserTheme: IActionHandler<
   IUserSettingsRootState,
-  typeof USER_SETTINGS_ACTIONS.setLauncherResolution
+  typeof USER_SETTINGS_ACTIONS.setUserTheme
 > = (
   state,
-  { payload: resolution },
+  { payload: theme },
 ) => ({
   ...state,
-  resolution,
+  theme,
 });
 
 export const USER_SETTINGS_HANDLERS = {
-  [USER_SETTINGS_TYPES.SET_RESOLUTION]: setLauncherResolution,
+  [USER_SETTINGS_TYPES.SET_USER_THEME]: setUserTheme,
 };

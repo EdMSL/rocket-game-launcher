@@ -75,6 +75,13 @@ export const setGameSettingsFilesBackup: IAction<IMainRootState['gameSettingsFil
   payload: gameSettingsFilesBackup,
 });
 
+export const setUserThemes: IAction<IMainRootState['userThemes']> = (
+  userThemes,
+) => ({
+  type: MAIN_TYPES.SET_USER_THEMES,
+  payload: userThemes,
+});
+
 export const setMessages: IAction<IMainRootState['messages']> = (
   messages,
 ) => ({
