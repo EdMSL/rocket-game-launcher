@@ -124,9 +124,11 @@ export const createStorage = (): Store<IAppState> => {
   const userSettings = storage.get('userSettings');
   const customPaths = createCustomPaths(configurationData);
 
-  // Это не сам state, поэтому игнорируем перезапись readonly
-  //@ts-ignore
-  configurationData.playButton = getPathToFile(configurationData.playButton, customPaths, '');
+  configurationData.playButton.path = getPathToFile(configurationData.playButton.path, customPaths, '');
+
+  if (!configurationData.playButton.label) {
+    configurationData.playButton.label = defaultLauncherConfig.playButton.label;
+  }
 
   if (configurationData.customButtons.length > 0) {
     const newButtons = configurationData.customButtons.map((btn) => ({
@@ -150,7 +152,7 @@ export const createStorage = (): Store<IAppState> => {
   /* eslint-disable @typescript-eslint/dot-notation */
   global['state'] = newStore;
 
-  const appStore = configureStore(global['state'], Scope.MAIN).store;
+  const appStore = configureStore(newStore, Scope.MAIN).store;
 
   appStore.subscribe(() => {
     const currentState = appStore.getState();

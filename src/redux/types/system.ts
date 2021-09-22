@@ -12,10 +12,13 @@ interface IModOrganizerParams {
   profileParamValueRegExp: string,
 }
 
-interface ILauncherAppsButton {
-  action: string,
+interface ILauncherAppButton {
   path: string,
   label: string,
+}
+
+interface ILauncherCustomButton extends ILauncherAppButton {
+  action: string,
 }
 
 export type ISystemRootState = Readonly<{
@@ -30,6 +33,6 @@ export type ISystemRootState = Readonly<{
   modOrganizer: IModOrganizerParams,
   documentsPath: string,
   customPaths: { [label: string]: string, },
-  playButton: string,
-  customButtons: ILauncherAppsButton[],
+  playButton: ILauncherAppButton,
+  customButtons: ILauncherCustomButton[],
 }>;

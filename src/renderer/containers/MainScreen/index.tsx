@@ -46,7 +46,7 @@ export const MainScreen: React.FC = () => {
 
   const onPlayGameBtnClick = useCallback(() => {
     dispatch(setIsGameRunning(true));
-    runApplication(playButton, 'Game', changeGameState);
+    runApplication(playButton.path, 'Game', changeGameState);
   }, [dispatch, playButton, changeGameState]);
 
   const onRunApplicationBtnClick = useCallback(({ currentTarget }) => {
@@ -77,7 +77,7 @@ export const MainScreen: React.FC = () => {
           isDisabled={isGameRunning}
           onClick={onPlayGameBtnClick}
         >
-          Играть
+          {playButton.label}
         </Button>
         {
           appButtons.map((button) => (

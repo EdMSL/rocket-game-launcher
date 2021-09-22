@@ -7,7 +7,7 @@
   "maxWidth": 0,
   "maxHeight": 0,
   "modOrganizer": {
-    "isUsed": false,
+    "isUsed": true,
     "path": "Mod Organizer",
     "pathToINI": "Mod Organizer\\ModOrganizer.ini",
     "pathToProfiles": "Mod Organizer\\profiles",
@@ -20,7 +20,10 @@
   "customPaths": {
     "%CUSTOM%": "Data\\OBSE\\Plugins"
   },
-  "playButton": "%GAMEDIR%\\Play.lnk",
+  "playButton": {
+    "path": "%GAMEDIR%\\Play.lnk",
+    "label": ""
+  },
   "customButtons": [
     {
       "action": "run",
@@ -36,6 +39,11 @@
       "action": "open",
       "path": "%CUSTOM%\\CSE",
       "label": "Открыть"
+    },
+    {
+      "action": "open",
+      "path": "%DOCUMENTS%",
+      "label": "Доки"
     }
   ]
 }

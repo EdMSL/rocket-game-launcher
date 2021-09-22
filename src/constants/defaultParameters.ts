@@ -37,6 +37,9 @@ export const defaultLauncherConfig: ISystemRootState = {
   },
   documentsPath: '',
   customPaths: {},
-  playButton: '',
+  playButton: {
+    path: '',
+    label: 'Играть',
+  },
   customButtons: [],
 };
