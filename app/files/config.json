@@ -8,14 +8,14 @@
   "maxHeight": 0,
   "modOrganizer": {
     "isUsed": false,
-    "path": ".\\Mod Organizer",
-    "pathToINI": ".\\Mod Organizer\\ModOrganizer.ini",
-    "pathToProfiles": ".\\Mod Organizer\\profiles",
+    "path": "Mod Organizer",
+    "pathToINI": "Mod Organizer\\ModOrganizer.ini",
+    "pathToProfiles": "Mod Organizer\\profiles",
     "profileSection": "General",
     "profileParam": "selected_profile",
     "profileParamValueRegExp": ""
   },
-  "documentsPath": ".\\My Games\\Oblivion",
+  "documentsPath": "My Games\\Oblivion",
   "isFirstLaunch": false,
   "customPaths": {
     "%CUSTOM%": "Data\\OBSE\\Plugins"
