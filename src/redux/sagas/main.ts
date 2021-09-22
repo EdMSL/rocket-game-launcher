@@ -48,6 +48,7 @@ import { getPathToFile } from '$utils/strings';
 import { IUnwrap } from '$types/common';
 import { setGameSettingsOptions } from '$actions/gameSettings';
 import { getUserThemesFolders } from '$utils/files';
+import { setUserTheme } from '$actions/userSettings';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -94,6 +95,19 @@ function* initLauncherSaga(): SagaIterator {
     }
 
     const themes: SagaReturnType<typeof getUserThemesSaga> = yield call(getUserThemesSaga);
+
+    // 1 т.к. есть одна дефолтная тема со значение ''.
+    if (Object.keys.length === 1) {
+      const { userSettings: { theme } }: IAppState = yield select(getState);
+
+      if (theme !== '') {
+        writeToLogFile(
+          'No themes found, but user theme is set in storage. Theme will be set to default.',
+          LogMessageType.WARNING,
+        );
+        yield put(setUserTheme(''));
+      }
+    }
 
     yield put(setUserThemes(themes));
   } catch (error: any) {

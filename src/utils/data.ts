@@ -56,7 +56,7 @@ export const getSystemInfo = async (): Promise<void> => {
       graphics: 'controllers',
       mem: 'total',
     });
-
+    ///TODO Неверно определяет архитектуру
     let result = `System info.\r\n  OS: ${systemData.osInfo.distro}, ${systemData.osInfo.arch}.\r\n  CPU: ${systemData.cpu.manufacturer} ${systemData.cpu.brand}, ${systemData.cpu.speed}GHz.\r\n  Memory: ${(systemData.mem.total / ONE_GB).toFixed(2)}Gb.`; //eslint-disable-line max-len
 
     if (systemData.graphics.controllers.length > 1) {
