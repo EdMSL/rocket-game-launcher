@@ -43,8 +43,7 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
     >
       <span>{label}</span>
       {
-          id !== 'resolutionCheckbox'
-          && description
+          description
           && onHover
           && onLeave
           && (
