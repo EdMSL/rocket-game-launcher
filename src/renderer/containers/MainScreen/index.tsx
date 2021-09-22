@@ -64,7 +64,11 @@ export const MainScreen: React.FC = () => {
   const onUserThemeSelectChange = useCallback((
     { target }: React.ChangeEvent<HTMLSelectElement>,
   ) => {
-    document.getElementById('theme')?.setAttribute('href', `../../../themes/${target.value}/styles.css`);
+    document
+      .getElementById('theme')?.setAttribute(
+        'href',
+        target.value === '' ? 'css/styles.css' : `../../../themes/${target.value}/styles.css`,
+      );
 
     dispatch(setUserTheme(target.value));
   }, [dispatch]);
