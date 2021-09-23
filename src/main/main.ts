@@ -12,6 +12,8 @@ import {
 import { showErrorBox } from '$utils/errors';
 import { getSystemInfo } from '$utils/data';
 import { createBackupFolders } from '$utils/backup';
+import { createFolderSync } from '$utils/files';
+import { USER_THEMES_PATH } from '$constants/paths';
 
 require('@electron/remote/main').initialize();
 
@@ -24,6 +26,7 @@ const start = async (): Promise<void> => {
   createWindow(store.getState().system);
 
   createBackupFolders();
+  createFolderSync(USER_THEMES_PATH);
 
   globalShortcut.register('Alt+Q', () => {
     app.quit();

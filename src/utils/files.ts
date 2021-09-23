@@ -550,8 +550,15 @@ export const getUserThemesFolders = (): string[] => {
 
     return [];
   } catch (error: any) {
+    let errorMsg = '';
+
+    if (error instanceof ReadWriteError) {
+      errorMsg = `${error.message}. Path: ${error.path}`;
+    } else {
+      errorMsg = error.message;
+    }
     writeToLogFileSync(
-      `Can't get list of user themes. Reason: ${error.message}.`,
+      `Can't get list of user themes. Reason: ${errorMsg}.`,
       LogMessageType.WARNING,
     );
 

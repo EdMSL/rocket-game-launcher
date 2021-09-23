@@ -166,3 +166,10 @@ export const getPathToFile = (
 
   return newPath;
 };
+
+/**
+ * Получить строку-список с ключ\значение из объекта.
+*/
+export const getObjectAsList = (obj: Record<string, unknown>): string => Object.keys(obj)
+  .map((key) => `${key}: ${obj[key]}`)
+  .join('\n');

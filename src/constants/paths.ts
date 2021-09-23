@@ -22,5 +22,5 @@ export const BACKUP_DIR = process.env.NODE_ENV === 'development'
 export const BACKUP_DIR_GAME_SETTINGS_FILES = path.resolve(`${BACKUP_DIR}/${GAME_SETTINGS_FILES_BACKUP_FOLDER_NAME}`); //eslint-disable-line max-len
 
 export const USER_THEMES_PATH = process.env.NODE_ENV === 'development'
-  ? path.resolve('./app/files/themes')
+  ? path.resolve('./app/themes')
   : path.resolve('./themes');

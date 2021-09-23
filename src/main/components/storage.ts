@@ -23,7 +23,7 @@ import {
 } from '$utils/errors';
 import { Scope } from '$constants/misc';
 import { checkConfigFileData } from '$utils/check';
-import { getPathToFile } from '$utils/strings';
+import { getObjectAsList, getPathToFile } from '$utils/strings';
 import { getUserThemes } from '$utils/data';
 import { INITIAL_STATE as mainInitialState } from '$reducers/main';
 import { INITIAL_STATE as systemInitialState } from '$reducers/system';
@@ -198,9 +198,9 @@ export const createStorage = (): Store<IAppState> => {
   });
 
   writeToLogFileSync(`Working directory: ${GAME_DIR}`);
-  writeToLogFileSync(`Custom paths: ${customPaths}`);
+  writeToLogFileSync(`Custom paths: \n${getObjectAsList(customPaths)}`);
 
-  if (configurationData.modOrganizer.isUsed) {
+  if (configurationData.modOrganizer) {
     writeToLogFileSync(`MO information.\n  Path: ${configurationData.modOrganizer.path}\n  Path to INI: ${configurationData.modOrganizer.pathToINI}\n  Path to profiles: ${configurationData.modOrganizer.pathToProfiles}\n  Profile parameter on INI: ${configurationData.modOrganizer.profileParam}\n  Profile parameter regExp: ${configurationData.modOrganizer.profileParamValueRegExp}`); //eslint-disable-line max-len
   }
 
