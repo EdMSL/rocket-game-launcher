@@ -6,13 +6,13 @@ import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {
   isChecked: boolean,
-  parentClassname?: string,
 }
 
 export const Switcher: React.FunctionComponent<IProps> = ({
   id,
   label,
   name = id,
+  className = '',
   parentClassname = '',
   description = '',
   currentHintId = '',
@@ -27,18 +27,11 @@ export const Switcher: React.FunctionComponent<IProps> = ({
   <div className={classNames(
     'switcher__container',
     parentClassname && `${parentClassname}-switcher__container`,
+    className,
   )}
   >
-    <p className={classNames(
-      'switcher__label',
-      parentClassname && `${parentClassname}-switcher__label`,
-    )}
-    >
-      <span className={classNames(
-        'switcher__label-text',
-        parentClassname && `${parentClassname}-switcher__label-text`,
-      )}
-      >
+    <p className={classNames('switcher__label')}>
+      <span className={classNames('switcher__label-text')}>
         {label}
       </span>
       {
@@ -56,17 +49,9 @@ export const Switcher: React.FunctionComponent<IProps> = ({
           )
         }
     </p>
-    <div className={classNames(
-      'switcher__block',
-      parentClassname && `${parentClassname}-switcher__block`,
-    )}
-    >
+    <div className={classNames('switcher__block')}>
       <input
-        className={classNames(
-          'visually-hidden',
-          'switcher__checkbox',
-          parentClassname && `${parentClassname}-switcher__checkbox`,
-        )}
+        className={classNames('visually-hidden', 'switcher__checkbox')}
         type="checkbox"
         id={id}
         name={name}
@@ -78,10 +63,7 @@ export const Switcher: React.FunctionComponent<IProps> = ({
       />
       <label
         htmlFor={id}
-        className={classNames(
-          'switcher__toggler',
-          parentClassname && `${parentClassname}-switcher__toggler`,
-        )}
+        className={classNames('switcher__toggler')}
       />
     </div>
   </div>

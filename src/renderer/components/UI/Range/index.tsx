@@ -34,7 +34,8 @@ export const Range: React.FunctionComponent<IProps> = ({
   label = '',
   description = '',
   valueText = '',
-  className = null,
+  className = '',
+  parentClassname = '',
   currentHintId = '',
   onChange,
   onButtonClick = null,
@@ -48,7 +49,12 @@ export const Range: React.FunctionComponent<IProps> = ({
   }, [onButtonClick, parent, name, step, max, min]);
 
   return (
-    <div className={classNames('range__block', className)}>
+    <div className={classNames(
+      'range__container',
+      parentClassname && `${parentClassname}-range__container`,
+      className,
+    )}
+    >
       <div className="range__label">
         <span>{label}</span>
         {

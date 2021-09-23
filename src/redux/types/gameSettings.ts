@@ -89,7 +89,8 @@ export type IGameSettingsRootState = Readonly<{
 
 export interface IUIElementProps<E> {
   id: string,
-  className?: string | null,
+  className?: string,
+  parentClassname?: string,
   label?: string,
   name?: string,
   multiparameters?: string,

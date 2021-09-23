@@ -17,15 +17,20 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
   description = '',
   isChecked,
   isDisabled = false,
-  className = null,
-  classNameCheckbox = null,
+  className = '',
+  parentClassname = '',
   currentHintId = '',
   multiparameters = '',
   onChange,
   onHover = null,
   onLeave = null,
 }) => (
-  <div className={classNames('checkbox__block', className)}>
+  <div className={classNames(
+    'checkbox__container',
+    parentClassname && `${parentClassname}-switcher__container`,
+    className,
+  )}
+  >
     <input
       className={classNames('visually-hidden', 'checkbox__input')}
       type="checkbox"
@@ -38,7 +43,7 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
       onChange={onChange}
     />
     <label
-      className={classNames('checkbox__label', classNameCheckbox)}
+      className={classNames('checkbox__label')}
       htmlFor={id}
     >
       <span>{label}</span>

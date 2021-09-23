@@ -33,7 +33,8 @@ export const Select: (React.FunctionComponent<IProps>) = ({
   value,
   isDisabled = false,
   optionsArr,
-  className = null,
+  className = '',
+  parentClassname = '',
   currentHintId = '',
   onChange,
   onHover = null,
@@ -42,7 +43,12 @@ export const Select: (React.FunctionComponent<IProps>) = ({
   const currentOptionsArr = optionsArr.length !== 0 ? optionsArr : defaultOptionsArr;
 
   return (
-    <div className={classNames('select__block', className)}>
+    <div className={classNames(
+      'select__container',
+      parentClassname && `${parentClassname}-select__container`,
+      className,
+    )}
+    >
       {
         label && (
           <label
