@@ -37,7 +37,7 @@ export const Modal: React.FC<IProps> = ({
         {
           onCloseBtnClick && (
             <Button
-              className="modal__btn"
+              className="modal__btn modal__btn--close"
               onClick={onCloseBtnClick}
             >
               Закрыть

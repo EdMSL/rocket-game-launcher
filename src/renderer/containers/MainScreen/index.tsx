@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
@@ -11,9 +11,8 @@ import { setIsGameRunning, addMessages } from '$actions/main';
 import { IAppState } from '$store/store';
 import { CreateUserMessage } from '$utils/message';
 import { LauncherButtonAction } from '$constants/misc';
-import { Select } from '$components/UI/Select';
-import { generateSelectOptions } from '$utils/data';
-import { setUserTheme } from '$actions/userSettings';
+import { Modal } from '$components/UI/Modal';
+import { LauncherSettings } from '$components/LauncherSettings';
 
 export const MainScreen: React.FC = () => {
   /* eslint-disable max-len */
@@ -27,6 +26,8 @@ export const MainScreen: React.FC = () => {
   /* eslint-enable max-len */
 
   const dispatch = useDispatch();
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const changeGameState = useCallback((isRunning: boolean, errorMessage: string) => {
     dispatch(setIsGameRunning(isRunning));
@@ -61,17 +62,13 @@ export const MainScreen: React.FC = () => {
     openFolder(currentTarget.dataset.path!, sendErrorMessage);
   }, [sendErrorMessage]);
 
-  const onUserThemeSelectChange = useCallback((
-    { target }: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    document
-      .getElementById('theme')?.setAttribute(
-        'href',
-        target.value === '' ? 'css/styles.css' : `../../../themes/${target.value}/styles.css`,
-      );
+  const closeModal = useCallback(() => {
+    setIsModalOpen(false);
+  }, []);
 
-    dispatch(setUserTheme(target.value));
-  }, [dispatch]);
+  const onLauncherSettingsBtnClick = useCallback(() => {
+    setIsModalOpen(true);
+  }, []);
 
   return (
     <main className={classNames('main', styles['main-screen__main'])}>
@@ -116,16 +113,27 @@ export const MainScreen: React.FC = () => {
             </NavLink>
           )
         }
+        <Button
+          className="control-panel__btn"
+          onClick={onLauncherSettingsBtnClick}
+        >
+          Настройки лаунчера
+        </Button>
       </div>
-      <div className={classNames('content', styles['main-screen__content'])}>
-        <p>Content</p>
-        <Select
-          optionsArr={generateSelectOptions(userThemes)}
-          id="user-themes"
-          value={userTheme}
-          onChange={onUserThemeSelectChange}
-        />
-      </div>
+      {
+        isModalOpen && (
+        <Modal
+          modalParentClassname="launcher-settings"
+          onCloseBtnClick={closeModal}
+        >
+          <LauncherSettings
+            userTheme={userTheme}
+            userThemes={userThemes}
+          />
+
+        </Modal>
+        )
+      }
     </main>
   );
 };
