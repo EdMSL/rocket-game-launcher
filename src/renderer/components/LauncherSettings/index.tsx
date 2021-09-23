@@ -6,14 +6,20 @@ import { IUserSettingsRootState } from '$types/userSettings';
 import { Select } from '$components/UI/Select';
 import { IMainRootState } from '$types/main';
 import { generateSelectOptions } from '$utils/data';
-import { setUserTheme } from '$actions/userSettings';
+import { setIsAutoclose, setUserTheme } from '$actions/userSettings';
+import { Switcher } from '$components/UI/Switcher';
 
 interface IProps {
+  isAutoclose: IUserSettingsRootState['isAutoclose'],
   userTheme: IUserSettingsRootState['theme'],
   userThemes: IMainRootState['userThemes'],
 }
 
-export const LauncherSettings: React.FC<IProps> = ({ userTheme, userThemes }) => {
+export const LauncherSettings: React.FC<IProps> = ({
+  isAutoclose,
+  userTheme,
+  userThemes,
+}) => {
   const dispatch = useDispatch();
 
   const onUserThemeSelectChange = useCallback((
@@ -28,6 +34,12 @@ export const LauncherSettings: React.FC<IProps> = ({ userTheme, userThemes }) =>
     dispatch(setUserTheme(target.value));
   }, [dispatch]);
 
+  const onConfigIniSwitcherToggle = useCallback((
+    { target }: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    dispatch(setIsAutoclose(target.checked));
+  }, [dispatch]);
+
   return (
     <div className={styles['launcher-settings__container']}>
       <Select
@@ -36,6 +48,13 @@ export const LauncherSettings: React.FC<IProps> = ({ userTheme, userThemes }) =>
         value={userTheme}
         label="Тема"
         onChange={onUserThemeSelectChange}
+      />
+      <Switcher
+        id="is-autoclose"
+        label="Автозакрытие лаунчера при старте игры"
+        isChecked={isAutoclose}
+        parentClassname="launcher-settings"
+        onChange={onConfigIniSwitcherToggle}
       />
     </div>
   );

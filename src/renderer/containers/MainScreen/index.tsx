@@ -1,3 +1,4 @@
+import { ipcRenderer } from 'electron';
 import React, { useCallback, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,6 +22,7 @@ export const MainScreen: React.FC = () => {
   const isGameRunning = useSelector((state: IAppState) => state.main.isGameRunning);
   const userThemes = useSelector((state: IAppState) => state.main.userThemes);
   const userTheme = useSelector((state: IAppState) => state.userSettings.theme);
+  const isAutoclose = useSelector((state: IAppState) => state.userSettings.isAutoclose);
   const isGameSettingsAvailable = useSelector((state: IAppState) => state.main.isGameSettingsAvailable);
   const gameSettingsGroups = useSelector((state: IAppState) => state.gameSettings.gameSettingsGroups);
   /* eslint-enable max-len */
@@ -29,16 +31,20 @@ export const MainScreen: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const changeGameState = useCallback((isRunning: boolean, errorMessage: string) => {
+  const changeGameState = useCallback((errorMessage: string, isRunning: boolean, close = false) => {
     dispatch(setIsGameRunning(isRunning));
 
     if (errorMessage) {
       dispatch(addMessages([CreateUserMessage.error(errorMessage)]));
+    } else if (isAutoclose && close) {
+      ipcRenderer.send('close app');
     }
-  }, [dispatch]);
+  }, [dispatch, isAutoclose]);
 
   const sendErrorMessage = useCallback((message: string) => {
-    dispatch(addMessages([CreateUserMessage.error(message)]));
+    if (message) {
+      dispatch(addMessages([CreateUserMessage.error(message)]));
+    }
   }, [dispatch]);
 
   const onDisabledNavLinkClick = useCallback((event) => {
@@ -54,9 +60,9 @@ export const MainScreen: React.FC = () => {
     runApplication(
       currentTarget.dataset.path!,
       currentTarget.dataset.label!,
-      changeGameState,
+      sendErrorMessage,
     );
-  }, [changeGameState]);
+  }, [sendErrorMessage]);
 
   const onOpenFolderBtnClick = useCallback(({ currentTarget }) => {
     openFolder(currentTarget.dataset.path!, sendErrorMessage);
@@ -127,6 +133,7 @@ export const MainScreen: React.FC = () => {
           onCloseBtnClick={closeModal}
         >
           <LauncherSettings
+            isAutoclose={isAutoclose}
             userTheme={userTheme}
             userThemes={userThemes}
           />

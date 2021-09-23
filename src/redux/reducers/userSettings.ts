@@ -3,7 +3,8 @@ import { createReducer } from 'reduxsauce';
 import { USER_SETTINGS_HANDLERS } from '$handlers/userSettings';
 import { IUserSettingsRootState } from '$types/userSettings';
 
-const INITIAL_STATE: IUserSettingsRootState = {
+export const INITIAL_STATE: IUserSettingsRootState = {
+  isAutoclose: false,
   theme: '',
 };
 

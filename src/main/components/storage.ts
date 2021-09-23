@@ -27,6 +27,7 @@ import { getObjectAsList, getPathToFile } from '$utils/strings';
 import { getUserThemes } from '$utils/data';
 import { INITIAL_STATE as mainInitialState } from '$reducers/main';
 import { INITIAL_STATE as systemInitialState } from '$reducers/system';
+import { INITIAL_STATE as userSettingsInitialState } from '$reducers/userSettings';
 
 interface IStorage {
   userSettings: IUserSettingsRootState,
@@ -121,6 +122,7 @@ export const createStorage = (): Store<IAppState> => {
   const storage = new Storage<IStorage>({
     defaults: {
       userSettings: {
+        isAutoclose: false,
         theme: '',
       },
     },
@@ -128,7 +130,7 @@ export const createStorage = (): Store<IAppState> => {
 
   const customPaths = createCustomPaths(configurationData);
 
-  const userSettings = storage.get('userSettings');
+  const userSettingsStorage = storage.get('userSettings');
 
   const userThemes = getUserThemes(getUserThemesFolders());
 
@@ -140,7 +142,7 @@ export const createStorage = (): Store<IAppState> => {
 
     // Игнорируем перезапись ReadOnly, т.к. это еще не state.
     //@ts-ignore
-    userSettings.theme = '';
+    userSettingsStorage.theme = '';
   }
 
   configurationData.playButton.path = getPathToFile(
@@ -164,7 +166,10 @@ export const createStorage = (): Store<IAppState> => {
   }
 
   const newStore = {
-    userSettings,
+    userSettings: {
+      ...userSettingsInitialState,
+      ...userSettingsStorage,
+    },
     system: {
       ...systemInitialState,
       ...configurationData,
