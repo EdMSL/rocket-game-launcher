@@ -18,15 +18,15 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background-color: $bg-color;
+  background-color: var(bg-color);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: $text-main;
+  background-color: var(--text-main);
   border-radius: 10px;
 
   &:hover {
-    background-color: darken($color: $text-main, $amount: 20);
+    background-color: var(--disabled-color);
   }
 }

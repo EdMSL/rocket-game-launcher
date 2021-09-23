@@ -11,6 +11,6 @@
   }
 
   &:disabled {
-    background-color: darken($color: $border-color, $amount: 50);
+    background-color: var(--disabled-color);
   }
 }

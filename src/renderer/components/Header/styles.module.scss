@@ -11,9 +11,9 @@ $icon-size: 24px;
   height: 40px;
   padding: 0 10px;
 
-  color: $text-secondary;
+  color: var(--text-secondary);
 
-  background-color: $text-main;
+  background-color: var(--text-main);
 
   -webkit-app-region: drag;
 }

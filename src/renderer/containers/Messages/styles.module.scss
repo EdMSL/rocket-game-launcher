@@ -16,15 +16,15 @@
   margin-bottom: 8px;
   padding: 6px 0;
 
-  color: $text-main;
+  color: var(--text-main);
 
   font-size: 12px;
   line-height: 1;
 
-  background-color: $text-secondary;
+  background-color: var(--text-secondary);
 
   &:hover {
-    background-color: lighten($color: $text-secondary, $amount: 10);
+    background-color: var(--hover-color);
   }
 }
 

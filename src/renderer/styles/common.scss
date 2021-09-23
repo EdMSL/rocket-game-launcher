@@ -18,7 +18,7 @@
 .button {
   @include reset-indents;
   font: inherit;
-  color: $text-secondary;
+  color: var(--text-secondary);
   text-decoration: none;
 
   background-color: transparent;
@@ -30,7 +30,7 @@
 .main-btn {
   padding: 10px 14px;
 
-  background-color: $border-color;
+  background-color: var(--border-color);
 }
 
 .checkbox__block {
@@ -114,7 +114,7 @@
     height: 24px;
     margin-top: -10px;
 
-    background-color: $text-main;
+    background-color: var(--text-main);
     border-radius: 3px;
 
     appearance: none;
@@ -125,7 +125,7 @@
     width: 100%;
     height: 5px;
 
-    background-color: $text-main;
+    background-color: var(--text-main);
   }
 
   &:hover {
@@ -205,22 +205,22 @@
   width: 250px;
   padding: 12px;
 
-  color: $text-secondary;
+  color: var(--text-secondary);
   text-align: center;
 
-  border-color: $border-color;
+  border-color: var(--border-color);
   outline: none;
 
   cursor: pointer;
 
   &:hover {
-    outline: 1px solid $border-color;
+    outline: 1px solid var(--border-color);
   }
 
   &:disabled {
     color: var(--text-disabled);
 
-    border-color: darken($color: $border-color, $amount: 50);
+    border-color: var(--disabled-color);
   }
 
   &:focus {
@@ -258,7 +258,7 @@
   width: 100%;
   height: 100%;
 
-  background-color: transparentize($focus-color, 0.5);
+  background-color: var(--overlay-color);
 }
 
 .modal__block {
@@ -269,7 +269,7 @@
   flex-direction: column;
   max-height: 100%;
 
-  background-color: $bg-color;
+  background-color: var(bg-color);
 }
 
 .modal__header {
@@ -293,7 +293,7 @@
 .modal__btn {
   padding: 10px 16px;
 
-  background-color: $border-color;
+  background-color: var(--border-color);
 }
 
 .loader__wrapper {
@@ -310,7 +310,7 @@
   width: 50px;
   height: 50px;
 
-  border: 5px solid $border-color;
+  border: 5px solid var(--border-color);
   border-top-color: transparent;
   border-radius: 50%;
 
@@ -324,7 +324,7 @@
   height: 100%;
   overflow: hidden;
 
-  color: $text-main;
+  color: var(--text-main);
 }
 
 .control-panel {
@@ -336,15 +336,24 @@
   display: inline-block;
   padding: 4px 8px;
 
-  color: $text-secondary;
+  color: var(--text-secondary);
   text-align: center;
   text-decoration: none;
 
-  background-color: $text-main;
+  background-color: var(--text-main);
+
+  &:hover {
+    background-color: var(--hover-color);
+  }
+
+  &:focus {
+    outline: 2px solid var(--focus-color);
+    outline-offset: -2px;
+  }
 
   &:disabled,
   &--disabled, {
-    background-color: darken($color: $text-secondary, $amount: 40);
+    background-color: var(--disabled-color);
   }
 
   &--active {

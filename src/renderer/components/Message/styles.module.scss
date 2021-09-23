@@ -4,7 +4,7 @@
 
   color: inherit;
 
-  background-color: $text-secondary;
+  background-color: var(--text-secondary);
 
   &:last-of-type {
     margin-bottom: 0;
@@ -24,14 +24,14 @@
   background-position: center center;
   background-size: 70% 70%;
 
-  border-left: 1px solid $text-main;
+  border-left: 1px solid var(--text-main);
 
   &:first-child {
     border-left-width: 0;
   }
 
   &:hover {
-    background-color: lighten($color: $text-secondary, $amount: 10);
+    background-color: var(--hover-color);
   }
   /* stylelint-disable string-no-newline, max-line-length */
 
