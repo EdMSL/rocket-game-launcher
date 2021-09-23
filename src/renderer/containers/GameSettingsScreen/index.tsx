@@ -118,8 +118,8 @@ export const GameSettingsScreen: React.FC = () => {
           gameSettingsGroups.map((group) => (
             <NavLink
               key={group.name}
-              className="control-panel__btn"
-              activeClassName={styles['control-panel__btn--active']}
+              className={classNames('button', 'main-btn', 'control-panel__btn')}
+              activeClassName="control-panel__btn--active"
               to={`${Routes.GAME_SETTINGS_SCREEN}/${group.name}`}
             >
               {group.label}
@@ -129,7 +129,7 @@ export const GameSettingsScreen: React.FC = () => {
         <NavLink
           exact
           to={Routes.MAIN_SCREEN}
-          className="control-panel__btn"
+          className={classNames('button', 'main-btn', 'control-panel__btn')}
         >
           Назад
         </NavLink>

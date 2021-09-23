@@ -80,7 +80,7 @@ export const MainScreen: React.FC = () => {
     <main className={classNames('main', styles['main-screen__main'])}>
       <div className={classNames('control-panel', styles['main-screen__control-panel'])}>
         <Button
-          className="control-panel__btn"
+          className={classNames('main-btn', 'control-panel__btn')}
           isDisabled={isGameRunning}
           onClick={onPlayGameBtnClick}
         >
@@ -90,7 +90,7 @@ export const MainScreen: React.FC = () => {
           appButtons.map((button) => (
             <Button
               key={button.path}
-              className="control-panel__btn"
+              className={classNames('main-btn', 'control-panel__btn')}
               btnPath={button.path}
               btnLabel={button.label}
               onClick={button.action === LauncherButtonAction.RUN
@@ -109,6 +109,8 @@ export const MainScreen: React.FC = () => {
                 ? `${Routes.GAME_SETTINGS_SCREEN}/${gameSettingsGroups[0].name}`
                 : Routes.GAME_SETTINGS_SCREEN}
               className={classNames(
+                'button',
+                'main-btn',
                 'control-panel__btn',
                 (isGameRunning || !isGameSettingsAvailable) && 'control-panel__btn--disabled',
                 styles['main-screen__btn'],
@@ -120,7 +122,7 @@ export const MainScreen: React.FC = () => {
           )
         }
         <Button
-          className="control-panel__btn"
+          className={classNames('main-btn', 'control-panel__btn')}
           onClick={onLauncherSettingsBtnClick}
         >
           Настройки лаунчера

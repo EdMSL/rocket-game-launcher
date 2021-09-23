@@ -38,23 +38,7 @@
   text-align: center;
   text-decoration: none;
 
-  background-color: var(--text-main);
-
-  &:hover {
-    background-color: var(--hover-color);
-  }
-
-  &:focus {
-    outline: 2px solid var(--focus-color);
-    outline-offset: -2px;
-  }
-
-  &:disabled,
-  &--disabled, {
-    background-color: var(--disabled-color);
-  }
-
   &--active {
-    background-color: $focus-color;
+    background-color: var(--focus-color);
   }
 }
