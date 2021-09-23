@@ -19,12 +19,14 @@ export const GameSettingParameterControllerType = {
   CHECKBOX: 'checkbox',
   RANGE: 'range',
   SELECT: 'select',
+  SWITCHER: 'switcher',
 };
 
 export const HTMLInputType = {
   CHECKBOX: 'checkbox',
   RANGE: 'range',
   SELECT: 'select-one',
+  SWITCHER: 'checkbox',
 };
 
 export const GameSettingParameterType = {

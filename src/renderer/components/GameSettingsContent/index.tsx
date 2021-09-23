@@ -27,6 +27,7 @@ import { Select } from '$components/UI/Select';
 import { Range } from '$components/UI/Range';
 import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
 import { getNumberOfDecimalPlaces, getValueFromRange } from '$utils/strings';
+import { Switcher } from '$components/UI/Switcher';
 
 interface IProps {
   gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
@@ -265,11 +266,34 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     );
                   }
 
+                  if (parameter.controllerType === GameSettingParameterControllerType.SWITCHER) {
+                    return (
+                      <Switcher
+                        key={parameter.id}
+                        className={styles['game-settings-content__item']}
+                        parentClassname="game-settings-content"
+                        id={parameter.id}
+                        name={getOptionName(parameter.items![0])}
+                        parent={fileName}
+                        multiparameters={parameter.items!.map((param) => getOptionName(param)).join()}
+                        label={parameter.label!}
+                        description={parameter.description}
+                        isChecked={Boolean(gameSettingsOptions[fileName] && +getValue(parameter.items![0], fileName))}
+                        isDisabled={!gameSettingsOptions[fileName]}
+                        currentHintId={currentHintId}
+                        onChange={onOptionInputChange}
+                        onHover={onParameterHover}
+                        onLeave={onParameterLeave}
+                      />
+                    );
+                  }
+
                   if (parameter.controllerType === GameSettingParameterControllerType.RANGE) {
                     return (
                       <Range
                         key={parameter.id}
                         className={styles['game-settings-content__item']}
+                        parentClassname="game-settings-content"
                         id={parameter.id}
                         name={getOptionName(parameter.items![0])}
                         parent={fileName}
@@ -327,6 +351,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                       <Range
                         key={parameter.id}
                         className={styles['game-settings-content__item']}
+                        parentClassname="game-settings-content"
                         id={parameter.id}
                         name={getOptionName(parameter)}
                         parent={fileName}
@@ -352,7 +377,28 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                       <Checkbox
                         key={parameter.id}
                         className={styles['game-settings-content__item']}
-                        classNameCheckbox={styles.setting__checkbox}
+                        parentClassname="game-settings-content"
+                        id={parameter.id}
+                        name={getOptionName(parameter)}
+                        parent={fileName}
+                        label={parameter.label!}
+                        description={parameter.description}
+                        isChecked={(gameSettingsOptions[fileName] && Boolean(+getValue(parameter, fileName))) || false}
+                        isDisabled={!gameSettingsOptions[fileName]}
+                        currentHintId={currentHintId}
+                        onChange={onOptionInputChange}
+                        onHover={onParameterHover}
+                        onLeave={onParameterLeave}
+                      />
+                    );
+                  }
+
+                  if (parameter.controllerType === GameSettingParameterControllerType.SWITCHER) {
+                    return (
+                      <Switcher
+                        key={parameter.id}
+                        className={styles['game-settings-content__item']}
+                        parentClassname="game-settings-content"
                         id={parameter.id}
                         name={getOptionName(parameter)}
                         parent={fileName}
