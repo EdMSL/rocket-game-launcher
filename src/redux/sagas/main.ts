@@ -7,7 +7,6 @@ import {
   put,
   takeLatest,
   select,
-  SagaReturnType,
 } from 'redux-saga/effects';
 import fs from 'fs';
 
@@ -21,7 +20,6 @@ import {
   createGameSettingsFilesBackup as createGameSettingsFilesBackupAction,
   deleteGameSettingsFilesBackup as deleteGameSettingsFilesBackupAction,
   restoreGameSettingsFilesBackup,
-  setUserThemes,
 } from '$actions/main';
 import {
   generateGameSettingsOptionsSaga,
@@ -47,39 +45,8 @@ import {
 import { getPathToFile } from '$utils/strings';
 import { IUnwrap } from '$types/common';
 import { setGameSettingsOptions } from '$actions/gameSettings';
-import { getUserThemesFolders } from '$utils/files';
-import { setUserTheme } from '$actions/userSettings';
 
 const getState = (state: IAppState): IAppState => state;
-
-/**
- * Получить список пользовательских тем.
-*/
-function* getUserThemesSaga(): SagaIterator<{ [key: string]: string, }> {
-  try {
-    let themesFolders: string[] = [];
-
-    if (fs.existsSync(USER_THEMES_PATH)) {
-      themesFolders = yield call(getUserThemesFolders);
-    }
-
-    const themesObjects = themesFolders.reduce((themes, theme) => ({
-      ...themes,
-      [theme]: theme,
-    }), {});
-
-    return {
-      '': 'default',
-      ...themesObjects,
-    };
-  } catch (error: any) {
-    writeToLogFile(`Failed to get user themes list. Will be used default theme. Reason: ${error.message}`); //eslint-disable-line max-len
-
-    return {
-      '': 'default',
-    };
-  }
-}
 
 /**
  * Инициализация лаунчера при запуске.
@@ -93,23 +60,6 @@ function* initLauncherSaga(): SagaIterator {
     } else {
       writeToLogFile('Game settings file settings.json not found.');
     }
-
-    const themes: SagaReturnType<typeof getUserThemesSaga> = yield call(getUserThemesSaga);
-
-    // 1 т.к. есть одна дефолтная тема со значение ''.
-    if (Object.keys.length === 1) {
-      const { userSettings: { theme } }: IAppState = yield select(getState);
-
-      if (theme !== '') {
-        writeToLogFile(
-          'No themes found, but user theme is set in storage. Theme will be set to default.',
-          LogMessageType.WARNING,
-        );
-        yield put(setUserTheme(''));
-      }
-    }
-
-    yield put(setUserThemes(themes));
   } catch (error: any) {
     let errorMessage = '';
 

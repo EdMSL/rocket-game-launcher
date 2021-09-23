@@ -3,7 +3,7 @@ import { createReducer } from 'reduxsauce';
 import { MAIN_HANDLERS } from '$handlers/main';
 import { IMainRootState } from '$types/main';
 
-const INITIAL_STATE: IMainRootState = {
+export const INITIAL_STATE: IMainRootState = {
   isLauncherInitialised: false,
   isGameRunning: false,
   isGameSettingsLoaded: false,

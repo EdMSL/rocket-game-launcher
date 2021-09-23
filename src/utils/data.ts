@@ -466,3 +466,18 @@ export const getArgsFromShortcut = (argsStr: string): string[] => {
     return arg;
   });
 };
+
+/**
+ * Получить список пользовательских тем для записи в `state`.
+*/
+export const getUserThemes = (themesFolders: string[]): { [key: string]: string, } => {
+  const themesObjects = themesFolders.reduce((themes, theme) => ({
+    ...themes,
+    [theme]: theme,
+  }), {});
+
+  return {
+    '': 'default',
+    ...themesObjects,
+  };
+};

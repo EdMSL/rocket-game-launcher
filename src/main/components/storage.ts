@@ -10,7 +10,9 @@ import {
   writeToLogFile,
   writeToLogFileSync,
 } from '$utils/log';
-import { readJSONFileSync, writeJSONFile } from '$utils/files';
+import {
+  getUserThemesFolders, readJSONFileSync, writeJSONFile,
+} from '$utils/files';
 import {
   CONFIG_FILE_PATH, DOCUMENTS_DIR, GAME_DIR,
 } from '$constants/paths';
@@ -22,6 +24,9 @@ import {
 import { Scope } from '$constants/misc';
 import { checkConfigFileData } from '$utils/check';
 import { getPathToFile } from '$utils/strings';
+import { getUserThemes } from '$utils/data';
+import { INITIAL_STATE as mainInitialState } from '$reducers/main';
+import { INITIAL_STATE as systemInitialState } from '$reducers/system';
 
 interface IStorage {
   userSettings: IUserSettingsRootState,
@@ -121,10 +126,28 @@ export const createStorage = (): Store<IAppState> => {
     },
   });
 
-  const userSettings = storage.get('userSettings');
   const customPaths = createCustomPaths(configurationData);
 
-  configurationData.playButton.path = getPathToFile(configurationData.playButton.path, customPaths, '');
+  const userSettings = storage.get('userSettings');
+
+  const userThemes = getUserThemes(getUserThemesFolders());
+
+  if (Object.keys(userThemes).length === 1) {
+    writeToLogFile(
+      'No themes found, but user theme is set in storage. Theme will be set to default.',
+      LogMessageType.WARNING,
+    );
+
+    // Игнорируем перезапись ReadOnly, т.к. это еще не state.
+    //@ts-ignore
+    userSettings.theme = '';
+  }
+
+  configurationData.playButton.path = getPathToFile(
+    configurationData.playButton.path,
+    customPaths,
+    '',
+  );
 
   if (!configurationData.playButton.label) {
     configurationData.playButton.label = defaultLauncherConfig.playButton.label;
@@ -143,9 +166,13 @@ export const createStorage = (): Store<IAppState> => {
   const newStore = {
     userSettings,
     system: {
-      ...defaultLauncherConfig,
+      ...systemInitialState,
       ...configurationData,
       customPaths: { ...customPaths },
+    },
+    main: {
+      ...mainInitialState,
+      userThemes,
     },
   };
 

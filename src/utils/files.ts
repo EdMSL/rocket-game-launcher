@@ -80,6 +80,27 @@ export const readDirectory = (
   });
 
 /**
+ * Синхронно получить содержимое папки.
+ * @param pathToDirectory Путь к папке.
+ * @returns Массив с именами файлов\папок.
+*/
+export const readDirectorySync = (
+  pathToDirectory: string,
+): string[] => {
+  try {
+    return fs.readdirSync(pathToDirectory);
+  } catch (error: any) {
+    const readWriteError = getReadWriteError(error, true);
+
+    throw new ReadWriteError(
+      `Can't read folder. ${readWriteError.message}`,
+      readWriteError,
+      pathToDirectory,
+    );
+  }
+};
+
+/**
  * Синхронно создать папку.
  * @param pathToDirectory Путь к папке.
 */
@@ -501,30 +522,39 @@ export const writeGameSettingsFile = async (
 /**
  * Получить список папок пользовательских тем.
 */
-export const getUserThemesFolders = async (): Promise<string[]> => {
-  const themesFolderContent = await readDirectory(USER_THEMES_PATH);
+export const getUserThemesFolders = (): string[] => {
+  try {
+    const themesFolderContent = readDirectorySync(USER_THEMES_PATH);
 
-  if (themesFolderContent.length > 0) {
-    const themesFolders = themesFolderContent.filter((item) => !path.extname(item));
+    if (themesFolderContent.length > 0) {
+      const themesFolders = themesFolderContent.filter((item) => !path.extname(item));
 
-    if (themesFolders.length > 0) {
-      const foldersReadResults = await Promise.allSettled(
-        themesFolders.map((folder) => readDirectory(path.join(USER_THEMES_PATH, folder))),
-      );
+      if (themesFolders.length > 0) {
+        const foldersReadResults = themesFolders.map((folder) => {
+          try {
+            return readDirectorySync(path.join(USER_THEMES_PATH, folder));
+          } catch (error) {
+            return [];
+          }
+        });
 
-      return foldersReadResults.reduce<string[]>((folders, currentResult, index) => {
-        if (currentResult.status === 'fulfilled') {
-          if (currentResult.value.includes('styles.css')) {
+        return foldersReadResults.reduce<string[]>((folders, currentResult, index) => {
+          if (currentResult.includes('styles.css')) {
             return [...folders, themesFolders[index]];
           }
 
           return [...folders];
-        }
-
-        return [...folders];
-      }, []);
+        }, []);
+      }
     }
-  }
 
-  return [];
+    return [];
+  } catch (error: any) {
+    writeToLogFileSync(
+      `Can't get list of user themes. Reason: ${error.message}.`,
+      LogMessageType.WARNING,
+    );
+
+    return [];
+  }
 };
