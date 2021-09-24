@@ -21,14 +21,39 @@
     "%CUSTOM%": "Data\\OBSE\\Plugins"
   },
   "playButton": {
-    "path": "%GAMEDIR%\\Play.lnk",
+    "path": "%GAMEDIR%\\Mod Organizer\\ModOrganizer.exe",
+    "args": [
+      "%GAMEDIR%\\obse_loader.exe"
+    ],
     "label": ""
   },
   "customButtons": [
     {
       "action": "run",
+      "path": "%GAMEDIR%\\Editor.lnk",
+      "label": "CSE MO1 ярлык"
+    },
+    {
+      "action": "run",
+      "path": "%GAMEDIR%\\Mod Organizer\\ModOrganizer.exe",
+      "args": [
+        "%GAMEDIR%\\obse loader.exe",
+        "-editor"
+      ],
+      "label": "CSE MO1 exe"
+    },
+    {
+      "action": "run",
       "path": "%GAMEDIR%\\Editor2.lnk",
-      "label": "CSE"
+      "label": "CSE MO2 ярлык"
+    },
+    {
+      "action": "run",
+      "path": "%GAMEDIR%\\MO2\\ModOrganizer.exe",
+      "args": [
+        "\"moshortcut://:Construction Set\""
+      ],
+      "label": "CSE MO2 exe"
     },
     {
       "action": "open",

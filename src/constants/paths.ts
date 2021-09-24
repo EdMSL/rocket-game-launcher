@@ -13,6 +13,10 @@ export const GAME_DIR = process.env.NODE_ENV === 'development'
   ? 'D:\\Oblivion'
   : path.resolve('../');
 
+export const DefaultCustomPath = {
+  '%GAMEDIR%': GAME_DIR,
+};
+
 export const DOCUMENTS_DIR = path.resolve(os.homedir(), 'Documents');
 
 export const BACKUP_DIR = process.env.NODE_ENV === 'development'

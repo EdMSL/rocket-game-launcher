@@ -1,13 +1,19 @@
 import { screen } from 'electron';
 import si from 'systeminformation';
 
-import { GameSettingsFileView } from '$constants/misc';
+import { CustomPathName, GameSettingsFileView } from '$constants/misc';
 import { IIniObj, IXmlObj } from './files';
 import {
-  LogMessageType, writeToLogFile, writeToLogFileSync,
+  LogMessageType,
+  writeToLogFile,
+  writeToLogFileSync,
 } from './log';
 import { CreateUserMessage } from './message';
-import { getLineIniParameterValue, getParameterRegExp } from './strings';
+import {
+  getLineIniParameterValue,
+  getParameterRegExp,
+  getPathToFile,
+} from './strings';
 import {
   IGameSettingsItemParameter,
   IGameSettingsParameter,
@@ -21,6 +27,7 @@ import {
 import { IUserMessage } from '$types/main';
 import { ISelectOption } from '$components/UI/Select';
 import { IIncorrectGameSettingsFiles } from '$sagas/gameSettings';
+import { DefaultCustomPath } from '$constants/paths';
 
 const ONE_GB = 1073741824;
 const SYMBOLS_TO_TYPE = 8;
@@ -455,17 +462,19 @@ export const changeSectionalIniParameter = (
     .getLine(parameterName).text = currLineText;
 };
 
-export const getArgsFromShortcut = (argsStr: string): string[] => {
-  const argsArr = argsStr.split(' ');
+export const getApplicationArgs = (args: string[]): string[] => args.map((arg) => {
+  let newArg = arg;
 
-  return argsArr.map((arg) => {
-    if (/"(.+)"/.test(arg)) {
-      return arg.match(/"(.+)"/)![1]!;
-    }
+  if (CustomPathName.GAMEDIR_REGEXP.test(arg)) {
+    newArg = getPathToFile(arg, DefaultCustomPath, '');
+  }
 
-    return arg;
-  });
-};
+  if (/^-.+$/.test(newArg)) {
+    return newArg;
+  }
+
+  return `"${newArg}"`;
+});
 
 /**
  * Получить список пользовательских тем для записи в `state`.

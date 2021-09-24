@@ -15,6 +15,7 @@ interface IModOrganizerParams {
 interface ILauncherAppButton {
   path: string,
   label: string,
+  args: string[],
 }
 
 interface ILauncherCustomButton extends ILauncherAppButton {

@@ -39,6 +39,7 @@ export const defaultLauncherConfig: ISystemRootState = {
   customPaths: {},
   playButton: {
     path: '',
+    args: [],
     label: 'Играть',
   },
   customButtons: [],

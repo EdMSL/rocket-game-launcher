@@ -8,16 +8,18 @@ import { LogMessageType, writeToLogFile } from '$utils/log';
 import { iconvDecode } from '$utils/files';
 import { GAME_DIR } from '$constants/paths';
 import { ErrorCode, ErrorMessage } from '$utils/errors';
-import { getArgsFromShortcut } from './data';
+import { getApplicationArgs } from './data';
 
 /**
  * Запустить приложение (.exe).
  * @param pathToApp Путь до файла.
+ * @param args Аргументы доп. параметров запуска.
  * @param appName Название файла, который требуется запустить.
  * @param cb Callack функция, которая выполнится после закрытия приложения (с ошибкой или без).
 */
 export const runApplication = (
   pathToApp: string,
+  args: string[] = [],
   appName = path.basename(pathToApp),
   cb?: (errorMessage: string, runningState: boolean, isClosed?: boolean) => void,
 ): void => {
@@ -44,10 +46,14 @@ export const runApplication = (
       const parsed = shell.readShortcutLink(pathToApp);
 
       if (parsed.args) {
-        execArgs = getArgsFromShortcut(parsed.args);
+        execArgs = [parsed.args];
       }
 
       execTarget = parsed.target;
+    }
+
+    if (pathToAppExtname === '.exe' && args.length > 0) {
+      execArgs = getApplicationArgs(args);
     }
 
     if (
@@ -55,7 +61,7 @@ export const runApplication = (
       || !mime.getType(execTarget)?.match(/application\/octet-stream/)
     ) {
       writeToLogFile(
-        `Message: Can't run application. ${ErrorMessage.MIME_TYPE}, received: ${mime.getType(pathToApp)}. App: ${appName}, path: ${pathToApp}.`, //eslint-disable-line max-len
+        `Message: Can't run application. ${ErrorMessage.MIME_TYPE}, received: ${mime.getType(pathToApp)}. App: ${execTarget}, path: ${pathToApp}.`, //eslint-disable-line max-len
         LogMessageType.ERROR,
       );
       if (cb) {

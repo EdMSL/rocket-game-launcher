@@ -53,12 +53,13 @@ export const MainScreen: React.FC = () => {
 
   const onPlayGameBtnClick = useCallback(() => {
     dispatch(setIsGameRunning(true));
-    runApplication(playButton.path, 'Game', changeGameState);
+    runApplication(playButton.path, playButton.args, 'Game', changeGameState);
   }, [dispatch, playButton, changeGameState]);
 
   const onRunApplicationBtnClick = useCallback(({ currentTarget }) => {
     runApplication(
       currentTarget.dataset.path!,
+      currentTarget.dataset.args!.split(','),
       currentTarget.dataset.label!,
       sendErrorMessage,
     );
@@ -92,6 +93,7 @@ export const MainScreen: React.FC = () => {
               key={button.path}
               className={classNames('main-btn', 'control-panel__btn')}
               btnPath={button.path}
+              btnArgs={button.args}
               btnLabel={button.label}
               onClick={button.action === LauncherButtonAction.RUN
                 ? onRunApplicationBtnClick

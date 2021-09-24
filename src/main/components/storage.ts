@@ -11,15 +11,21 @@ import {
   writeToLogFileSync,
 } from '$utils/log';
 import {
-  getUserThemesFolders, readJSONFileSync, writeJSONFile,
+  getUserThemesFolders,
+  readJSONFileSync,
+  writeJSONFile,
 } from '$utils/files';
 import {
-  CONFIG_FILE_PATH, DOCUMENTS_DIR, GAME_DIR,
+  CONFIG_FILE_PATH,
+  DOCUMENTS_DIR, GAME_DIR,
+  DefaultCustomPath,
 } from '$constants/paths';
 import { ISystemRootState } from '$types/system';
 import {
   CustomError,
-  ErrorName, ReadWriteError, showMessageBox,
+  ErrorName,
+  ReadWriteError,
+  showMessageBox,
 } from '$utils/errors';
 import { Scope } from '$constants/misc';
 import { checkConfigFileData } from '$utils/check';
@@ -102,8 +108,8 @@ const createCustomPaths = (configData: ISystemRootState): ICustomPaths => {
   }), {});
 
   return {
+    ...DefaultCustomPath,
     '%DOCUMENTS%': path.join(DOCUMENTS_DIR, configData.documentsPath),
-    '%GAMEDIR%': GAME_DIR,
     ...configData.modOrganizer.isUsed ? {
       '%MO%': path.join(GAME_DIR, configData.modOrganizer.pathToProfiles),
     } : {},
