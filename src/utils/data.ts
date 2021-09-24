@@ -465,7 +465,7 @@ export const changeSectionalIniParameter = (
 export const getApplicationArgs = (args: string[]): string[] => args.map((arg) => {
   let newArg = arg;
 
-  if (CustomPathName.GAMEDIR_REGEXP.test(arg)) {
+  if (CustomPathName.GAME_DIR_REGEXP.test(arg)) {
     newArg = getPathToFile(arg, DefaultCustomPath, '');
   }
 

@@ -21,35 +21,35 @@
     "%CUSTOM%": "Data\\OBSE\\Plugins"
   },
   "playButton": {
-    "path": "%GAMEDIR%\\Mod Organizer\\ModOrganizer.exe",
+    "path": "%GAME_DIR%\\Mod Organizer\\ModOrganizer.exe",
     "args": [
-      "%GAMEDIR%\\obse_loader.exe"
+      "%GAME_DIR%\\obse_loader.exe"
     ],
     "label": ""
   },
   "customButtons": [
     {
       "action": "run",
-      "path": "%GAMEDIR%\\Editor.lnk",
+      "path": "%GAME_DIR%\\Editor.lnk",
       "label": "CSE MO1 ярлык"
     },
     {
       "action": "run",
-      "path": "%GAMEDIR%\\Mod Organizer\\ModOrganizer.exe",
+      "path": "%MO_DIR%\\ModOrganizer.exe",
       "args": [
-        "%GAMEDIR%\\obse loader.exe",
+        "%GAME_DIR%\\obse loader.exe",
         "-editor"
       ],
       "label": "CSE MO1 exe"
     },
     {
       "action": "run",
-      "path": "%GAMEDIR%\\Editor2.lnk",
+      "path": "%GAME_DIR%\\Editor2.lnk",
       "label": "CSE MO2 ярлык"
     },
     {
       "action": "run",
-      "path": "%GAMEDIR%\\MO2\\ModOrganizer.exe",
+      "path": "%GAME_DIR%\\MO2\\ModOrganizer.exe",
       "args": [
         "\"moshortcut://:Construction Set\""
       ],
@@ -57,7 +57,7 @@
     },
     {
       "action": "open",
-      "path": "%GAMEDIR%",
+      "path": "%GAME_DIR%",
       "label": "Открыть папку игры"
     },
     {
@@ -69,6 +69,11 @@
       "action": "open",
       "path": "%DOCUMENTS%",
       "label": "Доки"
+    },
+    {
+      "action": "open",
+      "path": "%MO_DIR%",
+      "label": "Папка МО"
     }
   ]
 }

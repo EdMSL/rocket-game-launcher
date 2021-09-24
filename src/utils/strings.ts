@@ -123,12 +123,17 @@ export const getPathToFile = (
 ): string => {
   let newPath = pathToFile;
 
-  if (CustomPathName.MO_REGEXP.test(pathToFile)) {
+  if (CustomPathName.MO_PROFILES_REGEXP.test(pathToFile)) {
     if (profileMO) {
-      newPath = path.join(customPaths[CustomPathName.MO], profileMO, path.basename(pathToFile));
+      newPath = path.join(customPaths[CustomPathName.MO_PROFILES], profileMO, path.basename(pathToFile));
     } else {
       throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
     }
+  } else if (CustomPathName.MO_DIR_REGEXP.test(pathToFile)) {
+    newPath = path.join(
+      customPaths[CustomPathName.MO_DIR],
+      pathToFile.replace(CustomPathName.MO_DIR, ''),
+    );
   } else if (CustomPathName.DOCUMENTS_REGEXP.test(pathToFile)) {
     if (customPaths[CustomPathName.DOCUMENTS]) {
       newPath = path.join(
@@ -138,10 +143,10 @@ export const getPathToFile = (
     } else {
       throw new CustomError('The path to a file in the Documents folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
     }
-  } else if (CustomPathName.GAMEDIR_REGEXP.test(pathToFile)) {
+  } else if (CustomPathName.GAME_DIR_REGEXP.test(pathToFile)) {
     newPath = path.join(
-      customPaths[CustomPathName.GAMEDIR],
-      pathToFile.replace(CustomPathName.GAMEDIR, ''),
+      customPaths[CustomPathName.GAME_DIR],
+      pathToFile.replace(CustomPathName.GAME_DIR, ''),
     );
   } else if (CustomPathName.CUSTOM_PATH_REGEXP.test(pathToFile)) {
     const customPathName = pathToFile.match(CustomPathName.CUSTOM_PATH_REGEXP)![0];

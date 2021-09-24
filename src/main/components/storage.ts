@@ -40,11 +40,13 @@ interface IStorage {
 }
 
 interface ICustomPaths {
-  '%GAMEDIR%': string,
+  '%GAME_DIR%': string,
   //@ts-ignore
   '%DOCUMENTS%'?: string|undefined,
   //@ts-ignore
-  '%MO%'?: string|undefined,
+  '%MO_PROFILES%'?: string|undefined,
+  //@ts-ignore
+  '%MO_DIR%'?: string|undefined,
   [label: string]: string,
 }
 
@@ -109,9 +111,12 @@ const createCustomPaths = (configData: ISystemRootState): ICustomPaths => {
 
   return {
     ...DefaultCustomPath,
-    '%DOCUMENTS%': path.join(DOCUMENTS_DIR, configData.documentsPath),
+    ...configData.documentsPath ? {
+      '%DOCUMENTS%': path.join(DOCUMENTS_DIR, configData.documentsPath),
+    } : {},
     ...configData.modOrganizer.isUsed ? {
-      '%MO%': path.join(GAME_DIR, configData.modOrganizer.pathToProfiles),
+      '%MO_PROFILES%': path.join(GAME_DIR, configData.modOrganizer.pathToProfiles),
+      '%MO_DIR%': path.join(GAME_DIR, configData.modOrganizer.path),
     } : {},
     ...newCustomPaths,
   };

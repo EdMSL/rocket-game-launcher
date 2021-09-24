@@ -14,7 +14,7 @@ export const GAME_DIR = process.env.NODE_ENV === 'development'
   : path.resolve('../');
 
 export const DefaultCustomPath = {
-  '%GAMEDIR%': GAME_DIR,
+  '%GAME_DIR%': GAME_DIR,
 };
 
 export const DOCUMENTS_DIR = path.resolve(os.homedir(), 'Documents');
