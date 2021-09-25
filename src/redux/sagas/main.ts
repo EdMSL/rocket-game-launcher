@@ -27,7 +27,7 @@ import {
   initGameSettingsSaga,
   setInitialGameSettingsConfigSaga,
 } from '$sagas/gameSettings';
-import { GAME_SETTINGS_FILE_PATH, USER_THEMES_PATH } from '$constants/paths';
+import { GAME_SETTINGS_FILE_PATH, USER_THEMES_DIR } from '$constants/paths';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';

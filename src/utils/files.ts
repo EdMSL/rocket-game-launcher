@@ -20,7 +20,7 @@ import {
   ErrorMessage,
 } from '$utils/errors';
 import { Encoding, GameSettingsFileView } from '$constants/misc';
-import { USER_THEMES_PATH } from '$constants/paths';
+import { USER_THEMES_DIR } from '$constants/paths';
 
 export const xmlAttributePrefix = '@_';
 
@@ -524,7 +524,7 @@ export const writeGameSettingsFile = async (
 */
 export const getUserThemesFolders = (): string[] => {
   try {
-    const themesFolderContent = readDirectorySync(USER_THEMES_PATH);
+    const themesFolderContent = readDirectorySync(USER_THEMES_DIR);
 
     if (themesFolderContent.length > 0) {
       const themesFolders = themesFolderContent.filter((item) => !path.extname(item));
@@ -532,7 +532,7 @@ export const getUserThemesFolders = (): string[] => {
       if (themesFolders.length > 0) {
         const foldersReadResults = themesFolders.map((folder) => {
           try {
-            return readDirectorySync(path.join(USER_THEMES_PATH, folder));
+            return readDirectorySync(path.join(USER_THEMES_DIR, folder));
           } catch (error) {
             return [];
           }

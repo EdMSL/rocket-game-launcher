@@ -13,10 +13,6 @@ export const GAME_DIR = process.env.NODE_ENV === 'development'
   ? 'D:\\Oblivion'
   : path.resolve('../');
 
-export const DefaultCustomPath = {
-  '%GAME_DIR%': GAME_DIR,
-};
-
 export const DOCUMENTS_DIR = path.resolve(os.homedir(), 'Documents');
 
 export const BACKUP_DIR = process.env.NODE_ENV === 'development'
@@ -25,6 +21,10 @@ export const BACKUP_DIR = process.env.NODE_ENV === 'development'
 
 export const BACKUP_DIR_GAME_SETTINGS_FILES = path.resolve(`${BACKUP_DIR}/${GAME_SETTINGS_FILES_BACKUP_FOLDER_NAME}`); //eslint-disable-line max-len
 
-export const USER_THEMES_PATH = process.env.NODE_ENV === 'development'
+export const USER_THEMES_DIR = process.env.NODE_ENV === 'development'
   ? path.resolve('./app/themes')
   : path.resolve('./themes');
+
+export const DefaultCustomPath = {
+  '%GAME_DIR%': GAME_DIR,
+};
