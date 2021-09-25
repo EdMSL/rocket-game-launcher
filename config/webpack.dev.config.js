@@ -17,7 +17,7 @@ const devWebpackConfig = (env) => {
         ? path.resolve(`${baseWebpackConfig.externals.paths.src}/main/main.ts`)
         : path.resolve(`${baseWebpackConfig.externals.paths.src}/renderer/renderer.tsx`),
       output: {
-        path: `${baseWebpackConfig.externals.paths.dist}`,
+        path: `${baseWebpackConfig.externals.paths.build}`,
         filename: MAIN ? 'index.js' : 'renderer.js',
         publicPath: 'http://localhost:8081/build/',
       },

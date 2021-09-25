@@ -25,8 +25,10 @@ const start = async (): Promise<void> => {
 
   createWindow(store.getState().system);
 
-  createBackupFolders();
-  createFolderSync(USER_THEMES_DIR);
+  if (process.env.NODE_ENV === 'production') {
+    createBackupFolders();
+    createFolderSync(USER_THEMES_DIR);
+  }
 
   globalShortcut.register('Alt+Q', () => {
     app.quit();

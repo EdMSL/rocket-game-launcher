@@ -34,7 +34,7 @@ const configFileDataSchema = Joi.object({
   height: Joi.number().optional().default(defaultLauncherConfig.height),
   modOrganizer: {
     isUsed: Joi.bool().optional(),
-    version: Joi.number().valid(1, 2).required(),
+    version: Joi.number().valid(1, 2).when(Joi.ref('isUsed'), { is: true, then: Joi.required() }),
     path: Joi.string().optional().pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
     pathToINI: Joi.string().optional().pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
     pathToProfiles: Joi.string().optional().pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
@@ -56,6 +56,7 @@ const configFileDataSchema = Joi.object({
   }),
   customButtons: Joi.array()
     .items(Joi.object({
+      id: Joi.string().optional().default(() => getRandomId('custom-btn')),
       action: Joi.string().required().valid(...Object.values(LauncherButtonAction)),
       path: Joi.string().required(),
       args: Joi.array().items(Joi.string()).optional().default([])
@@ -87,8 +88,7 @@ const settingsMainSchema = Joi.object<IGameSettingsConfig>({
     .items(Joi.object({
       name: Joi.string().required(),
       label: Joi.string().optional().default(Joi.ref('name')),
-    })).optional().min(1)
-    .default([])
+    })).optional().default([])
     .unique((a, b) => a.name === b.name),
   baseFilesEncoding: Joi.string().optional().default(Encoding.WIN1251),
   gameSettingsFiles: Joi.object()

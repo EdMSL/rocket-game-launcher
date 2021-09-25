@@ -9,6 +9,11 @@ module.exports = function () {
             filename: 'images/[name].[ext]',
             publicPath: '../',
           },
+          parser: {
+            dataUrlCondition: {
+              maxSize: 10 * 1024,
+            },
+          },
         },
       ],
     },

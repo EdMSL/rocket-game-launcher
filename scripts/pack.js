@@ -1,4 +1,6 @@
 const packager = require('electron-packager');
+const fs = require('fs');
+const path = require('path');
 
 async function bundleElectronApp(asar) {
   const appPaths = await packager({
@@ -10,7 +12,7 @@ async function bundleElectronApp(asar) {
     overwrite: true,
     prune: true,
     icon: 'src/public/icon.ico',
-    ignore: new RegExp('(files|backup)'),
+    ignore: new RegExp('(files|backup|build)'),
     asar: Boolean(asar),
     win32metadata: {
       CompanyName: 'OA Team',
@@ -22,6 +24,21 @@ async function bundleElectronApp(asar) {
   });
 
   console.log(`Electron app bundles created:\n${appPaths.join('\n')}`);
+
+  return appPaths;
 }
 
-bundleElectronApp(process.argv[2]);
+bundleElectronApp(process.argv[2])
+  .then((data) => {
+    fs.mkdirSync(path.resolve(data[0], 'backup'));
+    fs.mkdirSync(path.resolve(data[0], 'themes'));
+    fs.copyFileSync(
+      path.resolve('./app/files/default_config.json'),
+      path.resolve(data[0], 'config.json'),
+    );
+    fs.copyFileSync(
+      path.resolve('./app/files/default_settings.json'),
+      path.resolve(data[0], 'settings.json'),
+    );
+  }).catch((error) => console.log(error.message));
+

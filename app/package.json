@@ -2,7 +2,7 @@
   "name": "rubicon",
   "version": "1.0.0",
   "description": "Launcher for TES4: Oblivion game and game builds with it",
-  "main": "./build/index.js",
+  "main": "./dist/index.js",
   "author": "Eduard Trayt <eduard2011rus@gmail.com> (https://github.com/EdMSL)",
   "license": "MIT"
 }

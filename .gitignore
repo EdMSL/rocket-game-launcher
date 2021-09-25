@@ -17,5 +17,6 @@ data/
 
 # Папка с собранными файлами проекта
 build/
+dist/
 release/
 backup/

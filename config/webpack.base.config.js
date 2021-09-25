@@ -7,7 +7,8 @@ const generateHtmlPlugin = require('./webpack/plugins/html-webpack-plugin');
 
 const PATHS = {
   src: path.join(__dirname, '../src'),
-  dist: path.join(__dirname, '../app/build'),
+  build: path.join(__dirname, '../app/build'),
+  dist: path.join(__dirname, '../app/dist'),
   conf: path.join(__dirname, '.'),
 };
 

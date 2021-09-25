@@ -1,9 +1,5 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-const regExps = require('../regExps');
-
-const { cssModules } = regExps;
-
 module.exports = function (mode, resourcesPath) {
   function getLoaders(cssOptions) {
     return [

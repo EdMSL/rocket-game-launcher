@@ -40,7 +40,7 @@ export const createWindow = (systemConfig: ISystemRootState): void => {
   });
 
   if (process.env.NODE_ENV === 'production') {
-    mainWindow.loadFile('./build/index.html');
+    mainWindow.loadFile('./dist/index.html');
   } else {
     const waitForWebpackDevServer = createWaitForWebpackDevServer(mainWindow);
     waitForWebpackDevServer();

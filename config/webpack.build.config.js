@@ -1,7 +1,7 @@
 const path = require('path');
 const { merge } = require('webpack-merge');
-const CssExtractPlugin = require('./webpack/plugins/mini-css-extract-plugin');
 
+const CssExtractPlugin = require('./webpack/plugins/mini-css-extract-plugin');
 const css = require('./webpack/rules/css');
 const baseWebpackConfig = require('./webpack.base.config');
 
@@ -9,7 +9,7 @@ const plugins = [
   CssExtractPlugin(),
 ];
 
-const buildWebpackConfig = (env) => {
+const buildWebpackConfig = (env, isRelease) => {
   const MAIN = !!(env && env.main);
 
   return merge([
@@ -20,7 +20,7 @@ const buildWebpackConfig = (env) => {
         ? path.resolve(`${baseWebpackConfig.externals.paths.src}/main/main.ts`)
         : path.resolve(`${baseWebpackConfig.externals.paths.src}/renderer/renderer.tsx`),
       output: {
-        path: `${baseWebpackConfig.externals.paths.dist}`,
+        path: `${baseWebpackConfig.externals.paths[isRelease ? 'dist' : 'build']}`,
         filename: MAIN ? 'index.js' : 'renderer.js',
       },
       target: MAIN ? 'electron-main' : 'electron-renderer',
