@@ -171,6 +171,7 @@ function* getDataFromMOIniSaga(): SagaIterator<string> {
     const {
       system: {
         modOrganizer: {
+          version,
           pathToINI,
           profileSection,
           profileParam,
@@ -186,27 +187,31 @@ function* getDataFromMOIniSaga(): SagaIterator<string> {
 
     const currentMOProfileIniSection = iniData.getSection(profileSection);
 
-    //TODO Возможно имеет смысл перейти на зависимость от версии МО
     if (currentMOProfileIniSection) {
       const profileName = currentMOProfileIniSection.getValue(profileParam);
 
       if (profileName) {
-        let name = profileName;
-
+        ///TODO Обработать случай для кастомного regexp
         if (profileParamValueRegExp) {
           const result = profileName.match(new RegExp(profileParamValueRegExp)) || [];
 
           if (result.length > 0) {
             // eslint-disable-next-line prefer-destructuring
-            name = result[1];
-          } else {
-            throw new CustomError('profileParamValueRegExp');
+            return result[1];
           }
+
+          throw new CustomError('profileParamValueRegExp');
         }
 
-        yield put(setMoProfile(name.toString()));// Если вдруг будет число
+        if (version === 1) {
+          return profileName.toString();
+        }
 
-        return name.toString();
+        if (version === 2) {
+          return profileName.match(/@ByteArray\((.+)\)/)![1];
+        }
+
+        return profileName.toString();
       }
 
       throw new CustomError('profileName');

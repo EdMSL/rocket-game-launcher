@@ -30,7 +30,7 @@ import {
 import { Scope } from '$constants/misc';
 import { checkConfigFileData } from '$utils/check';
 import { getObjectAsList, getPathToFile } from '$utils/strings';
-import { getUserThemes } from '$utils/data';
+import { getNewModOrganizerParams, getUserThemes } from '$utils/data';
 import { INITIAL_STATE as mainInitialState } from '$reducers/main';
 import { INITIAL_STATE as systemInitialState } from '$reducers/system';
 import { INITIAL_STATE as userSettingsInitialState } from '$reducers/userSettings';
@@ -139,8 +139,6 @@ export const createStorage = (): Store<IAppState> => {
     },
   });
 
-  const customPaths = createCustomPaths(configurationData);
-
   const userSettingsStorage = storage.get('userSettings');
 
   const userThemes = getUserThemes(getUserThemesFolders());
@@ -155,6 +153,15 @@ export const createStorage = (): Store<IAppState> => {
     //@ts-ignore
     userSettingsStorage.theme = '';
   }
+
+  if (configurationData.modOrganizer.isUsed) {
+    const newModOrganizerParams = getNewModOrganizerParams(configurationData.modOrganizer);
+
+    //@ts-ignore
+    configurationData.modOrganizer = newModOrganizerParams;
+  }
+
+  const customPaths = createCustomPaths(configurationData);
 
   configurationData.playButton.path = getPathToFile(
     configurationData.playButton.path,
@@ -184,6 +191,10 @@ export const createStorage = (): Store<IAppState> => {
     system: {
       ...systemInitialState,
       ...configurationData,
+      modOrganizer: {
+        ...systemInitialState.modOrganizer,
+        ...configurationData.modOrganizer,
+      },
       customPaths: { ...customPaths },
     },
     main: {

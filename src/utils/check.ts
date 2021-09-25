@@ -33,17 +33,14 @@ const configFileDataSchema = Joi.object({
   width: Joi.number().optional().default(defaultLauncherConfig.width),
   height: Joi.number().optional().default(defaultLauncherConfig.height),
   modOrganizer: {
-    isUsed: Joi.bool().optional().default(defaultLauncherConfig.modOrganizer.isUsed),
-    path: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.path).pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
-    pathToINI: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToINI).pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
-    pathToProfiles: Joi.string().optional().default(
-      defaultLauncherConfig.modOrganizer.pathToProfiles,
-    ).pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
-    profileSection: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.profileSection),
-    profileParam: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.profileParam),
-    profileParamValueRegExp: Joi.string().optional().allow('').default(
-      defaultLauncherConfig.modOrganizer.profileParamValueRegExp,
-    ),
+    isUsed: Joi.bool().optional(),
+    version: Joi.number().valid(1, 2).required(),
+    path: Joi.string().optional().pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
+    pathToINI: Joi.string().optional().pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
+    pathToProfiles: Joi.string().optional().pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
+    profileSection: Joi.string().optional(),
+    profileParam: Joi.string().optional(),
+    profileParamValueRegExp: Joi.string().optional().allow(''),
   },
   documentsPath: Joi.string().optional().allow('').default(defaultLauncherConfig.documentsPath)
     .pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),

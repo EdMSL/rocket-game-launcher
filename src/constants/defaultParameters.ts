@@ -2,7 +2,7 @@ import {
   IError,
   ISuccess,
 } from '$types/common';
-import { ISystemRootState } from '$types/system';
+import { IModOrganizerParams, ISystemRootState } from '$types/system';
 
 export const SUCCESS_STATUS: ISuccess = 'success';
 export const ERROR_STATUS: IError = 'error';
@@ -13,8 +13,19 @@ export const defaultLauncherResolution = {
   height: 768,
   minWidth: 800,
   minHeight: 600,
-  maxWidth: 1280,
-  maxHeight: 1024,
+  maxWidth: 0,
+  maxHeight: 0,
+};
+
+export const defaultModOrganizerParams: IModOrganizerParams = {
+  isUsed: false,
+  version: 2,
+  path: 'Mod Organizer',
+  pathToINI: 'Mod Organizer\\ModOrganizer.ini',
+  pathToProfiles: 'Mod Organizer\\profiles',
+  profileSection: 'General',
+  profileParam: 'selected_profile',
+  profileParamValueRegExp: '',
 };
 
 export const defaultLauncherConfig: ISystemRootState = {
@@ -26,15 +37,7 @@ export const defaultLauncherConfig: ISystemRootState = {
   width: defaultLauncherResolution.width,
   height: defaultLauncherResolution.height,
   isFirstLaunch: true,
-  modOrganizer: {
-    isUsed: true,
-    path: 'Mod Organizer',
-    pathToINI: 'Mod Organizer\\ModOrganizer.ini',
-    pathToProfiles: 'Mod Organizer\\profiles',
-    profileSection: 'General',
-    profileParam: 'selected_profile',
-    profileParamValueRegExp: '',
-  },
+  modOrganizer: defaultModOrganizerParams,
   documentsPath: '',
   customPaths: {},
   playButton: {

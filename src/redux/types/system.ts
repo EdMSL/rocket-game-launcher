@@ -2,8 +2,9 @@ export const SYSTEM_TYPES = {
   SET_IS_FIRST_LAUNCH: 'SET_IS_FIRST_LAUNCH',
 };
 
-interface IModOrganizerParams {
+export interface IModOrganizerParams {
   isUsed: boolean,
+  version: number,
   path: string,
   pathToINI: string,
   pathToProfiles: string,

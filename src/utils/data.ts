@@ -28,6 +28,8 @@ import { IUserMessage } from '$types/main';
 import { ISelectOption } from '$components/UI/Select';
 import { IIncorrectGameSettingsFiles } from '$sagas/gameSettings';
 import { DefaultCustomPath } from '$constants/paths';
+import { IModOrganizerParams } from '$types/system';
+import { defaultModOrganizerParams } from '$constants/defaultParameters';
 
 const ONE_GB = 1073741824;
 const SYMBOLS_TO_TYPE = 8;
@@ -488,5 +490,27 @@ export const getUserThemes = (themesFolders: string[]): { [key: string]: string,
   return {
     '': 'default',
     ...themesObjects,
+  };
+};
+
+/**
+ * Получить параметры Mod Organizer c учетом данных из config.json.
+ * @param data Данные из секции modOrganizer файлф config.json.
+ * @returns Объект с данными Mod Organizer.
+*/
+export const getNewModOrganizerParams = (data: IModOrganizerParams): IModOrganizerParams => {
+  if (data.path) {
+    return {
+      ...defaultModOrganizerParams,
+      ...data,
+      path: data.path,
+      pathToINI: data.pathToINI || defaultModOrganizerParams.pathToINI.replace(defaultModOrganizerParams.path, data.path),
+      pathToProfiles: data.pathToProfiles || defaultModOrganizerParams.pathToProfiles.replace(defaultModOrganizerParams.path, data.path),
+    };
+  }
+
+  return {
+    ...defaultModOrganizerParams,
+    ...data,
   };
 };

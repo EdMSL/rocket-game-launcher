@@ -8,12 +8,9 @@
   "maxHeight": 0,
   "modOrganizer": {
     "isUsed": true,
-    "path": "Mod Organizer",
-    "pathToINI": "Mod Organizer\\ModOrganizer.ini",
-    "pathToProfiles": "Mod Organizer\\profiles",
-    "profileSection": "General",
-    "profileParam": "selected_profile",
-    "profileParamValueRegExp": ""
+    "version": 2,
+    "path": "MO2",
+    "pathToINI": "MO3\\ModOrganizer.ini"
   },
   "documentsPath": "My Games\\Oblivion",
   "isFirstLaunch": false,
