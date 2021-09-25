@@ -40,5 +40,13 @@ bundleElectronApp(process.argv[2])
       path.resolve('./app/files/default_settings.json'),
       path.resolve(data[0], 'settings.json'),
     );
+    fs.copyFileSync(
+      './app/files/custom_styles.css',
+      path.resolve(data[0], 'themes', 'custom_styles.css'),
+    );
+    fs.copyFileSync(
+      './src/images/background.png',
+      path.resolve(data[0], 'themes', 'background.png'),
+    );
   }).catch((error) => console.log(error.message));
 
