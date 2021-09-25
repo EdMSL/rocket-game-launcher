@@ -414,10 +414,6 @@ export function* generateGameSettingsOptionsSaga(
       });
     }
 
-    if (Object.keys(totalGameSettingsOptions).length === 0) {
-      yield put(addMessages([CreateUserMessage.error('Нет доступных настроек для вывода.')]));
-    }
-
     return {
       totalGameSettingsOptions,
       incorrectGameSettingsFiles,
@@ -486,6 +482,11 @@ export function* initGameSettingsSaga(): SagaIterator {
     ) {
       yield put(addMessages([CreateUserMessage.warning('Обнаружены ошибки в файле игровых настроек settings.json. Некоторые настройки будут недоступны. Подробности в файле лога.')])); //eslint-disable-line max-len
     }
+
+    if (Object.keys(totalGameSettingsOptions).length === 0) {
+      yield put(addMessages([CreateUserMessage.error('Нет доступных настроек для вывода.')]));
+    }
+
     yield put(setGameSettingsOptions(totalGameSettingsOptions));
     yield put(setGameSettingsFiles(newGameSettingsFilesObj));
 
@@ -528,7 +529,10 @@ function* changeMOProfileSaga(
       gameSettings: { gameSettingsFiles, gameSettingsOptions },
       system: {
         modOrganizer: {
-          pathToINI, profileSection, profileParam,
+          pathToINI,
+          profileSection,
+          profileParam,
+          version,
         },
       },
     }: IAppState = yield select(getState);
@@ -542,7 +546,8 @@ function* changeMOProfileSaga(
       iniData,
       profileSection,
       profileParam,
-      moProfile,
+      ///TODO Переделать на поддержку кастомного RegExp
+      version === 1 ? moProfile : `@ByteArray(${moProfile})`,
     );
 
     yield call(
