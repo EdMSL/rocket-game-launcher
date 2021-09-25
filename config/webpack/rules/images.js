@@ -6,7 +6,7 @@ module.exports = function () {
           test: /\.(png|jpe?g|svg)$/,
           type: 'asset',
           generator: {
-            filename: 'images/[name].[ext]',
+            filename: 'images/[name][ext]',
             publicPath: '../',
           },
           parser: {

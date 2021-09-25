@@ -90,7 +90,7 @@ export const MainScreen: React.FC = () => {
         {
           appButtons.map((button) => (
             <Button
-              key={button.path}
+              key={button.id}
               className={classNames('main-btn', 'control-panel__btn')}
               btnPath={button.path}
               btnArgs={button.args}

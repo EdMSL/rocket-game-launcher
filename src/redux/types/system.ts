@@ -20,6 +20,7 @@ interface ILauncherAppButton {
 }
 
 interface ILauncherCustomButton extends ILauncherAppButton {
+  id: string,
   action: string,
 }
 
