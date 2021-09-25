@@ -9,12 +9,29 @@ export const ERROR_STATUS: IError = 'error';
 export const WARNING_STATUS = 'warning';
 
 export const defaultLauncherResolution = {
-  width: 1024,
-  height: 768,
-  minWidth: 800,
-  minHeight: 600,
+  width: 800,
+  height: 600,
+  minWidth: 0,
+  minHeight: 0,
   maxWidth: 0,
   maxHeight: 0,
+};
+
+export const minimalLauncherConfig = {
+  isResizable: false,
+  width: defaultLauncherResolution.width,
+  height: defaultLauncherResolution.height,
+  modOrganizer: {
+    isUsed: false,
+  },
+  documentsPath: 'My Games\\Oblivion',
+  isFirstLaunch: true,
+  customPaths: {},
+  playButton: {
+    path: '%GAME_DIR%\\Oblivion.exe',
+    label: 'Играть',
+  },
+  customButtons: [],
 };
 
 export const defaultModOrganizerParams: IModOrganizerParams = {

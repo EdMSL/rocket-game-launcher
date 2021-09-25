@@ -4,7 +4,7 @@ import path from 'path';
 
 import { configureStore, IAppState } from '$store/store';
 import { IUserSettingsRootState } from '$types/userSettings';
-import { defaultLauncherConfig } from '$constants/defaultParameters';
+import { defaultLauncherConfig, minimalLauncherConfig } from '$constants/defaultParameters';
 import {
   LogMessageType,
   writeToLogFile,
@@ -74,7 +74,7 @@ const getConfigurationData = (): ISystemRootState => {
           'warning',
         );
 
-        writeJSONFile(CONFIG_FILE_PATH, defaultLauncherConfig)
+        writeJSONFile(CONFIG_FILE_PATH, minimalLauncherConfig)
           .then(() => {
             writeToLogFile('New config file config.json successfully created.');
           })
