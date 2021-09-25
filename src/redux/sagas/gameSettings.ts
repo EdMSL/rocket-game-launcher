@@ -454,7 +454,9 @@ export function* initGameSettingsSaga(): SagaIterator {
 
     if (isMOUsed) {
       yield call(getMOProfilesSaga);
+
       moProfile = yield call(getDataFromMOIniSaga);
+      yield put(setMoProfile(moProfile));
     }
 
     let newGameSettingsFilesObj: IUnwrapSync<typeof checkGameSettingsFiles> = yield call(
