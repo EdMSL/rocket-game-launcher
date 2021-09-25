@@ -18,7 +18,7 @@ async function bundleElectronApp(asar) {
       CompanyName: 'OA Team',
       ProductName: 'Rubicon Game Launcher',
       InternalName: 'rubicon',
-      FileDescription: 'Launcher for TES4: Oblivion game and game builds with it',
+      FileDescription: 'Rubicon Game Launcher',
       'requested-execution-level': 'requireAdministrator',
     },
   });

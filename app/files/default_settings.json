@@ -8,7 +8,6 @@
       "parameters": [
         {
           "parameterType": "combined",
-          "settingGroup": "Graphic",
           "label": "Разрешение экрана",
           "description": "Устанавливает разрешение экрана",
           "controllerType": "select",
