@@ -23,6 +23,11 @@
   overflow: hidden;
 
   color: var(--text-main);
+
+  background-image: var(--bg-image);
+  background-repeat: no-repeat;
+  background-position: top left;
+  background-size: cover;
 }
 
 .control-panel {

@@ -1,11 +1,13 @@
 :root {
   --bg-color: hsl(0, 0%, 15%);
-  --overlay-color: hsla(0, 0%, 0%, 0.5);
+  --overlay-color: hsla(0, 0%, 0%, 0.3);
   --text-main: hsl(0, 0%, 90%);
   --text-secondary: hsl(0, 0%, 20%);
   --border-color: hsla(0, 0%, 0%, 0.2);
   --btn-color: hsl(0, 0%, 90%);
   --hover-color: hsl(199, 100%, 50%);
-  --focus-color: hsl(199, 100%, 30%);
+  --focus-color: hsl(199, 100%, 50%);
   --disabled-color: hsl(0, 0%, 45%);
+  --bg-image: url("~$images/background.png");
+
 }

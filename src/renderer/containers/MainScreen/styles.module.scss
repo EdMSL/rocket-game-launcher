@@ -1,9 +1,17 @@
 .main-screen__main {
-  color: inherit;
+  flex-direction: row;
 }
 
 .main-screen__control-panel {
-  color: inherit;
+  align-self: stretch;
+  justify-content: center;
+  padding: 20px;
+
+  background-color: var(--overlay-color);
+
+  & .control-panel__btn {
+    margin-bottom: 10px;
+  }
 }
 
 .main-screen__content {
