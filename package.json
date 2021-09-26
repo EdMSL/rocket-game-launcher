@@ -1,11 +1,11 @@
 {
-  "name": "rubicon",
+  "name": "rocket",
   "version": "0.0.1",
-  "description": "Launcher for TES4:Oblivion and game builds based on it",
+  "description": "A program for launching games and managing game builds based on them ",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/EdMSL/rubicon.git"
+    "url": "git+https://github.com/EdMSL/rocket.git"
   },
   "private": true,
   "author": "Eduard Trayt <eduard2011rus@gmail.com> (https://github.com/EdMSL)",

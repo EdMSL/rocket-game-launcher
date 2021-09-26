@@ -1,7 +1,7 @@
 {
-  "name": "rubicon",
+  "name": "rocket",
   "version": "1.0.0",
-  "description": "Launcher for TES4: Oblivion game and game builds with it",
+  "description": "A program for launching games and managing game builds based on them",
   "main": "./dist/index.js",
   "author": "Eduard Trayt <eduard2011rus@gmail.com> (https://github.com/EdMSL)",
   "license": "MIT"

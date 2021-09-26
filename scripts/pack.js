@@ -8,7 +8,7 @@ async function bundleElectronApp(asar) {
     arch: 'ia32',
     platform: 'win32',
     out: './app/release',
-    appBundleId: 'Rubicon',
+    appBundleId: 'Rocket',
     overwrite: true,
     prune: true,
     icon: 'src/public/icon.ico',
@@ -16,9 +16,9 @@ async function bundleElectronApp(asar) {
     asar: Boolean(asar),
     win32metadata: {
       CompanyName: 'OA Team',
-      ProductName: 'Rubicon Game Launcher',
-      InternalName: 'rubicon',
-      FileDescription: 'Rubicon Game Launcher',
+      ProductName: 'Rocket Game Launcher',
+      InternalName: 'rocket',
+      FileDescription: 'Rocket Game Launcher',
       'requested-execution-level': 'requireAdministrator',
     },
   });

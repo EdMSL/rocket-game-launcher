@@ -43,7 +43,7 @@ export const Header: React.FunctionComponent = () => {
         src={launcherIcon}
         alt="game logo"
       />
-      <p className={styles.header__title}>Rubicon Launcher</p>
+      <p className={styles.header__title}>Rocket Game Launcher</p>
       <div className={styles.header__controls}>
         <Button
           tabIndex={-1}
