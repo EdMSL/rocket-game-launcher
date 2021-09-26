@@ -410,5 +410,5 @@
   border-top-color: transparent;
   border-radius: 50%;
 
-  animation: $rotate-animation;
+  animation: var(--animation-rotate);
 }

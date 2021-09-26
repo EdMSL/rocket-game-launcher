@@ -124,10 +124,10 @@ export const MainScreen: React.FC = () => {
           )
         }
         <Button
-          className={classNames('main-btn', 'control-panel__btn')}
+          className={classNames('main-btn', styles['main-screen__launcher-settings-btn'])}
           onClick={onLauncherSettingsBtnClick}
         >
-          Настройки лаунчера
+          Настройки программы
         </Button>
       </div>
       {
