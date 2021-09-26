@@ -40,34 +40,37 @@ export const Header: React.FunctionComponent = () => {
   return (
     <header
       className={styles.header}
-      ref={(el) => {
-        if (el) {
-          el.style.setProperty('-webkit-app-region', 'drag', 'important');
-        }
-      }}
     >
-      <div className={styles['header__logo-block']}>
-        <img
-          className={styles.header__logo}
-          src={launcherIcon}
-          alt="game logo"
-        />
-        <p className={styles.header__title}>Rocket Game Launcher</p>
-      </div>
-      {
+      <div
+        className={styles.header__wrapper}
+        ref={(el) => {
+          if (el) {
+            el.style.setProperty('-webkit-app-region', 'drag', 'important');
+          }
+        }}
+      >
+        <div className={styles['header__logo-block']}>
+          <img
+            className={styles.header__logo}
+            src={launcherIcon}
+            alt="game logo"
+          />
+          <p className={styles.header__title}>Rocket Game Launcher</p>
+        </div>
+        {
         gameName
           && <p className={styles['header__game-name']}>{gameName}</p>
 
       }
-      <div className={styles.header__controls}>
-        <Button
-          tabIndex={-1}
-          className={classNames(styles.header__btn, styles['header__btn--fold'])}
-          onClick={onMinimizeAppClick}
-        >
-          <span className={styles['header__btn-text']}>Fold</span>
-        </Button>
-        {
+        <div className={styles.header__controls}>
+          <Button
+            tabIndex={-1}
+            className={classNames(styles.header__btn, styles['header__btn--fold'])}
+            onClick={onMinimizeAppClick}
+          >
+            <span className={styles['header__btn-text']}>Fold</span>
+          </Button>
+          {
           isResizable && (
             <Button
               tabIndex={-1}
@@ -83,13 +86,14 @@ export const Header: React.FunctionComponent = () => {
             </Button>
           )
         }
-        <Button
-          tabIndex={-1}
-          className={classNames(styles.header__btn, styles['header__btn--close'])}
-          onClick={onCloseAppClick}
-        >
-          <span className={styles['header__btn-text']}>Close</span>
-        </Button>
+          <Button
+            tabIndex={-1}
+            className={classNames(styles.header__btn, styles['header__btn--close'])}
+            onClick={onCloseAppClick}
+          >
+            <span className={styles['header__btn-text']}>Close</span>
+          </Button>
+        </div>
       </div>
     </header>
   );

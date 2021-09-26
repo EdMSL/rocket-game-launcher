@@ -1,9 +1,18 @@
 $icon-size: 24px;
 
-header {
+.header {
   position: relative;
   z-index: 1000;
 
+  padding: 1px;
+  padding-bottom: 0;
+
+  background-color: var(--text-secondary);
+
+  user-select: none;
+}
+
+.header__wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -12,10 +21,6 @@ header {
   padding-left: 10px;
 
   color: var(--text-main);
-
-  background-color: var(--text-secondary);
-
-  user-select: none;
 }
 
 .header__logo-block {
