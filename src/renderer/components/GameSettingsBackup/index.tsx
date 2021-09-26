@@ -147,7 +147,7 @@ export const GameSettingsBackup: React.FC<IProps> = ({
                           <ul className={styles['game-settings-backup__item-list']}>
                             <li className={styles['game-settings-backup__file']}>
                               <Checkbox
-                                classNameCheckbox={styles.setting__checkbox}
+                                className={styles['game-settings-backup__checkbox-block']}
                                 id={`selectall-${backupFolder.name}`}
                                 label="Выбрать все"
                                 isChecked={(
@@ -165,7 +165,6 @@ export const GameSettingsBackup: React.FC<IProps> = ({
                                 >
                                   <Checkbox
                                     className={styles['game-settings-backup__checkbox-block']}
-                                    classNameCheckbox={styles['game-settings-backup__checkbox']}
                                     id={`${backupFolder.name}&${file.name}`}
                                     label={file.name}
                                     isChecked={(selectedBackupFiles[backupFolder.name]

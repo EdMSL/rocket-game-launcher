@@ -32,13 +32,34 @@
 
 .control-panel__btn {
   display: inline-block;
-  padding: 4px 8px;
+  padding: 10px 18px;
 
-  color: var(--text-secondary);
   text-align: center;
   text-decoration: none;
 
   &--active {
-    background-color: var(--focus-color);
+    background-color: var(--active-color);
+
+    &:hover {
+      background-color: var(--active-color);
+    }
   }
+
+  &--disabled {
+    color: var(--disabled-text-color);
+
+    background-color: var(--disabled-color);
+
+    cursor: default;
+
+    &:hover,
+    &:focus {
+      background-color: var(--disabled-color);
+      outline: none;
+    }
+  }
+}
+
+.control-panel__btn-text {
+  color: inherit;
 }

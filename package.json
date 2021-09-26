@@ -1,6 +1,6 @@
 {
-  "name": "rocket",
-  "version": "0.0.1",
+  "name": "rocket-game-launcher",
+  "version": "1.0.0",
   "description": "A program for launching games and managing game builds based on them ",
   "main": "index.js",
   "repository": {

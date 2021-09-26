@@ -1,13 +1,15 @@
 .button {
   @include reset-indents;
   font: inherit;
-  color: var(--text-secondary);
+  color: var(--text-main);
   text-decoration: none;
 
   background-color: transparent;
   border: none;
   outline: none;
   cursor: pointer;
+
+  user-select: none;
 }
 
 .main-btn {
@@ -23,6 +25,14 @@
     outline: 2px solid var(--focus-color);
     outline-offset: -2px;
   }
+
+  &:disabled {
+    color: var(--disabled-text-color);
+
+    background-color: var(--disabled-color);
+
+    cursor: default;
+  }
 }
 
 .checkbox__container {
@@ -30,41 +40,49 @@
 
   display: flex;
   align-items: center;
-  padding-right: 30px;
 }
 
 .checkbox__label {
   flex-grow: 1;
   display: flex;
   align-items: center;
+  padding-right: 30px;
 
   cursor: pointer;
+
+  user-select: none;
 
   &::before {
     content: "";
     position: absolute;
-    top: 0;
-    right: 20px;
+    top: calc(50% - 10px);
+    right: 0;
 
     display: block;
-    width: 16px;
-    height: 16px;
+    box-sizing: border-box;
+    width: 20px;
+    height: 20px;
 
-    border: 1px solid $focus-color;
+    border: 1px solid var(--text-main);
     border-radius: 3px;
   }
 
   &::after {
     content: "";
     position: absolute;
-    top: 5px;
-    right: 25px;
+    top: calc(50% - 3px);
+    right: 7px;
 
     display: none;
     width: 6px;
     height: 6px;
 
-    background-color: $focus-color;
+    background-color: var(--text-main);
+    border-radius: 2px;
+  }
+
+  .checkbox__input:focus + &::before {
+    @include focus;
   }
 
   .checkbox__input:checked + &::after {
@@ -77,25 +95,28 @@
   align-items: center;
 }
 
-.range__controls {
-  align-self: stretch;
-  display: flex;
-  align-items: center;
-  width: 50%;
-}
-
 .range__label,
 .range__value {
   margin: 0;
 }
 
+.range__controls {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  min-width: 50%;
+}
+
 .range__label {
+  display: flex;
+  align-items: center;
   width: 30%;
   margin-right: 10px;
 }
 
 .range__input {
-  flex-grow: 2;
+  flex-grow: 6;
+  min-width: 10%;
 
   margin: 0 10px;
 
@@ -130,7 +151,7 @@
     outline: none;
 
     &::-webkit-slider-thumb {
-      border-color: $focus-color;
+      @include focus;
     }
   }
 }
@@ -143,13 +164,17 @@
 
   background-repeat: no-repeat;
   background-position: center center;
-  background-size: 40% 40%;
+  background-size: 18px 18px;
+
+  &:focus {
+    @include focus;
+  }
 
   &--decrease {
     background-image:
       url(
         'data:image/svg+xml,\
-    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="red"><path d="M368 272H144c-8.832 0-16-7.168-16-16s7.168-16 16-16h224c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"/><path d="M453.332 512H58.668C26.305 512 0 485.695 0 453.332V58.668C0 26.305 26.305 0 58.668 0h394.664C485.695 0 512 26.305 512 58.668v394.664C512 485.695 485.695 512 453.332 512zM58.668 32C43.968 32 32 43.969 32 58.668v394.664C32 468.032 43.969 480 58.668 480h394.664c14.7 0 26.668-11.969 26.668-26.668V58.668C480 43.968 468.031 32 453.332 32zm0 0" /></svg>'
+    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="rgb(230, 230, 230)"><path d="M368 272H144c-8.832 0-16-7.168-16-16s7.168-16 16-16h224c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"/><path d="M453.332 512H58.668C26.305 512 0 485.695 0 453.332V58.668C0 26.305 26.305 0 58.668 0h394.664C485.695 0 512 26.305 512 58.668v394.664C512 485.695 485.695 512 453.332 512zM58.668 32C43.968 32 32 43.969 32 58.668v394.664C32 468.032 43.969 480 58.668 480h394.664c14.7 0 26.668-11.969 26.668-26.668V58.668C480 43.968 468.031 32 453.332 32zm0 0" /></svg>'
       );
   }
 
@@ -157,7 +182,7 @@
     background-image:
       url(
         'data:image/svg+xml,\
-    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="red"><path d="M368 272H144c-8.832 0-16-7.168-16-16s7.168-16 16-16h224c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"/><path d="M256 384c-8.832 0-16-7.168-16-16V144c0-8.832 7.168-16 16-16s16 7.168 16 16v224c0 8.832-7.168 16-16 16zm0 0"/><path d="M453.332 512H58.668C26.305 512 0 485.695 0 453.332V58.668C0 26.305 26.305 0 58.668 0h394.664C485.695 0 512 26.305 512 58.668v394.664C512 485.695 485.695 512 453.332 512zM58.668 32C43.968 32 32 43.969 32 58.668v394.664C32 468.032 43.969 480 58.668 480h394.664c14.7 0 26.668-11.969 26.668-26.668V58.668C480 43.968 468.031 32 453.332 32zm0 0"/></svg>'
+    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="rgb(230, 230, 230)"><path d="M368 272H144c-8.832 0-16-7.168-16-16s7.168-16 16-16h224c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"/><path d="M256 384c-8.832 0-16-7.168-16-16V144c0-8.832 7.168-16 16-16s16 7.168 16 16v224c0 8.832-7.168 16-16 16zm0 0"/><path d="M453.332 512H58.668C26.305 512 0 485.695 0 453.332V58.668C0 26.305 26.305 0 58.668 0h394.664C485.695 0 512 26.305 512 58.668v394.664C512 485.695 485.695 512 453.332 512zM58.668 32C43.968 32 32 43.969 32 58.668v394.664C32 468.032 43.969 480 58.668 480h394.664c14.7 0 26.668-11.969 26.668-26.668V58.668C480 43.968 468.031 32 453.332 32zm0 0"/></svg>'
       );
   }
 }
@@ -190,11 +215,11 @@
 }
 
 .select__label-text {
-  color: inherit;
+  user-select: none;
 }
 
 .select__input {
-  width: 250px;
+  min-width: 240px;
   padding: 12px;
 
   color: var(--text-secondary);
@@ -204,6 +229,8 @@
   outline: none;
 
   cursor: pointer;
+
+  user-select: none;
 
   &:hover {
     outline: 1px solid var(--border-color);
@@ -216,7 +243,7 @@
   }
 
   &:focus {
-    border-color: $focus-color;
+    @include focus;
   }
 
   &:disabled,
@@ -318,12 +345,14 @@
   flex-direction: column;
   max-height: 100%;
 
-  background-color: var(bg-color);
+  background-color: var(--bg-color);
 }
 
 .modal__header {
   display: flex;
   justify-content: flex-end;
+
+  background-color: var(--text-secondary);
 }
 
 .modal__content {
@@ -340,9 +369,27 @@
 }
 
 .modal__btn {
-  padding: 10px 16px;
+  padding: 16px;
+  /* stylelint-disable string-no-newline, max-line-length */
+  background-image:
+    url(
+      'data:image/svg+xml,\
+  <svg height="16" width="16" viewBox="0 0 413.348 413.348" xmlns="http://www.w3.org/2000/svg">\
+  <path fill="rgb(251, 251, 254)" d="M413.348 24.354L388.994 0l-182.32 182.32L24.354 0 0 24.354l182.32 182.32L0 388.994l24.354 24.354 182.32-182.32 182.32 182.32 24.354-24.354-182.32-182.32z"/>\
+  </svg>'
+    );
+  /* stylelint-enable string-no-newline, max-line-length */
+  background-repeat: no-repeat;
+  background-position: center;
 
-  background-color: var(--border-color);
+  &--close:hover,
+  &--close:focus {
+    background-color: var(--header-btn-close-color);
+  }
+}
+
+.modal__btn .modal__btn-text {
+  display: none;
 }
 
 .loader__wrapper {

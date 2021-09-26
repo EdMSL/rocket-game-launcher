@@ -9,8 +9,7 @@
   "modOrganizer": {
     "isUsed": true,
     "version": 2,
-    "path": "MO2",
-    "pathToINI": "MO3\\ModOrganizer.ini"
+    "path": "MO2"
   },
   "documentsPath": "My Games\\Oblivion",
   "isFirstLaunch": false,

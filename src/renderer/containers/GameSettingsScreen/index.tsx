@@ -122,7 +122,9 @@ export const GameSettingsScreen: React.FC = () => {
               activeClassName="control-panel__btn--active"
               to={`${Routes.GAME_SETTINGS_SCREEN}/${group.name}`}
             >
-              {group.label}
+              <span className={classNames('control-panel__btn-text')}>
+                {group.label}
+              </span>
             </NavLink>
           ))
             }
@@ -131,7 +133,9 @@ export const GameSettingsScreen: React.FC = () => {
           to={Routes.MAIN_SCREEN}
           className={classNames('button', 'main-btn', 'control-panel__btn')}
         >
-          Назад
+          <span className={classNames('control-panel__btn-text')}>
+            Назад
+          </span>
         </NavLink>
       </div>
       <div className={styles['game-settings-screen__content']}>
@@ -146,7 +150,7 @@ export const GameSettingsScreen: React.FC = () => {
             <Select
               className={styles['game-settings-screen__select']}
               id="profiles-select"
-              label="Выберите профиль Mod Organizer"
+              label="Профиль Mod Organizer"
               value={moProfile}
               optionsArr={generateSelectOptions(moProfiles)}
               onChange={onMOProfilesSelectChange}

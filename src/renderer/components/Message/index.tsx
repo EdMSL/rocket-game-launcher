@@ -26,7 +26,12 @@ export const Message: React.FC<IProps> = ({ message }) => {
 
   return (
     <li
-      className={styles.message}
+      className={classNames(
+        styles.message,
+        message.type === 'error' && styles['message--error'],
+        message.type === 'warning' && styles['message--warning'],
+        message.type === 'success' && styles['message--success'],
+      )}
     >
       <div className={styles.message__header}>
         <Button

@@ -16,7 +16,7 @@
   "baseFilesEncoding": "win1251",
   "gameSettingsFiles": {
     "OblivionIni": {
-      "path": ".\\src\\tests\\fixtures\\files\\oblivion.ini",
+      "path": "%MO_PROFILES%\\oblivion.ini",
       "view": "sectional",
       "parameters": [
         {
@@ -56,7 +56,7 @@
       ]
     },
     "BlockheadIni": {
-      "path": ".\\src\\tests\\fixtures\\files\\Blockhead.ini",
+      "path": "%CUSTOM%\\Blockhead.ini",
       "view": "sectional",
       "parameters": [
         {
@@ -81,7 +81,7 @@
       ]
     },
     "MenuIni": {
-      "path": ".\\src\\tests\\fixtures\\files\\Menu.ini",
+      "path": "Data\\Ini\\DMS\\Menu.ini",
       "view": "line",
       "encoding": "utf-8",
       "parameters": [
@@ -99,7 +99,7 @@
       ]
     },
     "OblivionReloaded": {
-      "path": ".\\src\\tests\\fixtures\\files\\OblivionReloaded.dll.config",
+      "path": "%CUSTOM%\\OblivionReloaded.dll.config",
       "view": "tag",
       "parameters": [
         {
@@ -116,7 +116,7 @@
       ]
     },
     "TQPIni": {
-      "path": ".\\src\\tests\\fixtures\\files\\TQP.ini",
+      "path": "Data\\Ini\\TQP.ini",
       "view": "line",
       "parameters": [
         {
@@ -148,7 +148,7 @@
       ]
     },
     "FormIDFinderIni": {
-      "path": ".\\src\\tests\\fixtures\\files\\formID Finder.ini",
+      "path": "Data\\Ini\\formID Finder.ini",
       "view": "line",
       "parameters": [
         {

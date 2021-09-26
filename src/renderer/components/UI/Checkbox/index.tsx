@@ -6,7 +6,6 @@ import { IUIElementProps } from '$types/gameSettings';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {
   isChecked: boolean,
-  classNameCheckbox?: string | null,
 }
 
 export const Checkbox: React.FunctionComponent<IProps> = ({

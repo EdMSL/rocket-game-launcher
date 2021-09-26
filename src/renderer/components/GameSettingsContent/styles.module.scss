@@ -2,6 +2,8 @@
   align-self: stretch;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  min-height: 40px;
   margin-bottom: 10px;
 
   user-select: none;
@@ -19,8 +21,24 @@
 
 .game-settings-content__subblock {
   display: flex;
+  justify-content: space-between;
+  min-width: 240px;
 }
 
 .game-settings-content__select {
   flex-direction: row;
+}
+
+.game-settings-content__subblock .select__container {
+  min-width: 45%;
+  margin-bottom: 0;
+}
+
+.game-settings-content__subblock .select__input {
+  width: 100%;
+  min-width: 0;
+}
+
+.game-settings-content__select .select__label {
+  margin-bottom: 0;
 }

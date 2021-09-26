@@ -19,37 +19,23 @@ export const Modal: React.FC<IProps> = ({
     className={classNames('modal', modalParentClassname && `${modalParentClassname}__modal`)}
     as="section"
   >
-    <div className={classNames(
-      'modal__overlay',
-      modalParentClassname && `${modalParentClassname}__modal-overlay`,
-    )}
-    />
-    <div className={classNames(
-      'modal__block',
-      modalParentClassname && `${modalParentClassname}__modal-block`,
-    )}
-    >
-      <div className={classNames(
-        'modal__header',
-        modalParentClassname && `${modalParentClassname}__modal-header`,
-      )}
-      >
+    <div className={classNames('modal__overlay')} />
+    <div className={classNames('modal__block')}>
+      <div className={classNames('modal__header')}>
         {
           onCloseBtnClick && (
             <Button
               className="modal__btn modal__btn--close"
               onClick={onCloseBtnClick}
             >
-              Закрыть
+              <span className="modal__btn-text">
+                Закрыть
+              </span>
             </Button>
           )
     }
       </div>
-      <div className={classNames(
-        'modal__content',
-        modalParentClassname && `${modalParentClassname}__modal-content`,
-      )}
-      >
+      <div className={classNames('modal__content')}>
         {children}
       </div>
     </div>

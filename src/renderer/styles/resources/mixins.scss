@@ -17,3 +17,8 @@
   line-height: 1.5;
   font-weight: 400;
 }
+
+@mixin focus {
+  outline: 2px solid var(--focus-color);
+  outline-offset: -2px;
+}

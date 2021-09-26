@@ -1,6 +1,7 @@
 .game-settings-form__buttons {
   display: flex;
   justify-content: center;
+  padding-right: var(--indent-side);
 }
 
 .game-settings-form__btn {
@@ -8,9 +9,5 @@
 
   &:last-child {
     margin-right: 0;
-  }
-
-  &:disabled {
-    background-color: var(--disabled-color);
   }
 }

@@ -3,7 +3,16 @@
 }
 
 .game-settings-screen__navigation {
-  color: inherit;
+  flex-direction: row;
+}
+
+.game-settings-screen__navigation .control-panel__btn {
+  flex-grow: 2;
+
+  &:last-child {
+    flex-grow: 1;
+    order: -1;
+  }
 }
 
 .game-settings-screen__content {
@@ -11,15 +20,33 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  padding: 10px 0;
+  padding: 10px 0 10px var(--indent-side);
 }
 
 .game-settings-screen__profiles {
-  margin-bottom: 30px;
+  position: relative;
+
+  margin-top: 20px;
+  margin-bottom: 40px;
+  padding-right: var(--indent-side);
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+
+    width: calc(100% - var(--indent-side));
+    height: 2px;
+
+    background-color: var(--text-main);
+  }
 }
 
 .game-settings-screen__select {
-  color: inherit;
+  flex-grow: 1;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .game-settings-screen__form {
@@ -30,31 +57,16 @@
 }
 
 .game-settings-screen__options {
-  flex-grow: 1;
   display: flex;
   flex-direction: column;
+  padding-right: var(--indent-side);
+  padding-bottom: 20px;
   overflow-y: auto;
 }
 
-.game-settings-screen__modal {
-  color: inherit;
-}
-
-.game-settings-screen__modal-overlay {
-  color: inherit;
-}
-
-.game-settings-screen__modal-block {
+.game-settings-screen__modal .modal__block {
   flex-grow: 1;
   min-width: 95%;
   min-height: 95%;
   max-height: 95%;
-}
-
-.game-settings-screen__modal-header {
-  color: inherit;
-}
-
-.game-settings-screen__modal-content {
-  color: inherit;
 }

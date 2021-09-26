@@ -43,6 +43,7 @@ export const LauncherSettings: React.FC<IProps> = ({
   return (
     <div className={styles['launcher-settings__container']}>
       <Select
+        className={styles['launcher-settings__item']}
         optionsArr={generateSelectOptions(userThemes)}
         id="user-themes"
         value={userTheme}
@@ -50,6 +51,7 @@ export const LauncherSettings: React.FC<IProps> = ({
         onChange={onUserThemeSelectChange}
       />
       <Switcher
+        className={styles['launcher-settings__item']}
         id="is-autoclose"
         label="Автозакрытие лаунчера при старте игры"
         isChecked={isAutoclose}

@@ -9,11 +9,11 @@ $icon-size: 24px;
   align-items: center;
   width: 100%;
   height: 40px;
-  padding: 0 10px;
+  padding-left: 10px;
 
-  color: var(--text-secondary);
+  color: var(--text-main);
 
-  background-color: var(--text-main);
+  background-color: var(--text-secondary);
 
   -webkit-app-region: drag;
 }
@@ -42,19 +42,23 @@ $icon-size: 24px;
 
 .header__btn {
   flex-grow: 1;
-  max-width: 30px;
+  width: 38px;
 
   background-repeat: no-repeat;
   background-position: center center;
-  background-size: 40% 40%;
+  background-size: 30% 30%;
   /* stylelint-disable string-no-newline, max-line-length */
+
+  &:hover {
+    background-color: var(--header-btn-color);
+  }
 
   &--fold {
     background-image:
       url(
         'data:image/svg+xml,\
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32.354 22.354">\
-      <rect y="8.61" width="32.354" height="4.133"/>\
+      <rect fill="rgb(251, 251, 254)" y="8.61" width="32.354" height="4.133"/>\
     </svg>'
       );
   }
@@ -63,7 +67,7 @@ $icon-size: 24px;
     background-image:
       url(
         'data:image/svg+xml,\
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">\
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="rgb(251, 251, 254)">\
     <path d="M432,0H80C35.888,0,0,35.888,0,80v352c0,44.112,35.888,80,80,80h352c44.112,0,80-35.888,80-80V80 C512,35.888,476.112,0,432,0z M472,432c0,22.056-17.944,40-40,40H80c-22.056, 0-40-17.944-40-40V80c0-22.056,17.944-40,40-40h352 c22.056,0,40,17.944,40,40V432z"/>\
     </svg>'
       );
@@ -73,7 +77,7 @@ $icon-size: 24px;
     background-image:
       url(
         'data:image/svg+xml,\
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 477.867 477.867">\
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 477.867 477.867" fill="rgb(251, 251, 254)">\
     <path d="M341.333,85.333H51.2c-28.277,0-51.2,22.923-51.2,51.2v290.133c0,28.277,22.923,51.2,51.2,51.2h290.133 c28.277,0,51.2-22.923,51.2-51.2V136.533C392.533,108.256,369.61,85.333,341.333,85.333z M358.4,426.667 c0,9.426-7.641,17.067-17.067,17.067H51.2c-9.426,0-17.067-7.641-17.067-17.067V136.533c0-9.426,7.641-17.067,17.067-17.067 h290.133c9.426,0,17.067,7.641,17.067,17.067V426.667z"/>\
     <path d="M426.667,0h-307.2c-28.277,0-51.2,22.923-51.2,51.2c0,9.426,7.641,17.067,17.067,17.067S102.4,60.626,102.4,51.2 s7.641-17.067,17.067-17.067h307.2c9.426,0,17.067,7.641,17.067,17.067v307.2c0,9.426-7.641,17.067-17.067,17.067 s-17.067,7.641-17.067,17.067s7.641,17.067,17.067,17.067c28.277,0,51.2-22.923,51.2-51.2V51.2 C477.867,22.923,454.944,0,426.667,0z"/>\
     </svg>'
@@ -85,9 +89,13 @@ $icon-size: 24px;
       url(
         'data:image/svg+xml,\
     <svg height="16" width="16" viewBox="0 0 413.348 413.348" xmlns="http://www.w3.org/2000/svg">\
-    <path d="M413.348 24.354L388.994 0l-182.32 182.32L24.354 0 0 24.354l182.32 182.32L0 388.994l24.354 24.354 182.32-182.32 182.32 182.32 24.354-24.354-182.32-182.32z"/>\
+    <path fill="rgb(251, 251, 254)" d="M413.348 24.354L388.994 0l-182.32 182.32L24.354 0 0 24.354l182.32 182.32L0 388.994l24.354 24.354 182.32-182.32 182.32 182.32 24.354-24.354-182.32-182.32z"/>\
     </svg>'
       );
+
+    &:hover {
+      background-color: var(--header-btn-close-color);
+    }
   }
   /* stylelint-enable string-no-newline, max-line-length */
 
