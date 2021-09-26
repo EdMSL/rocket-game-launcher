@@ -16,6 +16,7 @@
   "customPaths": {
     "%CUSTOM%": "Data\\OBSE\\Plugins"
   },
+  "gameName": "Oblivion Association",
   "playButton": {
     "path": "%GAME_DIR%\\Mod Organizer\\ModOrganizer.exe",
     "args": [

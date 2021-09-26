@@ -57,6 +57,7 @@ export const defaultLauncherConfig: ISystemRootState = {
   modOrganizer: defaultModOrganizerParams,
   documentsPath: '',
   customPaths: {},
+  gameName: '',
   playButton: {
     path: '',
     args: [],

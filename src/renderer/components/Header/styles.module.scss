@@ -1,6 +1,6 @@
 $icon-size: 24px;
 
-.header {
+header {
   position: relative;
   z-index: 1000;
 
@@ -15,7 +15,11 @@ $icon-size: 24px;
 
   background-color: var(--text-secondary);
 
-  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.header__logo-block {
+  display: flex;
 }
 
 .header__logo {
@@ -29,6 +33,12 @@ $icon-size: 24px;
   flex-grow: 1;
 
   font-size: 14px;
+}
+
+.header__game-name {
+  @include reset-indents;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .header__controls {

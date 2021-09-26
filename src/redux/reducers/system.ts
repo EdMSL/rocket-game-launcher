@@ -16,6 +16,7 @@ export const INITIAL_STATE: ISystemRootState = {
   modOrganizer: defaultLauncherConfig.modOrganizer,
   documentsPath: defaultLauncherConfig.documentsPath,
   customPaths: defaultLauncherConfig.customPaths,
+  gameName: defaultLauncherConfig.gameName,
   playButton: defaultLauncherConfig.playButton,
   customButtons: defaultLauncherConfig.customButtons,
 };

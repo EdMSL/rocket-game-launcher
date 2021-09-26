@@ -36,6 +36,7 @@ export type ISystemRootState = Readonly<{
   modOrganizer: IModOrganizerParams,
   documentsPath: string,
   customPaths: { [label: string]: string, },
+  gameName: string,
   playButton: ILauncherAppButton,
   customButtons: ILauncherCustomButton[],
 }>;

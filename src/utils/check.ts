@@ -49,6 +49,7 @@ const configFileDataSchema = Joi.object({
     Joi.string().pattern(CustomPathName.CUSTOM_NAME_REGEXP, 'custom path name').not(...Object.values(DefaultCustomPathName)),
     Joi.string(),
   ).optional().default(defaultLauncherConfig.customPaths),
+  gameName: Joi.string().optional().allow(''),
   playButton: Joi.object({
     path: Joi.string().required(),
     args: Joi.array().items(Joi.string()).optional().default([]),

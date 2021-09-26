@@ -13,6 +13,7 @@ const launcherIcon = require('$images/icon.png');
 
 export const Header: React.FunctionComponent = () => {
   const isResizable = useSelector((state: IAppState) => state.system.isResizable);
+  const gameName = useSelector((state: IAppState) => state.system.gameName);
 
   const [isMaximize, setIsMaximize] = useState(false);
 
@@ -37,13 +38,27 @@ export const Header: React.FunctionComponent = () => {
   }, []);
 
   return (
-    <header className={styles.header}>
-      <img
-        className={styles.header__logo}
-        src={launcherIcon}
-        alt="game logo"
-      />
-      <p className={styles.header__title}>Rocket Game Launcher</p>
+    <header
+      className={styles.header}
+      ref={(el) => {
+        if (el) {
+          el.style.setProperty('-webkit-app-region', 'drag', 'important');
+        }
+      }}
+    >
+      <div className={styles['header__logo-block']}>
+        <img
+          className={styles.header__logo}
+          src={launcherIcon}
+          alt="game logo"
+        />
+        <p className={styles.header__title}>Rocket Game Launcher</p>
+      </div>
+      {
+        gameName
+          && <p className={styles['header__game-name']}>{gameName}</p>
+
+      }
       <div className={styles.header__controls}>
         <Button
           tabIndex={-1}
