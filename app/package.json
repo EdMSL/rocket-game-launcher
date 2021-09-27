@@ -1,5 +1,5 @@
 {
-  "name": "rocket-game-launcher",
+  "name": "rocket",
   "version": "1.0.0",
   "description": "A program for launching games and managing game builds based on them",
   "main": "./dist/index.js",
