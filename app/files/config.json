@@ -26,12 +26,10 @@
   },
   "customButtons": [
     {
-      "action": "run",
       "path": "%GAME_DIR%\\Editor.lnk",
       "label": "CSE MO1 ярлык"
     },
     {
-      "action": "run",
       "path": "%MO_DIR%\\ModOrganizer.exe",
       "args": [
         "%GAME_DIR%\\obse loader.exe",
@@ -40,12 +38,10 @@
       "label": "CSE MO1 exe"
     },
     {
-      "action": "run",
       "path": "%GAME_DIR%\\Editor2.lnk",
       "label": "CSE MO2 ярлык"
     },
     {
-      "action": "run",
       "path": "%GAME_DIR%\\MO2\\ModOrganizer.exe",
       "args": [
         "\"moshortcut://:Construction Set\""
@@ -53,22 +49,18 @@
       "label": "CSE MO2 exe"
     },
     {
-      "action": "open",
       "path": "%GAME_DIR%",
       "label": "Открыть папку игры"
     },
     {
-      "action": "open",
       "path": "%CUSTOM%\\CSE",
       "label": "Открыть"
     },
     {
-      "action": "open",
       "path": "%DOCUMENTS%",
       "label": "Доки"
     },
     {
-      "action": "open",
       "path": "%MO_DIR%",
       "label": "Папка МО"
     }

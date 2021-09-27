@@ -1,6 +1,7 @@
 import Storage from 'electron-store';
 import { Store } from 'redux';
 import path from 'path';
+import fs from 'fs';
 
 import { configureStore, IAppState } from '$store/store';
 import { IUserSettingsRootState } from '$types/userSettings';
@@ -24,16 +25,19 @@ import { ISystemRootState } from '$types/system';
 import {
   CustomError,
   ErrorName,
+  getReadWriteError,
   ReadWriteError,
   showMessageBox,
 } from '$utils/errors';
-import { Scope } from '$constants/misc';
+import { LauncherButtonAction, Scope } from '$constants/misc';
 import { checkConfigFileData } from '$utils/check';
 import { getObjectAsList, getPathToFile } from '$utils/strings';
 import { getNewModOrganizerParams, getUserThemes } from '$utils/data';
 import { INITIAL_STATE as mainInitialState } from '$reducers/main';
 import { INITIAL_STATE as systemInitialState } from '$reducers/system';
 import { INITIAL_STATE as userSettingsInitialState } from '$reducers/userSettings';
+import { IUserMessage } from '$types/main';
+import { CreateUserMessage } from '$utils/message';
 
 interface IStorage {
   userSettings: IUserSettingsRootState,
@@ -126,6 +130,7 @@ const createCustomPaths = (configData: ISystemRootState): ICustomPaths => {
   * Функция для создания файла настроек пользователя и хранилища Redux.
 */
 export const createStorage = (): Store<IAppState> => {
+  const messages: IUserMessage[] = [];
   const configurationData = getConfigurationData();
 
   // Создаем хранилаще пользовательских настроек (настройки темы и т.п.).
@@ -143,7 +148,7 @@ export const createStorage = (): Store<IAppState> => {
 
   const userThemes = getUserThemes(getUserThemesFolders());
 
-  if (Object.keys(userThemes).length === 1) {
+  if (Object.keys(userThemes).length === 1 && userSettingsStorage.theme !== '') {
     writeToLogFile(
       'No themes found, but user theme is set in storage. Theme will be set to default.',
       LogMessageType.WARNING,
@@ -152,6 +157,7 @@ export const createStorage = (): Store<IAppState> => {
     // Игнорируем перезапись ReadOnly, т.к. это еще не state.
     //@ts-ignore
     userSettingsStorage.theme = '';
+    storage.set('userSettings.theme', '');
   }
 
   if (configurationData.modOrganizer.isUsed) {
@@ -174,10 +180,30 @@ export const createStorage = (): Store<IAppState> => {
   }
 
   if (configurationData.customButtons.length > 0) {
-    const newButtons = configurationData.customButtons.map((btn) => ({
-      ...btn,
-      path: getPathToFile(btn.path, customPaths, ''),
-    }));
+    const newButtons = configurationData.customButtons.map((btn) => {
+      const pathTo = getPathToFile(btn.path, customPaths, '');
+
+      try {
+        return {
+          ...btn,
+          action: fs.statSync(pathTo).isDirectory() ? LauncherButtonAction.OPEN : LauncherButtonAction.RUN,
+          path: pathTo,
+        };
+      } catch (error: any) {
+        const err = getReadWriteError(error);
+
+        writeToLogFileSync(
+          `Can't get stat of file/folder. ${err.message} Path: ${pathTo}`,
+          LogMessageType.WARNING,
+        );
+
+        return undefined;
+      }
+    }).filter(Boolean);
+
+    if (configurationData.customButtons.length !== newButtons.length) {
+      messages.push(CreateUserMessage.warning('В процессе обработки пользовательских кнопок возникла ошибка. Не все кнопки будут доступны. Подробности в файле лога.')); //eslint-disable-line max-len
+    }
 
     //@ts-ignore
     configurationData.customButtons = newButtons;
@@ -200,6 +226,7 @@ export const createStorage = (): Store<IAppState> => {
     main: {
       ...mainInitialState,
       userThemes,
+      messages,
     },
   };
 

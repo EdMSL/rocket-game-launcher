@@ -58,7 +58,6 @@ const configFileDataSchema = Joi.object({
   customButtons: Joi.array()
     .items(Joi.object({
       id: Joi.string().optional().default(() => getRandomId('custom-btn')),
-      action: Joi.string().required().valid(...Object.values(LauncherButtonAction)),
       path: Joi.string().required(),
       args: Joi.array().items(Joi.string()).optional().default([])
         .when(Joi.ref('action'), { is: LauncherButtonAction.OPEN, then: Joi.forbidden() }),
