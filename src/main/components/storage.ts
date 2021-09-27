@@ -181,7 +181,7 @@ export const createStorage = (): Store<IAppState> => {
     configurationData.playButton.label = defaultLauncherConfig.playButton.label;
   }
 
-  if (configurationData.customButtons.length > 0) {
+  if (configurationData.customButtons && configurationData.customButtons.length > 0) {
     const newButtons = configurationData.customButtons.map((btn) => {
       const pathTo = getPathToFile(btn.path, customPaths, '');
 
