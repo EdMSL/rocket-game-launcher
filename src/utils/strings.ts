@@ -123,9 +123,9 @@ export const getPathToFile = (
 ): string => {
   let newPath = pathToFile;
 
-  if (CustomPathName.MO_PROFILES_REGEXP.test(pathToFile)) {
+  if (CustomPathName.MO_PROFILE_REGEXP.test(pathToFile)) {
     if (profileMO) {
-      newPath = path.join(customPaths[CustomPathName.MO_PROFILES], profileMO, path.basename(pathToFile));
+      newPath = path.join(customPaths[CustomPathName.MO_PROFILE], profileMO, path.basename(pathToFile));
     } else {
       throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
     }

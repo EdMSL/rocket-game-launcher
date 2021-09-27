@@ -16,7 +16,7 @@
   "baseFilesEncoding": "win1251",
   "gameSettingsFiles": {
     "OblivionIni": {
-      "path": "%MO_PROFILES%\\oblivion.ini",
+      "path": "%MO_PROFILE%\\oblivion.ini",
       "view": "sectional",
       "parameters": [
         {

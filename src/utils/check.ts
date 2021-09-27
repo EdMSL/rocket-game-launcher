@@ -32,7 +32,7 @@ const configFileDataSchema = Joi.object({
   maxHeight: Joi.number().optional().default(defaultLauncherConfig.maxHeight),
   width: Joi.number().optional().default(defaultLauncherConfig.width),
   height: Joi.number().optional().default(defaultLauncherConfig.height),
-  modOrganizer: {
+  modOrganizer: Joi.object({
     isUsed: Joi.bool().optional(),
     version: Joi.number().valid(1, 2).when(Joi.ref('isUsed'), { is: true, then: Joi.required() }),
     path: Joi.string().optional().pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
@@ -41,7 +41,7 @@ const configFileDataSchema = Joi.object({
     profileSection: Joi.string().optional(),
     profileParam: Joi.string().optional(),
     profileParamValueRegExp: Joi.string().optional().allow(''),
-  },
+  }),
   documentsPath: Joi.string().optional().allow('').default(defaultLauncherConfig.documentsPath)
     .pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
   isFirstLaunch: Joi.bool().optional().default(defaultLauncherConfig.isFirstLaunch),
@@ -54,7 +54,7 @@ const configFileDataSchema = Joi.object({
     path: Joi.string().required(),
     args: Joi.array().items(Joi.string()).optional().default([]),
     label: Joi.string().optional().allow('').default('Играть'),
-  }),
+  }).required(),
   customButtons: Joi.array()
     .items(Joi.object({
       id: Joi.string().optional().default(() => getRandomId('custom-btn')),
