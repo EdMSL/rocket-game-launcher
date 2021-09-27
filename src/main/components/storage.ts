@@ -142,6 +142,8 @@ export const createStorage = (): Store<IAppState> => {
         theme: '',
       },
     },
+    cwd: process.env.NODE_ENV === 'production' ? path.resolve() : path.resolve('./app/files'),
+    name: 'user',
   });
 
   const userSettingsStorage = storage.get('userSettings');
