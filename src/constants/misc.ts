@@ -42,16 +42,18 @@ export const RangeButtonName = {
 };
 
 export const DefaultCustomPathName = {
-  MO_PROFILE: '%MO_PROFILE%',
   MO_DIR: '%MO_DIR%',
+  MO_MODS: '%MO_MODS%',
+  MO_PROFILE: '%MO_PROFILE%',
   DOCUMENTS: '%DOCUMENTS%',
   GAME_DIR: '%GAME_DIR%',
 };
 
 export const CustomPathName = {
   ...DefaultCustomPathName,
-  MO_PROFILE_REGEXP: new RegExp('%MO_PROFILE%'),
   MO_DIR_REGEXP: new RegExp('%MO_DIR%'),
+  MO_MODS_REGEXP: new RegExp('%MO_MODS%'),
+  MO_PROFILE_REGEXP: new RegExp('%MO_PROFILE%'),
   DOCUMENTS_REGEXP: new RegExp('%DOCUMENTS%'),
   GAME_DIR_REGEXP: new RegExp('%GAME_DIR%'),
   CUSTOM_NAME_REGEXP: /^%[A-Z_]+%$/,

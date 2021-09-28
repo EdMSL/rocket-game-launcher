@@ -48,9 +48,11 @@ interface ICustomPaths {
   //@ts-ignore
   '%DOCUMENTS%'?: string|undefined,
   //@ts-ignore
-  '%MO_PROFILE%'?: string|undefined,
-  //@ts-ignore
   '%MO_DIR%'?: string|undefined,
+  //@ts-ignore
+  '%MO_MODS%'?: string|undefined,
+  //@ts-ignore
+  '%MO_PROFILE%'?: string|undefined,
   [label: string]: string,
 }
 
@@ -119,8 +121,9 @@ const createCustomPaths = (configData: ISystemRootState): ICustomPaths => {
       '%DOCUMENTS%': path.join(DOCUMENTS_DIR, configData.documentsPath),
     } : {},
     ...configData.modOrganizer.isUsed ? {
-      '%MO_PROFILE%': path.join(GAME_DIR, configData.modOrganizer.pathToProfiles),
       '%MO_DIR%': path.join(GAME_DIR, configData.modOrganizer.path),
+      '%MO_MODS%': path.join(GAME_DIR, configData.modOrganizer.path, 'mods'),
+      '%MO_PROFILE%': path.join(GAME_DIR, configData.modOrganizer.pathToProfiles),
     } : {},
     ...newCustomPaths,
   };

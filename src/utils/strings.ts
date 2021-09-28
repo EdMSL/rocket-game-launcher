@@ -134,6 +134,11 @@ export const getPathToFile = (
       customPaths[CustomPathName.MO_DIR],
       pathToFile.replace(CustomPathName.MO_DIR, ''),
     );
+  } else if (CustomPathName.MO_MODS_REGEXP.test(pathToFile)) {
+    newPath = path.join(
+      customPaths[CustomPathName.MO_MODS],
+      pathToFile.replace(CustomPathName.MO_MODS, ''),
+    );
   } else if (CustomPathName.DOCUMENTS_REGEXP.test(pathToFile)) {
     if (customPaths[CustomPathName.DOCUMENTS]) {
       newPath = path.join(
