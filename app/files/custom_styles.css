@@ -1,3 +1,23 @@
+:root {
+  /* --bg-color: hsl(247, 10%, 18%); */
+  /* --overlay-color: hsla(0, 0%, 0%, 0.5); */
+  /* --text-main: hsl(0, 0%, 90%); */
+  /* --text-secondary: hsl(249, 11%, 12%); */
+  /* --border-color: hsla(0, 0%, 0%, 0.2); */
+  /* --btn-color: hsl(245, 8%, 28%); */
+  /* --hover-color: hsl(199, 100%, 50%); */
+  /* --focus-color: hsl(199, 100%, 50%); */
+  /* --active-color: hsl(199, 100%, 40%); */
+  /* --disabled-color: hsla(245, 8%, 28%, 0.5); */
+  /* --disabled-text-color: hsl(0, 0%, 35%); */
+  /* --header-btn-color: hsl(250, 4%, 31%); */
+  /* --header-btn-close-color: hsl(355, 86%, 49%); */
+  /* --error-color: rgb(255, 65, 65); */
+  /* --warning-color: rgb(248, 162, 34); */
+  /* --success-color: rgb(43, 231, 90); */
+  /* --info-color: hsl(199, 100%, 40%); */
+}
+
 .main {
   background-image: url("./background.png");
   background-repeat: no-repeat;

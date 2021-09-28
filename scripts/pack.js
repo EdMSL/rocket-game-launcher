@@ -48,5 +48,9 @@ bundleElectronApp(process.argv[2])
       './src/images/background.png',
       path.resolve(data[0], 'themes', 'background.png'),
     );
+    fs.copyFileSync(
+      './MANUAL.MD',
+      path.resolve(data[0], 'MANUAL.MD'),
+    );
   }).catch((error) => console.log(error.message));
 
