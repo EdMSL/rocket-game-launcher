@@ -5,7 +5,7 @@ import {
   Encoding,
   GameSettingParameterControllerType,
   GameSettingsFileView,
-  GameSettingParameterType,
+  GameSettingsOptionType,
   LauncherButtonAction,
   CustomPathName,
   DefaultCustomPathName,
@@ -103,7 +103,7 @@ const settingsMainSchema = Joi.object<IGameSettingsConfig>({
 // id для параметров не указываются в settings.json, вместо этого они генерируются автоматически.
 const settingParameterSchemaDefault = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('parameter')),
-  parameterType: Joi.string().optional().default(GameSettingParameterType.DEFAULT).valid(GameSettingParameterType.DEFAULT),
+  optionType: Joi.string().optional().default(GameSettingsOptionType.DEFAULT).valid(GameSettingsOptionType.DEFAULT),
   name: Joi.string().required(),
   label: Joi.string().optional().default(Joi.ref('name')),
   description: Joi.string().optional().default('').allow(''),
@@ -147,7 +147,7 @@ const settingParameterSchemaDefault = Joi.object({
 
 const settingParameterSchemaGroup = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('parameter')),
-  parameterType: Joi.string().required().valid(GameSettingParameterType.GROUP),
+  optionType: Joi.string().required().valid(GameSettingsOptionType.GROUP),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
@@ -195,7 +195,7 @@ const settingParameterSchemaGroup = Joi.object({
 
 const settingParameterSchemaCombined = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('parameter')),
-  parameterType: Joi.string().required().valid(GameSettingParameterType.COMBINED),
+  optionType: Joi.string().required().valid(GameSettingsOptionType.COMBINED),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
@@ -251,7 +251,7 @@ const settingParameterSchemaCombined = Joi.object({
 
 const settingParameterSchemaRelated = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('parameter')),
-  parameterType: Joi.string().required().valid(GameSettingParameterType.RELATED),
+  optionType: Joi.string().required().valid(GameSettingsOptionType.RELATED),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),

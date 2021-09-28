@@ -29,7 +29,7 @@ export const HTMLInputType = {
   SWITCHER: 'checkbox',
 };
 
-export const GameSettingParameterType = {
+export const GameSettingsOptionType = {
   DEFAULT: 'default',
   GROUP: 'group',
   RELATED: 'related',

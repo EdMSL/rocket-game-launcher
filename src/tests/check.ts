@@ -114,10 +114,10 @@ describe('#Check', () => {
       //@ts-ignore
       const result = checkGameSettingsFiles(obj.gameSettingsFiles, Encoding.WIN1251, obj.gameSettingsGroups);
 
-      assert.hasAllKeys(result.anyFile.optionsList[0], ['id', 'description', 'name', 'iniGroup', 'settingGroup', 'controllerType', 'parameterType', 'label', 'max', 'min', 'step']);
-      assert.hasAllKeys(result.anyFile.optionsList[1], ['id', 'description', 'name', 'iniGroup', 'settingGroup', 'controllerType', 'parameterType', 'label']);
-      assert.hasAllKeys(result.someFile.optionsList[0], ['id', 'description', 'name', 'settingGroup', 'controllerType', 'parameterType', 'label', 'options']);
-      assert.equal(result.anyFile.optionsList[0].parameterType, 'default');
+      assert.hasAllKeys(result.anyFile.optionsList[0], ['id', 'description', 'name', 'iniGroup', 'settingGroup', 'controllerType', 'optionType', 'label', 'max', 'min', 'step']);
+      assert.hasAllKeys(result.anyFile.optionsList[1], ['id', 'description', 'name', 'iniGroup', 'settingGroup', 'controllerType', 'optionType', 'label']);
+      assert.hasAllKeys(result.someFile.optionsList[0], ['id', 'description', 'name', 'settingGroup', 'controllerType', 'optionType', 'label', 'options']);
+      assert.equal(result.anyFile.optionsList[0].optionType, 'default');
       assert.equal(result.anyFile.optionsList[1].label, 'Any new name');
       assert.isNumber(result.anyFile.optionsList[0].max);
     });
@@ -127,7 +127,7 @@ describe('#Check', () => {
       //@ts-ignore
       const result = checkGameSettingsFiles(obj.gameSettingsFiles, Encoding.WIN1251, obj.gameSettingsGroups);
 
-      assert.hasAllKeys(result.groupFile.optionsList[0], ['id', 'description', 'settingGroup', 'controllerType', 'parameterType', 'label', 'options', 'items']);
+      assert.hasAllKeys(result.groupFile.optionsList[0], ['id', 'description', 'settingGroup', 'controllerType', 'optionType', 'label', 'options', 'items']);
       //@ts-ignore
       assert.hasAllKeys(result.groupFile.optionsList[0].items[0], ['id', 'name']);
     });
@@ -137,7 +137,7 @@ describe('#Check', () => {
       //@ts-ignore
       const result = checkGameSettingsFiles(obj.gameSettingsFiles, Encoding.WIN1251, obj.gameSettingsGroups);
 
-      assert.hasAllKeys(result.relatedFile.optionsList[0], ['id', 'description', 'settingGroup', 'parameterType', 'label', 'items']);
+      assert.hasAllKeys(result.relatedFile.optionsList[0], ['id', 'description', 'settingGroup', 'optionType', 'label', 'items']);
       //@ts-ignore
       assert.hasAllKeys(result.relatedFile.optionsList[0].items[0], ['id', 'name', 'controllerType', 'options']);
     });
@@ -147,7 +147,7 @@ describe('#Check', () => {
       //@ts-ignore
       const result = checkGameSettingsFiles(obj.gameSettingsFiles, Encoding.WIN1251, obj.gameSettingsGroups);
 
-      assert.hasAllKeys(result.tagFile.optionsList[0], ['id', 'description', 'name', 'settingGroup', 'parameterType', 'controllerType', 'label', 'attributeName', 'attributePath']);
+      assert.hasAllKeys(result.tagFile.optionsList[0], ['id', 'description', 'name', 'settingGroup', 'optionType', 'controllerType', 'label', 'attributeName', 'attributePath']);
     });
 
     describe('All tests should throw error', () => {

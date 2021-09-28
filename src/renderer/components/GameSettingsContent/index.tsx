@@ -18,7 +18,7 @@ import {
 } from '$utils/data';
 import {
   GameSettingParameterControllerType,
-  GameSettingParameterType,
+  GameSettingsOptionType,
   HTMLInputType,
   RangeButtonName,
 } from '$constants/misc';
@@ -146,7 +146,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
   ) => {
     if (
       !isIGameSettingsItemParameter(parameter)
-      && parameter.parameterType === GameSettingParameterType.COMBINED
+      && parameter.optionType === GameSettingsOptionType.COMBINED
     ) {
       return parameter.items!
         .map((item) => gameSettingsOptions[iniName][getOptionName(item)].value)
@@ -172,7 +172,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
               locationSettingGroup,
             ).map(
               (parameter) => {
-                if (parameter.parameterType === GameSettingParameterType.RELATED) {
+                if (parameter.optionType === GameSettingsOptionType.RELATED) {
                   return (
                     <div
                       key={parameter.label}
@@ -219,7 +219,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                   );
                 }
 
-                if (parameter.parameterType === GameSettingParameterType.GROUP) {
+                if (parameter.optionType === GameSettingsOptionType.GROUP) {
                   if (parameter.controllerType === GameSettingParameterControllerType.SELECT) {
                     return (
                       <Select
@@ -316,7 +316,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                   }
                 }
 
-                if (parameter.parameterType === GameSettingParameterType.COMBINED) {
+                if (parameter.optionType === GameSettingsOptionType.COMBINED) {
                   if (parameter.controllerType === GameSettingParameterControllerType.SELECT) {
                     return (
                       <Select
@@ -345,7 +345,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                   }
                 }
 
-                if (parameter.parameterType === GameSettingParameterType.DEFAULT) {
+                if (parameter.optionType === GameSettingsOptionType.DEFAULT) {
                   if (parameter.controllerType === GameSettingParameterControllerType.RANGE) {
                     return (
                       <Range

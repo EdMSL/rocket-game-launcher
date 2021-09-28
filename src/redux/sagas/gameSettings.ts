@@ -70,7 +70,7 @@ import { IUserMessage, MAIN_TYPES } from '$types/main';
 import {
   CustomPathName,
   Encoding,
-  GameSettingParameterType,
+  GameSettingsOptionType,
   GameSettingsFileView,
 } from '$constants/misc';
 import {
@@ -307,9 +307,9 @@ export function* generateGameSettingsOptionsSaga(
             //Если опция с типом group или related,
             // то генерация производится для каждого параметра в items.
             if (
-              currentParameter.parameterType === GameSettingParameterType.RELATED
-              || currentParameter.parameterType === GameSettingParameterType.GROUP
-              || currentParameter.parameterType === GameSettingParameterType.COMBINED
+              currentParameter.optionType === GameSettingsOptionType.RELATED
+              || currentParameter.optionType === GameSettingsOptionType.GROUP
+              || currentParameter.optionType === GameSettingsOptionType.COMBINED
             ) {
               let specParamsErrors: IUserMessage[] = [];
 

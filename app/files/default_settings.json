@@ -7,7 +7,7 @@
       "view": "sectional",
       "optionsList": [
         {
-          "parameterType": "combined",
+          "optionType": "combined",
           "label": "Разрешение экрана",
           "description": "Устанавливает разрешение экрана",
           "controllerType": "select",

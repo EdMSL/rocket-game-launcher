@@ -15,25 +15,12 @@
   ],
   "baseFilesEncoding": "win1251",
   "gameSettingsFiles": {
-    "EnchancedHotkeysIni": {
-      "path": "%MO_MODS%\\Enhanced Hotkeys 2.3.1\\ini\\Enhanced Hotkeys.ini",
-      "view": "line",
-      "optionsList": [
-        {
-          "parameterType": "default",
-          "name": "tnoEH.debug",
-          "settingGroup": "Control",
-          "label": "Дебаг мод",
-          "controllerType": "switcher"
-        }
-      ]
-    },
     "OblivionIni": {
       "path": "%MO_PROFILE%\\oblivion.ini",
       "view": "sectional",
       "optionsList": [
         {
-          "parameterType": "combined",
+          "optionType": "combined",
           "settingGroup": "Graphic",
           "label": "Разрешение экрана",
           "description": "Устанавливает разрешение экрана",
@@ -56,7 +43,7 @@
           ]
         },
         {
-          "parameterType": "default",
+          "optionType": "default",
           "name": "bFull Screen",
           "iniGroup": "Display",
           "settingGroup": "Graphic",
@@ -73,7 +60,7 @@
       "view": "sectional",
       "optionsList": [
         {
-          "parameterType": "default",
+          "optionType": "default",
           "name": "CheckOverrideSourceType",
           "iniGroup": "EquipmentOverride",
           "settingGroup": "Graphic",
@@ -133,7 +120,7 @@
       "view": "line",
       "optionsList": [
         {
-          "parameterType": "group",
+          "optionType": "group",
           "label": "Удалить предмет/заклинание",
           "description": "Изменить клавишу удаления предметов/заклинаний",
           "settingGroup": "Control",
@@ -165,7 +152,7 @@
       "view": "line",
       "optionsList": [
         {
-          "parameterType": "related",
+          "optionType": "related",
           "settingGroup": "Control",
           "label": "Показать информацию об объекте",
           "description": "Изменить комбинацию",

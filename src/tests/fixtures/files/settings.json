@@ -43,7 +43,7 @@
       "optionsList": [
         {
           "name": "Some name",
-          "parameterType": "default",
+          "optionType": "default",
           "settingGroup": "Control",
           "controllerType": "select",
           "label": "Some label",
@@ -86,7 +86,7 @@
       "view": "line",
       "optionsList": [
         {
-          "parameterType": "group",
+          "optionType": "group",
           "label": "Group label",
           "settingGroup": "Control",
           "controllerType": "select",
@@ -117,7 +117,7 @@
       "view": "line",
       "optionsList": [
         {
-          "parameterType": "related",
+          "optionType": "related",
           "settingGroup": "Control",
           "label": "Related label",
           "items": [
