@@ -302,7 +302,7 @@ export function* generateGameSettingsOptionsSaga(
         const incorrectIndexes: number[] = [];
         const currentGameSettingsFile = gameSettingsFiles[currentGameSettingsFileName];
 
-        const optionsFromFile = currentGameSettingsFile.parameters.reduce<IGameSettingsOptionsItem>(
+        const optionsFromFile = currentGameSettingsFile.optionsList.reduce<IGameSettingsOptionsItem>(
           (currentOptions, currentParameter, index) => {
             //Если опция с типом group или related,
             // то генерация производится для каждого параметра в items.

@@ -18,7 +18,7 @@
     "anyFile": {
       "path": "./any.ini",
       "view": "sectional",
-      "parameters": [
+      "optionsList": [
         {
           "name": "Any name",
           "iniGroup": "Display",
@@ -40,7 +40,7 @@
     "someFile": {
       "path": "./ini/some.ini",
       "view": "line",
-      "parameters": [
+      "optionsList": [
         {
           "name": "Some name",
           "parameterType": "default",
@@ -58,7 +58,7 @@
       "path": "./ini/new.ini",
       "view": "line",
       "encoding": "utf-8",
-      "parameters": [
+      "optionsList": [
         {
           "name": "New name",
           "settingGroup": "Control",
@@ -70,7 +70,7 @@
     "tagFile": {
       "path": "./ini/tag.config",
       "view": "tag",
-      "parameters": [
+      "optionsList": [
         {
           "name": "AnisotropicFilter",
           "attributeName": "Value",
@@ -84,7 +84,7 @@
     "groupFile": {
       "path": "./ini/group.ini",
       "view": "line",
-      "parameters": [
+      "optionsList": [
         {
           "parameterType": "group",
           "label": "Group label",
@@ -115,7 +115,7 @@
     "relatedFile": {
       "path": "./ini/related.ini",
       "view": "line",
-      "parameters": [
+      "optionsList": [
         {
           "parameterType": "related",
           "settingGroup": "Control",

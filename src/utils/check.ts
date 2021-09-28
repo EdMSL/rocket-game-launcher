@@ -301,7 +301,7 @@ const gameSettingsFileSchema = Joi.object({
   encoding: Joi.string().optional().default(Joi.ref('$encoding')),
   path: Joi.string().required(),
   view: Joi.string().required().valid(...Object.values(GameSettingsFileView)),
-  parameters: Joi.array().items(Joi.alternatives().try(
+  optionsList: Joi.array().items(Joi.alternatives().try(
     settingParameterSchemaDefault,
     settingParameterSchemaGroup,
     settingParameterSchemaRelated,

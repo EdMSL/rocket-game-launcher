@@ -5,7 +5,7 @@
     "OblivionIni": {
       "path": "%DOCUMENTS%\\oblivion.ini",
       "view": "sectional",
-      "parameters": [
+      "optionsList": [
         {
           "parameterType": "combined",
           "label": "Разрешение экрана",

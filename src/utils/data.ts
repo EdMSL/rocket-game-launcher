@@ -282,7 +282,7 @@ export const filterIncorrectGameSettingsFiles = (
     const currentFileIncorrectIndexes = incorrectGameSettingsFiles[gameSettingsFileName];
 
     if (Object.keys(incorrectGameSettingsFiles).includes(gameSettingsFileName)) {
-      if (currentFile.parameters.length === currentFileIncorrectIndexes.length) {
+      if (currentFile.optionsList.length === currentFileIncorrectIndexes.length) {
         return { ...newGameSettingsFiles };
       }
 
@@ -290,8 +290,8 @@ export const filterIncorrectGameSettingsFiles = (
         ...newGameSettingsFiles,
         [gameSettingsFileName]: {
           ...currentFile,
-          parameters: [
-            ...currentFile.parameters
+          optionsList: [
+            ...currentFile.optionsList
               .filter((parameter, index) => !currentFileIncorrectIndexes.includes(index)),
           ],
         },
@@ -317,12 +317,12 @@ export const getParametersForOptionsGenerate = (
   currentGameSettingGroup: string,
 ): IGameSettingsParameter[] => {
   if (gameSettingsGroups.length > 0 && currentGameSettingGroup) {
-    return gameSettingsFile.parameters.filter(
+    return gameSettingsFile.optionsList.filter(
       (currentParameter) => currentParameter.settingGroup === currentGameSettingGroup,
     );
   }
 
-  return gameSettingsFile.parameters;
+  return gameSettingsFile.optionsList;
 };
 
 /**

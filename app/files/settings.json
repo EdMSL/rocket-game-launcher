@@ -15,10 +15,23 @@
   ],
   "baseFilesEncoding": "win1251",
   "gameSettingsFiles": {
+    "EnchancedHotkeysIni": {
+      "path": "%MO_MODS%\\Enhanced Hotkeys 2.3.1\\ini\\Enhanced Hotkeys.ini",
+      "view": "line",
+      "optionsList": [
+        {
+          "parameterType": "default",
+          "name": "tnoEH.debug",
+          "settingGroup": "Control",
+          "label": "Дебаг мод",
+          "controllerType": "switcher"
+        }
+      ]
+    },
     "OblivionIni": {
       "path": "%MO_PROFILE%\\oblivion.ini",
       "view": "sectional",
-      "parameters": [
+      "optionsList": [
         {
           "parameterType": "combined",
           "settingGroup": "Graphic",
@@ -58,7 +71,7 @@
     "BlockheadIni": {
       "path": "%CUSTOM%\\Blockhead.ini",
       "view": "sectional",
-      "parameters": [
+      "optionsList": [
         {
           "parameterType": "default",
           "name": "CheckOverrideSourceType",
@@ -84,7 +97,7 @@
       "path": "Data\\Ini\\DMS\\Menu.ini",
       "view": "line",
       "encoding": "utf-8",
-      "parameters": [
+      "optionsList": [
         {
           "name": "DMSMain.Name",
           "settingGroup": "Graphic",
@@ -101,7 +114,7 @@
     "OblivionReloaded": {
       "path": "%CUSTOM%\\OblivionReloaded.dll.config",
       "view": "tag",
-      "parameters": [
+      "optionsList": [
         {
           "name": "AnisotropicFilter",
           "attributeName": "Value",
@@ -118,7 +131,7 @@
     "TQPIni": {
       "path": "Data\\Ini\\TQP.ini",
       "view": "line",
-      "parameters": [
+      "optionsList": [
         {
           "parameterType": "group",
           "label": "Удалить предмет/заклинание",
@@ -150,7 +163,7 @@
     "FormIDFinderIni": {
       "path": "Data\\Ini\\formID Finder.ini",
       "view": "line",
-      "parameters": [
+      "optionsList": [
         {
           "parameterType": "related",
           "settingGroup": "Control",

@@ -162,7 +162,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
         //Так как параметр из gameSettingsFile может
         // иметь в себе несколько опций (combined, related и group),
         // которые являются отдельными параметрами из файлов,
-        // то вывод опций делаем на основе параметров (gameSettingsFiles[fileName].parameters),
+        // то вывод опций делаем на основе параметров (gameSettingsFiles[fileName].optionsList),
         // а не опций (gameSettingsOptions), иначе получаем дубли контроллеров.
         Object.keys(gameSettingsFiles)
           .map(
