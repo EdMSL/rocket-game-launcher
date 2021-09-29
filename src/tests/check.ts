@@ -147,7 +147,7 @@ describe('#Check', () => {
       //@ts-ignore
       const result = checkGameSettingsFiles(obj.gameSettingsFiles, Encoding.WIN1251, obj.gameSettingsGroups);
 
-      assert.hasAllKeys(result.tagFile.optionsList[0], ['id', 'description', 'name', 'settingGroup', 'optionType', 'controllerType', 'label', 'attributeName', 'attributePath']);
+      assert.hasAllKeys(result.tagFile.optionsList[0], ['id', 'description', 'name', 'settingGroup', 'optionType', 'controllerType', 'label', 'valueName', 'valuePath']);
     });
 
     describe('All tests should throw error', () => {

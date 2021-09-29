@@ -103,7 +103,7 @@ export interface IGeneratedGameSettingsParam {
 
 export const isIGameSettingsItemParameter = (
   parameter: IGameSettingsParameter | IGameSettingsItemParameter,
-): parameter is IGameSettingsItemParameter => parameter.attributePath !== undefined && parameter.attributeName !== undefined;
+): parameter is IGameSettingsItemParameter => parameter.valuePath !== undefined && parameter.valueName !== undefined;
 
 export const isDataFromIniFile = (
   fileView: string,
@@ -118,7 +118,7 @@ export const getOptionName = (
   parameter: IGameSettingsParameter|IGameSettingsItemParameter,
 ): string => {
   if (isIGameSettingsItemParameter(parameter)) {
-    return `${parameter.attributePath}/${parameter.name}/${parameter.attributeName}`;
+    return `${parameter.valuePath}/${parameter.name}/${parameter.valueName}`;
   }
 
   if (parameter.iniGroup) {
@@ -205,11 +205,11 @@ export const getOptionData = (
       ));
     }
   } else if (fileView === GameSettingsFileView.TAG) {
-    const attributePathArr = [...currentGameSettingParameter.attributePath!?.split('/')];
+    const valuePathArr = [...currentGameSettingParameter.valuePath!?.split('/')];
     const pathArr = [
-      ...attributePathArr,
+      ...valuePathArr,
       currentGameSettingParameter.name!,
-      currentGameSettingParameter.attributeName!,
+      currentGameSettingParameter.valueName!,
     ];
 
     let index = 0;
@@ -218,9 +218,9 @@ export const getOptionData = (
 
       if (typeof obj[key] === 'object') {
         getProp(obj[key], pathArr[index]);
-      } else if (key === currentGameSettingParameter.attributeName) {
+      } else if (key === currentGameSettingParameter.valueName) {
         optionName = pathArr.join('/');
-        optionValue = obj[currentGameSettingParameter.attributeName!];
+        optionValue = obj[currentGameSettingParameter.valueName!];
       }
     };
 
@@ -229,11 +229,11 @@ export const getOptionData = (
     if (!optionName || !optionValue) {
       let errorMsg = '';
       if (index === pathArr.length) {
-        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingParameter.attributeName}" attribute in "${currentGameSettingParameter.name}" parameter specified in "${gameSettingsFileName}".`; //eslint-disable-line max-len
+        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingParameter.valueName}" attribute in "${currentGameSettingParameter.name}" parameter specified in "${gameSettingsFileName}".`; //eslint-disable-line max-len
       } else if (index === pathArr.length - 1) {
         errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingParameter.name}" parameter specified in "${gameSettingsFileName}".`; //eslint-disable-line max-len
       } else {
-        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${pathArr[index - 1]}" tag specified in "attributePath" in "${gameSettingsFileName}".`; //eslint-disable-line max-len
+        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${pathArr[index - 1]}" tag specified in "valuePath" in "${gameSettingsFileName}".`; //eslint-disable-line max-len
       }
       optionErrors.push(CreateUserMessage.warning(errorMsg));
     }

@@ -112,12 +112,12 @@ const settingParameterSchemaDefault = Joi.object({
       is: GameSettingsFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ),
-  attributeName: Joi.string().when(
+  valueName: Joi.string().when(
     Joi.ref('$view'), {
       is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ),
-  attributePath: Joi.string().when(
+  valuePath: Joi.string().when(
     Joi.ref('$view'), {
       is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
     },
@@ -180,12 +180,12 @@ const settingParameterSchemaGroup = Joi.object({
           is: GameSettingsFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
-      attributeName: Joi.string().when(
+      valueName: Joi.string().when(
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
-      attributePath: Joi.string().when(
+      valuePath: Joi.string().when(
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
@@ -236,12 +236,12 @@ const settingParameterSchemaCombined = Joi.object({
           is: GameSettingsFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
-      attributeName: Joi.string().when(
+      valueName: Joi.string().when(
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
-      attributePath: Joi.string().when(
+      valuePath: Joi.string().when(
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
@@ -268,12 +268,12 @@ const settingParameterSchemaRelated = Joi.object({
           is: GameSettingsFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
-      attributeName: Joi.string().when(
+      valueName: Joi.string().when(
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
-      attributePath: Joi.string().when(
+      valuePath: Joi.string().when(
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
