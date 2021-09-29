@@ -681,7 +681,10 @@ function* saveGameSettingsFilesSaga(
           && !isDataFromIniFile(currWriteFileView, currWriteFileData)
         ) {
           const pathArr = [...optionName.split('/')];
-          pathArr[pathArr.length - 1] = `${xmlAttributePrefix}${pathArr[pathArr.length - 1]}`;
+
+          if (pathArr[pathArr.length - 1] !== '#text') {
+            pathArr[pathArr.length - 1] = `${xmlAttributePrefix}${pathArr[pathArr.length - 1]}`;
+          }
 
           setValueForObjectDeepKey(
             currWriteFileData,

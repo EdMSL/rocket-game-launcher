@@ -104,8 +104,8 @@
       "optionsList": [
         {
           "name": "AnisotropicFilter",
-          "attributeName": "Value",
-          "attributePath": "_Main/Main/Misc",
+          "valueName": "Value",
+          "valuePath": "_Main/Main/Misc",
           "settingGroup": "Audio",
           "controllerType": "range",
           "label": "Фильтрация",

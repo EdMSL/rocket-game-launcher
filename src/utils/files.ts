@@ -480,28 +480,25 @@ export const writeXMLFile = (
   pathToFile: string,
   xmlDataObj: IXmlObj,
   encoding: string,
-): Promise<void> => {
-  console.log(xmlDataObj);
-  return writeFileData(
-    pathToFile,
-    iconv.encode(new XMLParserForWrite({
-      format: true,
-      ignoreAttributes: false,
-      attributeNamePrefix: xmlAttributePrefix,
-      indentBy: '\t',
-      textNodeName: '#text',
-      supressEmptyNode: true,
-    }).parse(xmlDataObj), encoding),
-  )
-    .catch((error) => {
-      writeToLogFile(
-        `Message: ${error.message}. Path: '${pathToFile}'`,
-        LogMessageType.ERROR,
-      );
+): Promise<void> => writeFileData(
+  pathToFile,
+  iconv.encode(new XMLParserForWrite({
+    format: true,
+    ignoreAttributes: false,
+    attributeNamePrefix: xmlAttributePrefix,
+    indentBy: '\t',
+    textNodeName: '#text',
+    supressEmptyNode: true,
+  }).parse(xmlDataObj), encoding),
+)
+  .catch((error) => {
+    writeToLogFile(
+      `Message: ${error.message}. Path: '${pathToFile}'`,
+      LogMessageType.ERROR,
+    );
 
-      throw error;
-    });
-};
+    throw error;
+  });
 
 export const writeGameSettingsFile = async (
   pathToFile: string,
