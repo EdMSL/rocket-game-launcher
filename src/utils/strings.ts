@@ -2,8 +2,8 @@ import path from 'path';
 
 import { ISystemRootState } from '$types/system';
 import { CustomError } from './errors';
-import { CustomPathName } from '$constants/misc';
-import { DOCUMENTS_DIR, GAME_DIR } from '$constants/paths';
+import { CustomPathName, DefaultCustomPathName } from '$constants/misc';
+import { GAME_DIR } from '$constants/paths';
 
 const HEXADECIMAL = 16;
 const HEXADECIMAL_FACTOR = 1e8;
@@ -130,15 +130,31 @@ export const getPathToFile = (
       throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
     }
   } else if (CustomPathName.MO_DIR_REGEXP.test(pathToFile)) {
-    newPath = path.join(
-      customPaths[CustomPathName.MO_DIR],
-      pathToFile.replace(CustomPathName.MO_DIR, ''),
-    );
+    if (customPaths[CustomPathName.MO_DIR]) {
+      newPath = path.join(
+        customPaths[CustomPathName.MO_DIR],
+        pathToFile.replace(CustomPathName.MO_DIR, ''),
+      );
+    } else {
+      if (profileMO) {
+        throw new CustomError('The path to a file in the Mod Organizer folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
+      }
+
+      throw new CustomError(`Incorrect path received. Path variable ${DefaultCustomPathName.MO_DIR} is not available.`); //eslint-disable-line max-len
+    }
   } else if (CustomPathName.MO_MODS_REGEXP.test(pathToFile)) {
-    newPath = path.join(
-      customPaths[CustomPathName.MO_MODS],
-      pathToFile.replace(CustomPathName.MO_MODS, ''),
-    );
+    if (customPaths[CustomPathName.MO_DIR]) {
+      newPath = path.join(
+        customPaths[CustomPathName.MO_MODS],
+        pathToFile.replace(CustomPathName.MO_MODS, ''),
+      );
+    } else {
+      if (profileMO) {
+        throw new CustomError('The path to a file in the Mod Organizer mods folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
+      }
+
+      throw new CustomError(`Incorrect path received. Path variable ${DefaultCustomPathName.MO_MODS} is not available.`); //eslint-disable-line max-len
+    }
   } else if (CustomPathName.DOCUMENTS_REGEXP.test(pathToFile)) {
     if (customPaths[CustomPathName.DOCUMENTS]) {
       newPath = path.join(

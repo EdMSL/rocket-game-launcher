@@ -186,9 +186,9 @@ export const createStorage = (): Store<IAppState> => {
 
   if (configurationData.customButtons && configurationData.customButtons.length > 0) {
     const newButtons = configurationData.customButtons.map((btn) => {
-      const pathTo = getPathToFile(btn.path, customPaths, '');
-
       try {
+        const pathTo = getPathToFile(btn.path, customPaths, '');
+
         return {
           ...btn,
           action: fs.statSync(pathTo).isDirectory() ? LauncherButtonAction.OPEN : LauncherButtonAction.RUN,
@@ -198,7 +198,7 @@ export const createStorage = (): Store<IAppState> => {
         const err = getReadWriteError(error);
 
         writeToLogFileSync(
-          `Can't get stat of file/folder. ${err.message} Path: ${pathTo}`,
+          `Can't create custom button. ${btn.label}. ${err.message} Path: ${btn.path}`,
           LogMessageType.WARNING,
         );
 
