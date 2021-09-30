@@ -342,7 +342,7 @@ export const checkGameSettingsFiles = (
   baseFilesEncoding: IGameSettingsRootState['baseFilesEncoding'],
   gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
 ): IGameSettingsConfig['gameSettingsFiles'] => {
-  writeToLogFileSync('Started checking game settings files from settings.json.');
+  writeToLogFileSync('Started checking "gameSettingsFiles" from settings.json.');
 
   const validationErrors: IGameSettingsFileError[] = [];
 
@@ -386,7 +386,7 @@ export const checkGameSettingsFiles = (
   }
 
   if (Object.keys(newGameSettingsFilesObj).length === 0) {
-    throw new CustomError('No options available after game settings validation.');
+    throw new CustomError('No game settings options available after "gameSettingsFiles" validation.'); //eslint-disable-line max-len
   }
 
   return newGameSettingsFilesObj;

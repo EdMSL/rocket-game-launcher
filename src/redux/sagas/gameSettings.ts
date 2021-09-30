@@ -480,7 +480,7 @@ export function* initGameSettingsSaga(): SagaIterator {
       Object.keys(newGameSettingsFilesObj).length !== Object.keys(gameSettingsFiles).length
       || Object.keys(incorrectGameSettingsFiles).length > 0
     ) {
-      yield put(addMessages([CreateUserMessage.warning('Обнаружены ошибки в файле игровых настроек settings.json. Некоторые настройки будут недоступны. Подробности в файле лога.')])); //eslint-disable-line max-len
+      yield put(addMessages([CreateUserMessage.warning('Обнаружены ошибки в файле игровых настроек settings.json. Некоторые опции будут недоступны. Подробности в файле лога.')])); //eslint-disable-line max-len
     }
 
     if (Object.keys(totalGameSettingsOptions).length === 0) {
