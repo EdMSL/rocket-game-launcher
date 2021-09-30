@@ -103,7 +103,7 @@ const settingsMainSchema = Joi.object<IGameSettingsConfig>({
 // id для параметров не указываются в settings.json, вместо этого они генерируются автоматически.
 const settingParameterSchemaDefault = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('parameter')),
-  optionType: Joi.string().optional().default(GameSettingsOptionType.DEFAULT).valid(GameSettingsOptionType.DEFAULT),
+  optionType: Joi.string().required().valid(GameSettingsOptionType.DEFAULT),
   name: Joi.string().required(),
   label: Joi.string().optional().default(Joi.ref('name')),
   description: Joi.string().optional().default('').allow(''),
