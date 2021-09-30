@@ -1,5 +1,4 @@
 # Change Log
 
-
-## 0.0.1 (January 1, 1970)
+## 1.0.0 (January 1, 1970)
 Initial release.

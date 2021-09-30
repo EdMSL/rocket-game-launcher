@@ -32,6 +32,7 @@ bundleElectronApp(process.argv[2])
   .then((data) => {
     fs.mkdirSync(path.resolve(data[0], 'backup'));
     fs.mkdirSync(path.resolve(data[0], 'themes'));
+    fs.mkdirSync(path.resolve(data[0], 'help'));
     fs.copyFileSync(
       path.resolve('./app/files/default_config.json'),
       path.resolve(data[0], 'config.json'),
@@ -49,8 +50,16 @@ bundleElectronApp(process.argv[2])
       path.resolve(data[0], 'themes', 'background.png'),
     );
     fs.copyFileSync(
+      './CHANGELOG.MD',
+      path.resolve(data[0], 'CHANGELOG.MD'),
+    );
+    fs.copyFileSync(
       './MANUAL.MD',
-      path.resolve(data[0], 'MANUAL.MD'),
+      path.resolve(data[0], 'help', 'MANUAL.MD'),
+    );
+    fs.copyFileSync(
+      path.resolve('./app/files/example_settings.json'),
+      path.resolve(data[0], 'help', 'example_settings.json'),
     );
   }).catch((error) => console.log(error.message));
 
