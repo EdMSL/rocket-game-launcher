@@ -207,7 +207,7 @@ export const createStorage = (): Store<IAppState> => {
     }).filter(Boolean);
 
     if (configurationData.customButtons.length !== newButtons.length) {
-      messages.push(CreateUserMessage.warning('В процессе обработки пользовательских кнопок возникла ошибка. Не все кнопки будут доступны. Подробности в файле лога.')); //eslint-disable-line max-len
+      messages.push(CreateUserMessage.warning('В процессе обработки списка пользовательских кнопок возникла ошибка. Не все кнопки будут доступны. Подробности в файле лога.')); //eslint-disable-line max-len
     }
 
     //@ts-ignore
