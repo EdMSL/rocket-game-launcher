@@ -126,8 +126,11 @@ module.exports = {
     'import/prefer-default-export': 0,
 
     'jsx-a11y/alt-text': 0,
-    'jsx-a11y/label-has-associated-control': 0,
+    'jsx-a11y/anchor-is-valid': 0,
+    'jsx-a11y/click-events-have-key-events': 0,
     'jsx-a11y/control-has-associated-label': 0,
+    'jsx-a11y/label-has-associated-control': 0,
+    'jsx-a11y/no-static-element-interactions': 0,
 
     'react/jsx-indent': 1,
     'react/jsx-fragments': [1, 'element'],

@@ -1,4 +1,6 @@
-import React, { useEffect } from 'react';
+import React, {
+  useEffect, useCallback, useState,
+} from 'react';
 import {
   Switch,
   Route,
@@ -12,9 +14,13 @@ import { GameSettingsScreen } from '$containers/GameSettingsScreen';
 import { Messages } from '$containers/Messages';
 import { Header } from '$components/Header';
 import { IAppState } from '$store/store';
+import { Modal } from '$components/UI/Modal';
+import { AppInfo } from '$components/AppInfo';
 
 export const App = (): JSX.Element => {
   const userTheme = useSelector((state: IAppState) => state.userSettings.theme);
+
+  const [isOpenAppInfo, setIsOpenAppInfo] = useState<boolean>(false);
 
   useEffect(() => {
     document
@@ -26,9 +32,21 @@ export const App = (): JSX.Element => {
     // Дальше изменение стилей идет через UI. Поэтому у useEffect нет заваисимостей.
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const openAppInfo = useCallback(() => {
+    if (isOpenAppInfo) {
+      return;
+    }
+
+    setIsOpenAppInfo(true);
+  }, [isOpenAppInfo]);
+
+  const onCloseAppInfoModal = useCallback(() => {
+    setIsOpenAppInfo(false);
+  }, []);
+
   return (
     <div className={styles.app}>
-      <Header />
+      <Header openAppInfo={openAppInfo} />
       <Switch>
         <Route
           exact
@@ -41,6 +59,13 @@ export const App = (): JSX.Element => {
         />
       </Switch>
       <Messages />
+      {
+        isOpenAppInfo && (
+          <Modal onCloseBtnClick={onCloseAppInfoModal}>
+            <AppInfo />
+          </Modal>
+        )
+      }
     </div>
   );
 };

@@ -11,7 +11,13 @@ import { IAppState } from '$store/store';
 
 const launcherIcon = require('$images/icon.png');
 
-export const Header: React.FunctionComponent = () => {
+interface IProps {
+  openAppInfo: () => any,
+}
+
+export const Header: React.FunctionComponent<IProps> = ({
+  openAppInfo,
+}) => {
   const isResizable = useSelector((state: IAppState) => state.system.isResizable);
   const gameName = useSelector((state: IAppState) => state.system.gameName);
 
@@ -24,6 +30,10 @@ export const Header: React.FunctionComponent = () => {
 
     return (): void => { ipcRenderer.removeAllListeners('max-unmax window'); };
   }, []);
+
+  const onInfoAppClick = useCallback(() => {
+    openAppInfo();
+  }, [openAppInfo]);
 
   const onMinimizeAppClick = useCallback(() => {
     ipcRenderer.send('minimize window');
@@ -55,16 +65,19 @@ export const Header: React.FunctionComponent = () => {
             src={launcherIcon}
             alt="game logo"
           />
-          <p className={styles.header__title}>Rocket Game Launcher</p>
         </div>
         {
-        gameName
+          gameName
           && <p className={styles['header__game-name']}>{gameName}</p>
-
-      }
+        }
         <div className={styles.header__controls}>
           <Button
-            tabIndex={-1}
+            className={classNames(styles.header__btn, styles['header__btn--info'])}
+            onClick={onInfoAppClick}
+          >
+            <span className={styles['header__btn-text']}>Info</span>
+          </Button>
+          <Button
             className={classNames(styles.header__btn, styles['header__btn--fold'])}
             onClick={onMinimizeAppClick}
           >
@@ -73,7 +86,6 @@ export const Header: React.FunctionComponent = () => {
           {
           isResizable && (
             <Button
-              tabIndex={-1}
               className={classNames(
                 styles.header__btn,
                 styles[`header__btn--${isMaximize ? 'unmaximize' : 'maximize'}`],
@@ -87,7 +99,6 @@ export const Header: React.FunctionComponent = () => {
           )
         }
           <Button
-            tabIndex={-1}
             className={classNames(styles.header__btn, styles['header__btn--close'])}
             onClick={onCloseAppClick}
           >

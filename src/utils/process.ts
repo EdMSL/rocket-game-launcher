@@ -205,3 +205,5 @@ export const openFolder = (
     }
   }
 };
+
+export const openSite = (url: string): void => { shell.openExternal(url); };
