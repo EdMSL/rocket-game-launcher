@@ -21,6 +21,8 @@
   flex-direction: column;
   min-height: 0;
   padding: 10px 0 10px var(--indent-side);
+
+  background-color: var(--overlay-color);
 }
 
 .game-settings-screen__profiles {

@@ -11,7 +11,7 @@ import {
 import fs from 'fs';
 
 import { IAppState } from '$store/store';
-import { Routes } from '$constants/routes';
+import { GAME_SETTINGS_PATH_REGEXP, Routes } from '$constants/routes';
 import {
   addMessages,
   setGameSettingsFilesBackup,
@@ -27,7 +27,7 @@ import {
   initGameSettingsSaga,
   setInitialGameSettingsConfigSaga,
 } from '$sagas/gameSettings';
-import { GAME_SETTINGS_FILE_PATH, USER_THEMES_DIR } from '$constants/paths';
+import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';
@@ -45,6 +45,7 @@ import {
 import { getPathToFile } from '$utils/strings';
 import { IUnwrap } from '$types/common';
 import { setGameSettingsOptions } from '$actions/gameSettings';
+import { getGameSettingsOptionsWithDefaultValues } from '$utils/data';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -259,9 +260,17 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
     yield call(initLauncherSaga);
   }
 
-  if (location.pathname.includes(`${Routes.GAME_SETTINGS_SCREEN}`)) {
-    if (isLauncherInitialised && !isGameSettingsLoaded) {
-      yield call(initGameSettingsSaga);
+  if (GAME_SETTINGS_PATH_REGEXP.test(location.pathname)) {
+    if (isLauncherInitialised) {
+      if (!isGameSettingsLoaded) {
+        yield call(initGameSettingsSaga);
+      } else {
+        const {
+          gameSettings: { gameSettingsOptions },
+        }: IAppState = yield select(getState);
+
+        yield put(setGameSettingsOptions(getGameSettingsOptionsWithDefaultValues(gameSettingsOptions)));
+      }
     } else if (!isLauncherInitialised) {
       yield put(push(`${Routes.MAIN_SCREEN}`));
     }

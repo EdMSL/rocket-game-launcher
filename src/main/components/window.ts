@@ -79,6 +79,12 @@ export const createWindow = (systemConfig: ISystemRootState): void => {
     mainWindow.webContents.send('max-unmax window', false);
   });
 
+  if (process.env.NODE_ENV === 'production') {
+    globalShortcut.register('F11', () => {
+      // отключаем разворачивание окна приложения
+    });
+  }
+
   if (process.env.NODE_ENV === 'development') {
     globalShortcut.register('F11', () => {
       mainWindow.webContents.openDevTools();
