@@ -1,4 +1,6 @@
-import { dialog } from 'electron';
+import { dialog, shell } from 'electron';
+
+export const reportLink = 'https://rubarius.ru/forums/topic/631-%D0%BE%D1%88%D0%B8%D0%B1%D0%BA%D0%B8/'; //eslint-disable-line
 
 export const ErrorMessage = {
   DEFAULT: "There's been an error",
@@ -125,4 +127,8 @@ export const getReadWriteError = (error: NodeJS.ErrnoException, isDirOperation =
   }
 
   return error;
+};
+
+export const reportError = (error) => {
+  shell.openExternal(reportLink);
 };
