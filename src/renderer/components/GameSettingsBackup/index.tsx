@@ -17,6 +17,7 @@ import {
 import { CreateUserMessage } from '$utils/message';
 import { IMainRootState } from '$types/main';
 import { Loader } from '$components/UI/Loader';
+import { getPathToParentFileFolder } from '$utils/strings';
 
 interface ISelectedFiles {
   [key: string]: string[],
@@ -120,6 +121,10 @@ export const GameSettingsBackup: React.FC<IProps> = ({
     openFolder(BACKUP_DIR_GAME_SETTINGS_FILES, sendErrorMessage);
   }, [sendErrorMessage]);
 
+  const onOpenOriginalFileDirectoryBtnClick = useCallback(({ currentTarget }) => {
+    openFolder(getPathToParentFileFolder(currentTarget.innerText), sendErrorMessage);
+  }, [sendErrorMessage]);
+
   return (
     <div className={styles['game-settings-backup__container']}>
       {
@@ -172,6 +177,12 @@ export const GameSettingsBackup: React.FC<IProps> = ({
                                       || false}
                                     onChange={onFileInputChange}
                                   />
+                                  <Button
+                                    className={styles['game-settings-backup__path']}
+                                    onClick={onOpenOriginalFileDirectoryBtnClick}
+                                  >
+                                    {file.path}
+                                  </Button>
                                 </li>
                               ))
                             }

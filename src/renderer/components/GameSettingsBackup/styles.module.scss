@@ -6,7 +6,6 @@
 }
 
 .game-settings-backup__list {
-  // flex-grow: 1;
   @include reset-list;
   display: flex;
   flex-direction: column;
@@ -68,9 +67,12 @@
 
 .game-settings-backup__file {
   display: flex;
+  flex-direction: column;
 
   min-height: 30px;
-  padding: 0 10px;
+  padding: 4px 10px;
+
+  user-select: none;
 
   &:first-child {
     font-weight: 700;
@@ -85,8 +87,18 @@
   flex-grow: 1;
 }
 
-.game-settings-backup__checkbox-block .checkbox__label::after {
-  // flex-grow: 1;
+.game-settings-backup__file:not(:first-of-type) .checkbox__label::before {
+  top: calc(50% - 1px);
+}
+
+.game-settings-backup__file:not(:first-of-type) .checkbox__label::after {
+  top: calc(50% + 6px);
+}
+
+.game-settings-backup__path {
+  align-self: flex-start;
+
+  font-size: 12px;
 }
 
 .game-settings-backup__restore-btn {

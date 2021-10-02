@@ -199,3 +199,10 @@ export const getPathToFile = (
 export const getObjectAsList = (obj: Record<string, unknown>): string => Object.keys(obj)
   .map((key) => `${key}: ${obj[key]}`)
   .join('\n');
+
+/**
+ * Получить до родительской папки файла.
+ * @param pathToFile Путь до файла, для которого нужно получить путь до папки.
+ * @returns Строка абсолютного пути до папки.
+*/
+export const getPathToParentFileFolder = (pathToFile: string): string => path.dirname(pathToFile);
