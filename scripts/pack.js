@@ -61,5 +61,9 @@ bundleElectronApp(process.argv[2])
       path.resolve('./app/files/example_settings.json'),
       path.resolve(data[0], 'help', 'example_settings.json'),
     );
+    fs.renameSync(
+      path.resolve(data[0]),
+      path.resolve(path.dirname(data[0]), 'Rocket Game Launcher'),
+    );
   }).catch((error) => console.log(error.message));
 

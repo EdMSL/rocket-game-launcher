@@ -1,5 +1,14 @@
 {
-  "gameSettingsGroups": [],
+  "gameSettingsGroups": [
+    {
+      "name": "Graphic",
+      "label": "Графика"
+    },
+    {
+      "name": "Audio",
+      "label": "Аудио"
+    }
+  ],
   "baseFilesEncoding": "win1251",
   "gameSettingsFiles": {
     "OblivionIni": {
@@ -8,6 +17,7 @@
       "optionsList": [
         {
           "optionType": "combined",
+          "settingGroup": "Graphic",
           "label": "Разрешение экрана",
           "description": "Устанавливает разрешение экрана",
           "controllerType": "select",
@@ -39,6 +49,17 @@
               "iniGroup": "Display"
             }
           ]
+        },
+        {
+          "optionType": "default",
+          "settingGroup": "Audio",
+          "label": "Громкость музыки",
+          "name": "fDefaultMusicVolume",
+          "iniGroup": "Audio",
+          "controllerType": "range",
+          "min": 0,
+          "max": 1,
+          "step": 0.1
         }
       ]
     }
