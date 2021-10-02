@@ -127,11 +127,9 @@ export const GameSettingsBackup: React.FC<IProps> = ({
 
   return (
     <div className={styles['game-settings-backup__container']}>
-      {
-        !isGameSettingsFilesBackuping && (
-          <React.Fragment>
-            <ul className={styles['game-settings-backup__list']}>
-              {
+      <React.Fragment>
+        <ul className={styles['game-settings-backup__list']}>
+          {
                 gameSettingsFilesBackup.length > 0
                   ? gameSettingsFilesBackup.map((backupFolder) => (
                     <React.Fragment key={backupFolder.name}>
@@ -208,40 +206,38 @@ export const GameSettingsBackup: React.FC<IProps> = ({
                   ))
                   : <li className={styles['game-settings-backup__item']}>Нет доступных бэкапов</li>
               }
-            </ul>
-            <div className={styles['game-settings-backup__controls']}>
-              <Button
-                className={classNames('main-btn', styles['game-settings-backup__btn'])}
-                onClick={onCreateBackupWithRefreshBtnClick}
-              >
-                Создать бэкап
-              </Button>
-              <Button
-                className={classNames('main-btn', styles['game-settings-backup__btn'])}
-                onClick={onRefreshBackupsBtnClick}
-              >
-                Обновить
-              </Button>
-              <Button
-                className={classNames('main-btn', styles['game-settings-backup__btn'])}
-                onClick={onOpenBackupFolderBtnClick}
-              >
-                Открыть папку с бэкапами
-              </Button>
-              <Button
-                className={classNames('main-btn', styles['settings__main-btn'])}
-                isDisabled={isGameSettingsFilesBackuping}
-                onClick={onCancelBtnClick}
-              >
-                Отмена
-              </Button>
-            </div>
-          </React.Fragment>
-        )
-      }
-      {
-        isGameSettingsFilesBackuping && <Loader />
-      }
+        </ul>
+        <div className={styles['game-settings-backup__controls']}>
+          <Button
+            className={classNames('main-btn', styles['game-settings-backup__btn'])}
+            onClick={onCreateBackupWithRefreshBtnClick}
+          >
+            Создать бэкап
+          </Button>
+          <Button
+            className={classNames('main-btn', styles['game-settings-backup__btn'])}
+            onClick={onRefreshBackupsBtnClick}
+          >
+            Обновить
+          </Button>
+          <Button
+            className={classNames('main-btn', styles['game-settings-backup__btn'])}
+            onClick={onOpenBackupFolderBtnClick}
+          >
+            Открыть папку с бэкапами
+          </Button>
+          <Button
+            className={classNames('main-btn', styles['settings__main-btn'])}
+            isDisabled={isGameSettingsFilesBackuping}
+            onClick={onCancelBtnClick}
+          >
+            Отмена
+          </Button>
+        </div>
+        {
+            isGameSettingsFilesBackuping && <Loader />
+          }
+      </React.Fragment>
     </div>
   );
 };
