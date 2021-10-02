@@ -300,15 +300,14 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         multiparameters={parameter.items!.map((param) => getOptionName(param)).join()}
                         label={parameter.label!}
                         description={parameter.description}
-                        value={(gameSettingsOptions[fileName] && getValue(parameter.items![0], fileName)) || '0'}
-                        valueText={getValue(parameter.items![0], fileName).toString()}
+                        defaultValue={(gameSettingsOptions[fileName] && getValue(parameter.items![0], fileName)) || '0'}
                         min={parameter.min!}
                         max={parameter.max!}
                         step={parameter.step!}
                         isDisabled={!gameSettingsOptions[fileName]}
                         currentHintId={currentHintId}
                         onChange={onOptionInputChange}
-                        onButtonClick={onOptionRangeButtonClick}
+                        onChangeBtnClick={onOptionRangeButtonClick}
                         onHover={onParameterHover}
                         onLeave={onParameterLeave}
                       />
@@ -355,17 +354,16 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         id={parameter.id}
                         name={getOptionName(parameter)}
                         parent={fileName}
-                        value={(gameSettingsOptions[fileName] && getValue(parameter, fileName)) || '0'}
+                        defaultValue={(gameSettingsOptions[fileName] && getValue(parameter, fileName)) || '0'}
                         min={parameter.min!}
                         max={parameter.max!}
                         step={parameter.step!}
                         isDisabled={!gameSettingsOptions[fileName]}
                         label={parameter.label!}
                         description={parameter.description}
-                        valueText={getValue(parameter, fileName).toString()}
                         currentHintId={currentHintId}
                         onChange={onOptionInputChange}
-                        onButtonClick={onOptionRangeButtonClick}
+                        onChangeBtnClick={onOptionRangeButtonClick}
                         onHover={onParameterHover}
                         onLeave={onParameterLeave}
                       />

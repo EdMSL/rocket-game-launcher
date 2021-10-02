@@ -1,17 +1,20 @@
-import React, { useCallback } from 'react';
+import React, {
+  useCallback, useState, useEffect,
+} from 'react';
 import classNames from 'classnames';
 
 import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
 import { RangeButtonName } from '$constants/misc';
 import { IUIElementProps } from '$types/gameSettings';
+import { getNumberOfDecimalPlaces } from '$utils/strings';
+import { useDebouncedFunction } from '$utils/hooks';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {
-  value: string,
+  defaultValue: string,
   min: number,
   max: number,
   step: number,
-  valueText: string,
-  onButtonClick?: (
+  onChangeBtnClick?: (
     btnName: string,
     parent: string,
     name: string,
@@ -26,27 +29,45 @@ export const Range: React.FunctionComponent<IProps> = ({
   name = id,
   parent = '',
   multiparameters = '',
-  value,
+  defaultValue,
   min,
   max,
   step,
   isDisabled,
   label = '',
   description = '',
-  valueText = '',
   className = '',
   parentClassname = '',
   currentHintId = '',
   onChange,
-  onButtonClick = null,
+  onChangeBtnClick = null,
   onHover = null,
   onLeave = null,
 }) => {
+  const [value, setValue] = useState(defaultValue);
+
+  useEffect(() => {
+    setValue(defaultValue);
+  }, [defaultValue]);
+
   const onRangeBtnClick = useCallback(({ currentTarget }) => {
-    if (onButtonClick) {
-      onButtonClick(currentTarget.name, parent, name, min, max, step);
+    if (onChangeBtnClick) {
+      onChangeBtnClick(currentTarget.name, parent, name, min, max, step);
     }
-  }, [onButtonClick, parent, name, step, max, min]);
+  }, [onChangeBtnClick, parent, name, step, max, min]);
+
+  const debouncedChangeValue = useDebouncedFunction(
+    (newValue) => onChange(newValue),
+  );
+
+  const onInputChange = (event): void => {
+    const newValue = /\./g.test(defaultValue)
+      ? (+event.target.value).toFixed(getNumberOfDecimalPlaces(defaultValue))
+      : event.target.value;
+
+    setValue(newValue);
+    debouncedChangeValue(event);
+  };
 
   return (
     <div className={classNames(
@@ -74,7 +95,7 @@ export const Range: React.FunctionComponent<IProps> = ({
       </div>
       <div className="range__controls">
         {
-          onButtonClick && (
+          onChangeBtnClick && (
             <button
               type="button"
               className={classNames('button', 'range__button', 'range__button--decrease')}
@@ -97,10 +118,10 @@ export const Range: React.FunctionComponent<IProps> = ({
           max={max}
           step={step}
           disabled={isDisabled}
-          onChange={onChange}
+          onChange={onInputChange}
         />
         {
-          onButtonClick && (
+          onChangeBtnClick && (
             <button
               type="button"
               className={classNames('button', 'range__button', 'range__button--increase')}
@@ -113,7 +134,7 @@ export const Range: React.FunctionComponent<IProps> = ({
         }
       </div>
       <p className="range__input">
-        {valueText}
+        {value}
       </p>
     </div>
   );
