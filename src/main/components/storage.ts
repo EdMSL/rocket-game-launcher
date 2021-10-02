@@ -5,7 +5,9 @@ import fs from 'fs';
 
 import { configureStore, IAppState } from '$store/store';
 import { IUserSettingsRootState } from '$types/userSettings';
-import { defaultLauncherConfig, minimalLauncherConfig } from '$constants/defaultParameters';
+import {
+  defaultLauncherConfig, ILauncherConfig, minimalLauncherConfig,
+} from '$constants/defaultParameters';
 import {
   LogMessageType,
   writeToLogFile,
@@ -14,7 +16,6 @@ import {
 import {
   getUserThemesFolders,
   readJSONFileSync,
-  writeJSONFile,
 } from '$utils/files';
 import {
   CONFIG_FILE_PATH,
@@ -27,12 +28,13 @@ import {
   ErrorName,
   getReadWriteError,
   ReadWriteError,
-  showMessageBox,
 } from '$utils/errors';
 import { LauncherButtonAction, Scope } from '$constants/misc';
 import { checkConfigFileData } from '$utils/check';
 import { getObjectAsList, getPathToFile } from '$utils/strings';
-import { getNewModOrganizerParams, getUserThemes } from '$utils/data';
+import {
+  getNewModOrganizerParams, getUserThemes,
+} from '$utils/data';
 import { INITIAL_STATE as mainInitialState } from '$reducers/main';
 import { INITIAL_STATE as systemInitialState } from '$reducers/system';
 import { INITIAL_STATE as userSettingsInitialState } from '$reducers/userSettings';
@@ -58,12 +60,11 @@ interface ICustomPaths {
 
 const saveToStorageParams = ['userSettings'];
 
-const getConfigurationData = (): ISystemRootState => {
+const getConfigurationData = (): ILauncherConfig => {
   // Считываем данные из файла конфигурации лаунчера. Эти данные затем передаются в стейт Redux.
   // Если файл не найден, то создаем новый с дефолтными настройками.
   try {
-    let configData = readJSONFileSync<ISystemRootState>(CONFIG_FILE_PATH);
-    configData = checkConfigFileData(configData);
+    const configData = readJSONFileSync<ISystemRootState>(CONFIG_FILE_PATH);
 
     return configData;
   } catch (error: any) {
@@ -74,21 +75,21 @@ const getConfigurationData = (): ISystemRootState => {
           LogMessageType.WARNING,
         );
 
-        showMessageBox(
-          'Will be loaded default values. A new config file will be created',
-          'Launcher config file not found',
-          'warning',
-        );
+        // showMessageBox(
+        //   'Will be loaded default values. A new config file will be created',
+        //   'Launcher config file not found',
+        //   'warning',
+        // );
 
-        writeJSONFile(CONFIG_FILE_PATH, minimalLauncherConfig)
-          .then(() => {
-            writeToLogFile('New config file config.json successfully created.');
-          })
-          .catch(() => {
-            writeToLogFile('New config file config.json not created.', LogMessageType.WARNING);
-          });
+        // writeJSONFile(CONFIG_FILE_PATH, minimalLauncherConfig)
+        //   .then(() => {
+        //     writeToLogFile('New config file config.json successfully created.');
+        //   })
+        //   .catch(() => {
+        //     writeToLogFile('New config file config.json not created.', LogMessageType.WARNING);
+        //   });
 
-        return defaultLauncherConfig;
+        return minimalLauncherConfig;
       }
 
       throw new Error('Found problems with config.json.');
@@ -121,9 +122,9 @@ const createCustomPaths = (configData: ISystemRootState): ICustomPaths => {
       '%DOCUMENTS%': path.join(DOCUMENTS_DIR, configData.documentsPath),
     } : {},
     ...configData.modOrganizer.isUsed ? {
-      '%MO_DIR%': path.join(GAME_DIR, configData.modOrganizer.path),
-      '%MO_MODS%': path.join(GAME_DIR, configData.modOrganizer.path, 'mods'),
-      '%MO_PROFILE%': path.join(GAME_DIR, configData.modOrganizer.pathToProfiles),
+      '%MO_DIR%': path.join(GAME_DIR, configData.modOrganizer.path!),
+      '%MO_MODS%': path.join(GAME_DIR, configData.modOrganizer.path!, 'mods'),
+      '%MO_PROFILE%': path.join(GAME_DIR, configData.modOrganizer.pathToProfiles!),
     } : {},
     ...newCustomPaths,
   };
@@ -134,7 +135,8 @@ const createCustomPaths = (configData: ISystemRootState): ICustomPaths => {
 */
 export const createStorage = (): Store<IAppState> => {
   const messages: IUserMessage[] = [];
-  const configurationData = getConfigurationData();
+  const configurationFileData = getConfigurationData();
+  const configurationData = checkConfigFileData(configurationFileData);
 
   // Создаем хранилаще пользовательских настроек (настройки темы и т.п.).
   // Хранилище располагается в файле config.json в папке AppData/ (app.getPath('userData')).
@@ -174,11 +176,16 @@ export const createStorage = (): Store<IAppState> => {
 
   const customPaths = createCustomPaths(configurationData);
 
-  configurationData.playButton.path = getPathToFile(
+  configurationData.playButton.path = configurationData.playButton.path ? getPathToFile(
     configurationData.playButton.path,
     customPaths,
     '',
-  );
+  )
+    : defaultLauncherConfig.playButton.path;
+
+  if (!configurationData.playButton.path) {
+    messages.push(CreateUserMessage.warning('Не указан путь для файла запуска игры.')); //eslint-disable-line max-len
+  }
 
   if (!configurationData.playButton.label) {
     configurationData.playButton.label = defaultLauncherConfig.playButton.label;
@@ -259,8 +266,8 @@ export const createStorage = (): Store<IAppState> => {
   writeToLogFileSync(`Working directory: ${GAME_DIR}`);
   writeToLogFileSync(`Custom paths: \n${getObjectAsList(customPaths)}`);
 
-  if (configurationData.modOrganizer) {
-    writeToLogFileSync(`MO information.\n  Path: ${configurationData.modOrganizer.path}\n  Path to INI: ${configurationData.modOrganizer.pathToINI}\n  Path to profiles: ${configurationData.modOrganizer.pathToProfiles}\n  Profile parameter on INI: ${configurationData.modOrganizer.profileParam}\n  Profile parameter regExp: ${configurationData.modOrganizer.profileParamValueRegExp}`); //eslint-disable-line max-len
+  if (configurationFileData.modOrganizer) {
+    writeToLogFileSync(`MO information: \n${getObjectAsList(configurationFileData.modOrganizer!)}`);
   }
 
   return appStore;

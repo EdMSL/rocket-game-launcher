@@ -196,7 +196,7 @@ export const getPathToFile = (
 /**
  * Получить строку-список с ключ\значение из объекта.
 */
-export const getObjectAsList = (obj: Record<string, unknown>): string => Object.keys(obj)
+export const getObjectAsList = (obj: { [key: string]: any, }): string => Object.keys(obj)
   .map((key) => `${key}: ${obj[key]}`)
   .join('\n');
 

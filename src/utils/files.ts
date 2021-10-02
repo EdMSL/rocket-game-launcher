@@ -439,7 +439,7 @@ export const writeFileData = (
 */
 export const writeJSONFile = (
   pathToFile: string,
-  data: Record<string, unknown>,
+  data: { [key: string]: any, },
 ): Promise<void> => writeFileData(pathToFile, JSON.stringify(data, null, 2))
   .catch((error) => {
     writeToLogFile(

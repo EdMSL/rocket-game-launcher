@@ -82,7 +82,7 @@ export const MainScreen: React.FC = () => {
       <div className={classNames('control-panel', styles['main-screen__control-panel'])}>
         <Button
           className={classNames('main-btn', 'control-panel__btn')}
-          isDisabled={isGameRunning}
+          isDisabled={isGameRunning || !playButton.path}
           onClick={onPlayGameBtnClick}
         >
           {playButton.label}
@@ -103,26 +103,22 @@ export const MainScreen: React.FC = () => {
             </Button>
           ))
         }
-        {
-          isGameSettingsAvailable && (
-            <NavLink
-              exact
-              to={gameSettingsGroups.length > 0
-                ? `${Routes.GAME_SETTINGS_SCREEN}/${gameSettingsGroups[0].name}`
-                : Routes.GAME_SETTINGS_SCREEN}
-              className={classNames(
-                'button',
-                'main-btn',
-                'control-panel__btn',
-                (isGameRunning || !isGameSettingsAvailable) && 'control-panel__btn--disabled',
-                styles['main-screen__btn'],
-              )}
-              onClick={onDisabledNavLinkClick}
-            >
-              Настройки
-            </NavLink>
-          )
-        }
+        <NavLink
+          exact
+          to={gameSettingsGroups.length > 0
+            ? `${Routes.GAME_SETTINGS_SCREEN}/${gameSettingsGroups[0].name}`
+            : Routes.GAME_SETTINGS_SCREEN}
+          className={classNames(
+            'button',
+            'main-btn',
+            'control-panel__btn',
+            (isGameRunning || !isGameSettingsAvailable || !playButton.path) && 'control-panel__btn--disabled',
+            styles['main-screen__btn'],
+          )}
+          onClick={onDisabledNavLinkClick}
+        >
+          Настройки
+        </NavLink>
         <Button
           className={classNames('main-btn', styles['main-screen__launcher-settings-btn'])}
           onClick={onLauncherSettingsBtnClick}

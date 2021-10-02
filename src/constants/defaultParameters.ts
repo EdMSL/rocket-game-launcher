@@ -2,11 +2,44 @@ import {
   IError,
   ISuccess,
 } from '$types/common';
-import { IModOrganizerParams, ISystemRootState } from '$types/system';
+import {
+  ILauncherAppButton,
+  ILauncherCustomButton,
+  IModOrganizerParams,
+  ISystemRootState,
+} from '$types/system';
 
 export const SUCCESS_STATUS: ISuccess = 'success';
 export const ERROR_STATUS: IError = 'error';
 export const WARNING_STATUS = 'warning';
+
+interface ILauncherConfigModOrganizerParams {
+  isUsed: boolean,
+  version?: number,
+  path?: string,
+  pathToINI?: string,
+  pathToProfiles?: string,
+  profileSection?: string,
+  profileParam?: string,
+  profileParamValueRegExp?: string,
+}
+
+export interface ILauncherConfig {
+  isResizable?: boolean,
+  minWidth?: number,
+  minHeight?: number,
+  maxWidth?: number,
+  maxHeight?: number,
+  width?: number,
+  height?: number,
+  isFirstLaunch?: boolean,
+  modOrganizer?: ILauncherConfigModOrganizerParams,
+  documentsPath?: string,
+  customPaths?: { [label: string]: string, },
+  gameName?: string,
+  playButton?: ILauncherAppButton,
+  customButtons?: ILauncherCustomButton[],
+}
 
 export const defaultLauncherResolution = {
   width: 800,
@@ -17,18 +50,18 @@ export const defaultLauncherResolution = {
   maxHeight: 0,
 };
 
-export const minimalLauncherConfig = {
+export const minimalLauncherConfig: ILauncherConfig = {
   isResizable: false,
   width: defaultLauncherResolution.width,
   height: defaultLauncherResolution.height,
   modOrganizer: {
     isUsed: false,
   },
-  documentsPath: 'My Games\\Oblivion',
+  documentsPath: '',
   isFirstLaunch: true,
   customPaths: {},
   playButton: {
-    path: '%GAME_DIR%\\Oblivion.exe',
+    path: '',
     label: 'Играть',
   },
   customButtons: [],

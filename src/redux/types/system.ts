@@ -13,13 +13,13 @@ export interface IModOrganizerParams {
   profileParamValueRegExp: string,
 }
 
-interface ILauncherAppButton {
+export interface ILauncherAppButton {
   path: string,
   label: string,
-  args: string[],
+  args?: string[],
 }
 
-interface ILauncherCustomButton extends ILauncherAppButton {
+export interface ILauncherCustomButton extends ILauncherAppButton {
   id: string,
   action: string,
 }

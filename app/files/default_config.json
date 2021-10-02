@@ -6,9 +6,9 @@
   "modOrganizer": {
     "isUsed": false
   },
-  "documentsPath": "My Games\\Oblivion",
+  "documentsPath": "",
   "playButton": {
-    "path": "%GAME_DIR%\\Oblivion.exe",
+    "path": "",
     "label": "Играть"
   }
 }

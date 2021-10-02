@@ -6,7 +6,6 @@ import {
   GameSettingParameterControllerType,
   GameSettingsFileView,
   GameSettingsOptionType,
-  LauncherButtonAction,
   CustomPathName,
   DefaultCustomPathName,
 } from '$constants/misc';
@@ -14,7 +13,11 @@ import { IGameSettingsConfig, IGameSettingsRootState } from '$types/gameSettings
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';
-import { defaultLauncherConfig } from '$constants/defaultParameters';
+import {
+  defaultLauncherConfig,
+  ILauncherConfig,
+  minimalLauncherConfig,
+} from '$constants/defaultParameters';
 import { ISystemRootState } from '$types/system';
 import { CustomError, ErrorName } from './errors';
 import { getRandomId } from './strings';
@@ -41,7 +44,7 @@ const configFileDataSchema = Joi.object({
     profileSection: Joi.string().optional(),
     profileParam: Joi.string().optional(),
     profileParamValueRegExp: Joi.string().optional().allow(''),
-  }),
+  }).default(minimalLauncherConfig.modOrganizer),
   documentsPath: Joi.string().optional().allow('').default(defaultLauncherConfig.documentsPath)
     .pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
   isFirstLaunch: Joi.bool().optional().default(defaultLauncherConfig.isFirstLaunch),
@@ -51,20 +54,20 @@ const configFileDataSchema = Joi.object({
   ).optional().default(defaultLauncherConfig.customPaths),
   gameName: Joi.string().optional().allow(''),
   playButton: Joi.object({
-    path: Joi.string().required(),
+    path: Joi.string().optional().allow('').default(''),
     args: Joi.array().items(Joi.string()).optional().default([]),
     label: Joi.string().optional().allow('').default('Играть'),
-  }).required(),
+  }).optional().default(defaultLauncherConfig.playButton),
   customButtons: Joi.array()
     .items(Joi.object({
       id: Joi.string().optional().default(() => getRandomId('custom-btn')),
       path: Joi.string().required(),
       args: Joi.array().items(Joi.string()).optional().default([]),
       label: Joi.string().required(),
-    })).optional(),
+    })).optional().default([]),
 });
 
-export const checkConfigFileData = (configObj: ISystemRootState): ISystemRootState => {
+export const checkConfigFileData = (configObj: ILauncherConfig): ISystemRootState => {
   writeToLogFileSync('Started checking the config.json file.');
 
   const validateResult = configFileDataSchema.validate(configObj, {
@@ -97,7 +100,7 @@ const settingsMainSchema = Joi.object<IGameSettingsConfig>({
         Joi.string(),
         Joi.any(),
       ),
-    ).required(),
+    ).required().min(1),
 });
 
 // id для параметров не указываются в settings.json, вместо этого они генерируются автоматически.
