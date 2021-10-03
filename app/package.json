@@ -1,6 +1,6 @@
 {
   "name": "rocket",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A program for launching games and managing game builds based on them",
   "main": "./dist/index.js",
   "author": "Eduard Trayt <eduard2011rus@gmail.com> (https://github.com/EdMSL)",
