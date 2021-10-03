@@ -2,6 +2,7 @@ import Storage from 'electron-store';
 import { Store } from 'redux';
 import path from 'path';
 import fs from 'fs';
+import { app } from 'electron';
 
 import { configureStore, IAppState } from '$store/store';
 import { IUserSettingsRootState } from '$types/userSettings';
@@ -19,7 +20,7 @@ import {
 } from '$utils/files';
 import {
   CONFIG_FILE_PATH,
-  DOCUMENTS_DIR, GAME_DIR,
+  GAME_DIR,
   DefaultCustomPath,
 } from '$constants/paths';
 import { ISystemRootState } from '$types/system';
@@ -119,7 +120,7 @@ const createCustomPaths = (configData: ISystemRootState): ICustomPaths => {
   return {
     ...DefaultCustomPath,
     ...configData.documentsPath ? {
-      '%DOCUMENTS%': path.join(DOCUMENTS_DIR, configData.documentsPath),
+      '%DOCUMENTS%': path.join(app.getPath('documents'), configData.documentsPath),
     } : {},
     ...configData.modOrganizer.isUsed ? {
       '%MO_DIR%': path.join(GAME_DIR, configData.modOrganizer.path!),

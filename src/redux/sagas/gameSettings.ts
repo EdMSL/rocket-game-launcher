@@ -499,7 +499,7 @@ export function* initGameSettingsSaga(): SagaIterator {
     } else if (error instanceof CustomError) {
       errorMessage = `${error.message}`;
     } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
+      errorMessage = `${error.message}. Path "${error.path}".`;
     } else {
       errorMessage = `Unknown error. Message: ${error.message}`;
     }

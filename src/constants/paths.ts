@@ -1,5 +1,4 @@
 import path from 'path';
-import os from 'os';
 
 export const GAME_SETTINGS_FILES_BACKUP_FOLDER_NAME = 'game_settings_files';
 
@@ -12,8 +11,6 @@ export const GAME_SETTINGS_FILE_PATH = process.env.NODE_ENV === 'development'
 export const GAME_DIR = process.env.NODE_ENV === 'development'
   ? 'D:\\Oblivion'
   : path.resolve('../');
-
-export const DOCUMENTS_DIR = path.resolve(os.homedir(), 'Documents');
 
 export const BACKUP_DIR = process.env.NODE_ENV === 'development'
   ? path.resolve('./app/backup')
