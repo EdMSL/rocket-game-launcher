@@ -127,7 +127,7 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
                   isChecked={
                     selectedBackupFiles.includes(file.id)
                     || false
-}
+                  }
                   onChange={onFileInputChange}
                 />
                 <Button
@@ -148,8 +148,7 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
           id={`restore-${backupName}`}
           isDisabled={
             isGameSettingsFilesBackuping
-            || !selectedBackupFiles[backupName]
-            || selectedBackupFiles[backupName].length === 0
+            || selectedBackupFiles.length === 0
           }
           onClick={onRestoreBackupBtnClick}
         >
