@@ -1,13 +1,14 @@
 import Storage from 'electron-store';
 import { Store } from 'redux';
 import path from 'path';
-import fs from 'fs';
 import { app } from 'electron';
 
 import { configureStore, IAppState } from '$store/store';
 import { IUserSettingsRootState } from '$types/userSettings';
 import {
-  defaultLauncherConfig, ILauncherConfig, minimalLauncherConfig,
+  defaultLauncherConfig,
+  ILauncherConfig,
+  minimalLauncherConfig,
 } from '$constants/defaultParameters';
 import {
   LogMessageType,
@@ -17,46 +18,36 @@ import {
 import {
   getUserThemesFolders,
   readJSONFileSync,
+  writeJSONFile,
 } from '$utils/files';
 import {
   CONFIG_FILE_PATH,
   GAME_DIR,
-  DefaultCustomPath,
 } from '$constants/paths';
 import { ISystemRootState } from '$types/system';
 import {
   CustomError,
   ErrorName,
-  getReadWriteError,
   ReadWriteError,
+  showMessageBox,
 } from '$utils/errors';
-import { LauncherButtonAction, Scope } from '$constants/misc';
 import { checkConfigFileData } from '$utils/check';
 import { getObjectAsList, getPathToFile } from '$utils/strings';
 import {
-  getNewModOrganizerParams, getUserThemes,
+  createCustomPaths,
+  getCustomButtons,
+  getNewModOrganizerParams,
+  getUserThemes,
 } from '$utils/data';
 import { INITIAL_STATE as mainInitialState } from '$reducers/main';
 import { INITIAL_STATE as systemInitialState } from '$reducers/system';
 import { INITIAL_STATE as userSettingsInitialState } from '$reducers/userSettings';
 import { IUserMessage } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
+import { Scope } from '$constants/misc';
 
 interface IStorage {
   userSettings: IUserSettingsRootState,
-}
-
-interface ICustomPaths {
-  '%GAME_DIR%': string,
-  //@ts-ignore
-  '%DOCUMENTS%'?: string|undefined,
-  //@ts-ignore
-  '%MO_DIR%'?: string|undefined,
-  //@ts-ignore
-  '%MO_MODS%'?: string|undefined,
-  //@ts-ignore
-  '%MO_PROFILE%'?: string|undefined,
-  [label: string]: string,
 }
 
 const saveToStorageParams = ['userSettings'];
@@ -76,19 +67,19 @@ const getConfigurationData = (): ILauncherConfig => {
           LogMessageType.WARNING,
         );
 
-        // showMessageBox(
-        //   'Will be loaded default values. A new config file will be created',
-        //   'Launcher config file not found',
-        //   'warning',
-        // );
+        showMessageBox(
+          'Will be loaded default values. A new config file will be created',
+          'Launcher config file not found',
+          'warning',
+        );
 
-        // writeJSONFile(CONFIG_FILE_PATH, minimalLauncherConfig)
-        //   .then(() => {
-        //     writeToLogFile('New config file config.json successfully created.');
-        //   })
-        //   .catch(() => {
-        //     writeToLogFile('New config file config.json not created.', LogMessageType.WARNING);
-        //   });
+        writeJSONFile(CONFIG_FILE_PATH, minimalLauncherConfig)
+          .then(() => {
+            writeToLogFile('New config file config.json successfully created.');
+          })
+          .catch(() => {
+            writeToLogFile('New config file config.json not created.', LogMessageType.WARNING);
+          });
 
         return minimalLauncherConfig;
       }
@@ -105,33 +96,6 @@ const getConfigurationData = (): ILauncherConfig => {
 };
 
 /**
- * Генерация пользовательских путей с добавлением двух по умолчанию: для папки
- * игры в документах пользователя
- * и папки профилей Mod Organizer, если он используется.
- * @param configData Данные из файла config.json
- * @returns Объект с пользовательскими путями.
-*/
-const createCustomPaths = (configData: ISystemRootState): ICustomPaths => {
-  const newCustomPaths = Object.keys(configData.customPaths).reduce((paths, currentPathKey) => ({
-    ...paths,
-    [currentPathKey]: path.join(GAME_DIR, configData.customPaths[currentPathKey]),
-  }), {});
-
-  return {
-    ...DefaultCustomPath,
-    ...configData.documentsPath ? {
-      '%DOCUMENTS%': path.join(app.getPath('documents'), configData.documentsPath),
-    } : {},
-    ...configData.modOrganizer.isUsed ? {
-      '%MO_DIR%': path.join(GAME_DIR, configData.modOrganizer.path!),
-      '%MO_MODS%': path.join(GAME_DIR, configData.modOrganizer.path!, 'mods'),
-      '%MO_PROFILE%': path.join(GAME_DIR, configData.modOrganizer.pathToProfiles!),
-    } : {},
-    ...newCustomPaths,
-  };
-};
-
-/**
   * Функция для создания файла настроек пользователя и хранилища Redux.
 */
 export const createStorage = (): Store<IAppState> => {
@@ -139,8 +103,8 @@ export const createStorage = (): Store<IAppState> => {
   const configurationFileData = getConfigurationData();
   const configurationData = checkConfigFileData(configurationFileData);
 
-  // Создаем хранилаще пользовательских настроек (настройки темы и т.п.).
-  // Хранилище располагается в файле config.json в папке AppData/ (app.getPath('userData')).
+  // Создаем хранилище пользовательских настроек (настройки темы и т.п.).
+  // Хранилище располагается в файле user.json в корне программы.
   const storage = new Storage<IStorage>({
     defaults: {
       userSettings: {
@@ -152,6 +116,7 @@ export const createStorage = (): Store<IAppState> => {
     name: 'user',
   });
 
+  // Обработка файла user.json
   const userSettingsStorage = storage.get('userSettings');
 
   const userThemes = getUserThemes(getUserThemesFolders());
@@ -168,23 +133,25 @@ export const createStorage = (): Store<IAppState> => {
     storage.set('userSettings.theme', '');
   }
 
+  // Обработка данных Mod Organizer
   if (configurationData.modOrganizer.isUsed) {
-    const newModOrganizerParams = getNewModOrganizerParams(configurationData.modOrganizer);
-
     //@ts-ignore
-    configurationData.modOrganizer = newModOrganizerParams;
+    configurationData.modOrganizer = getNewModOrganizerParams(configurationData.modOrganizer);
   }
 
-  const customPaths = createCustomPaths(configurationData);
+  // Переменные путей и настройка кнопок
+  const customPaths = createCustomPaths(
+    configurationData,
+    app,
+  );
 
-  configurationData.playButton.path = configurationData.playButton.path ? getPathToFile(
-    configurationData.playButton.path,
-    customPaths,
-    '',
-  )
-    : defaultLauncherConfig.playButton.path;
-
-  if (!configurationData.playButton.path) {
+  if (configurationData.playButton.path) {
+    configurationData.playButton.path = getPathToFile(
+      configurationData.playButton.path,
+      customPaths,
+      '',
+    );
+  } else {
     messages.push(CreateUserMessage.warning('Не указан путь для файла запуска игры.')); //eslint-disable-line max-len
   }
 
@@ -193,26 +160,7 @@ export const createStorage = (): Store<IAppState> => {
   }
 
   if (configurationData.customButtons && configurationData.customButtons.length > 0) {
-    const newButtons = configurationData.customButtons.map((btn) => {
-      try {
-        const pathTo = getPathToFile(btn.path, customPaths, '');
-
-        return {
-          ...btn,
-          action: fs.statSync(pathTo).isDirectory() ? LauncherButtonAction.OPEN : LauncherButtonAction.RUN,
-          path: pathTo,
-        };
-      } catch (error: any) {
-        const err = getReadWriteError(error);
-
-        writeToLogFileSync(
-          `Can't create custom button. ${btn.label}. ${err.message} Path: ${btn.path}`,
-          LogMessageType.WARNING,
-        );
-
-        return undefined;
-      }
-    }).filter(Boolean);
+    const newButtons = getCustomButtons(configurationData.customButtons, customPaths);
 
     if (configurationData.customButtons.length !== newButtons.length) {
       messages.push(CreateUserMessage.warning('В процессе обработки списка пользовательских кнопок возникла ошибка. Не все кнопки будут доступны. Подробности в файле лога.')); //eslint-disable-line max-len
@@ -222,6 +170,7 @@ export const createStorage = (): Store<IAppState> => {
     configurationData.customButtons = newButtons;
   }
 
+  // Генерация state без gameSettings.
   const newStore = {
     userSettings: {
       ...userSettingsInitialState,
@@ -233,6 +182,10 @@ export const createStorage = (): Store<IAppState> => {
       modOrganizer: {
         ...systemInitialState.modOrganizer,
         ...configurationData.modOrganizer,
+      },
+      playButton: {
+        ...systemInitialState.playButton,
+        ...configurationData.playButton,
       },
       customPaths: { ...customPaths },
     },

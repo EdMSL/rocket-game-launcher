@@ -12,7 +12,7 @@ export const AppInfo: React.FC = () => {
   return (
     <div className={styles['app-info__container']}>
       <p className={styles['app-info__title']}>Rocket Game Launcher</p>
-      <p>Version: 1.0.0</p>
+      <p>Version: 1.0.1</p>
       <p>
         Created by
         <a

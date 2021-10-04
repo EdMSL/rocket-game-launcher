@@ -1,7 +1,13 @@
 import { screen } from 'electron';
 import si from 'systeminformation';
+import fs from 'fs';
+import path from 'path';
 
-import { CustomPathName, GameSettingsFileView } from '$constants/misc';
+import {
+  CustomPathName,
+  GameSettingsFileView,
+  LauncherButtonAction,
+} from '$constants/misc';
 import { IIniObj, IXmlObj } from './files';
 import {
   LogMessageType,
@@ -27,9 +33,19 @@ import {
 import { IUserMessage } from '$types/main';
 import { ISelectOption } from '$components/UI/Select';
 import { IIncorrectGameSettingsFiles } from '$sagas/gameSettings';
-import { DefaultCustomPath } from '$constants/paths';
-import { IModOrganizerParams } from '$types/system';
+import {
+  DefaultCustomPath,
+  GAME_DIR,
+  ICustomPaths,
+} from '$constants/paths';
+import {
+  ILauncherAppButton,
+  ILauncherCustomButton,
+  IModOrganizerParams,
+  ISystemRootState,
+} from '$types/system';
 import { defaultModOrganizerParams } from '$constants/defaultParameters';
+import { getReadWriteError } from './errors';
 
 const ONE_GB = 1073741824;
 const SYMBOLS_TO_TYPE = 8;
@@ -514,3 +530,67 @@ export const getNewModOrganizerParams = (data: IModOrganizerParams): IModOrganiz
     ...data,
   };
 };
+
+/**
+ * Генерация переменных путей.
+ * @param configData Данные из файла config.json.
+ * @param app Объект Electron.app.
+ * @returns Объект с пользовательскими путями.
+*/
+export const createCustomPaths = (
+  configData: ISystemRootState,
+  app: Electron.App,
+): ICustomPaths => {
+  const newCustomPaths = Object.keys(configData.customPaths).reduce((paths, currentPathKey) => ({
+    ...paths,
+    [currentPathKey]: path.join(GAME_DIR, configData.customPaths[currentPathKey]),
+  }), {});
+
+  return {
+    ...DefaultCustomPath,
+    ...configData.documentsPath ? {
+      '%DOCUMENTS%': path.join(app.getPath('documents'), configData.documentsPath),
+    } : {},
+    ...configData.modOrganizer.isUsed ? {
+      '%MO_DIR%': path.join(GAME_DIR, configData.modOrganizer.path!),
+      '%MO_MODS%': path.join(GAME_DIR, configData.modOrganizer.path!, 'mods'),
+      '%MO_PROFILE%': path.join(GAME_DIR, configData.modOrganizer.pathToProfiles!),
+    } : {},
+    ...newCustomPaths,
+  };
+};
+
+/**
+ * Получить данные для генерации пользовательских кнопок.
+ * @param buttonsData Данные о кнопках из config.json.
+ * @param customPaths Объект с переменными путей.
+ * @returns Массив объектов пользовательских кнопок.
+*/
+export const getCustomButtons = (
+  buttonsData: ILauncherAppButton[],
+  customPaths: ICustomPaths,
+  // Типы определяются неверно, после filter отсекутся все undefined,
+  // но ts все равно считает, что они там есть.
+  //@ts-ignore
+): ILauncherCustomButton[] => buttonsData.map<ILauncherCustomButton|undefined>((btn) => {
+  try {
+    const pathTo = getPathToFile(btn.path, customPaths, '');
+
+    return {
+      ...btn,
+      action: fs.statSync(pathTo).isDirectory()
+        ? LauncherButtonAction.OPEN
+        : LauncherButtonAction.RUN,
+      path: pathTo,
+    };
+  } catch (error: any) {
+    const err = getReadWriteError(error);
+
+    writeToLogFileSync(
+      `Can't create custom button. ${btn.label}. ${err.message} Path: ${btn.path}`,
+      LogMessageType.WARNING,
+    );
+
+    return undefined;
+  }
+}).filter(Boolean);
