@@ -21,6 +21,7 @@ import {
 import { CustomError, ReadWriteError } from './errors';
 import { IGameSettingsBackup, IUserMessage } from '$types/main';
 import { CreateUserMessage } from './message';
+import { getRandomId } from './strings';
 
 export const createBackupFolders = (isThrowError = false): void => {
   try {
@@ -84,11 +85,11 @@ export const readBackupFolder = async (folderName: string): Promise<IGameSetting
         'path.txt',
       ));
       const pathFileData = fileDataResult.toString().split('\n');
-      console.log('pathFileData: ', pathFileData);
       const newFiles = files.filter((file) => file !== 'path.txt').map((file) => {
         const pathToFile = pathFileData.find((currFile) => currFile.includes(file));
 
         return {
+          id: getRandomId('backup-file'),
           name: file,
           path: pathToFile!,
         };

@@ -1,0 +1,103 @@
+.game-settings-backup__item-container {
+  margin-bottom: 10px;
+}
+
+.game-settings-backup__item {
+  display: block;
+}
+
+.game-settings-backup__title {
+  display: list-item;
+
+  cursor: pointer;
+
+  &::-webkit-details-marker {
+    display: block;
+  }
+}
+
+.game-settings-backup__title-text {
+  font-size: 18px;
+  vertical-align: middle;
+
+  user-select: none;
+}
+/* stylelint-disable string-no-newline, max-line-length */
+
+.game-settings-backup__item-btn {
+  width: 20px;
+  height: 20px;
+  margin-left: 14px;
+
+  vertical-align: sub;
+
+  &--edit {
+    background-image:
+      url(
+        'data:image/svg+xml,\
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 528.899 528.899" fill="rgb(230, 230, 230)">\
+        <path d="M328.883,89.125l107.59,107.589l-272.34,272.34L56.604,361.465L328.883,89.125z M518.113,63.177l-47.981-47.981 c-18.543-18.543-48.653-18.543-67.259,0l-45.961,45.961l107.59,107.59l53.611-53.611 C532.495,100.753,532.495,77.559,518.113,63.177z M0.3,512.69c-1.958,8.812,5.998,16.708,14.811,14.565l119.891-29.069 L27.473,390.597L0.3,512.69z"/>\
+      </svg>'
+      );
+  }
+
+  &--delete {
+    background-image:
+      url(
+        'data:image/svg+xml,\
+      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="rgb(230, 230, 230)"><g>\
+        <path d="m424 64h-88v-16c0-26.467-21.533-48-48-48h-64c-26.467 0-48 21.533-48 48v16h-88c-22.056 0-40 17.944-40 40v56c0 8.836 7.164 16 16 16h8.744l13.823 290.283c1.221 25.636 22.281 45.717 47.945 45.717h242.976c25.665 0 46.725-20.081 47.945-45.717l13.823-290.283h8.744c8.836 0 16-7.164 16-16v-56c0-22.056-17.944-40-40-40zm-216-16c0-8.822 7.178-16 16-16h64c8.822 0 16 7.178 16 16v16h-96zm-128 56c0-4.411 3.589-8 8-8h336c4.411 0 8 3.589 8 8v40c-4.931 0-331.567 0-352 0zm313.469 360.761c-.407 8.545-7.427 15.239-15.981 15.239h-242.976c-8.555 0-15.575-6.694-15.981-15.239l-13.751-288.761h302.44z"/><path d="m256 448c8.836 0 16-7.164 16-16v-208c0-8.836-7.164-16-16-16s-16 7.164-16 16v208c0 8.836 7.163 16 16 16z"/><path d="m336 448c8.836 0 16-7.164 16-16v-208c0-8.836-7.164-16-16-16s-16 7.164-16 16v208c0 8.836 7.163 16 16 16z"/><path d="m176 448c8.836 0 16-7.164 16-16v-208c0-8.836-7.164-16-16-16s-16 7.164-16 16v208c0 8.836 7.163 16 16 16z"/></g>\
+      </svg>'
+      );
+  }
+}
+/* stylelint-enable string-no-newline, max-line-length */
+
+.game-settings-backup__item-btn-text {
+  display: none;
+}
+
+.game-settings-backup__item-list {
+  @include reset-list;
+  margin-bottom: 10px;
+}
+
+.game-settings-backup__file {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 30px;
+  padding: 4px 10px;
+
+  user-select: none;
+
+  &:first-child {
+    font-weight: 700;
+  }
+
+  &:hover {
+    background-color: var(--btn-color);
+  }
+}
+
+.game-settings-backup__checkbox-block {
+  flex-grow: 1;
+}
+
+.game-settings-backup__file:not(:first-of-type) .checkbox__label::before {
+  top: calc(50% - 1px);
+}
+
+.game-settings-backup__file:not(:first-of-type) .checkbox__label::after {
+  top: calc(50% + 6px);
+}
+
+.game-settings-backup__path {
+  align-self: flex-start;
+
+  font-size: 12px;
+}
+
+.game-settings-backup__restore-btn {
+  color: var(--text-main);
+}

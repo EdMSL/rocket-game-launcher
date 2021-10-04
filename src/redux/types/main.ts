@@ -22,7 +22,8 @@ export interface IUserMessage extends IMessage {
   id: string,
 }
 
-interface IBackupFile {
+export interface IBackupFile {
+  id: string,
   name: string,
   path: string,
 }
