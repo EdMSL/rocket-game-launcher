@@ -7,6 +7,7 @@ import { GAME_DIR } from '$constants/paths';
 
 const HEXADECIMAL = 16;
 const HEXADECIMAL_FACTOR = 1e8;
+const MAX_PATH_LENGTH = 255;
 
 /**
  * Преобразовать JSON строку в объект.
@@ -206,3 +207,20 @@ export const getObjectAsList = (obj: { [key: string]: any, }): string => Object.
  * @returns Строка абсолютного пути до папки.
 */
 export const getPathToParentFileFolder = (pathToFile: string): string => path.dirname(pathToFile);
+
+/**
+ * Проверка имени папки на корректность.
+ * @param name Имя для проверки.
+ * @returns Является ли имя корректным.
+*/
+export const isValidName = (name: string): boolean => {
+  if (typeof name !== 'string' || name.length > MAX_PATH_LENGTH) {
+    return false;
+  }
+
+  if (/.+\.\s*$/.test(name)) {
+    return false;
+  }
+
+  return !/[<>:"/\\|?*]/.test(name);
+};

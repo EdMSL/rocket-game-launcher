@@ -55,6 +55,14 @@
   &::placeholder {
     text-align: center;
   }
+
+  &--error {
+    border-color: var(--error-color);
+
+    &:focus {
+      border-color: var(--error-color);
+    }
+  }
 }
 /* stylelint-disable string-no-newline, max-line-length */
 

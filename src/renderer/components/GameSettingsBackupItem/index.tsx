@@ -9,7 +9,7 @@ import {
 import { Button } from '$components/UI/Button';
 import { Checkbox } from '$components/UI/Checkbox';
 import { openFolder } from '$utils/process';
-import { getPathToParentFileFolder } from '$utils/strings';
+import { getPathToParentFileFolder, isValidName } from '$utils/strings';
 import {
   deleteGameSettingsFilesBackup,
   renameGameSettingsFilesBackup,
@@ -57,7 +57,10 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
   }, [dispatch]);
 
   const onBackupNameInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    if (allBackups.includes(target.value.trim().toLocaleLowerCase())) {
+    if (
+      allBackups.includes(target.value.trim().toLocaleLowerCase())
+      || !isValidName(target.value)
+    ) {
       setIsBackupNameError(true);
     } else {
       setIsBackupNameError(false);
@@ -69,10 +72,10 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
   const onFormSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!isBackupNameError) {
+    if (!isBackupNameError && currentBackupName) {
       onBackupConfirmBtnClick();
     }
-  }, [isBackupNameError, onBackupConfirmBtnClick]);
+  }, [isBackupNameError, currentBackupName, onBackupConfirmBtnClick]);
 
   const onOpenOriginalFileDirectoryBtnClick = useCallback(({ currentTarget }) => {
     openFolder(getPathToParentFileFolder(currentTarget.innerText), sendErrorMessage);
@@ -125,7 +128,10 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
                   onSubmit={onFormSubmit}
                 >
                   <input
-                    className={styles['game-settings-backup__name-field']}
+                    className={classNames(
+                      styles['game-settings-backup__name-field'],
+                      isBackupNameError && styles['game-settings-backup__name-field--error'],
+                    )}
                     type="text"
                     placeholder={backupName}
                     value={currentBackupName}
