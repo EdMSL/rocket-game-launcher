@@ -66,6 +66,14 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
     setCurrentBackupName(target.value);
   }, [allBackups]);
 
+  const onFormSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!isBackupNameError) {
+      onBackupConfirmBtnClick();
+    }
+  }, [isBackupNameError, onBackupConfirmBtnClick]);
+
   const onOpenOriginalFileDirectoryBtnClick = useCallback(({ currentTarget }) => {
     openFolder(getPathToParentFileFolder(currentTarget.innerText), sendErrorMessage);
   }, [sendErrorMessage]);
@@ -112,7 +120,10 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
           {
             isEditBackupNameMode && (
               <React.Fragment>
-                <form className={styles['game-settings-backup__form']}>
+                <form
+                  className={styles['game-settings-backup__form']}
+                  onSubmit={onFormSubmit}
+                >
                   <input
                     className={styles['game-settings-backup__name-field']}
                     type="text"
