@@ -16,6 +16,7 @@ import {
   deleteFolder,
   readDirectory,
   readFileData,
+  renameFileOrFolder,
   writeFileDataSync,
 } from './files';
 import { CustomError, ReadWriteError } from './errors';
@@ -130,6 +131,17 @@ export const getGameSettingsFilesBackups = async (): Promise<IGameSettingsBackup
   }
 
   return [];
+};
+
+export const renameGameSettingsFilesBackups = async (
+  backupName: string,
+  newBackupName: string,
+): Promise<void> => {
+  await renameFileOrFolder(
+    path.join(BACKUP_DIR_GAME_SETTINGS_FILES, backupName),
+    newBackupName,
+    true,
+  );
 };
 
 export const deleteGameSettingsFilesBackup = async (

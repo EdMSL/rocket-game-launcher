@@ -50,6 +50,14 @@ export const deleteGameSettingsFilesBackup: IAction<string> = (
   payload: backupId,
 });
 
+export const renameGameSettingsFilesBackup = (
+  backupName: string,
+  newBackupName: string,
+) => ({
+  type: MAIN_TYPES.RENAME_GAME_SETTINGS_FILES_BACKUP,
+  payload: { backupName, newBackupName },
+});
+
 export const restoreGameSettingsFilesBackup: IAction<IGameSettingsBackup> = (
   filesBackup,
 ) => ({

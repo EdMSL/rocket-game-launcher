@@ -192,6 +192,30 @@ export const deleteFile = (pathToFile: string): Promise<void> => fsPromises.unli
   });
 
 /**
+ * Асинхронно переименовать файл.
+ * @param pathToFile Путь до файла.
+ * @param newName Новое имя файла/папки
+ * @param isDir Переименование для директории или нет.
+*/
+export const renameFileOrFolder = (
+  pathToFile: string,
+  newName: string,
+  isDir = false,
+): Promise<void> => fsPromises.rename(
+  pathToFile,
+  path.join(path.dirname(pathToFile), newName),
+)
+  .catch((error) => {
+    const readWriteError = getReadWriteError(error, isDir);
+
+    throw new ReadWriteError(
+      `Can't rename ${isDir ? 'folder' : 'file'}. ${readWriteError.message}`,
+      readWriteError,
+      pathToFile,
+    );
+  });
+
+/**
  * Синхронно считать данные из файла.
  * @param pathToFile Путь к файлу.
  * @param encoding Кодировка считываемого файла. По-умолчанию `'utf8'`.

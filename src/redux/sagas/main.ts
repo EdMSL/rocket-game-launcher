@@ -20,6 +20,7 @@ import {
   createGameSettingsFilesBackup as createGameSettingsFilesBackupAction,
   deleteGameSettingsFilesBackup as deleteGameSettingsFilesBackupAction,
   restoreGameSettingsFilesBackup,
+  renameGameSettingsFilesBackup,
 } from '$actions/main';
 import {
   generateGameSettingsOptionsSaga,
@@ -40,6 +41,7 @@ import {
   createGameSettingsFilesBackup,
   deleteGameSettingsFilesBackup,
   getGameSettingsFilesBackups,
+  renameGameSettingsFilesBackups,
   restoreBackupFiles,
 } from '$utils/backup';
 import { getPathToFile } from '$utils/strings';
@@ -203,6 +205,59 @@ function* deleteGameSettingsFilesBackupSaga({
   }
 }
 
+function* renameGameSettingsFilesBackupSaga({
+  payload: { backupName, newBackupName },
+}: ReturnType<typeof renameGameSettingsFilesBackup>): SagaIterator {
+  try {
+    yield put(setIsGameSettingsFilesBackuping(true));
+
+    yield call(
+      renameGameSettingsFilesBackups,
+      backupName,
+      newBackupName,
+    );
+
+    const {
+      main: {
+        gameSettingsFilesBackup,
+      },
+    }: IAppState = yield select(getState);
+
+    const backupData = gameSettingsFilesBackup.map((currentBackup) => {
+      if (currentBackup.name === backupName) {
+        return {
+          ...currentBackup,
+          name: newBackupName,
+        };
+      }
+      return currentBackup;
+    });
+
+    yield put(setGameSettingsFilesBackup(backupData));
+  } catch (error: any) {
+    let errorMessage = '';
+
+    if (error instanceof SagaError) {
+      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
+    } else if (error instanceof CustomError) {
+      errorMessage = `${error.message}`;
+    } else if (error instanceof ReadWriteError) {
+      errorMessage = `${error.message}. Path '${error.path}'.`;
+    } else {
+      errorMessage = `Unknown error. Message: ${error.message}`;
+    }
+
+    writeToLogFileSync(
+      `Failed to rename game settings files backup folder. Reason: ${errorMessage}`,
+      LogMessageType.ERROR,
+    );
+
+    yield put(addMessages([CreateUserMessage.error('Произошла ошибка при попытке переименования папки бэкапа. Подробности в файле лога.')])); //eslint-disable-line max-len
+  } finally {
+    yield put(setIsGameSettingsFilesBackuping(false));
+  }
+}
+
 function* restoreGameSettingsFilesBackupSaga({
   payload: filesBackup,
 }: ReturnType<typeof restoreGameSettingsFilesBackup>): SagaIterator {
@@ -283,5 +338,6 @@ export default function* mainSaga(): SagaIterator {
   yield takeLatest(MAIN_TYPES.CREATE_GAME_SETTINGS_FILES_BACKUP, createGameSettingsBackupSaga);
   yield takeLatest(MAIN_TYPES.GET_GAME_SETTINGS_FILES_BACKUP, getGameSettingsFilesBackupSaga);
   yield takeLatest(MAIN_TYPES.DELETE_GAME_SETTINGS_FILES_BACKUP, deleteGameSettingsFilesBackupSaga);
+  yield takeLatest(MAIN_TYPES.RENAME_GAME_SETTINGS_FILES_BACKUP, renameGameSettingsFilesBackupSaga);
   yield takeLatest(MAIN_TYPES.RESTORE_GAME_SETTINGS_FILES_BACKUP, restoreGameSettingsFilesBackupSaga);
 }

@@ -31,6 +31,8 @@ export const GameSettingsBackup: React.FC<IProps> = ({
 }) => {
   const dispatch = useDispatch();
 
+  const gameSettingsBackupsNames = gameSettingsFilesBackup.map((backup) => backup.name.toLowerCase());
+
   const sendErrorMessage = useCallback((message: string) => {
     dispatch(addMessages([CreateUserMessage.error(message)]));
   }, [dispatch]);
@@ -65,8 +67,10 @@ export const GameSettingsBackup: React.FC<IProps> = ({
             gameSettingsFilesBackup.length > 0
               ? gameSettingsFilesBackup.map((backupFolder) => (
                 <GameSettingsBackupItem
+                  key={backupFolder.name}
                   backupName={backupFolder.name}
                   backupFiles={backupFolder.files}
+                  allBackups={gameSettingsBackupsNames}
                   isGameSettingsFilesBackuping={isGameSettingsFilesBackuping}
                   sendErrorMessage={sendErrorMessage}
                 />
@@ -77,12 +81,14 @@ export const GameSettingsBackup: React.FC<IProps> = ({
         <div className={styles['game-settings-backup__controls']}>
           <Button
             className={classNames('main-btn', styles['game-settings-backup__btn'])}
+            isDisabled={isGameSettingsFilesBackuping}
             onClick={onCreateBackupWithRefreshBtnClick}
           >
             Создать бэкап
           </Button>
           <Button
             className={classNames('main-btn', styles['game-settings-backup__btn'])}
+            isDisabled={isGameSettingsFilesBackuping}
             onClick={onRefreshBackupsBtnClick}
           >
             Обновить
@@ -94,7 +100,7 @@ export const GameSettingsBackup: React.FC<IProps> = ({
             Открыть папку с бэкапами
           </Button>
           <Button
-            className={classNames('main-btn', styles['settings__main-btn'])}
+            className={classNames('main-btn', styles['game-settings-backup__btn'])}
             isDisabled={isGameSettingsFilesBackuping}
             onClick={onCancelBtnClick}
           >

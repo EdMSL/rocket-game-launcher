@@ -10,11 +10,16 @@ import { Button } from '$components/UI/Button';
 import { Checkbox } from '$components/UI/Checkbox';
 import { openFolder } from '$utils/process';
 import { getPathToParentFileFolder } from '$utils/strings';
-import { deleteGameSettingsFilesBackup, restoreGameSettingsFilesBackup } from '$actions/main';
+import {
+  deleteGameSettingsFilesBackup,
+  renameGameSettingsFilesBackup,
+  restoreGameSettingsFilesBackup,
+} from '$actions/main';
 
 interface IProps {
   backupName: string,
   backupFiles: IBackupFile[],
+  allBackups: string[],
   isGameSettingsFilesBackuping: IMainRootState['isGameSettingsFilesBackuping'],
   sendErrorMessage: (message: string) => void,
 }
@@ -22,38 +27,62 @@ interface IProps {
 export const GameSettingsBackupItem: React.FC<IProps> = ({
   backupName,
   backupFiles,
+  allBackups,
   isGameSettingsFilesBackuping,
   sendErrorMessage,
 }) => {
   const dispatch = useDispatch();
 
   const [selectedBackupFiles, setSelectedBackupFiles] = useState<string[]>([]);
+  const [isEditBackupNameMode, setIsEditBackupNameMode] = useState<boolean>(false);
+  const [currentBackupName, setCurrentBackupName] = useState<string>('');
+  const [isBackupNameError, setIsBackupNameError] = useState<boolean>(false);
 
-  const onBackupEditBtn = useCallback((event: React.SyntheticEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const onBackupEditBtnClick = useCallback(() => {
+    setIsEditBackupNameMode(true);
+  }, []);
 
+  const onBackupConfirmBtnClick = useCallback(() => {
+    dispatch(renameGameSettingsFilesBackup(backupName, currentBackupName.trim()));
+    setIsEditBackupNameMode(false);
+  }, [dispatch, backupName, currentBackupName]);
+
+  const onBackupCancelBtnClick = useCallback(() => {
+    setCurrentBackupName('');
+    setIsEditBackupNameMode(false);
+  }, []);
+
+  const onBackupDeleteBtnClick = useCallback((event: React.SyntheticEvent) => {
     dispatch(deleteGameSettingsFilesBackup(event.currentTarget.id.split('-')[1]));
   }, [dispatch]);
 
-  const onBackupDeleteBtn = useCallback((event: React.SyntheticEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const onBackupNameInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    if (allBackups.includes(target.value.trim().toLocaleLowerCase())) {
+      setIsBackupNameError(true);
+    } else {
+      setIsBackupNameError(false);
+    }
 
-    dispatch(deleteGameSettingsFilesBackup(event.currentTarget.id.split('-')[1]));
-  }, [dispatch]);
+    setCurrentBackupName(target.value);
+  }, [allBackups]);
 
   const onOpenOriginalFileDirectoryBtnClick = useCallback(({ currentTarget }) => {
     openFolder(getPathToParentFileFolder(currentTarget.innerText), sendErrorMessage);
   }, [sendErrorMessage]);
 
-  const onFileInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
+  const onBackupFileCheckboxChange = useCallback((
+    { target }: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const newSelectedFiles = target.checked
       ? [...selectedBackupFiles, target.id]
       : selectedBackupFiles.filter((fileId) => fileId !== target.id);
 
     setSelectedBackupFiles(newSelectedFiles);
   }, [selectedBackupFiles]);
+
+  const onBackupNameInputBlur = useCallback(() => {
+    onBackupCancelBtnClick();
+  }, [onBackupCancelBtnClick]);
 
   const onAllFilesInputChange = useCallback(({ target }) => {
     const newSelectedFiles = target.checked
@@ -80,27 +109,70 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
     <li className={styles['game-settings-backup__item-container']}>
       <details className={styles['game-settings-backup__item']}>
         <summary className={styles['game-settings-backup__title']}>
-          <span className={styles['game-settings-backup__title-text']}>
-            {backupName}
-          </span>
-          <Button
-            className={classNames(
-              styles['game-settings-backup__item-btn--edit'],
-              styles['game-settings-backup__item-btn'],
-            )}
-            onClick={onBackupEditBtn}
-          >
-            Редактировать
-          </Button>
-          <Button
-            className={classNames(
-              styles['game-settings-backup__item-btn--delete'],
-              styles['game-settings-backup__item-btn'],
-            )}
-            onClick={onBackupDeleteBtn}
-          >
-            Удалить
-          </Button>
+          {
+            isEditBackupNameMode && (
+              <React.Fragment>
+                <form className={styles['game-settings-backup__form']}>
+                  <input
+                    className={styles['game-settings-backup__name-field']}
+                    type="text"
+                    placeholder={backupName}
+                    value={currentBackupName}
+                    autoFocus
+                    onChange={onBackupNameInputChange}
+                    // onBlur={onBackupNameInputBlur}
+                  />
+                </form>
+                <Button
+                  className={classNames(
+                    styles['game-settings-backup__item-btn--confirm'],
+                    styles['game-settings-backup__item-btn'],
+                  )}
+                  isDisabled={!currentBackupName || isBackupNameError}
+                  onClick={onBackupConfirmBtnClick}
+                >
+                  Принять
+                </Button>
+                <Button
+                  className={classNames(
+                    styles['game-settings-backup__item-btn--cancel'],
+                    styles['game-settings-backup__item-btn'],
+                  )}
+                  onClick={onBackupCancelBtnClick}
+                >
+                  Отменить
+                </Button>
+              </React.Fragment>
+            )
+          }
+          {
+            !isEditBackupNameMode && (
+              <React.Fragment>
+                <span className={styles['game-settings-backup__title-text']}>
+                  {backupName}
+                </span>
+                <Button
+                  className={classNames(
+                    styles['game-settings-backup__item-btn--edit'],
+                    styles['game-settings-backup__item-btn'],
+                  )}
+                  isDisabled={isEditBackupNameMode}
+                  onClick={onBackupEditBtnClick}
+                >
+                  Редактировать
+                </Button>
+                <Button
+                  className={classNames(
+                    styles['game-settings-backup__item-btn--delete'],
+                    styles['game-settings-backup__item-btn'],
+                  )}
+                  onClick={onBackupDeleteBtnClick}
+                >
+                  Удалить
+                </Button>
+              </React.Fragment>
+            )
+          }
         </summary>
         <ul className={styles['game-settings-backup__item-list']}>
           <li className={styles['game-settings-backup__file']}>
@@ -128,7 +200,7 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
                     selectedBackupFiles.includes(file.id)
                     || false
                   }
-                  onChange={onFileInputChange}
+                  onChange={onBackupFileCheckboxChange}
                 />
                 <Button
                   className={styles['game-settings-backup__path']}
