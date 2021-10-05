@@ -1,4 +1,6 @@
-import React, { useCallback, useState } from 'react';
+import React, {
+  useCallback, useState, useEffect, useRef,
+} from 'react';
 import { useDispatch } from 'react-redux';
 import classNames from 'classnames';
 
@@ -32,11 +34,49 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
   sendErrorMessage,
 }) => {
   const dispatch = useDispatch();
+  const nameInput = useRef<HTMLInputElement>(null);
+  const backupDetails = useRef<HTMLDetailsElement>(null);
 
   const [selectedBackupFiles, setSelectedBackupFiles] = useState<string[]>([]);
   const [isEditBackupNameMode, setIsEditBackupNameMode] = useState<boolean>(false);
   const [currentBackupName, setCurrentBackupName] = useState<string>('');
   const [isBackupNameError, setIsBackupNameError] = useState<boolean>(false);
+
+  const cancelBackupRename = useCallback(() => {
+    setCurrentBackupName('');
+    setIsEditBackupNameMode(false);
+  }, []);
+
+  const onEscKeyPress = useCallback((event: KeyboardEvent) => {
+    if (event.code === 'Escape') {
+      cancelBackupRename();
+      nameInput.current?.focus();
+    }
+  }, [cancelBackupRename]);
+
+  const onSpaceKeyPress = useCallback((event: KeyboardEvent) => {
+    if (event.code === 'Space' && document.activeElement === nameInput.current) {
+      event.preventDefault();
+    }
+  }, []);
+
+  useEffect(() => {
+    const input = nameInput.current;
+    const details = backupDetails.current;
+
+    nameInput.current?.addEventListener('keyup', onEscKeyPress);
+    backupDetails.current?.addEventListener('keyup', onSpaceKeyPress);
+
+    return (): void => {
+      if (input !== null) {
+        input.removeEventListener('keyup', onEscKeyPress);
+      }
+
+      if (details !== null) {
+        details.removeEventListener('keyup', onSpaceKeyPress);
+      }
+    };
+  }, [onEscKeyPress, onSpaceKeyPress]);
 
   const onBackupEditBtnClick = useCallback(() => {
     setIsEditBackupNameMode(true);
@@ -45,12 +85,12 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
   const onBackupConfirmBtnClick = useCallback(() => {
     dispatch(renameGameSettingsFilesBackup(backupName, currentBackupName.trim()));
     setIsEditBackupNameMode(false);
+    setCurrentBackupName('');
   }, [dispatch, backupName, currentBackupName]);
 
   const onBackupCancelBtnClick = useCallback(() => {
-    setCurrentBackupName('');
-    setIsEditBackupNameMode(false);
-  }, []);
+    cancelBackupRename();
+  }, [cancelBackupRename]);
 
   const onBackupDeleteBtnClick = useCallback((event: React.SyntheticEvent) => {
     dispatch(deleteGameSettingsFilesBackup(event.currentTarget.id.split('-')[1]));
@@ -60,6 +100,7 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
     if (
       allBackups.includes(target.value.trim().toLocaleLowerCase())
       || !isValidName(target.value)
+      || (target.value.length > 0 && target.value.trim().length === 0)
     ) {
       setIsBackupNameError(true);
     } else {
@@ -92,8 +133,8 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
   }, [selectedBackupFiles]);
 
   const onBackupNameInputBlur = useCallback(() => {
-    onBackupCancelBtnClick();
-  }, [onBackupCancelBtnClick]);
+    cancelBackupRename();
+  }, [cancelBackupRename]);
 
   const onAllFilesInputChange = useCallback(({ target }) => {
     const newSelectedFiles = target.checked
@@ -118,7 +159,10 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
 
   return (
     <li className={styles['game-settings-backup__item-container']}>
-      <details className={styles['game-settings-backup__item']}>
+      <details
+        className={styles['game-settings-backup__item']}
+        ref={backupDetails}
+      >
         <summary className={styles['game-settings-backup__title']}>
           {
             isEditBackupNameMode && (
@@ -132,6 +176,7 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
                       styles['game-settings-backup__name-field'],
                       isBackupNameError && styles['game-settings-backup__name-field--error'],
                     )}
+                    ref={nameInput}
                     type="text"
                     placeholder={backupName}
                     value={currentBackupName}

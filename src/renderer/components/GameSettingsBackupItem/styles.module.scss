@@ -12,6 +12,10 @@
 
   cursor: pointer;
 
+  &:focus {
+    @include focus;
+  }
+
   &::marker {
     display: block;
   }
@@ -75,6 +79,11 @@
 
   background-repeat: no-repeat;
   background-position: center;
+
+  &:focus {
+    @include focus;
+    outline-offset: 2px;
+  }
 
   &:disabled {
     opacity: 0.5;
