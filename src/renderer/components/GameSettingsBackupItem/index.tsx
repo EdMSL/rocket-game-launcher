@@ -34,8 +34,9 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
   sendErrorMessage,
 }) => {
   const dispatch = useDispatch();
+
   const nameInput = useRef<HTMLInputElement>(null);
-  const backupDetails = useRef<HTMLDetailsElement>(null);
+  const backupSummary = useRef<HTMLDetailsElement>(null);
 
   const [selectedBackupFiles, setSelectedBackupFiles] = useState<string[]>([]);
   const [isEditBackupNameMode, setIsEditBackupNameMode] = useState<boolean>(false);
@@ -45,15 +46,18 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
   const cancelBackupRename = useCallback(() => {
     setCurrentBackupName('');
     setIsEditBackupNameMode(false);
+    setIsBackupNameError(false);
   }, []);
 
   const onEscKeyPress = useCallback((event: KeyboardEvent) => {
     if (event.code === 'Escape') {
       cancelBackupRename();
-      nameInput.current?.focus();
+      backupSummary.current?.focus();
     }
   }, [cancelBackupRename]);
 
+  // При нажатии пробела summary сворачивается\разворачивается.
+  // Для этого отключаем этот функционал, когда инпут внутри него в фокусе.
   const onSpaceKeyPress = useCallback((event: KeyboardEvent) => {
     if (event.code === 'Space' && document.activeElement === nameInput.current) {
       event.preventDefault();
@@ -62,21 +66,24 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
 
   useEffect(() => {
     const input = nameInput.current;
-    const details = backupDetails.current;
+    const summary = backupSummary.current;
 
     nameInput.current?.addEventListener('keyup', onEscKeyPress);
-    backupDetails.current?.addEventListener('keyup', onSpaceKeyPress);
+    backupSummary.current?.addEventListener('keyup', onSpaceKeyPress);
 
     return (): void => {
       if (input !== null) {
         input.removeEventListener('keyup', onEscKeyPress);
       }
 
-      if (details !== null) {
-        details.removeEventListener('keyup', onSpaceKeyPress);
+      if (summary !== null) {
+        summary.removeEventListener('keyup', onSpaceKeyPress);
       }
     };
-  }, [onEscKeyPress, onSpaceKeyPress]);
+    // Нам не нужно перерисовывать компонент при изменении значений в nameInput,
+    // нужно лишь повесить обработчик, когда он будет смонтирован, так как он изначально null
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onEscKeyPress, onSpaceKeyPress, nameInput.current]);
 
   const onBackupEditBtnClick = useCallback(() => {
     setIsEditBackupNameMode(true);
@@ -161,9 +168,11 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
     <li className={styles['game-settings-backup__item-container']}>
       <details
         className={styles['game-settings-backup__item']}
-        ref={backupDetails}
       >
-        <summary className={styles['game-settings-backup__title']}>
+        <summary
+          className={styles['game-settings-backup__title']}
+          ref={backupSummary}
+        >
           {
             isEditBackupNameMode && (
               <React.Fragment>

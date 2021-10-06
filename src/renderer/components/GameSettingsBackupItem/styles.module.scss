@@ -8,7 +8,10 @@
 
 .game-settings-backup__title {
   display: list-item;
+  box-sizing: content-box;
   height: 30px;
+  padding: 2px;
+  padding-top: 4px;
 
   cursor: pointer;
 
