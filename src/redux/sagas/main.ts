@@ -33,7 +33,7 @@ import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';
 import {
-  CustomError, ReadWriteError, SagaError,
+  CustomError, ErrorName, ReadWriteError, SagaError,
 } from '$utils/errors';
 import { MAIN_TYPES } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
@@ -182,24 +182,36 @@ function* deleteGameSettingsFilesBackupSaga({
 
     yield call(getGameSettingsFilesBackupSaga, false);
   } catch (error: any) {
-    let errorMessage = '';
+    if (error instanceof ReadWriteError && error.cause.name === ErrorName.NOT_FOUND) {
+      yield put(addMessages([CreateUserMessage.warning(
+        'Не удалось удалить файлы бэкапа. Папка была удалена, перемещена или переименована.',
+      )]));
+      yield call(getGameSettingsFilesBackupSaga, false);
 
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
+      writeToLogFileSync(
+        `Failed to delete game settings files backup. Reason: ${error.message}. Path '${error.path}'.`, //eslint-disable-line max-len
+        LogMessageType.ERROR,
+      );
     } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
+      let errorMessage = '';
+
+      if (error instanceof SagaError) {
+        errorMessage = `Error in "${error.sagaName}". ${error.message}`;
+      } else if (error instanceof CustomError) {
+        errorMessage = `${error.message}`;
+      } else if (error instanceof ReadWriteError) {
+        errorMessage = `${error.message}. Path '${error.path}'.`;
+      } else {
+        errorMessage = `Unknown error. Message: ${error.message}`;
+      }
+
+      writeToLogFileSync(
+        `Failed to delete game settings files backup. Reason: ${errorMessage}`,
+        LogMessageType.ERROR,
+      );
+
+      yield put(addMessages([CreateUserMessage.error('Произошла ошибка в процессе удаления файлов бэкапа. Подробности в файле лога.')])); //eslint-disable-line max-len
     }
-
-    writeToLogFileSync(
-      `Failed to create game settings files backup. Reason: ${errorMessage}`,
-      LogMessageType.ERROR,
-    );
-
-    yield put(addMessages([CreateUserMessage.error('Произошла критическая ошибка в процессе удаления файлов бэкапа. Подробности в файле лога.')])); //eslint-disable-line max-len
   } finally {
     yield put(setIsGameSettingsFilesBackuping(false));
   }
@@ -235,24 +247,54 @@ function* renameGameSettingsFilesBackupSaga({
 
     yield put(setGameSettingsFilesBackup(backupData));
   } catch (error: any) {
-    let errorMessage = '';
+    if (error instanceof ReadWriteError && error.cause.name === ErrorName.NOT_FOUND) {
+      yield put(addMessages([CreateUserMessage.warning(
+        'Не удалось переименовать папку бэкапа. Папка была удалена, перемещена или переименована.',
+      )]));
+      yield call(getGameSettingsFilesBackupSaga, false);
 
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
+      writeToLogFileSync(
+        `Failed to rename game settings files backup. Reason: ${error.message}. Path '${error.path}'.`, //eslint-disable-line max-len
+        LogMessageType.ERROR,
+      );
     } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
+      let errorMessage = '';
+
+      if (error instanceof SagaError) {
+        errorMessage = `Error in "${error.sagaName}". ${error.message}`;
+      } else if (error instanceof CustomError) {
+        errorMessage = `${error.message}`;
+      } else if (error instanceof ReadWriteError) {
+        errorMessage = `${error.message}. Path '${error.path}'.`;
+      } else {
+        errorMessage = `Unknown error. Message: ${error.message}`;
+      }
+
+      writeToLogFileSync(
+        `Failed to rename game settings files backup. Reason: ${errorMessage}`,
+        LogMessageType.ERROR,
+      );
+
+      yield put(addMessages([CreateUserMessage.error('Произошла ошибка при попытке переименования папки бэкапа. Подробности в файле лога.')])); //eslint-disable-line max-len
     }
+    // let errorMessage = '';
 
-    writeToLogFileSync(
-      `Failed to rename game settings files backup folder. Reason: ${errorMessage}`,
-      LogMessageType.ERROR,
-    );
+    // if (error instanceof SagaError) {
+    //   errorMessage = `Error in "${error.sagaName}". ${error.message}`;
+    // } else if (error instanceof CustomError) {
+    //   errorMessage = `${error.message}`;
+    // } else if (error instanceof ReadWriteError) {
+    //   errorMessage = `${error.message}. Path '${error.path}'.`;
+    // } else {
+    //   errorMessage = `Unknown error. Message: ${error.message}`;
+    // }
 
-    yield put(addMessages([CreateUserMessage.error('Произошла ошибка при попытке переименования папки бэкапа. Подробности в файле лога.')])); //eslint-disable-line max-len
+    // writeToLogFileSync(
+    //   `Failed to rename game settings files backup folder. Reason: ${errorMessage}`,
+    //   LogMessageType.ERROR,
+    // );
+
+    // yield put(addMessages([CreateUserMessage.error('Произошла ошибка при попытке переименования папки бэкапа. Подробности в файле лога.')])); //eslint-disable-line max-len
   } finally {
     yield put(setIsGameSettingsFilesBackuping(false));
   }
