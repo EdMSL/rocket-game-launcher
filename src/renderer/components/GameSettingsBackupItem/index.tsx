@@ -86,12 +86,6 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
     setIsEditBackupNameMode(true);
   }, []);
 
-  const onBackupConfirmBtnClick = useCallback(() => {
-    dispatch(renameGameSettingsFilesBackup(backupName, currentBackupName.trim()));
-    setIsEditBackupNameMode(false);
-    setCurrentBackupName('');
-  }, [dispatch, backupName, currentBackupName]);
-
   const onBackupCancelBtnClick = useCallback(() => {
     cancelBackupRename();
   }, [cancelBackupRename]);
@@ -118,9 +112,11 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
     event.preventDefault();
 
     if (!isBackupNameError && currentBackupName) {
-      onBackupConfirmBtnClick();
+      dispatch(renameGameSettingsFilesBackup(backupName, currentBackupName.trim()));
+      setIsEditBackupNameMode(false);
+      setCurrentBackupName('');
     }
-  }, [isBackupNameError, currentBackupName, onBackupConfirmBtnClick]);
+  }, [dispatch, backupName, isBackupNameError, currentBackupName]);
 
   const onOpenOriginalFileDirectoryBtnClick = useCallback(({ currentTarget }) => {
     openFolder(getPathToParentFileFolder(currentTarget.innerText), sendErrorMessage);
@@ -189,26 +185,26 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
                     autoFocus
                     onChange={onBackupNameInputChange}
                   />
+                  <Button
+                    className={classNames(
+                      styles['game-settings-backup__item-btn--confirm'],
+                      styles['game-settings-backup__item-btn'],
+                    )}
+                    isSubmit
+                    isDisabled={!currentBackupName || isBackupNameError}
+                  >
+                    Принять
+                  </Button>
+                  <Button
+                    className={classNames(
+                      styles['game-settings-backup__item-btn--cancel'],
+                      styles['game-settings-backup__item-btn'],
+                    )}
+                    onClick={onBackupCancelBtnClick}
+                  >
+                    Отменить
+                  </Button>
                 </form>
-                <Button
-                  className={classNames(
-                    styles['game-settings-backup__item-btn--confirm'],
-                    styles['game-settings-backup__item-btn'],
-                  )}
-                  isDisabled={!currentBackupName || isBackupNameError}
-                  onClick={onBackupConfirmBtnClick}
-                >
-                  Принять
-                </Button>
-                <Button
-                  className={classNames(
-                    styles['game-settings-backup__item-btn--cancel'],
-                    styles['game-settings-backup__item-btn'],
-                  )}
-                  onClick={onBackupCancelBtnClick}
-                >
-                  Отменить
-                </Button>
               </React.Fragment>
             )
           }

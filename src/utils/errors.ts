@@ -87,12 +87,14 @@ export class ReadWriteError extends Error {
 }
 
 export class SagaError extends Error {
-  public sagaName;
+  public sagaName: string;
+  public reason: Error|undefined;
 
-  constructor(sagaName: string, message: string) {
+  constructor(sagaName: string, message: string, reason?: Error) {
     super(message);
     this.name = ErrorName.SAGA_ERROR;
     this.sagaName = sagaName;
+    this.reason = reason;
   }
 }
 

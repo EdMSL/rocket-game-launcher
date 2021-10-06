@@ -20,6 +20,7 @@ import {
   changeMoProfile,
   saveGameSettingsFiles,
   setGameSettingsOptions,
+  updateGameSettingsOptions,
 } from '$actions/gameSettings';
 import { IGameSettingsOptionsItem } from '$types/gameSettings';
 import { Loader } from '$components/UI/Loader';
@@ -72,6 +73,10 @@ export const GameSettingsScreen: React.FC = () => {
       dispatch(saveGameSettingsFiles(getChangedGameSettingsOptions(gameSettingsOptions)));
     }
   }, [dispatch, gameSettingsOptions, isGameOptionsChanged]);
+
+  const onRefreshSettingsBtnClick = useCallback(() => {
+    dispatch(updateGameSettingsOptions());
+  }, [dispatch]);
 
   const onCancelSettingsBtnClick = useCallback(() => {
     dispatch(setGameSettingsOptions(getGameSettingsOptionsWithDefaultValues(gameSettingsOptions)));
@@ -187,6 +192,7 @@ export const GameSettingsScreen: React.FC = () => {
                 isGameOptionsChanged={getIsSaveResetSettingsButtonsDisabled()}
                 isBackuping={isGameSettingsFilesBackuping}
                 isSaving={isGameSettingsSaving}
+                onRefreshSettingsBtnClick={onRefreshSettingsBtnClick}
                 onCancelSettingsBtnClick={onCancelSettingsBtnClick}
                 onCreateBackupBtnClick={onCreateBackupBtnClick}
                 onBackupsBtnClick={onBackupsBtnClick}

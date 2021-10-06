@@ -98,7 +98,7 @@ const getState = (state: IAppState): IAppState => state;
  * Получить данные из файла конфигурации лаунчера
  * config.json, проверить основные поля и записать в `state`
 */
-export function* setInitialGameSettingsConfigSaga(): SagaIterator {
+export function* setInitialGameSettingsConfigSaga(isUpdate = false): SagaIterator {
   try {
     const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_FILE_PATH);
     const newSettingsConfigObj = checkGameSettingsConfigMainFields(gameSettingsObj);
@@ -111,14 +111,16 @@ export function* setInitialGameSettingsConfigSaga(): SagaIterator {
     if (error instanceof CustomError) {
       errorMessage = error.message;
     } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
+      errorMessage = `${error.message}. Path: '${error.path}'.`;
     } else {
       errorMessage = `Unknown error. Message: ${error.message}`;
     }
 
-    yield put(addMessages([CreateUserMessage.error('Ошибка обработки файла settings.json. Игровые настройки будут недоступны. Подробности в файле лога')])); //eslint-disable-line max-len
+    if (!isUpdate) {
+      yield put(addMessages([CreateUserMessage.error('Ошибка обработки файла settings.json. Игровые настройки будут недоступны. Подробности в файле лога')])); //eslint-disable-line max-len
+    }
 
-    throw new SagaError('Set initial game settings saga', errorMessage);
+    throw new SagaError('Set initial game settings saga', errorMessage, error);
   }
 }
 
@@ -428,7 +430,7 @@ export function* generateGameSettingsOptionsSaga(
  * Получаем данные МО, проверяем на валидность параметры игровых настроек (`gameSettingsFiles`)
  * и переписываем их в случае невалидности некоторых полей, генерируем опции игровых настроек.
 */
-export function* initGameSettingsSaga(): SagaIterator {
+export function* initGameSettingsSaga(isUpdate = false): SagaIterator {
   try {
     yield put(setIsGameSettingsLoaded(false));
     writeToLogFileSync('Game settings initialization started.');
@@ -509,7 +511,11 @@ export function* initGameSettingsSaga(): SagaIterator {
       LogMessageType.ERROR,
     );
 
-    yield put(addMessages([CreateUserMessage.error('Произошла ошибка в процессе генерации игровых настроек. Подробности в файле лога.')]));//eslint-disable-line max-len
+    if (!isUpdate) {
+      yield put(addMessages([CreateUserMessage.error('Произошла ошибка в процессе генерации игровых настроек. Подробности в файле лога.')]));//eslint-disable-line max-len
+    } else {
+      throw new SagaError('Init game settings', errorMessage);
+    }
   } finally {
     yield put(setIsGameSettingsLoaded(true));
   }

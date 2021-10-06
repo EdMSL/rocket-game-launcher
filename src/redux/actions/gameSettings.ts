@@ -22,6 +22,10 @@ export const changeGameSettingsOption = (
   payload: { parent, gameSettingsOptions },
 });
 
+export const updateGameSettingsOptions = () => ({
+  type: GAME_SETTINGS_TYPES.UPDATE_GAME_SETTINGS_OPTIONS,
+});
+
 export const setGameSettingsConfig: IAction<IGameSettingsConfig> = (
   gameSetingsConfig,
 ) => ({
