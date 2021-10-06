@@ -99,9 +99,9 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
     cancelBackupRename();
   }, [cancelBackupRename]);
 
-  const onBackupDeleteBtnClick = useCallback((event: React.SyntheticEvent) => {
-    dispatch(deleteGameSettingsFilesBackup(event.currentTarget.id.split('-')[1]));
-  }, [dispatch]);
+  const onBackupDeleteBtnClick = useCallback(() => {
+    dispatch(deleteGameSettingsFilesBackup(backupName));
+  }, [dispatch, backupName]);
 
   const onBackupNameInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     if (

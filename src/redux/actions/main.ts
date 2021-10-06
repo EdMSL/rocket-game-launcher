@@ -44,10 +44,10 @@ export const createGameSettingsFilesBackup: IAction<boolean> = (isGetBackup = fa
 });
 
 export const deleteGameSettingsFilesBackup: IAction<string> = (
-  backupId,
+  backupName,
 ) => ({
   type: MAIN_TYPES.DELETE_GAME_SETTINGS_FILES_BACKUP,
-  payload: backupId,
+  payload: backupName,
 });
 
 export const renameGameSettingsFilesBackup = (

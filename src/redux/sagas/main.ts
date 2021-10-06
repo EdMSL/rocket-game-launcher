@@ -167,13 +167,13 @@ function* createGameSettingsBackupSaga(
 }
 
 function* deleteGameSettingsFilesBackupSaga({
-  payload: iniBackupId,
+  payload: backupName,
 }: ReturnType<typeof deleteGameSettingsFilesBackupAction>): SagaIterator {
   try {
     yield put(setIsGameSettingsFilesBackuping(true));
 
     const deleteResultMessage: IUnwrap<typeof deleteGameSettingsFilesBackup> = yield call(
-      deleteGameSettingsFilesBackup, iniBackupId,
+      deleteGameSettingsFilesBackup, backupName,
     );
 
     if (deleteResultMessage.length > 0) {
