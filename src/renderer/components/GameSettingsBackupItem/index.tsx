@@ -80,10 +80,7 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
         summary.removeEventListener('keyup', onSpaceKeyPress);
       }
     };
-    // Нам не нужно перерисовывать компонент при изменении значений в nameInput,
-    // нужно лишь повесить обработчик, когда он будет смонтирован, так как он изначально null
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onEscKeyPress, onSpaceKeyPress, nameInput.current]);
+  }, [onEscKeyPress, onSpaceKeyPress, isEditBackupNameMode]);
 
   const onBackupEditBtnClick = useCallback(() => {
     setIsEditBackupNameMode(true);
@@ -191,7 +188,6 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
                     value={currentBackupName}
                     autoFocus
                     onChange={onBackupNameInputChange}
-                    // onBlur={onBackupNameInputBlur}
                   />
                 </form>
                 <Button
