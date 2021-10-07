@@ -89,6 +89,54 @@ function* initLauncherSaga(): SagaIterator {
   }
 }
 
+function* updateGameSettingsOptionsSaga(): SagaIterator {
+  yield put(setIsGameSettingsLoaded(false));
+
+  try {
+    yield put(setIsGameSettingsAvailable(false));
+    const newConfigData: IUnwrap<IGameSettingsConfig> = yield call(setInitialGameSettingsConfigSaga, true);
+
+    // yield take(GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_CONFIG);
+    yield call(initGameSettingsSaga, true, newConfigData.gameSettingsFiles);
+  } catch (error: any) {
+    if (
+      error instanceof SagaError
+      && error.reason instanceof ReadWriteError
+      && error.reason.cause.name === ErrorName.NOT_FOUND
+    ) {
+      writeToLogFile('Game settings file settings.json not found.');
+
+      yield put(addMessages(
+        [CreateUserMessage.error('Не найден файл settings.json, обновление прервано. Игровые настройки будут недоступны.')], // eslint-disable-line max-len
+      ));
+      yield put(push(`${Routes.MAIN_SCREEN}`));
+    } else {
+      let errorMessage = '';
+
+      if (error instanceof SagaError) {
+        errorMessage = `Error in "${error.sagaName}". ${error.message}`;
+      } else if (error instanceof CustomError) {
+        errorMessage = `${error.message}`;
+      } else if (error instanceof ReadWriteError) {
+        errorMessage = `${error.message}. Path '${error.path}'.`;
+      } else {
+        errorMessage = `Unknown error. Message: ${error.message}`;
+      }
+
+      writeToLogFileSync(
+        `An error occured during update game settings options: ${errorMessage}`,
+        LogMessageType.ERROR,
+      );
+
+      yield put(addMessages(
+        [CreateUserMessage.error('Возникла ошибка в процессе обновления игровых настроек. Подробности в файле лога.')], // eslint-disable-line max-len
+      ));
+    }
+  } finally {
+    yield put(setIsGameSettingsLoaded(true));
+  }
+}
+
 function* getGameSettingsFilesBackupSaga(isExternalCall = true): SagaIterator {
   try {
     if (isExternalCall) {
@@ -331,53 +379,6 @@ function* restoreGameSettingsFilesBackupSaga({
     yield put(addMessages([CreateUserMessage.error('Произошла критическая ошибка в процессе восстановления файлов из бэкапа. Файлы не были восстановлены. Подробности в файле лога.')])); //eslint-disable-line max-len
   } finally {
     yield put(setIsGameSettingsFilesBackuping(false));
-  }
-}
-
-function* updateGameSettingsOptionsSaga(): SagaIterator {
-  yield put(setIsGameSettingsLoaded(false));
-
-  try {
-    yield put(setIsGameSettingsAvailable(false));
-    yield call(setInitialGameSettingsConfigSaga, true);
-    yield take(MAIN_TYPES.SET_IS_GAME_SETTINGS_AVAILABLE);
-    yield call(initGameSettingsSaga, true);
-  } catch (error: any) {
-    if (
-      error instanceof SagaError
-      && error.reason instanceof ReadWriteError
-      && error.reason.cause.name === ErrorName.NOT_FOUND
-    ) {
-      writeToLogFile('Game settings file settings.json not found.');
-
-      yield put(addMessages(
-        [CreateUserMessage.error('Не найден файл settings.json, обновление прервано. Игровые настройки будут недоступны.')], // eslint-disable-line max-len
-      ));
-      yield put(push(`${Routes.MAIN_SCREEN}`));
-    } else {
-      let errorMessage = '';
-
-      if (error instanceof SagaError) {
-        errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-      } else if (error instanceof CustomError) {
-        errorMessage = `${error.message}`;
-      } else if (error instanceof ReadWriteError) {
-        errorMessage = `${error.message}. Path '${error.path}'.`;
-      } else {
-        errorMessage = `Unknown error. Message: ${error.message}`;
-      }
-
-      writeToLogFileSync(
-        `An error occured during update game settings options: ${errorMessage}`,
-        LogMessageType.ERROR,
-      );
-
-      yield put(addMessages(
-        [CreateUserMessage.error('Возникла ошибка в процессе обновления игровых настроек. Подробности в файле лога.')], // eslint-disable-line max-len
-      ));
-    }
-  } finally {
-    yield put(setIsGameSettingsLoaded(true));
   }
 }
 

@@ -97,10 +97,16 @@ const getState = (state: IAppState): IAppState => state;
  * Получить данные из файла конфигурации лаунчера
  * config.json, проверить основные поля и записать в `state`
 */
-export function* setInitialGameSettingsConfigSaga(isFromUpdateAction = false): SagaIterator {
+/// FIXME Пересмотреть механизм работы и убрать ошибку
+
+export function* setInitialGameSettingsConfigSaga(isFromUpdateAction = false): SagaIterator {//eslint-disable-line
   try {
     const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_FILE_PATH);
     const newSettingsConfigObj = checkGameSettingsConfigMainFields(gameSettingsObj);
+
+    if (isFromUpdateAction) {
+      return newSettingsConfigObj;
+    }
 
     yield put(setGameSettingsConfig(newSettingsConfigObj));
     yield put(setIsGameSettingsAvailable(true));
@@ -429,14 +435,19 @@ export function* generateGameSettingsOptionsSaga(
  * Получаем данные МО, проверяем на валидность параметры игровых настроек (`gameSettingsFiles`)
  * и переписываем их в случае невалидности некоторых полей, генерируем опции игровых настроек.
 */
-export function* initGameSettingsSaga(isFromUpdateAction = false): SagaIterator {
+export function* initGameSettingsSaga(
+  isFromUpdateAction = false,
+  settingsFiles?: IGameSettingsConfig['gameSettingsFiles'],
+): SagaIterator {
   try {
     yield put(setIsGameSettingsLoaded(false));
     writeToLogFileSync('Game settings initialization started.');
 
+    let gameSettingsFiles;
+
     const {
       gameSettings: {
-        gameSettingsFiles,
+        gameSettingsFiles: settingsFilesFromState,
         baseFilesEncoding,
         gameSettingsGroups,
       },
@@ -446,6 +457,12 @@ export function* initGameSettingsSaga(isFromUpdateAction = false): SagaIterator 
         },
       },
     }: IAppState = yield select(getState);
+
+    if (settingsFiles) {
+      gameSettingsFiles = settingsFiles;
+    } else {
+      gameSettingsFiles = settingsFilesFromState;
+    }
 
     let moProfile: string = '';
 
