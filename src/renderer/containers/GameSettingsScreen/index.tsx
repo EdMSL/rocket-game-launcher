@@ -163,43 +163,40 @@ export const GameSettingsScreen: React.FC = () => {
           </div>
         )
         }
-        {
-          isGameSettingsLoaded && Object.keys(gameSettingsOptions).length > 0 && (
-            <form
-              className={styles['game-settings-screen__form']}
-              onSubmit={onGameSettingsFormSubmit}
-            >
-              <div className={styles['game-settings-screen__options']}>
-                <Switch>
-                  <Route
-                    path={gameSettingsGroups.length > 0
-                      ? `${Routes.GAME_SETTINGS_SCREEN}/:settingGroup/`
-                      : Routes.GAME_SETTINGS_SCREEN}
-                    render={(): React.ReactElement => (
-                      <React.Fragment>
-                        <GameSettingsContent
-                          gameSettingsOptions={gameSettingsOptions}
-                          gameSettingsFiles={gameSettingsFiles}
-                          gameSettingsGroups={gameSettingsGroups}
-                          onSettingOptionChange={onSettingOptionChange}
-                        />
-                      </React.Fragment>
-                    )}
-                  />
-                </Switch>
-              </div>
-              <GameSettingsFormControls
-                isGameOptionsChanged={getIsSaveResetSettingsButtonsDisabled()}
-                isBackuping={isGameSettingsFilesBackuping}
-                isSaving={isGameSettingsSaving}
-                onRefreshSettingsBtnClick={onRefreshSettingsBtnClick}
-                onCancelSettingsBtnClick={onCancelSettingsBtnClick}
-                onCreateBackupBtnClick={onCreateBackupBtnClick}
-                onBackupsBtnClick={onBackupsBtnClick}
+        <form
+          className={styles['game-settings-screen__form']}
+          onSubmit={onGameSettingsFormSubmit}
+        >
+          <div className={styles['game-settings-screen__options']}>
+            <Switch>
+              <Route
+                path={gameSettingsGroups.length > 0
+                  ? `${Routes.GAME_SETTINGS_SCREEN}/:settingGroup/`
+                  : Routes.GAME_SETTINGS_SCREEN}
+                render={(): React.ReactElement => (
+                  <React.Fragment>
+                    <GameSettingsContent
+                      isGameSettingsLoaded={isGameSettingsLoaded}
+                      gameSettingsOptions={gameSettingsOptions}
+                      gameSettingsFiles={gameSettingsFiles}
+                      gameSettingsGroups={gameSettingsGroups}
+                      onSettingOptionChange={onSettingOptionChange}
+                    />
+                  </React.Fragment>
+                )}
               />
-            </form>
-          )
-        }
+            </Switch>
+          </div>
+          <GameSettingsFormControls
+            isGameOptionsChanged={getIsSaveResetSettingsButtonsDisabled()}
+            isBackuping={isGameSettingsFilesBackuping}
+            isSaving={isGameSettingsSaving}
+            onRefreshSettingsBtnClick={onRefreshSettingsBtnClick}
+            onCancelSettingsBtnClick={onCancelSettingsBtnClick}
+            onCreateBackupBtnClick={onCreateBackupBtnClick}
+            onBackupsBtnClick={onBackupsBtnClick}
+          />
+        </form>
         {
           isModalOpen && (
             <Modal

@@ -28,8 +28,10 @@ import { Range } from '$components/UI/Range';
 import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
 import { getNumberOfDecimalPlaces, getValueFromRange } from '$utils/strings';
 import { Switcher } from '$components/UI/Switcher';
+import { IMainRootState } from '$types/main';
 
 interface IProps {
+  isGameSettingsLoaded: IMainRootState['isGameSettingsLoaded'],
   gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
   gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
   gameSettingsOptions: IGameSettingsRootState['gameSettingsOptions'],
@@ -49,6 +51,7 @@ interface IProps {
  * через контроллер.
 */
 export const GameSettingsContent: React.FunctionComponent<IProps> = ({
+  isGameSettingsLoaded,
   gameSettingsFiles,
   gameSettingsGroups,
   gameSettingsOptions,
@@ -159,12 +162,12 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
   return (
     <React.Fragment>
       {
-        //Так как параметр из gameSettingsFile может
-        // иметь в себе несколько опций (combined, related и group),
-        // которые являются отдельными параметрами из файлов,
+        //Так как опция из gameSettingsFile может
+        // иметь разное кол-во параметров из файлов,
         // то вывод опций делаем на основе параметров (gameSettingsFiles[fileName].optionsList),
         // а не опций (gameSettingsOptions), иначе получаем дубли контроллеров.
-        Object.keys(gameSettingsFiles)
+        (isGameSettingsLoaded || Object.keys(gameSettingsOptions).length > 0)
+        && Object.keys(gameSettingsFiles)
           .map(
             (fileName) => getParametersForOptionsGenerate(
               gameSettingsFiles[fileName],
@@ -175,7 +178,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                 if (parameter.optionType === GameSettingsOptionType.RELATED) {
                   return (
                     <div
-                      key={parameter.label}
+                      key={parameter.id}
                       className={styles['game-settings-content__item']}
                     >
                       <div className={styles['game-settings-content__label']}>

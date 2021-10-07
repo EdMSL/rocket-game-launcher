@@ -32,6 +32,11 @@ interface IGameSettingsFileError {
   error: string,
 }
 
+export interface IGameSettingsConfigCheckResult {
+  files: IGameSettingsConfig['gameSettingsFiles'],
+  isError: boolean,
+}
+
 const configFileDataSchema = Joi.object({
   isResizable: Joi.bool().optional().default(defaultLauncherConfig.isResizable),
   minWidth: Joi.number().optional().default(defaultLauncherConfig.minWidth),
@@ -105,9 +110,19 @@ const settingsMainSchema = Joi.object<IGameSettingsConfig>({
     ).required().min(1),
 });
 
-// id для параметров не указываются в settings.json, вместо этого они генерируются автоматически.
+const gameSettingsFileSchema = Joi.object({
+  encoding: Joi.string().optional().default(Joi.ref('$encoding')),
+  path: Joi.string().required(),
+  view: Joi.string().required().valid(...Object.values(GameSettingsFileView)),
+  optionsList: Joi.array().items(Joi.object().pattern(
+    Joi.string(),
+    Joi.any(),
+  )),
+});
+
+// id для опций не указываются в settings.json, вместо этого они генерируются автоматически.
 const defaultOptionTypeSchema = Joi.object({
-  id: Joi.string().optional().default(() => getRandomId('parameter')),
+  id: Joi.string().optional().default(() => getRandomId('option')),
   optionType: Joi.string().required().valid(GameSettingsOptionType.DEFAULT),
   name: Joi.string().required(),
   label: Joi.string().optional().default(Joi.ref('name')),
@@ -131,7 +146,8 @@ const defaultOptionTypeSchema = Joi.object({
     Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
-  ).valid(Joi.ref('$availableGameSettingsGroups', { in: true })),
+  ).valid(Joi.in('$availableGameSettingsGroups', { render: true }))
+    .messages({ 'any.only': '"settingGroup" must be one of {$availableGameSettingsGroups}' }),
   controllerType: Joi.string().required().valid(...Object.values(GameSettingParameterControllerType)),
   options: Joi.object().pattern(
     Joi.string(),
@@ -151,13 +167,14 @@ const defaultOptionTypeSchema = Joi.object({
 });
 
 const groupOptionTypeSchema = Joi.object({
-  id: Joi.string().optional().default(() => getRandomId('parameter')),
+  id: Joi.string().optional().default(() => getRandomId('option')),
   optionType: Joi.string().required().valid(GameSettingsOptionType.GROUP),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
-  ).valid(Joi.ref('$availableGameSettingsGroups', { in: true })),
+  ).valid(Joi.in('$availableGameSettingsGroups', { render: true }))
+    .messages({ 'any.only': '"settingGroup" must be one of {$availableGameSettingsGroups}' }),
   controllerType: Joi.string().required().valid(...Object.values(GameSettingParameterControllerType)),
   options: Joi.object().pattern(
     Joi.string(),
@@ -199,13 +216,14 @@ const groupOptionTypeSchema = Joi.object({
 });
 
 const combinedOptionTypeSchema = Joi.object({
-  id: Joi.string().optional().default(() => getRandomId('parameter')),
+  id: Joi.string().optional().default(() => getRandomId('option')),
   optionType: Joi.string().required().valid(GameSettingsOptionType.COMBINED),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
-  ).valid(Joi.ref('$availableGameSettingsGroups', { in: true })),
+  ).valid(Joi.in('$availableGameSettingsGroups', { render: true }))
+    .messages({ 'any.only': '"settingGroup" must be one of {$availableGameSettingsGroups}' }),
   controllerType: Joi.string().required().valid(GameSettingParameterControllerType.SELECT),
   separator: Joi.string().optional().default(':'),
   options: Joi.object().pattern(
@@ -255,13 +273,14 @@ const combinedOptionTypeSchema = Joi.object({
 });
 
 const relatedOptionTypeSchema = Joi.object({
-  id: Joi.string().optional().default(() => getRandomId('parameter')),
+  id: Joi.string().optional().default(() => getRandomId('option')),
   optionType: Joi.string().required().valid(GameSettingsOptionType.RELATED),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
-  ).valid(Joi.ref('$availableGameSettingsGroups', { in: true })),
+  ).valid(Joi.in('$availableGameSettingsGroups', { render: true }))
+    .messages({ 'any.only': '"settingGroup" must be one of {$availableGameSettingsGroups}' }),
   description: Joi.string().optional().default('').allow(''),
   label: Joi.string().required(),
   items: Joi.array()
@@ -302,16 +321,6 @@ const relatedOptionTypeSchema = Joi.object({
     })).required().min(2),
 });
 
-const gameSettingsFileSchema = Joi.object({
-  encoding: Joi.string().optional().default(Joi.ref('$encoding')),
-  path: Joi.string().required(),
-  view: Joi.string().required().valid(...Object.values(GameSettingsFileView)),
-  optionsList: Joi.array().items(Joi.object().pattern(
-    Joi.string(),
-    Joi.any(),
-  )),
-});
-
 /**
  * Проверка файла игровых настроек на соответствие требованиям.
  * Проверка на наличие необходимых и опциональных полей, а так же фильтрация некорректных.
@@ -341,7 +350,7 @@ export const checkGameSettingsConfigMainFields = (
  * @param validationOptions Опции валидатора.
  * @returns Объект с массивом игровых опций и массивом ошибок проверки.
 */
-const checkGameSettingsFilesOptionsList = (
+const checkGameSettingsFileOptionsList = (
   optionsList: IGameSettingsParameter[],
   validationOptions: Joi.ValidationOptions,
 ): { options: IGameSettingsParameter[], errors: string[], } => {
@@ -349,6 +358,12 @@ const checkGameSettingsFilesOptionsList = (
 
   const options = optionsList.reduce<IGameSettingsParameter[]>((totalOptions, currentOption) => {
     let validationResult: Joi.ValidationResult;
+
+    if (!Object.values(GameSettingsOptionType).includes(currentOption.optionType)) {
+      errors.push(`"optionType" must be one of [${Object.values(GameSettingsOptionType).join(', ')}]`);
+
+      return [...totalOptions];
+    }
 
     switch (currentOption.optionType) {
       case GameSettingsOptionType.COMBINED:
@@ -364,13 +379,14 @@ const checkGameSettingsFilesOptionsList = (
         validationResult = defaultOptionTypeSchema.validate(currentOption, validationOptions);
         break;
     }
+
     if (validationResult.error) {
       errors.push(validationResult.error.message);
 
       return [...totalOptions];
     }
 
-    return [...totalOptions, currentOption];
+    return [...totalOptions, validationResult.value];
   }, []);
 
   return {
@@ -388,7 +404,7 @@ export const checkGameSettingsFiles = (
   gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
   baseFilesEncoding: IGameSettingsRootState['baseFilesEncoding'],
   gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
-): IGameSettingsConfig['gameSettingsFiles'] => {
+): IGameSettingsConfigCheckResult => {
   writeToLogFileSync('Started checking "gameSettingsFiles" from settings.json.');
 
   const validationErrors: IGameSettingsFileError[] = [];
@@ -424,12 +440,12 @@ export const checkGameSettingsFiles = (
       const {
         options,
         errors,
-      } = checkGameSettingsFilesOptionsList(
+      } = checkGameSettingsFileOptionsList(
         gameSettingsFiles[fileName].optionsList,
         validationOptions,
       );
 
-      if (errors) {
+      if (errors.length > 0) {
         validationErrors.push({ parent: fileName, error: errors.join() });
       }
 
@@ -450,13 +466,14 @@ export const checkGameSettingsFiles = (
 
   if (validationErrors.length > 0) {
     validationErrors.forEach((currentError) => {
-      writeToLogFile(`${currentError.parent}: ${currentError.error}`, LogMessageType.ERROR);
+      if (currentError.error) {
+        writeToLogFile(`${currentError.parent}: ${currentError.error}`, LogMessageType.ERROR);
+      }
     });
   }
 
-  if (Object.keys(newGameSettingsFilesObj).length === 0) {
-    throw new CustomError('No game settings options available after "gameSettingsFiles" validation.'); //eslint-disable-line max-len
-  }
-
-  return newGameSettingsFilesObj;
+  return {
+    files: newGameSettingsFilesObj,
+    isError: validationErrors.length > 0,
+  };
 };
