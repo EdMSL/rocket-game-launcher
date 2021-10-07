@@ -148,8 +148,7 @@ export const GameSettingsScreen: React.FC = () => {
         isModOrganizerUsed
         && moProfile
         && moProfiles.length > 0
-        && Object.keys(gameSettingsOptions).length > 0
-        && isGameSettingsLoaded
+        && (Object.keys(gameSettingsOptions).length > 0 || isGameSettingsLoaded)
         && (
           <div className={styles['game-settings-screen__profiles']}>
             <Select

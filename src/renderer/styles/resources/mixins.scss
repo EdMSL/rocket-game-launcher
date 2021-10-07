@@ -19,6 +19,6 @@
 }
 
 @mixin focus {
-  outline: 1px dotted var(--focus-color);
+  outline: 2px dotted var(--focus-color);
   outline-offset: -2px;
 }

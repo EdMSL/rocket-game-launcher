@@ -104,12 +104,13 @@ export function* setInitialGameSettingsConfigSaga(isFromUpdateAction = false): S
     const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_FILE_PATH);
     const newSettingsConfigObj = checkGameSettingsConfigMainFields(gameSettingsObj);
 
+    yield put(setIsGameSettingsAvailable(true));
+
     if (isFromUpdateAction) {
       return newSettingsConfigObj;
     }
 
     yield put(setGameSettingsConfig(newSettingsConfigObj));
-    yield put(setIsGameSettingsAvailable(true));
   } catch (error: any) {
     let errorMessage = '';
 
@@ -538,6 +539,7 @@ export function* initGameSettingsSaga(
 
     throw new SagaError('Init game settings', errorMessage);
   } finally {
+    yield take(GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_FILES);
     yield put(setIsGameSettingsLoaded(true));
   }
 }

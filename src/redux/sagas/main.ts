@@ -94,9 +94,9 @@ function* updateGameSettingsOptionsSaga(): SagaIterator {
 
   try {
     yield put(setIsGameSettingsAvailable(false));
+
     const newConfigData: IUnwrap<IGameSettingsConfig> = yield call(setInitialGameSettingsConfigSaga, true);
 
-    // yield take(GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_CONFIG);
     yield call(initGameSettingsSaga, true, newConfigData.gameSettingsFiles);
   } catch (error: any) {
     if (
