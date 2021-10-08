@@ -17,12 +17,19 @@ body {
   background: transparent;
 }
 
-::-webkit-scrollbar-track {
-  background-color: var(bg-color);
+::-webkit-scrollbar-track,
+.scrollbar__track {
+  background-color: transparent;
   border-radius: 10px;
 }
 
-::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb,
+.scrollbar__thumb {
+  top: 0;
+  right: 0;
+
+  height: 100%;
+
   background-color: var(--text-main);
   border-radius: 10px;
 

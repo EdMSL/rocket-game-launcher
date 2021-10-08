@@ -1,6 +1,7 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, ReactElement } from 'react';
 import classNames from 'classnames';
 import { useDispatch } from 'react-redux';
+import { Scrollbars } from 'react-custom-scrollbars-2';
 
 import styles from './styles.module.scss';
 import { Button } from '$components/UI/Button';
@@ -59,24 +60,44 @@ export const GameSettingsBackup: React.FC<IProps> = ({
     openFolder(BACKUP_DIR_GAME_SETTINGS_FILES, sendErrorMessage);
   }, [sendErrorMessage]);
 
+  /* eslint-disable react/jsx-props-no-spreading */
   return (
     <div className={styles['game-settings-backup__container']}>
       <React.Fragment>
         <ul className={styles['game-settings-backup__list']}>
-          {
-            gameSettingsFilesBackup.length > 0
-              ? gameSettingsFilesBackup.map((backupFolder) => (
-                <GameSettingsBackupItem
-                  key={backupFolder.name}
-                  backupName={backupFolder.name}
-                  backupFiles={backupFolder.files}
-                  allBackups={gameSettingsBackupsNames}
-                  isGameSettingsFilesBackuping={isGameSettingsFilesBackuping}
-                  sendErrorMessage={sendErrorMessage}
-                />
-              ))
-              : <li className={styles['game-settings-backup__item']}>Нет доступных бэкапов</li>
-              }
+          <Scrollbars
+            autoHeight
+            autoHide
+            autoHeightMax="100%"
+            hideTracksWhenNotNeeded
+            renderTrackVertical={(props): ReactElement => (
+              <div
+                {...props}
+                className="scrollbar__track"
+              />
+            )}
+            renderThumbVertical={(props): ReactElement => (
+              <div
+                {...props}
+                className="scrollbar__thumb"
+              />
+            )}
+          >
+            {
+              gameSettingsFilesBackup.length > 0
+                ? gameSettingsFilesBackup.map((backupFolder) => (
+                  <GameSettingsBackupItem
+                    key={backupFolder.name}
+                    backupName={backupFolder.name}
+                    backupFiles={backupFolder.files}
+                    allBackups={gameSettingsBackupsNames}
+                    isGameSettingsFilesBackuping={isGameSettingsFilesBackuping}
+                    sendErrorMessage={sendErrorMessage}
+                  />
+                ))
+                : <li className={styles['game-settings-backup__item']}>Нет доступных бэкапов</li>
+            }
+          </Scrollbars>
         </ul>
         <div className={styles['game-settings-backup__controls']}>
           <Button
