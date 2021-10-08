@@ -94,23 +94,25 @@ export interface IGenerateGameSettingsOptionsResult {
 const getState = (state: IAppState): IAppState => state;
 
 /**
- * Получить данные из файла конфигурации лаунчера
- * config.json, проверить основные поля и записать в `state`
+ * Получить данные из файла игровых настроек
+ * settings.json, проверить основные поля и записать в `state`, если требуется
+ * @param isFromUpdateAction Выполнениe для обновления опций?
+ * @returns Объект с данными из settings.json.
 */
-/// FIXME Пересмотреть механизм работы и убрать ошибку
-
-export function* setInitialGameSettingsConfigSaga(isFromUpdateAction = false): SagaIterator {//eslint-disable-line
+export function* getInitialGameSettingsConfigSaga(
+  isFromUpdateAction = false,
+): SagaIterator<IGameSettingsConfig> {
   try {
     const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_FILE_PATH);
     const newSettingsConfigObj = checkGameSettingsConfigMainFields(gameSettingsObj);
 
-    yield put(setIsGameSettingsAvailable(true));
-
-    if (isFromUpdateAction) {
-      return newSettingsConfigObj;
+    if (!isFromUpdateAction) {
+      yield put(setGameSettingsConfig(newSettingsConfigObj));
     }
 
-    yield put(setGameSettingsConfig(newSettingsConfigObj));
+    yield put(setIsGameSettingsAvailable(true));
+
+    return newSettingsConfigObj;
   } catch (error: any) {
     let errorMessage = '';
 

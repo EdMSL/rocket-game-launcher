@@ -7,7 +7,7 @@ import {
   put,
   takeLatest,
   select,
-  take,
+  SagaReturnType,
 } from 'redux-saga/effects';
 import fs from 'fs';
 
@@ -29,7 +29,7 @@ import {
   generateGameSettingsOptionsSaga,
   IGenerateGameSettingsOptionsResult,
   initGameSettingsSaga,
-  setInitialGameSettingsConfigSaga,
+  getInitialGameSettingsConfigSaga,
 } from '$sagas/gameSettings';
 import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import {
@@ -51,7 +51,7 @@ import { getPathToFile } from '$utils/strings';
 import { IUnwrap } from '$types/common';
 import { setGameSettingsOptions } from '$actions/gameSettings';
 import { getGameSettingsOptionsWithDefaultValues } from '$utils/data';
-import { GAME_SETTINGS_TYPES, IGameSettingsConfig } from '$types/gameSettings';
+import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -63,7 +63,7 @@ function* initLauncherSaga(): SagaIterator {
 
   try {
     if (fs.existsSync(GAME_SETTINGS_FILE_PATH)) {
-      yield call(setInitialGameSettingsConfigSaga);
+      yield call(getInitialGameSettingsConfigSaga);
     } else {
       writeToLogFile('Game settings file settings.json not found.');
     }
@@ -95,7 +95,10 @@ function* updateGameSettingsOptionsSaga(): SagaIterator {
   try {
     yield put(setIsGameSettingsAvailable(false));
 
-    const newConfigData: IUnwrap<IGameSettingsConfig> = yield call(setInitialGameSettingsConfigSaga, true);
+    const newConfigData: SagaReturnType<typeof getInitialGameSettingsConfigSaga> = yield call(
+      getInitialGameSettingsConfigSaga,
+      true,
+    );
 
     yield call(initGameSettingsSaga, true, newConfigData.gameSettingsFiles);
   } catch (error: any) {
