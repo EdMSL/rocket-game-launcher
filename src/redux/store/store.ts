@@ -2,6 +2,9 @@ import {
   createStore, applyMiddleware, compose, Store, Middleware,
 } from 'redux';
 import {
+  TypedUseSelectorHook, useSelector,
+} from 'react-redux';
+import {
   createHashHistory, History,
 } from 'history';
 import { routerMiddleware } from 'connected-react-router';
@@ -20,6 +23,7 @@ import { Scope } from '$constants/misc';
 
 ///FIXME Выглядит не особо изящно, попробовать переделать
 export type IAppState = ReturnType<ReturnType<typeof getRootReducer>>;
+export const useAppSelector: TypedUseSelectorHook<IAppState> = useSelector;
 
 export const configureStore = (
   initialState,

@@ -13,10 +13,6 @@ export type IUnwrap<T> = T extends (...args: any[]) => Promise<infer U> ? U : T;
 export type IUnwrapSync<T> = T extends (...args: any[]) => infer U ? U : T;
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-export interface IAction<T> {
-  (payload: T): UnsafeReturnType<T>,
-}
-
 export interface IActionHandler<S, T> {
   (state: S, payload: UnsafeReturnType<T>): S,
 }

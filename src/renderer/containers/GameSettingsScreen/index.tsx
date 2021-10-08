@@ -2,12 +2,12 @@ import React, { useCallback, useState } from 'react';
 import {
   Switch, Route, NavLink,
 } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import classNames from 'classnames';
 
 import styles from './styles.module.scss';
 import { Routes } from '$constants/routes';
-import { IAppState } from '$store/store';
+import { useAppSelector } from '$store/store';
 import {
   generateSelectOptions,
   getChangedGameSettingsOptions,
@@ -35,16 +35,16 @@ import { GameSettingsBackup } from '$components/GameSettingsBackup';
 */
 export const GameSettingsScreen: React.FC = () => {
   /* eslint-disable max-len */
-  const isGameSettingsLoaded = useSelector((state: IAppState) => state.main.isGameSettingsLoaded);
-  const isGameSettingsFilesBackuping = useSelector((state: IAppState) => state.main.isGameSettingsFilesBackuping);
-  const gameSettingsFilesBackup = useSelector((state: IAppState) => state.main.gameSettingsFilesBackup);
-  const isGameSettingsSaving = useSelector((state: IAppState) => state.main.isGameSettingsSaving);
-  const gameSettingsFiles = useSelector((state: IAppState) => state.gameSettings.gameSettingsFiles);
-  const gameSettingsGroups = useSelector((state: IAppState) => state.gameSettings.gameSettingsGroups);
-  const gameSettingsOptions = useSelector((state: IAppState) => state.gameSettings.gameSettingsOptions);
-  const moProfile = useSelector((state: IAppState) => state.gameSettings.moProfile);
-  const moProfiles = useSelector((state: IAppState) => state.gameSettings.moProfiles);
-  const isModOrganizerUsed = useSelector((state: IAppState) => state.system.modOrganizer.isUsed);
+  const isGameSettingsLoaded = useAppSelector((state) => state.main.isGameSettingsLoaded);
+  const isGameSettingsFilesBackuping = useAppSelector((state) => state.main.isGameSettingsFilesBackuping);
+  const gameSettingsFilesBackup = useAppSelector((state) => state.main.gameSettingsFilesBackup);
+  const isGameSettingsSaving = useAppSelector((state) => state.main.isGameSettingsSaving);
+  const gameSettingsFiles = useAppSelector((state) => state.gameSettings.gameSettingsFiles);
+  const gameSettingsGroups = useAppSelector((state) => state.gameSettings.gameSettingsGroups);
+  const gameSettingsOptions = useAppSelector((state) => state.gameSettings.gameSettingsOptions);
+  const moProfile = useAppSelector((state) => state.gameSettings.moProfile);
+  const moProfiles = useAppSelector((state) => state.gameSettings.moProfiles);
+  const isModOrganizerUsed = useAppSelector((state) => state.system.modOrganizer.isUsed);
   /* eslint-enable max-len */
 
   const dispatch = useDispatch();

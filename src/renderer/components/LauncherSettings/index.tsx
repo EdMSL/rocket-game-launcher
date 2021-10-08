@@ -6,7 +6,7 @@ import { IUserSettingsRootState } from '$types/userSettings';
 import { Select } from '$components/UI/Select';
 import { IMainRootState } from '$types/main';
 import { generateSelectOptions } from '$utils/data';
-import { setIsAutoclose, setUserTheme } from '$actions/userSettings';
+import { setIsAutoClose, setUserTheme } from '$actions/userSettings';
 import { Switcher } from '$components/UI/Switcher';
 
 interface IProps {
@@ -37,7 +37,7 @@ export const LauncherSettings: React.FC<IProps> = ({
   const onConfigIniSwitcherToggle = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    dispatch(setIsAutoclose(target.checked));
+    dispatch(setIsAutoClose(target.checked));
   }, [dispatch]);
 
   return (

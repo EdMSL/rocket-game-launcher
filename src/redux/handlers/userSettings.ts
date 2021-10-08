@@ -2,9 +2,10 @@ import { IActionHandler } from '$types/common';
 import { USER_SETTINGS_TYPES, IUserSettingsRootState } from '$types/userSettings';
 import * as USER_SETTINGS_ACTIONS from '$actions/userSettings';
 
-const setIsAutoclose: IActionHandler<
-  IUserSettingsRootState,
-  typeof USER_SETTINGS_ACTIONS.setIsAutoclose
+type IUserSettingsActionHadler<P> = IActionHandler<IUserSettingsRootState, P>;
+
+const setIsAutoClose: IUserSettingsActionHadler<
+  typeof USER_SETTINGS_ACTIONS.setIsAutoClose
 > = (
   state,
   { payload: isAutoclose },
@@ -13,8 +14,7 @@ const setIsAutoclose: IActionHandler<
   isAutoclose,
 });
 
-const setUserTheme: IActionHandler<
-  IUserSettingsRootState,
+const setUserTheme: IUserSettingsActionHadler<
   typeof USER_SETTINGS_ACTIONS.setUserTheme
 > = (
   state,
@@ -25,6 +25,6 @@ const setUserTheme: IActionHandler<
 });
 
 export const USER_SETTINGS_HANDLERS = {
-  [USER_SETTINGS_TYPES.SET_IS_AUTOCLOSE]: setIsAutoclose,
+  [USER_SETTINGS_TYPES.SET_IS_AUTOCLOSE]: setIsAutoClose,
   [USER_SETTINGS_TYPES.SET_USER_THEME]: setUserTheme,
 };

@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron';
 import React, { useCallback, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import classNames from 'classnames';
 
 import styles from './styles.module.scss';
@@ -9,7 +9,7 @@ import { Routes } from '$constants/routes';
 import { runApplication, openFolder } from '$utils/process';
 import { Button } from '$components/UI/Button';
 import { setIsGameRunning, addMessages } from '$actions/main';
-import { IAppState } from '$store/store';
+import { useAppSelector } from '$store/store';
 import { CreateUserMessage } from '$utils/message';
 import { LauncherButtonAction } from '$constants/misc';
 import { Modal } from '$components/UI/Modal';
@@ -17,14 +17,14 @@ import { LauncherSettings } from '$components/LauncherSettings';
 
 export const MainScreen: React.FC = () => {
   /* eslint-disable max-len */
-  const playButton = useSelector((state: IAppState) => state.system.playButton);
-  const appButtons = useSelector((state: IAppState) => state.system.customButtons);
-  const isGameRunning = useSelector((state: IAppState) => state.main.isGameRunning);
-  const userThemes = useSelector((state: IAppState) => state.main.userThemes);
-  const userTheme = useSelector((state: IAppState) => state.userSettings.theme);
-  const isAutoclose = useSelector((state: IAppState) => state.userSettings.isAutoclose);
-  const isGameSettingsAvailable = useSelector((state: IAppState) => state.main.isGameSettingsAvailable);
-  const gameSettingsGroups = useSelector((state: IAppState) => state.gameSettings.gameSettingsGroups);
+  const playButton = useAppSelector((state) => state.system.playButton);
+  const appButtons = useAppSelector((state) => state.system.customButtons);
+  const isGameRunning = useAppSelector((state) => state.main.isGameRunning);
+  const userThemes = useAppSelector((state) => state.main.userThemes);
+  const userTheme = useAppSelector((state) => state.userSettings.theme);
+  const isAutoclose = useAppSelector((state) => state.userSettings.isAutoclose);
+  const isGameSettingsAvailable = useAppSelector((state) => state.main.isGameSettingsAvailable);
+  const gameSettingsGroups = useAppSelector((state) => state.gameSettings.gameSettingsGroups);
   /* eslint-enable max-len */
 
   const dispatch = useDispatch();

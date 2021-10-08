@@ -1,14 +1,14 @@
 import React, { useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import styles from './styles.module.scss';
-import { IAppState } from '$store/store';
+import { useAppSelector } from '$store/store';
 import { Message } from '$components/Message';
 import { setMessages } from '$actions/main';
 import { Button } from '$components/UI/Button';
 
 export const Messages: React.FC = () => {
-  const messages = useSelector((state: IAppState) => state.main.messages);
+  const messages = useAppSelector((state) => state.main.messages);
 
   const dispatch = useDispatch();
 

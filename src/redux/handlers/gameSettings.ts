@@ -2,8 +2,9 @@ import { IActionHandler } from '$types/common';
 import { GAME_SETTINGS_TYPES, IGameSettingsRootState } from '$types/gameSettings';
 import * as GAME_SETTINGS_ACTIONS from '$actions/gameSettings';
 
-const setGameSettingsOptions: IActionHandler<
-  IGameSettingsRootState,
+type IGameSettingsActionHadler<P> = IActionHandler<IGameSettingsRootState, P>;
+
+const setGameSettingsOptions: IGameSettingsActionHadler<
   typeof GAME_SETTINGS_ACTIONS.setGameSettingsOptions
 > = (
   state,
@@ -13,7 +14,9 @@ const setGameSettingsOptions: IActionHandler<
   gameSettingsOptions,
 });
 
-const changeGameSettingsOption = (
+const changeGameSettingsOption: IGameSettingsActionHadler<
+  typeof GAME_SETTINGS_ACTIONS.changeGameSettingsOption
+> = (
   state,
   { payload: { parent, gameSettingsOptions } },
 ) => ({
@@ -27,8 +30,7 @@ const changeGameSettingsOption = (
   },
 });
 
-const setGameSettingsConfig: IActionHandler<
-  IGameSettingsRootState,
+const setGameSettingsConfig: IGameSettingsActionHadler<
   typeof GAME_SETTINGS_ACTIONS.setGameSettingsConfig
 > = (
   state,
@@ -38,8 +40,7 @@ const setGameSettingsConfig: IActionHandler<
   ...gameSettingsConfig,
 });
 
-const setGameSettingsFiles: IActionHandler<
-  IGameSettingsRootState,
+const setGameSettingsFiles: IGameSettingsActionHadler<
   typeof GAME_SETTINGS_ACTIONS.setGameSettingsFiles
 > = (
   state,
@@ -49,8 +50,7 @@ const setGameSettingsFiles: IActionHandler<
   gameSettingsFiles,
 });
 
-const setMoProfile: IActionHandler<
-  IGameSettingsRootState,
+const setMoProfile: IGameSettingsActionHadler<
   typeof GAME_SETTINGS_ACTIONS.setMoProfile
 > = (
   state,
@@ -60,8 +60,7 @@ const setMoProfile: IActionHandler<
   moProfile,
 });
 
-const setMoProfiles: IActionHandler<
-  IGameSettingsRootState,
+const setMoProfiles: IGameSettingsActionHadler<
   typeof GAME_SETTINGS_ACTIONS.setMoProfiles
 > = (
   state,

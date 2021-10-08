@@ -2,8 +2,9 @@ import { IActionHandler } from '$types/common';
 import { MAIN_TYPES, IMainRootState } from '$types/main';
 import * as MAIN_ACTIONS from '$actions/main';
 
-const setIsGameRunning: IActionHandler<
-  IMainRootState,
+type IMainActionHadler<P> = IActionHandler<IMainRootState, P>;
+
+const setIsGameRunning: IMainActionHadler<
   typeof MAIN_ACTIONS.setIsGameRunning
 > = (
   state,
@@ -13,8 +14,7 @@ const setIsGameRunning: IActionHandler<
   isGameRunning,
 });
 
-const setIsLauncherInitialised: IActionHandler<
-  IMainRootState,
+const setIsLauncherInitialised: IMainActionHadler<
   typeof MAIN_ACTIONS.setIsLauncherInitialised
 > = (
   state,
@@ -24,8 +24,7 @@ const setIsLauncherInitialised: IActionHandler<
   isLauncherInitialised,
 });
 
-const setIsGameSettingsLoaded: IActionHandler<
-  IMainRootState,
+const setIsGameSettingsLoaded: IMainActionHadler<
   typeof MAIN_ACTIONS.setIsGameSettingsLoaded
 > = (
   state,
@@ -35,8 +34,7 @@ const setIsGameSettingsLoaded: IActionHandler<
   isGameSettingsLoaded,
 });
 
-const setIsGameSettingsAvailable: IActionHandler<
-  IMainRootState,
+const setIsGameSettingsAvailable: IMainActionHadler<
   typeof MAIN_ACTIONS.setIsGameSettingsAvailable
 > = (
   state,
@@ -46,8 +44,7 @@ const setIsGameSettingsAvailable: IActionHandler<
   isGameSettingsAvailable,
 });
 
-const setIsGameSettingsSaving: IActionHandler<
-  IMainRootState,
+const setIsGameSettingsSaving: IMainActionHadler<
   typeof MAIN_ACTIONS.setIsGameSettingsSaving
 > = (
   state,
@@ -57,8 +54,7 @@ const setIsGameSettingsSaving: IActionHandler<
   isGameSettingsSaving,
 });
 
-const setIsGameSettingsFilesBackuping: IActionHandler<
-  IMainRootState,
+const setIsGameSettingsFilesBackuping: IMainActionHadler<
   typeof MAIN_ACTIONS.setIsGameSettingsFilesBackuping
 > = (
   state,
@@ -68,8 +64,7 @@ const setIsGameSettingsFilesBackuping: IActionHandler<
   isGameSettingsFilesBackuping,
 });
 
-const setGameSettingsFilesBackup: IActionHandler<
-  IMainRootState,
+const setGameSettingsFilesBackup: IMainActionHadler<
   typeof MAIN_ACTIONS.setGameSettingsFilesBackup
 > = (
   state,
@@ -79,8 +74,7 @@ const setGameSettingsFilesBackup: IActionHandler<
   gameSettingsFilesBackup,
 });
 
-const setUserThemes: IActionHandler<
-  IMainRootState,
+const setUserThemes: IMainActionHadler<
   typeof MAIN_ACTIONS.setUserThemes
 > = (
   state,
@@ -90,8 +84,7 @@ const setUserThemes: IActionHandler<
   userThemes,
 });
 
-const setMessages: IActionHandler<
-  IMainRootState,
+const setMessages: IMainActionHadler<
   typeof MAIN_ACTIONS.setMessages
 > = (
   state,
@@ -101,8 +94,7 @@ const setMessages: IActionHandler<
   messages,
 });
 
-const addMessages: IActionHandler<
-  IMainRootState,
+const addMessages: IMainActionHadler<
   typeof MAIN_ACTIONS.addMessages
 > = (
   state,
@@ -115,8 +107,7 @@ const addMessages: IActionHandler<
   ],
 });
 
-const deleteMessages: IActionHandler<
-  IMainRootState,
+const deleteMessages: IMainActionHadler<
   typeof MAIN_ACTIONS.deleteMessages
 > = (
   state,

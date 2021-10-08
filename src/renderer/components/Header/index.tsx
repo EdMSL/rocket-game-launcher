@@ -3,11 +3,10 @@ import React, {
 } from 'react';
 import { ipcRenderer } from 'electron';
 import classNames from 'classnames';
-import { useSelector } from 'react-redux';
 
 import { Button } from '$components/UI/Button';
 import styles from './styles.module.scss';
-import { IAppState } from '$store/store';
+import { useAppSelector } from '$store/store';
 
 const launcherIcon = require('$images/icon.png');
 
@@ -18,8 +17,8 @@ interface IProps {
 export const Header: React.FunctionComponent<IProps> = ({
   openAppInfo,
 }) => {
-  const isResizable = useSelector((state: IAppState) => state.system.isResizable);
-  const gameName = useSelector((state: IAppState) => state.system.gameName);
+  const isResizable = useAppSelector((state) => state.system.isResizable);
+  const gameName = useAppSelector((state) => state.system.gameName);
 
   const [isMaximize, setIsMaximize] = useState(false);
 

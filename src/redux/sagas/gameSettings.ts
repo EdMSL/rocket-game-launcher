@@ -6,6 +6,7 @@ import {
   takeLatest,
   select,
   all,
+  SagaReturnType,
 } from 'redux-saga/effects';
 import path from 'path';
 
@@ -142,7 +143,7 @@ function* getMOProfilesSaga(): SagaIterator {
         pathToProfiles,
       },
     },
-  }: IAppState = yield select(getState);
+  }: ReturnType<typeof getState> = yield select(getState);
 
   const profilesPath = path.resolve(GAME_DIR, pathToProfiles);
 
@@ -188,7 +189,7 @@ function* getDataFromMOIniSaga(): SagaIterator<string> {
           profileParamValueRegExp,
         },
       },
-    }: IAppState = yield select(getState);
+    }: ReturnType<typeof getState> = yield select(getState);
 
     const iniData: IUnwrap<typeof readINIFile> = yield call(
       readINIFile,
@@ -262,7 +263,7 @@ function* getDataFromGameSettingsFilesSaga(
   try {
     const {
       system: { customPaths },
-    }: IAppState = yield select(getState);
+    }: ReturnType<typeof getState> = yield select(getState);
 
     const currentFilesData: IUnwrap<typeof readFileForGameSettingsOptions>[] = yield all(
       Object.keys(filesForRead).map((fileName) => call(
@@ -301,7 +302,7 @@ export function* generateGameSettingsOptionsSaga(
     let incorrectGameSettingsFiles: IIncorrectGameSettingsFiles = {};
     let optionsErrors: IUserMessage[] = [];
 
-    const currentFilesDataObj: IUnwrap<IGetDataFromFilesResult> = yield call(
+    const currentFilesDataObj: SagaReturnType<typeof getDataFromGameSettingsFilesSaga> = yield call(
       getDataFromGameSettingsFilesSaga,
       gameSettingsFiles,
       moProfile,
@@ -459,7 +460,7 @@ export function* initGameSettingsSaga(
           isUsed: isMOUsed,
         },
       },
-    }: IAppState = yield select(getState);
+    }: ReturnType<typeof getState> = yield select(getState);
 
     if (settingsFiles) {
       gameSettingsFiles = settingsFiles;
@@ -489,7 +490,7 @@ export function* initGameSettingsSaga(
     const {
       totalGameSettingsOptions,
       incorrectGameSettingsFiles,
-    }: IUnwrap<IGenerateGameSettingsOptionsResult> = yield call(
+    }: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
       generateGameSettingsOptionsSaga,
       newGameSettingsFilesObj,
       moProfile,
@@ -548,10 +549,10 @@ export function* initGameSettingsSaga(
 
 /**
  * Изменяет текущий профиль Mod Organizer на другой, записывая изменения в файл.
- * @param moProfile Имя профиля.
+ * @param newMOProfile Имя профиля.
 */
 function* changeMOProfileSaga(
-  { payload: moProfile }: ReturnType<typeof changeMoProfile>,
+  { payload: newMOProfile }: ReturnType<typeof changeMoProfile>,
 ): SagaIterator {
   try {
     yield put(setIsGameSettingsLoaded(false));
@@ -566,7 +567,7 @@ function* changeMOProfileSaga(
           version,
         },
       },
-    }: IAppState = yield select(getState);
+    }: ReturnType<typeof getState> = yield select(getState);
 
     const iniData: IUnwrap<typeof readINIFile> = yield call(
       readINIFile,
@@ -578,7 +579,7 @@ function* changeMOProfileSaga(
       profileSection,
       profileParam,
       ///TODO Переделать на поддержку кастомного RegExp
-      version === 1 ? moProfile : `@ByteArray(${moProfile})`,
+      version === 1 ? newMOProfile : `@ByteArray(${newMOProfile})`,
     );
 
     yield call(
@@ -602,13 +603,15 @@ function* changeMOProfileSaga(
         return { ...acc };
       }, {});
 
-    const { totalGameSettingsOptions }: IUnwrap<IGenerateGameSettingsOptionsResult> = yield call(
+    const {
+      totalGameSettingsOptions,
+    }: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
       generateGameSettingsOptionsSaga,
       MOProfileGameSettingsOnly,
-      moProfile,
+      newMOProfile,
     );
 
-    yield put(setMoProfile(moProfile));
+    yield put(setMoProfile(newMOProfile));
     yield put(setGameSettingsOptions({
       ...gameSettingsOptions,
       ...totalGameSettingsOptions,
@@ -652,7 +655,7 @@ function* saveGameSettingsFilesSaga(
         moProfile, gameSettingsFiles, gameSettingsOptions,
       },
       system: { customPaths },
-    }: IAppState = yield select(getState);
+    }: ReturnType<typeof getState> = yield select(getState);
     const changedFilesNames = Object.keys(changedGameSettingsOptions);
 
     const changedGameSettingsFiles = Object.keys(gameSettingsFiles)
@@ -667,7 +670,7 @@ function* saveGameSettingsFilesSaga(
         return { ...acc };
       }, {});
 
-    const currentFilesData: IUnwrap<IGetDataFromFilesResult> = yield call(
+    const currentFilesData: SagaReturnType<typeof getDataFromGameSettingsFilesSaga> = yield call(
       getDataFromGameSettingsFilesSaga,
       changedGameSettingsFiles,
       moProfile,

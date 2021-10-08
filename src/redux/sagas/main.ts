@@ -27,7 +27,6 @@ import {
 } from '$actions/main';
 import {
   generateGameSettingsOptionsSaga,
-  IGenerateGameSettingsOptionsResult,
   initGameSettingsSaga,
   getInitialGameSettingsConfigSaga,
 } from '$sagas/gameSettings';
@@ -186,7 +185,7 @@ function* createGameSettingsBackupSaga(
     const {
       system: { customPaths },
       gameSettings: { gameSettingsFiles, moProfile },
-    }: IAppState = yield select(getState);
+    }: ReturnType<typeof getState> = yield select(getState);
 
     const filesForBackupPaths = Object.keys(gameSettingsFiles).map((fileName) => getPathToFile(gameSettingsFiles[fileName].path, customPaths, moProfile));
 
@@ -288,7 +287,7 @@ function* renameGameSettingsFilesBackupSaga({
       main: {
         gameSettingsFilesBackup,
       },
-    }: IAppState = yield select(getState);
+    }: ReturnType<typeof getState> = yield select(getState);
 
     const backupData = gameSettingsFilesBackup.map((currentBackup) => {
       if (currentBackup.name === backupName) {
@@ -350,11 +349,11 @@ function* restoreGameSettingsFilesBackupSaga({
         gameSettingsFiles,
         moProfile,
       },
-    }: IAppState = yield select(getState);
+    }: ReturnType<typeof getState> = yield select(getState);
 
     const {
       totalGameSettingsOptions,
-    }: IUnwrap<IGenerateGameSettingsOptionsResult> = yield call(
+    }: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
       generateGameSettingsOptionsSaga,
       gameSettingsFiles,
       moProfile,
@@ -388,7 +387,7 @@ function* restoreGameSettingsFilesBackupSaga({
 function* locationChangeSaga({ payload: { location } }: LocationChangeAction): SagaIterator {
   const {
     main: { isLauncherInitialised, isGameSettingsLoaded },
-  }: IAppState = yield select(getState);
+  }: ReturnType<typeof getState> = yield select(getState);
 
   if (!isLauncherInitialised && location.pathname === `${Routes.MAIN_SCREEN}`) {
     yield call(initLauncherSaga);
@@ -401,7 +400,7 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
       } else {
         const {
           gameSettings: { gameSettingsOptions },
-        }: IAppState = yield select(getState);
+        }: ReturnType<typeof getState> = yield select(getState);
 
         yield put(setGameSettingsOptions(getGameSettingsOptionsWithDefaultValues(gameSettingsOptions)));
       }

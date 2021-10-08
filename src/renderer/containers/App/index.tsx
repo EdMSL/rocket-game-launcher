@@ -5,7 +5,6 @@ import {
   Switch,
   Route,
 } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 
 import styles from './styles.module.scss';
 import { Routes } from '$constants/routes';
@@ -13,12 +12,12 @@ import { MainScreen } from '$containers/MainScreen';
 import { GameSettingsScreen } from '$containers/GameSettingsScreen';
 import { Messages } from '$containers/Messages';
 import { Header } from '$components/Header';
-import { IAppState } from '$store/store';
+import { useAppSelector } from '$store/store';
 import { Modal } from '$components/UI/Modal';
 import { AppInfo } from '$components/AppInfo';
 
 export const App = (): JSX.Element => {
-  const userTheme = useSelector((state: IAppState) => state.userSettings.theme);
+  const userTheme = useAppSelector((state) => state.userSettings.theme);
 
   const [isOpenAppInfo, setIsOpenAppInfo] = useState<boolean>(false);
 
