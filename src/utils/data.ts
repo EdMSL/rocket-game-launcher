@@ -511,7 +511,7 @@ export const getUserThemes = (themesFolders: string[]): { [key: string]: string,
 
 /**
  * Получить параметры Mod Organizer c учетом данных из config.json.
- * @param data Данные из секции modOrganizer файлф config.json.
+ * @param data Данные из секции modOrganizer файла config.json.
  * @returns Объект с данными Mod Organizer.
 */
 export const getNewModOrganizerParams = (data: IModOrganizerParams): IModOrganizerParams => {
@@ -520,8 +520,15 @@ export const getNewModOrganizerParams = (data: IModOrganizerParams): IModOrganiz
       ...defaultModOrganizerParams,
       ...data,
       path: data.path,
-      pathToINI: data.pathToINI || defaultModOrganizerParams.pathToINI.replace(defaultModOrganizerParams.path, data.path),
-      pathToProfiles: data.pathToProfiles || defaultModOrganizerParams.pathToProfiles.replace(defaultModOrganizerParams.path, data.path),
+      pathToINI:
+        data.pathToINI
+        || defaultModOrganizerParams.pathToINI.replace(defaultModOrganizerParams.path, data.path),
+      pathToProfiles:
+        data.pathToProfiles
+        || defaultModOrganizerParams.pathToProfiles.replace(defaultModOrganizerParams.path, data.path),
+      pathToMods:
+        data.pathToMods
+        || defaultModOrganizerParams.pathToMods.replace(defaultModOrganizerParams.path, data.path),
     };
   }
 
@@ -552,9 +559,9 @@ export const createCustomPaths = (
       '%DOCUMENTS%': path.join(app.getPath('documents'), configData.documentsPath),
     } : {},
     ...configData.modOrganizer.isUsed ? {
-      '%MO_DIR%': path.join(GAME_DIR, configData.modOrganizer.path!),
-      '%MO_MODS%': path.join(GAME_DIR, configData.modOrganizer.path!, 'mods'),
-      '%MO_PROFILE%': path.join(GAME_DIR, configData.modOrganizer.pathToProfiles!),
+      '%MO_DIR%': path.join(GAME_DIR, configData.modOrganizer.path),
+      '%MO_MODS%': path.join(GAME_DIR, configData.modOrganizer.pathToMods),
+      '%MO_PROFILE%': path.join(GAME_DIR, configData.modOrganizer.pathToProfiles),
     } : {},
     ...newCustomPaths,
   };

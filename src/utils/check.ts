@@ -51,6 +51,7 @@ const configFileDataSchema = Joi.object({
     path: Joi.string().optional().pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
     pathToINI: Joi.string().optional().pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
     pathToProfiles: Joi.string().optional().pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
+    pathToMods: Joi.string().optional().pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
     profileSection: Joi.string().optional(),
     profileParam: Joi.string().optional(),
     profileParamValueRegExp: Joi.string().optional().allow(''),
