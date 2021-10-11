@@ -26,7 +26,7 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
 }) => (
   <div className={classNames(
     'checkbox__container',
-    parentClassname && `${parentClassname}-switcher__container`,
+    parentClassname && `${parentClassname}-checkbox__container`,
     className,
   )}
   >

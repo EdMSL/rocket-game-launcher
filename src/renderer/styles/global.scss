@@ -19,6 +19,11 @@ body {
 
 ::-webkit-scrollbar-track,
 .scrollbar__track {
+  top: 0;
+  right: 0;
+
+  height: 100%;
+
   background-color: transparent;
   border-radius: 10px;
 }
@@ -28,12 +33,10 @@ body {
   top: 0;
   right: 0;
 
-  height: 100%;
+  min-height: 6px;
 
   background-color: var(--text-main);
   border-radius: 10px;
 
-  &:hover {
-    background-color: var(--disabled-color);
-  }
+  cursor: pointer;
 }

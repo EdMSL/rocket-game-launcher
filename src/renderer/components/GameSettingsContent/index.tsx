@@ -1,6 +1,9 @@
-import React, { useCallback, useState } from 'react';
+import React, {
+  useCallback, useState, ReactElement,
+} from 'react';
 import { useParams } from 'react-router-dom';
 import classNames from 'classnames';
+import { Scrollbars } from 'react-custom-scrollbars-2';
 
 import styles from './styles.module.scss';
 import {
@@ -159,8 +162,26 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
     return gameSettingsOptions[iniName][getOptionName(parameter)].value;
   }, [gameSettingsOptions]);
 
+  /* eslint-disable react/jsx-props-no-spreading */
   return (
-    <React.Fragment>
+    <Scrollbars
+      autoHeight
+      autoHide
+      autoHeightMax="100%"
+      hideTracksWhenNotNeeded
+      renderTrackVertical={(props): ReactElement => (
+        <div
+          {...props}
+          className="scrollbar__track"
+        />
+      )}
+      renderThumbVertical={(props): ReactElement => (
+        <div
+          {...props}
+          className="scrollbar__thumb"
+        />
+      )}
+    >
       {
         //Так как опция из gameSettingsFile может
         // иметь разное кол-во параметров из файлов,
@@ -446,6 +467,6 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
           )
 
       }
-    </React.Fragment>
+    </Scrollbars>
   );
 };
