@@ -51,7 +51,7 @@ export const Switcher: React.FunctionComponent<IProps> = ({
     </p>
     <div className={classNames('switcher__block')}>
       <input
-        className={classNames('visually-hidden', 'switcher__checkbox')}
+        className={classNames('visually-hidden', 'switcher__input')}
         type="checkbox"
         id={id}
         name={name}

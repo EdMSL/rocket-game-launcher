@@ -274,7 +274,7 @@
   align-items: center;
 }
 
-.switcher__checkbox {
+.switcher__input {
   display: none;
 }
 
@@ -306,9 +306,15 @@
     transition: left 0.3s linear;
   }
 
-  .switcher__checkbox:checked + &::before {
+  .switcher__input:checked + &::before {
     left: calc(100% - 16px - 1px);
   }
+}
+
+.number__container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .modal {
