@@ -15,6 +15,7 @@ import { Header } from '$components/Header';
 import { useAppSelector } from '$store/store';
 import { Modal } from '$components/UI/Modal';
 import { AppInfo } from '$components/AppInfo';
+import { DeveloperScreen } from '$containers/DeveloperScreen';
 
 export const App = (): JSX.Element => {
   const userTheme = useAppSelector((state) => state.userSettings.theme);
@@ -55,6 +56,10 @@ export const App = (): JSX.Element => {
         <Route
           path={Routes.GAME_SETTINGS_SCREEN}
           component={GameSettingsScreen}
+        />
+        <Route
+          path={Routes.DEVELOPER_SCREEN}
+          component={DeveloperScreen}
         />
       </Switch>
       <Messages />

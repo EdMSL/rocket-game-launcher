@@ -1,0 +1,19 @@
+.developer-screen__main {
+  padding: 20px 10px 10px;
+}
+
+.developer-screen__block {
+  display: flex;
+  flex-direction: column;
+}
+
+.developer-screen__block-title {
+  @include reset-indents;
+  margin-bottom: 20px;
+
+  text-align: center;
+}
+
+.developer-screen__item {
+  margin-bottom: 10px;
+}

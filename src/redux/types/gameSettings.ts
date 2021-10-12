@@ -94,6 +94,7 @@ export interface IUIElementProps<E> {
   parentClassname?: string,
   label?: string,
   name?: string,
+  value?: string|number,
   multiparameters?: string,
   isDisabled?: boolean,
   parent?: string,

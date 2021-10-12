@@ -387,10 +387,14 @@ function* restoreGameSettingsFilesBackupSaga({
 function* locationChangeSaga({ payload: { location } }: LocationChangeAction): SagaIterator {
   const {
     main: { isLauncherInitialised, isGameSettingsLoaded },
+    system: { isFirstLaunch },
   }: ReturnType<typeof getState> = yield select(getState);
-
   if (!isLauncherInitialised && location.pathname === `${Routes.MAIN_SCREEN}`) {
-    yield call(initLauncherSaga);
+    if (isFirstLaunch) {
+      yield put(push(`${Routes.DEVELOPER_SCREEN}`));
+    } else {
+      yield call(initLauncherSaga);
+    }
   }
 
   if (GAME_SETTINGS_PATH_REGEXP.test(location.pathname)) {
