@@ -8,6 +8,7 @@ export interface IModOrganizerParams {
   path: string,
   pathToINI: string,
   pathToProfiles: string,
+  pathToMods: string,
   profileSection: string,
   profileParam: string,
   profileParamValueRegExp: string,
