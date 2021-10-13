@@ -317,6 +317,52 @@
   align-items: center;
 }
 
+.number__input {
+  padding: 10px;
+}
+
+.path-selector__container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.path-selector__input-block {
+  position: relative;
+}
+
+.path-selector__input {
+  padding: 10px;
+}
+
+.path-selector__input-btn {
+  position: absolute;
+  right: 0;
+
+  width: 20px;
+  height: 100%;
+
+  font-size: 0;
+
+  background-color: var(--bg-color);
+
+  &::before {
+    content: '...';
+
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 700;
+    text-align: center;
+  }
+}
+
 .modal {
   position: absolute;
   top: 0;
