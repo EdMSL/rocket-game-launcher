@@ -172,6 +172,25 @@ export const DeveloperScreen: React.FC = () => {
           />
         </div>
         <div className={styles['developer-screen__block']}>
+          <p className={styles['developer-screen__block-title']}>Настройки приложений и пользовательских путей</p>
+          <PathSelector
+            className={styles['developer-screen__item']}
+            id="documentsPath"
+            label="Путь до папки файлов игры в Documents пользователя"
+            value={currentConfig.documentsPath}
+            onChange={onSelectPathTextInputChange}
+            onButtonClick={onSelectPathBtnClick}
+          />
+          <PathSelector
+            className={styles['developer-screen__item']}
+            id="documentsPath"
+            label="Путь до .exe или .lnk файла игры"
+            value={currentConfig.documentsPath}
+            onChange={onSelectPathTextInputChange}
+            onButtonClick={onSelectPathBtnClick}
+          />
+        </div>
+        <div className={styles['developer-screen__block']}>
           <p className={styles['developer-screen__block-title']}>Настройки Mod Organizer</p>
           <Switcher
             className={styles['developer-screen__item']}
@@ -195,6 +214,7 @@ export const DeveloperScreen: React.FC = () => {
             onChange={onSelectChange}
           />
           <PathSelector
+            className={styles['developer-screen__item']}
             id="path"
             label="Путь до папки Mod Organizer"
             parent="modOrganizer"
@@ -203,6 +223,7 @@ export const DeveloperScreen: React.FC = () => {
             onButtonClick={onSelectPathBtnClick}
           />
           <PathSelector
+            className={styles['developer-screen__item']}
             id="pathToMods"
             label="Путь до папки модов Mod Organizer"
             parent="modOrganizer"
