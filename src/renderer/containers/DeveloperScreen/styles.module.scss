@@ -5,15 +5,25 @@
 .developer-screen__block {
   display: flex;
   flex-direction: column;
+  margin-bottom: 16px;
 }
 
 .developer-screen__block-title {
   @include reset-indents;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 
   text-align: center;
 }
 
 .developer-screen__item {
   margin-bottom: 10px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.developer-screen__item.select__container {
+  flex-direction: row;
+  justify-content: space-between;
 }

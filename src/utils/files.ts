@@ -10,7 +10,9 @@ import {
   writeToLogFile,
   writeToLogFileSync,
 } from '$utils/log';
-import { parseJSON } from '$utils/strings';
+import {
+  checkIsPathIsNotOutsideValidFolder, getPathWithoutRootDir, parseJSON,
+} from '$utils/strings';
 import {
   ReadWriteError,
   getReadWriteError,
@@ -19,8 +21,16 @@ import {
   ErrorName,
   ErrorMessage,
 } from '$utils/errors';
-import { Encoding, GameSettingsFileView } from '$constants/misc';
-import { USER_THEMES_DIR } from '$constants/paths';
+import {
+  Encoding, GameSettingsFileView,
+} from '$constants/misc';
+import {
+  USER_THEMES_DIR,
+} from '$constants/paths';
+import { ISystemRootState } from '$types/system';
+
+const { dialog } = require('electron').remote;
+const { BrowserWindow } = require('electron').remote;
 
 export const xmlAttributePrefix = '@_';
 
@@ -589,5 +599,29 @@ export const getUserThemesFolders = (): string[] => {
     );
 
     return [];
+  }
+};
+
+/**
+ * Вызывает диалоговое окно для выбора пути и возвращает путь к файлу,
+ * отсекая директорию до папки игры.
+ * @param customPaths Кастомные пути из `state`.
+*/
+export const getPathFromFileInput = async (
+  customPaths: ISystemRootState['customPaths'],
+): Promise<string|undefined> => {
+  try {
+    const pathObj = await dialog.showOpenDialog(BrowserWindow.getFocusedWindow()!, {
+
+      properties: ['openDirectory'],
+    });
+
+    const pathStr = checkIsPathIsNotOutsideValidFolder(pathObj.filePaths[0], customPaths);
+
+    return getPathWithoutRootDir(pathStr, customPaths);
+  } catch (error: any) {
+    writeToLogFile(`Can't get path from file input. Reason: ${error.message}`);
+
+    return undefined;
   }
 };

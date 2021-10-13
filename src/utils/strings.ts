@@ -110,6 +110,37 @@ export const getValueFromRange = (
   return +max;
 };
 
+export const getPathWithoutRootDir = (
+  pathToFile: string,
+  customPaths: ISystemRootState['customPaths'],
+): string => {
+  if (new RegExp(GAME_DIR.replaceAll('\\', '\\\\')).test(pathToFile)) {
+    return pathToFile.replace(GAME_DIR, '').substr(1);
+  } else if (new RegExp(customPaths[CustomPathName.DOCUMENTS].replaceAll('\\', '\\\\')).test(pathToFile)) {
+    return pathToFile.replace(customPaths[CustomPathName.DOCUMENTS], '').substr(1);
+  }
+
+  throw new CustomError(`Recieved incorrect path: ${pathToFile}`);
+};
+
+export const checkIsPathIsNotOutsideValidFolder = (
+  pathForCheck: string,
+  customPaths: ISystemRootState['customPaths'],
+): string => {
+  const newPath = path.normalize(pathForCheck);
+
+  if (
+    !new RegExp(GAME_DIR.replaceAll('\\', '\\\\')).test(pathForCheck)
+    && !new RegExp(customPaths[CustomPathName.DOCUMENTS]
+      .replaceAll('\\', '\\\\'))
+      .test(pathForCheck)
+  ) {
+    throw new CustomError(`The path is outside of a valid folder. Path: ${pathForCheck}`);
+  }
+
+  return newPath;
+};
+
 /**
  * Получить путь до файла с учетом кастомных путей.
  * @param pathToFile Путь до файла из settings.json.
@@ -182,16 +213,7 @@ export const getPathToFile = (
     newPath = path.join(GAME_DIR, pathToFile);
   }
 
-  newPath = path.normalize(newPath);
-
-  if (
-    !new RegExp(GAME_DIR.replaceAll('\\', '\\\\')).test(newPath)
-    && !new RegExp(customPaths[CustomPathName.DOCUMENTS].replaceAll('\\', '\\\\')).test(newPath)
-  ) {
-    throw new CustomError(`The path is outside of a valid folder. Path: ${newPath}`);
-  }
-
-  return newPath;
+  return checkIsPathIsNotOutsideValidFolder(newPath, customPaths);
 };
 
 /**
