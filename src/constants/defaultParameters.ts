@@ -5,9 +5,11 @@ import {
 import {
   ILauncherAppButton,
   ILauncherCustomButton,
+  ILauncherDevCustomButton,
   IModOrganizerParams,
   ISystemRootState,
 } from '$types/system';
+import { LauncherButtonAction } from './misc';
 
 export const SUCCESS_STATUS: ISuccess = 'success';
 export const ERROR_STATUS: IError = 'error';
@@ -49,6 +51,13 @@ export const defaultLauncherResolution = {
   minHeight: 0,
   maxWidth: 0,
   maxHeight: 0,
+};
+
+export const defaultLauncherCustomButton: ILauncherDevCustomButton = {
+  action: LauncherButtonAction.OPEN,
+  label: '',
+  path: '',
+  args: [],
 };
 
 export const minimalLauncherConfig: ILauncherConfig = {

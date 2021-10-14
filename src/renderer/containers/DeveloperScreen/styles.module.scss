@@ -6,6 +6,9 @@
   display: flex;
   flex-direction: column;
   margin-bottom: 16px;
+  padding-bottom: 20px;
+
+  border-bottom: 1px solid var(--text-main);
 
   &:last-child {
     margin-bottom: 0;
@@ -13,6 +16,15 @@
 }
 
 .developer-screen__block-title {
+  @include reset-indents;
+  margin-bottom: 10px;
+
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.developer-screen__text {
   @include reset-indents;
   margin-bottom: 10px;
 
@@ -32,4 +44,8 @@
 .developer-screen__item.select__container {
   flex-direction: row;
   justify-content: space-between;
+}
+
+.developer-screen__custom-btns-container {
+  @include reset-list;
 }
