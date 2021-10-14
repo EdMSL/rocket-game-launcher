@@ -29,9 +29,6 @@ import {
 } from '$constants/paths';
 import { ISystemRootState } from '$types/system';
 
-const { dialog } = require('electron').remote;
-const { BrowserWindow } = require('electron').remote;
-
 export const xmlAttributePrefix = '@_';
 
 interface IIniLine {
@@ -606,15 +603,26 @@ export const getUserThemesFolders = (): string[] => {
  * Вызывает диалоговое окно для выбора пути и возвращает путь к файлу,
  * отсекая директорию до папки игры.
  * @param customPaths Кастомные пути из `state`.
+ * @param isPathToFile Выбирается путь до файла или папки?
+ * @param dialog Компонент `dialog` из Electron.
+ * @param currentWindow Текущее окно, из которого вызывается команда выбора пути.
 */
 export const getPathFromFileInput = async (
   customPaths: ISystemRootState['customPaths'],
+  isPathToFile: boolean,
+  dialog: Electron.Dialog,
+  currentWindow: Electron.BrowserWindow,
 ): Promise<string|undefined> => {
   try {
-    const pathObj = await dialog.showOpenDialog(BrowserWindow.getFocusedWindow()!, {
+    const pathObj = await dialog.showOpenDialog(currentWindow, {
 
-      properties: ['openDirectory'],
+      properties: [isPathToFile ? 'openFile' : 'openDirectory'],
+      filters: [{ name: 'Executable (".exe", ".lnk")', extensions: ['exe', 'lnk'] }],
     });
+
+    if (pathObj.filePaths.length === 0) {
+      return '';
+    }
 
     const pathStr = checkIsPathIsNotOutsideValidFolder(pathObj.filePaths[0], customPaths);
 

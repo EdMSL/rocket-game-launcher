@@ -1,6 +1,10 @@
+import { ipcRenderer } from 'electron';
 import React, {
-  useCallback, useState, ReactElement,
+  useCallback,
+  useState,
+  ReactElement,
 } from 'react';
+import { useDispatch } from 'react-redux';
 import classNames from 'classnames';
 import Scrollbars from 'react-custom-scrollbars-2';
 
@@ -11,7 +15,6 @@ import { Switcher } from '$components/UI/Switcher';
 import { defaultLauncherConfig } from '$constants/defaultParameters';
 import { ISystemRootState } from '$types/system';
 import { Select } from '$components/UI/Select';
-import { getPathFromFileInput } from '$utils/files';
 import { PathSelector } from '$components/UI/PathSelector';
 import { addMessages } from '$actions/main';
 import { CreateUserMessage } from '$utils/message';
@@ -19,14 +22,24 @@ import { CreateUserMessage } from '$utils/message';
 export const DeveloperScreen: React.FC = () => {
   const customPaths = useAppSelector((state) => state.system.customPaths);
 
+  const dispatch = useDispatch();
+
   const [currentConfig, setCurrentConfig] = useState<ISystemRootState>(defaultLauncherConfig);
 
   const onSelectPathBtnClick = useCallback(async (id: string, parent: string) => {
-    let pathToDir = await getPathFromFileInput(customPaths);
+    let pathStr: string = await ipcRenderer.invoke(
+      'get path from native window',
+      customPaths,
+      (parent === 'playButton' || parent === 'customButton') && id === 'path',
+    );
 
-    if (pathToDir !== undefined) {
-      if (pathToDir === '') {
-        pathToDir = currentConfig.modOrganizer.path;
+    if (pathStr !== undefined) {
+      if (pathStr === '') {
+        if (parent) {
+          pathStr = currentConfig[parent][id];
+        } else {
+          pathStr = currentConfig[id];
+        }
       }
 
       if (parent) {
@@ -34,19 +47,19 @@ export const DeveloperScreen: React.FC = () => {
           ...currentConfig,
           [parent]: {
             ...currentConfig[parent],
-            [id]: pathToDir,
+            [id]: pathStr,
           },
         });
       } else {
         setCurrentConfig({
           ...currentConfig,
-          [id]: pathToDir,
+          [id]: pathStr,
         });
       }
     } else {
-      addMessages([CreateUserMessage.error('Выбран некорректный путь до папки. Подробности в файле лога.')]); //eslint-disable-line max-len
+      dispatch(addMessages([CreateUserMessage.error('Выбран некорректный путь до папки. Подробности в файле лога.')])); //eslint-disable-line max-len
     }
-  }, [customPaths, currentConfig]);
+  }, [dispatch, customPaths, currentConfig]);
 
   const onSelectPathTextInputChange = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
@@ -183,7 +196,8 @@ export const DeveloperScreen: React.FC = () => {
           />
           <PathSelector
             className={styles['developer-screen__item']}
-            id="documentsPath"
+            id="path"
+            parent="playButton"
             label="Путь до .exe или .lnk файла игры"
             value={currentConfig.documentsPath}
             onChange={onSelectPathTextInputChange}

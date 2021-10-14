@@ -1,5 +1,9 @@
 import {
-  app, ipcMain, globalShortcut,
+  app,
+  ipcMain,
+  dialog,
+  globalShortcut,
+  BrowserWindow,
 } from 'electron';
 
 import { createStorage } from './components/storage';
@@ -12,8 +16,9 @@ import {
 import { showErrorBox } from '$utils/errors';
 import { getSystemInfo } from '$utils/data';
 import { createBackupFolders } from '$utils/backup';
-import { createFolderSync } from '$utils/files';
+import { createFolderSync, getPathFromFileInput } from '$utils/files';
 import { USER_THEMES_DIR } from '$constants/paths';
+import { ISystemRootState } from '$types/system';
 
 require('@electron/remote/main').initialize();
 
@@ -36,6 +41,20 @@ const start = async (): Promise<void> => {
 
   writeToLogFileSync('Application ready.');
 };
+
+ipcMain.handle(
+  'get path from native window',
+  (
+    event,
+    customPaths: ISystemRootState['customPaths'],
+    isPathToFile: boolean,
+  ) => getPathFromFileInput(
+    customPaths,
+    isPathToFile,
+    dialog,
+    BrowserWindow.getFocusedWindow()!,
+  ),
+);
 
 ipcMain.on('close app', () => {
   app.quit();
