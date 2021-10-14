@@ -1,3 +1,5 @@
+$checkbox-size: 20px;
+
 .button {
   @include reset-indents;
   font: inherit;
@@ -10,6 +12,10 @@
   cursor: pointer;
 
   user-select: none;
+
+  &:disabled {
+    cursor: default;
+  }
 }
 
 .main-btn {
@@ -51,8 +57,8 @@
   &::before {
     content: "";
     position: absolute;
-    top: calc(50% - 10px);
-    right: 0;
+    top: calc(50% - #{$checkbox-size} / 2);
+    right: calc(#{$checkbox-size} / 2);
 
     display: block;
     box-sizing: border-box;
@@ -69,7 +75,7 @@
     content: "";
     position: absolute;
     top: calc(50% - 3px);
-    right: 7px;
+    right: calc(#{$checkbox-size} / 2 + 7px);
 
     display: none;
     width: 6px;
@@ -311,13 +317,23 @@
   }
 }
 
-.number__container {
+.number-field__container {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.number__input {
+.number-field__input {
+  padding: 10px;
+}
+
+.text-field__container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.text-field__input {
   padding: 10px;
 }
 
