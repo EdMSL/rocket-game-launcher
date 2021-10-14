@@ -8,7 +8,7 @@ interface IProps extends IUIElementProps<HTMLInputElement> {
 
 }
 
-export const Number: React.FunctionComponent<IProps> = ({
+export const NumberField: React.FunctionComponent<IProps> = ({
   id,
   label,
   name = id,
@@ -25,13 +25,13 @@ export const Number: React.FunctionComponent<IProps> = ({
   onLeave = null,
 }) => (
   <div className={classNames(
-    'number__container',
-    parentClassname && `${parentClassname}-number__container`,
+    'number-field__container',
+    parentClassname && `${parentClassname}-number-field__container`,
     className,
   )}
   >
     <label
-      className="number__label"
+      className="number-field__label"
       htmlFor={id}
     >
       <span>{label}</span>
@@ -51,7 +51,7 @@ export const Number: React.FunctionComponent<IProps> = ({
       }
     </label>
     <input
-      className="number__input"
+      className="number-field__input"
       type="number"
       id={id}
       name={name}
