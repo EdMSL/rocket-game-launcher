@@ -218,7 +218,7 @@ export const DeveloperScreen: React.FC = () => {
             label="Текст кнопки запуска"
             onChange={OnTextFieldChange}
           />
-          <div>
+          <div className={styles['developer-screen__custom-btns']}>
             <p className={styles['developer-screen__text']}>
               Кнопки запуска дополнительных программ
             </p>
@@ -227,7 +227,7 @@ export const DeveloperScreen: React.FC = () => {
                 customButtons.map((item) => <CustomBtnItem item={item} />)
               }
             </ul>
-            <Button onClick={onAddCustomBtnBtnClick}>Добавить</Button>
+            <Button onClick={onAddCustomBtnBtnClick}>Добавить кнопку</Button>
           </div>
         </div>
         <div className={styles['developer-screen__block']}>
