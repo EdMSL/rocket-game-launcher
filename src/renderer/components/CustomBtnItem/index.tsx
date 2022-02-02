@@ -4,14 +4,16 @@ import styles from './styles.module.scss';
 import { Checkbox } from '$components/UI/Checkbox';
 import { PathSelector } from '$components/UI/PathSelector';
 import { TextField } from '$components/UI/TextField';
-import { ILauncherDevCustomButton } from '$types/system';
+import { ILauncherCustomButton } from '$types/system';
 import { LauncherButtonAction } from '$constants/misc';
 
 interface IProps {
-  item: ILauncherDevCustomButton,
+  item: ILauncherCustomButton,
 }
 
-export const CustomBtnItem: React.FC<IProps> = ({ item }) => {
+export const CustomBtnItem: React.FC<IProps> = ({
+  item,
+}) => {
   const onCheckboxChange = useCallback(() => {}, []);
   const OnTextFieldChange = useCallback(() => {}, []);
   const onSelectPathBtnClick = useCallback(() => {}, []);
@@ -21,28 +23,29 @@ export const CustomBtnItem: React.FC<IProps> = ({ item }) => {
     <li className={styles['developer-screen__custom-btn-item']}>
       <Checkbox
         className={styles['developer-screen__item']}
-        id="btn_item"
+        id={`item_checkbox-${item.id}`}
         label="Кнопка запуска приложения?"
-        isChecked={item.action === LauncherButtonAction.RUN || true}
+        isChecked={item.action === LauncherButtonAction.RUN}
         onChange={onCheckboxChange}
       />
       <PathSelector
         className={styles['developer-screen__item']}
-        id=""
+        id={`item_path-${item.id}`}
         label="Путь до файла\папки"
+        value={item.path}
         onButtonClick={onSelectPathBtnClick}
         onChange={onSelectPathTextInputChange}
       />
       <TextField
         className={styles['developer-screen__item']}
-        id="args"
+        id={`item_args-${item.id}`}
         value={item.args?.toString()}
         label="Аргументы запуска"
         onChange={OnTextFieldChange}
       />
       <TextField
         className={styles['developer-screen__item']}
-        id="label"
+        id={`item_label-${item.id}`}
         value={item.label}
         label="Заголовок кнопки"
         onChange={OnTextFieldChange}
