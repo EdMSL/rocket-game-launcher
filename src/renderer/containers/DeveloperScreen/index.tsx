@@ -14,7 +14,7 @@ import { NumberField } from '$components/UI/NumberField';
 import { TextField } from '$components/UI/TextField';
 import { Switcher } from '$components/UI/Switcher';
 import { defaultLauncherConfig, defaultLauncherCustomButton } from '$constants/defaultParameters';
-import { ILauncherDevCustomButton, ISystemRootState } from '$types/system';
+import { ILauncherCustomButton, ISystemRootState } from '$types/system';
 import { Select } from '$components/UI/Select';
 import { PathSelector } from '$components/UI/PathSelector';
 import { addMessages } from '$actions/main';
@@ -26,11 +26,12 @@ import { CustomBtnItem } from '$components/CustomBtnItem';
 
 export const DeveloperScreen: React.FC = () => {
   const customPaths = useAppSelector((state) => state.system.customPaths);
+  const customButtons = useAppSelector((state) => state.system.customButtons);
 
   const dispatch = useDispatch();
 
   const [currentConfig, setCurrentConfig] = useState<ISystemRootState>(defaultLauncherConfig);
-  const [customButtons, setCustomButtons] = useState<ILauncherDevCustomButton[]>([defaultLauncherCustomButton]);
+  const [configCustomButtons, setConfigCustomButtons] = useState<ILauncherCustomButton[]>(customButtons);
 
   const changeCurrentConfig = useCallback((id, value, parent) => {
     if (parent) {
@@ -197,8 +198,8 @@ export const DeveloperScreen: React.FC = () => {
             className={styles['developer-screen__item']}
             id="path"
             parent="playButton"
-            label="Путь до .exe или .lnk файла игры"
-            value={currentConfig.documentsPath}
+            label="Путь до исполняемого файла игры"
+            value={currentConfig.playButton.path}
             onChange={onSelectPathTextInputChange}
             onButtonClick={onSelectPathBtnClick}
           />
@@ -224,7 +225,12 @@ export const DeveloperScreen: React.FC = () => {
             </p>
             <ul className={styles['developer-screen__custom-btns-container']}>
               {
-                customButtons.map((item) => <CustomBtnItem item={item} />)
+                configCustomButtons.map((item) => (
+                  <CustomBtnItem
+                    key={item.id}
+                    item={item}
+                  />
+                ))
               }
             </ul>
             <Button onClick={onAddCustomBtnBtnClick}>Добавить кнопку</Button>
