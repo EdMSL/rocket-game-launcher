@@ -617,7 +617,7 @@ export const getPathFromFileInput = async (
     const pathObj = await dialog.showOpenDialog(currentWindow, {
 
       properties: [isPathToFile ? 'openFile' : 'openDirectory'],
-      filters: [{ name: 'Executable (".exe", ".lnk")', extensions: ['exe', 'lnk'] }],
+      filters: [{ name: 'Executable', extensions: ['exe', 'lnk'] }],
     });
 
     if (pathObj.filePaths.length === 0) {

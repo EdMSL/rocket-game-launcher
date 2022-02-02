@@ -20,10 +20,6 @@ export interface ILauncherAppButton {
   args?: string[],
 }
 
-export interface ILauncherDevCustomButton extends ILauncherAppButton {
-  action: string,
-}
-
 export interface ILauncherCustomButton extends ILauncherAppButton {
   id: string,
   action: string,

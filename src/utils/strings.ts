@@ -116,7 +116,10 @@ export const getPathWithoutRootDir = (
 ): string => {
   if (new RegExp(GAME_DIR.replaceAll('\\', '\\\\')).test(pathToFile)) {
     return pathToFile.replace(GAME_DIR, '').substr(1);
-  } else if (new RegExp(customPaths[CustomPathName.DOCUMENTS].replaceAll('\\', '\\\\')).test(pathToFile)) {
+  } else if (
+    customPaths[CustomPathName.DOCUMENTS]
+    && new RegExp(customPaths[CustomPathName.DOCUMENTS].replaceAll('\\', '\\\\')).test(pathToFile)
+  ) {
     return pathToFile.replace(customPaths[CustomPathName.DOCUMENTS], '').substr(1);
   }
 
