@@ -96,6 +96,8 @@ export const DeveloperScreen: React.FC = () => {
 
   const onAddCustomBtnBtnClick = useCallback(() => {}, []);
 
+  const onAddCustomPathBtnClick = useCallback(() => {}, []);
+
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <main className={classNames('main', styles['developer-screen__main'])}>
@@ -193,6 +195,31 @@ export const DeveloperScreen: React.FC = () => {
             onChange={onSelectPathTextInputChange}
             onButtonClick={onSelectPathBtnClick}
           />
+          <p className={styles['developer-screen__text']}>Настройка пользовательских путей</p>
+          <p className={styles['developer-screen__custom-block']}>
+            {
+              Object.keys(currentConfig.customPaths).map((currentCustomPath) => (
+                <React.Fragment>
+                  <TextField
+                    className={styles['developer-screen__item']}
+                    id="gameName"
+                    value={currentCustomPath}
+                    label="Название игры"
+                    onChange={OnTextFieldChange}
+                  />
+                  <PathSelector
+                    className={styles['developer-screen__item']}
+                    id="documentsPath"
+                    label="Путь до папки файлов игры в Documents пользователя"
+                    value={currentConfig[currentCustomPath]}
+                    onChange={onSelectPathTextInputChange}
+                    onButtonClick={onSelectPathBtnClick}
+                  />
+                </React.Fragment>
+              ))
+            }
+          </p>
+          <Button onClick={onAddCustomPathBtnClick}>Добавить путь</Button>
           <p className={styles['developer-screen__text']}>Настройки запуска игры</p>
           <PathSelector
             className={styles['developer-screen__item']}
