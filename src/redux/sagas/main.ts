@@ -183,7 +183,7 @@ function* createGameSettingsBackupSaga(
     yield put(setIsGameSettingsFilesBackuping(true));
 
     const {
-      system: { customPaths },
+      config: { customPaths },
       gameSettings: { gameSettingsFiles, moProfile },
     }: ReturnType<typeof getState> = yield select(getState);
 
@@ -387,7 +387,7 @@ function* restoreGameSettingsFilesBackupSaga({
 function* locationChangeSaga({ payload: { location } }: LocationChangeAction): SagaIterator {
   const {
     main: { isLauncherInitialised, isGameSettingsLoaded },
-    system: { isFirstLaunch },
+    config: { isFirstLaunch },
   }: ReturnType<typeof getState> = yield select(getState);
   if (!isLauncherInitialised && location.pathname === `${Routes.MAIN_SCREEN}`) {
     if (isFirstLaunch) {

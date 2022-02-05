@@ -17,8 +17,8 @@ interface IProps {
 export const Header: React.FunctionComponent<IProps> = ({
   openAppInfo,
 }) => {
-  const isResizable = useAppSelector((state) => state.system.isResizable);
-  const gameName = useAppSelector((state) => state.system.gameName);
+  const isResizable = useAppSelector((state) => state.config.isResizable);
+  const gameName = useAppSelector((state) => state.config.gameName);
 
   const [isMaximize, setIsMaximize] = useState(false);
 

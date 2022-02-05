@@ -4,7 +4,7 @@ import styles from './styles.module.scss';
 import { Checkbox } from '$components/UI/Checkbox';
 import { PathSelector } from '$components/UI/PathSelector';
 import { TextField } from '$components/UI/TextField';
-import { ILauncherCustomButton } from '$types/system';
+import { ILauncherCustomButton } from '$types/config';
 import { LauncherButtonAction } from '$constants/misc';
 
 interface IProps {

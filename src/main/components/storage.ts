@@ -24,7 +24,7 @@ import {
   CONFIG_FILE_PATH,
   GAME_DIR,
 } from '$constants/paths';
-import { ISystemRootState } from '$types/system';
+import { IConfigRootState } from '$types/config';
 import {
   CustomError,
   ErrorName,
@@ -40,7 +40,7 @@ import {
   getUserThemes,
 } from '$utils/data';
 import { INITIAL_STATE as mainInitialState } from '$reducers/main';
-import { INITIAL_STATE as systemInitialState } from '$reducers/system';
+import { INITIAL_STATE as configInitialState } from '$reducers/config';
 import { INITIAL_STATE as userSettingsInitialState } from '$reducers/userSettings';
 import { IUserMessage } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
@@ -56,7 +56,7 @@ const getConfigurationData = (): ILauncherConfig => {
   // Считываем данные из файла конфигурации лаунчера. Эти данные затем передаются в стейт Redux.
   // Если файл не найден, то создаем новый с дефолтными настройками.
   try {
-    const configData = readJSONFileSync<ISystemRootState>(CONFIG_FILE_PATH);
+    const configData = readJSONFileSync<IConfigRootState>(CONFIG_FILE_PATH);
 
     return configData;
   } catch (error: any) {
@@ -176,15 +176,15 @@ export const createStorage = (): Store<IAppState> => {
       ...userSettingsInitialState,
       ...userSettingsStorage,
     },
-    system: {
-      ...systemInitialState,
+    config: {
+      ...configInitialState,
       ...configurationData,
       modOrganizer: {
-        ...systemInitialState.modOrganizer,
+        ...configInitialState.modOrganizer,
         ...configurationData.modOrganizer,
       },
       playButton: {
-        ...systemInitialState.playButton,
+        ...configInitialState.playButton,
         ...configurationData.playButton,
       },
       customPaths: { ...customPaths },

@@ -138,7 +138,7 @@ export function* getInitialGameSettingsConfigSaga(
 */
 function* getMOProfilesSaga(): SagaIterator {
   const {
-    system: {
+    config: {
       modOrganizer: {
         pathToProfiles,
       },
@@ -180,7 +180,7 @@ function* getMOProfilesSaga(): SagaIterator {
 function* getDataFromMOIniSaga(): SagaIterator<string> {
   try {
     const {
-      system: {
+      config: {
         modOrganizer: {
           version,
           pathToINI,
@@ -262,7 +262,7 @@ function* getDataFromGameSettingsFilesSaga(
 ): SagaIterator<IGetDataFromFilesResult> {
   try {
     const {
-      system: { customPaths },
+      config: { customPaths },
     }: ReturnType<typeof getState> = yield select(getState);
 
     const currentFilesData: IUnwrap<typeof readFileForGameSettingsOptions>[] = yield all(
@@ -455,7 +455,7 @@ export function* initGameSettingsSaga(
         baseFilesEncoding,
         gameSettingsGroups,
       },
-      system: {
+      config: {
         modOrganizer: {
           isUsed: isMOUsed,
         },
@@ -559,7 +559,7 @@ function* changeMOProfileSaga(
 
     const {
       gameSettings: { gameSettingsFiles, gameSettingsOptions },
-      system: {
+      config: {
         modOrganizer: {
           pathToINI,
           profileSection,
@@ -654,7 +654,7 @@ function* saveGameSettingsFilesSaga(
       gameSettings: {
         moProfile, gameSettingsFiles, gameSettingsOptions,
       },
-      system: { customPaths },
+      config: { customPaths },
     }: ReturnType<typeof getState> = yield select(getState);
     const changedFilesNames = Object.keys(changedGameSettingsOptions);
 

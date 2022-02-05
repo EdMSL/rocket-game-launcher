@@ -6,8 +6,8 @@ import {
   ILauncherAppButton,
   ILauncherCustomButton,
   IModOrganizerParams,
-  ISystemRootState,
-} from '$types/system';
+  IConfigRootState,
+} from '$types/config';
 import { LauncherButtonAction } from './misc';
 
 export const SUCCESS_STATUS: ISuccess = 'success';
@@ -89,7 +89,7 @@ export const defaultModOrganizerParams: IModOrganizerParams = {
   profileParamValueRegExp: '',
 };
 
-export const defaultLauncherConfig: ISystemRootState = {
+export const defaultLauncherConfig: IConfigRootState = {
   isResizable: false,
   minWidth: defaultLauncherResolution.minWidth,
   minHeight: defaultLauncherResolution.minHeight,

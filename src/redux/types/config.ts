@@ -1,4 +1,4 @@
-export const SYSTEM_TYPES = {
+export const CONFIG_TYPES = {
   SET_IS_FIRST_LAUNCH: 'SET_IS_FIRST_LAUNCH',
 };
 
@@ -25,7 +25,7 @@ export interface ILauncherCustomButton extends ILauncherAppButton {
   action: string,
 }
 
-export type ISystemRootState = Readonly<{
+export type IConfigRootState = Readonly<{
   isResizable: boolean,
   minWidth: number,
   minHeight: number,

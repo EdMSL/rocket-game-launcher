@@ -1,6 +1,6 @@
 import path from 'path';
 
-import { ISystemRootState } from '$types/system';
+import { IConfigRootState } from '$types/config';
 import { CustomError } from './errors';
 import { CustomPathName, DefaultCustomPathName } from '$constants/misc';
 import { GAME_DIR } from '$constants/paths';
@@ -112,7 +112,7 @@ export const getValueFromRange = (
 
 export const getPathWithoutRootDir = (
   pathToFile: string,
-  customPaths: ISystemRootState['customPaths'],
+  customPaths: IConfigRootState['customPaths'],
 ): string => {
   if (new RegExp(GAME_DIR.replaceAll('\\', '\\\\')).test(pathToFile)) {
     return pathToFile.replace(GAME_DIR, '').substr(1);
@@ -128,7 +128,7 @@ export const getPathWithoutRootDir = (
 
 export const checkIsPathIsNotOutsideValidFolder = (
   pathForCheck: string,
-  customPaths: ISystemRootState['customPaths'],
+  customPaths: IConfigRootState['customPaths'],
 ): string => {
   const newPath = path.normalize(pathForCheck);
 
@@ -153,7 +153,7 @@ export const checkIsPathIsNotOutsideValidFolder = (
 */
 export const getPathToFile = (
   pathToFile: string,
-  customPaths: ISystemRootState['customPaths'],
+  customPaths: IConfigRootState['customPaths'],
   profileMO: string,
 ): string => {
   let newPath = pathToFile;

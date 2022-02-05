@@ -27,7 +27,7 @@ import {
 import {
   USER_THEMES_DIR,
 } from '$constants/paths';
-import { ISystemRootState } from '$types/system';
+import { IConfigRootState } from '$types/config';
 
 export const xmlAttributePrefix = '@_';
 
@@ -608,7 +608,7 @@ export const getUserThemesFolders = (): string[] => {
  * @param currentWindow Текущее окно, из которого вызывается команда выбора пути.
 */
 export const getPathFromFileInput = async (
-  customPaths: ISystemRootState['customPaths'],
+  customPaths: IConfigRootState['customPaths'],
   isPathToFile: boolean,
   dialog: Electron.Dialog,
   currentWindow: Electron.BrowserWindow,

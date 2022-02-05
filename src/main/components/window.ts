@@ -9,13 +9,13 @@ import windowStateKeeper from 'electron-window-state';
 
 import { createWaitForWebpackDevServer } from './waitDevServer';
 import { defaultLauncherResolution } from '$constants/defaultParameters';
-import { ISystemRootState } from '$types/system';
+import { IConfigRootState } from '$types/config';
 import { getDisplaysInfo } from '$utils/data';
 
 /**
  * Функция для создания и показа окна приложения
 */
-export const createWindow = (systemConfig: ISystemRootState): void => {
+export const createWindow = (config: IConfigRootState): void => {
   const mainWindowState = windowStateKeeper({
     defaultWidth: defaultLauncherResolution.width,
     defaultHeight: defaultLauncherResolution.height,
@@ -24,13 +24,13 @@ export const createWindow = (systemConfig: ISystemRootState): void => {
   const mainWindow = new BrowserWindow({
     x: mainWindowState.x,
     y: mainWindowState.y,
-    minWidth: systemConfig.isResizable ? systemConfig.minWidth : 0,
-    minHeight: systemConfig.isResizable ? systemConfig.minHeight : 0,
-    maxWidth: systemConfig.isResizable ? systemConfig.maxWidth : 0,
-    maxHeight: systemConfig.isResizable ? systemConfig.maxHeight : 0,
-    width: systemConfig.isResizable ? mainWindowState.width : systemConfig.width,
-    height: systemConfig.isResizable ? mainWindowState.height : systemConfig.height,
-    resizable: systemConfig.isResizable,
+    minWidth: config.isResizable ? config.minWidth : 0,
+    minHeight: config.isResizable ? config.minHeight : 0,
+    maxWidth: config.isResizable ? config.maxWidth : 0,
+    maxHeight: config.isResizable ? config.maxHeight : 0,
+    width: config.isResizable ? mainWindowState.width : config.width,
+    height: config.isResizable ? mainWindowState.height : config.height,
+    resizable: config.isResizable,
     frame: false,
     webPreferences: {
       nodeIntegration: true,

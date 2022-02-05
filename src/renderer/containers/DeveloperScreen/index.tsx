@@ -14,7 +14,7 @@ import { NumberField } from '$components/UI/NumberField';
 import { TextField } from '$components/UI/TextField';
 import { Switcher } from '$components/UI/Switcher';
 import { defaultLauncherConfig, defaultLauncherCustomButton } from '$constants/defaultParameters';
-import { ILauncherCustomButton, ISystemRootState } from '$types/system';
+import { ILauncherCustomButton, IConfigRootState } from '$types/config';
 import { Select } from '$components/UI/Select';
 import { PathSelector } from '$components/UI/PathSelector';
 import { addMessages } from '$actions/main';
@@ -25,12 +25,12 @@ import { Button } from '$components/UI/Button';
 import { CustomBtnItem } from '$components/CustomBtnItem';
 
 export const DeveloperScreen: React.FC = () => {
-  const customPaths = useAppSelector((state) => state.system.customPaths);
-  const customButtons = useAppSelector((state) => state.system.customButtons);
+  const customPaths = useAppSelector((state) => state.config.customPaths);
+  const customButtons = useAppSelector((state) => state.config.customButtons);
 
   const dispatch = useDispatch();
 
-  const [currentConfig, setCurrentConfig] = useState<ISystemRootState>(defaultLauncherConfig);
+  const [currentConfig, setCurrentConfig] = useState<IConfigRootState>(defaultLauncherConfig);
   const [configCustomButtons, setConfigCustomButtons] = useState<ILauncherCustomButton[]>(customButtons);
 
   const changeCurrentConfig = useCallback((id, value, parent) => {

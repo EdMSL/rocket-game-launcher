@@ -42,8 +42,8 @@ import {
   ILauncherAppButton,
   ILauncherCustomButton,
   IModOrganizerParams,
-  ISystemRootState,
-} from '$types/system';
+  IConfigRootState,
+} from '$types/config';
 import { defaultModOrganizerParams } from '$constants/defaultParameters';
 import { getReadWriteError } from './errors';
 
@@ -545,7 +545,7 @@ export const getNewModOrganizerParams = (data: IModOrganizerParams): IModOrganiz
  * @returns Объект с пользовательскими путями.
 */
 export const createCustomPaths = (
-  configData: ISystemRootState,
+  configData: IConfigRootState,
   app: Electron.App,
 ): ICustomPaths => {
   const newCustomPaths = Object.keys(configData.customPaths).reduce((paths, currentPathKey) => ({

@@ -44,7 +44,7 @@ export const GameSettingsScreen: React.FC = () => {
   const gameSettingsOptions = useAppSelector((state) => state.gameSettings.gameSettingsOptions);
   const moProfile = useAppSelector((state) => state.gameSettings.moProfile);
   const moProfiles = useAppSelector((state) => state.gameSettings.moProfiles);
-  const isModOrganizerUsed = useAppSelector((state) => state.system.modOrganizer.isUsed);
+  const isModOrganizerUsed = useAppSelector((state) => state.config.modOrganizer.isUsed);
   /* eslint-enable max-len */
 
   const dispatch = useDispatch();

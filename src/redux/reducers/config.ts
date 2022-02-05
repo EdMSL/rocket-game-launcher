@@ -1,10 +1,10 @@
 import { createReducer } from 'reduxsauce';
 
 import { defaultLauncherConfig } from '$constants/defaultParameters';
-import { SYSTEM_HANDLERS } from '$handlers/system';
-import { ISystemRootState } from '$types/system';
+import { CONFIG_HANDLERS } from '$handlers/config';
+import { IConfigRootState } from '$types/config';
 
-export const INITIAL_STATE: ISystemRootState = {
+export const INITIAL_STATE: IConfigRootState = {
   isResizable: defaultLauncherConfig.isResizable,
   minWidth: defaultLauncherConfig.minWidth,
   minHeight: defaultLauncherConfig.minHeight,
@@ -21,4 +21,4 @@ export const INITIAL_STATE: ISystemRootState = {
   customButtons: defaultLauncherConfig.customButtons,
 };
 
-export const systemReducer = createReducer<ISystemRootState>(INITIAL_STATE, SYSTEM_HANDLERS);
+export const configReducer = createReducer<IConfigRootState>(INITIAL_STATE, CONFIG_HANDLERS);

@@ -23,7 +23,7 @@ import {
   ILauncherConfig,
   minimalLauncherConfig,
 } from '$constants/defaultParameters';
-import { ISystemRootState } from '$types/system';
+import { IConfigRootState } from '$types/config';
 import { CustomError, ErrorName } from './errors';
 import { getRandomId } from './strings';
 
@@ -78,7 +78,7 @@ const configFileDataSchema = Joi.object({
     })).optional().default([]),
 });
 
-export const checkConfigFileData = (configObj: ILauncherConfig): ISystemRootState => {
+export const checkConfigFileData = (configObj: ILauncherConfig): IConfigRootState => {
   writeToLogFileSync('Started checking the config.json file.');
 
   const validateResult = configFileDataSchema.validate(configObj, {
