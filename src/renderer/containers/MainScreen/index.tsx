@@ -120,11 +120,27 @@ export const MainScreen: React.FC = () => {
           Настройки
         </NavLink>
         <Button
-          className={classNames('main-btn', styles['main-screen__launcher-settings-btn'])}
+          className={classNames(
+            'main-btn',
+            styles['main-screen__bottom-btn'],
+            styles['main-screen__bottom-btn--settings'],
+          )}
           onClick={onLauncherSettingsBtnClick}
         >
-          Настройки программы
+          <span className={styles['main-screen__bottom-btn-text']}>Настройки программы</span>
         </Button>
+        <NavLink
+          exact
+          to={Routes.DEVELOPER_SCREEN}
+          className={classNames(
+            'main-btn',
+            styles['main-screen__bottom-btn'],
+            styles['main-screen__bottom-btn--developer'],
+          )}
+          onClick={onDisabledNavLinkClick}
+        >
+          <span className={styles['main-screen__bottom-btn-text']}>Экран разработчика</span>
+        </NavLink>
       </div>
       {
         isModalOpen && (
