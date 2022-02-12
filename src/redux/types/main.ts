@@ -22,18 +22,6 @@ export const MAIN_TYPES = {
   DELETE_MESSAGES: 'DELETE_MESSAGES',
 };
 
-export interface IModOrganizerParams {
-  isUsed: boolean,
-  version: number,
-  path: string,
-  pathToINI: string,
-  pathToProfiles: string,
-  pathToMods: string,
-  profileSection: string,
-  profileParam: string,
-  profileParamValueRegExp: string,
-}
-
 export interface ILauncherAppButton {
   path: string,
   label: string,
@@ -60,23 +48,37 @@ export interface IGameSettingsBackup {
   files: IBackupFile[],
 }
 
+export interface IModOrganizerParams {
+  isUsed: boolean,
+  version: number,
+  path: string,
+  pathToINI: string,
+  pathToProfiles: string,
+  pathToMods: string,
+  profileSection: string,
+  profileParam: string,
+  profileParamValueRegExp: string,
+}
+
+export interface ILauncherConfig {
+  isResizable: boolean,
+  minWidth: number,
+  minHeight: number,
+  maxWidth: number,
+  maxHeight: number,
+  width: number,
+  height: number,
+  isFirstLaunch: boolean,
+  modOrganizer: IModOrganizerParams,
+  documentsPath: string,
+  customPaths: { [label: string]: string, },
+  gameName: string,
+  playButton: ILauncherAppButton,
+  customButtons: ILauncherCustomButton[],
+}
+
 export type IMainRootState = Readonly<{
-  config: {
-    isResizable: boolean,
-    minWidth: number,
-    minHeight: number,
-    maxWidth: number,
-    maxHeight: number,
-    width: number,
-    height: number,
-    isFirstLaunch: boolean,
-    modOrganizer: IModOrganizerParams,
-    documentsPath: string,
-    customPaths: { [label: string]: string, },
-    gameName: string,
-    playButton: ILauncherAppButton,
-    customButtons: ILauncherCustomButton[],
-  },
+  config: ILauncherConfig,
   isLauncherInitialised: boolean,
   isGameRunning: boolean,
   isGameSettingsLoaded: boolean,

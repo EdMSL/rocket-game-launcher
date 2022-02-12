@@ -4,6 +4,7 @@ import {
 } from '$types/common';
 import {
   ILauncherAppButton,
+  ILauncherConfig,
   ILauncherCustomButton,
   IModOrganizerParams,
 } from '$types/main';
@@ -23,24 +24,6 @@ interface ILauncherConfigModOrganizerParams {
   profileSection?: string,
   profileParam?: string,
   profileParamValueRegExp?: string,
-}
-
-export interface ILauncherConfig {
-  isResizable: boolean,
-  minWidth: number,
-  minHeight: number,
-  maxWidth: number,
-  maxHeight: number,
-  width: number,
-  height: number,
-  isFirstLaunch: boolean,
-  modOrganizer: IModOrganizerParams,
-  // modOrganizer: ILauncherConfigModOrganizerParams,
-  documentsPath: string,
-  customPaths: { [label: string]: string, },
-  gameName: string,
-  playButton: ILauncherAppButton,
-  customButtons: ILauncherCustomButton[],
 }
 
 export const defaultLauncherResolution = {

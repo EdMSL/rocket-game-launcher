@@ -7,7 +7,6 @@ import { configureStore, IAppState } from '$store/store';
 import { IUserSettingsRootState } from '$types/userSettings';
 import {
   defaultLauncherConfig,
-  ILauncherConfig,
 } from '$constants/defaultParameters';
 import {
   LogMessageType,
@@ -40,7 +39,7 @@ import {
 import { INITIAL_STATE as mainInitialState } from '$reducers/main';
 // import { INITIAL_STATE as configInitialState } from '$reducers/main';
 import { INITIAL_STATE as userSettingsInitialState } from '$reducers/userSettings';
-import { IUserMessage } from '$types/main';
+import { ILauncherConfig, IUserMessage } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
 import { Scope } from '$constants/misc';
 

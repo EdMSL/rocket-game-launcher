@@ -8,6 +8,7 @@ import {
   GameSettingsOptionType,
   CustomPathName,
   DefaultCustomPathName,
+  LauncherButtonAction,
 } from '$constants/misc';
 import {
   IGameSettingsConfig,
@@ -20,13 +21,12 @@ import {
 } from '$utils/log';
 import {
   defaultLauncherConfig,
-  ILauncherConfig,
   // minimalLauncherConfig,
 } from '$constants/defaultParameters';
 // import { IConfigRootState } from '$types/config';
 import { CustomError, ErrorName } from './errors';
 import { getRandomId } from './strings';
-import { IMainRootState } from '$types/main';
+import { ILauncherConfig } from '$types/main';
 
 interface IGameSettingsFileError {
   parent: string,
@@ -61,7 +61,7 @@ const configFileDataSchema = Joi.object({
     .pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
   isFirstLaunch: Joi.bool().optional().default(defaultLauncherConfig.isFirstLaunch),
   customPaths: Joi.object().pattern(
-    Joi.string().pattern(CustomPathName.CUSTOM_NAME_REGEXP, 'custom path name').not(...Object.values(DefaultCustomPathName)),
+    Joi.string().pattern(CustomPathName.CUSTOM_PATH_NAME_REGEXP).not(...Object.values(DefaultCustomPathName)),
     Joi.string(),
   ).optional().default(defaultLauncherConfig.customPaths),
   gameName: Joi.string().optional().allow(''),
@@ -76,10 +76,11 @@ const configFileDataSchema = Joi.object({
       path: Joi.string().required(),
       args: Joi.array().items(Joi.string()).optional().default([]),
       label: Joi.string().required(),
+      action: Joi.string().optional().valid(...Object.values(LauncherButtonAction)).default(LauncherButtonAction.RUN),
     })).optional().default([]),
 });
 
-export const checkConfigFileData = (configObj: ILauncherConfig): IMainRootState['config'] => {
+export const checkConfigFileData = (configObj: ILauncherConfig): ILauncherConfig => {
   writeToLogFileSync('Started checking the config.json file.');
 
   const validateResult = configFileDataSchema.validate(configObj, {
