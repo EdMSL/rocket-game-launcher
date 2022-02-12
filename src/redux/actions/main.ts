@@ -18,6 +18,14 @@ export const setIsFirstLaunch = (
   payload: isFirstLaunch,
 });
 
+export const saveLauncherConfig = (
+  newConfig: IMainRootState['config'],
+  isGoToMainScreen = false,
+) => ({
+  type: MAIN_TYPES.SAVE_LAUNCHER_CONFIG,
+  payload: { newConfig, isGoToMainScreen },
+});
+
 export const setIsGameRunning = (
   isGameRunning: IMainRootState['isGameRunning'],
 ) => ({

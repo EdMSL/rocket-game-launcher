@@ -11,7 +11,7 @@ interface IButtonProps {
   btnPath?: string,
   btnArgs?: string[],
   btnLabel?: string,
-  onClick?: (e: React.SyntheticEvent) => void,
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void,
 }
 export const Button: React.FunctionComponent<IButtonProps> = memo(({
   children,

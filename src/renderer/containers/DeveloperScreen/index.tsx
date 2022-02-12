@@ -17,18 +17,20 @@ import { Switcher } from '$components/UI/Switcher';
 import { Select } from '$components/UI/Select';
 import { PathSelector } from '$components/UI/PathSelector';
 import {
-  setLauncherConfig, addMessages,
+  saveLauncherConfig,
+  addMessages,
 } from '$actions/main';
 import { CreateUserMessage } from '$utils/message';
-import { Checkbox } from '$components/UI/Checkbox';
 import { LauncherButtonAction } from '$constants/misc';
 import { Button } from '$components/UI/Button';
 import { CustomBtnItem } from '$components/CustomBtnItem';
 import { Routes } from '$constants/routes';
 import { IMainRootState } from '$types/main';
+import { Loader } from '$components/UI/Loader';
 
 export const DeveloperScreen: React.FC = () => {
   const launcherConfig = useAppSelector((state) => state.main.config);
+  const isGameSettingsSaving = useAppSelector((state) => state.main.isGameSettingsSaving);
 
   const dispatch = useDispatch();
 
@@ -99,8 +101,10 @@ export const DeveloperScreen: React.FC = () => {
 
   const onAddCustomPathBtnClick = useCallback(() => {}, []);
 
-  const onSaveConfigBtnClick = useCallback(() => {
-    dispatch(setLauncherConfig(currentConfig));
+  const onSaveBtnClick = useCallback((
+    { currentTarget }: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    dispatch(saveLauncherConfig(currentConfig, currentTarget.id === 'ok_btn'));
   }, [dispatch, currentConfig]);
 
   const onResetBtnClick = useCallback(() => {
@@ -111,18 +115,17 @@ export const DeveloperScreen: React.FC = () => {
   return (
     <main className={classNames('main', styles['developer-screen__main'])}>
       <p className={styles['develover-screen__controller']}>
-        <NavLink
-          exact
-          to={Routes.MAIN_SCREEN}
+        <Button
+          id="ok_btn"
+          onClick={onSaveBtnClick}
           className={classNames(
             'button',
             'main-btn',
             'control-panel__btn',
           )}
-          onClick={onResetBtnClick}
         >
           ОК
-        </NavLink>
+        </Button>
         <NavLink
           exact
           to={Routes.MAIN_SCREEN}
@@ -136,7 +139,7 @@ export const DeveloperScreen: React.FC = () => {
           Отмена
         </NavLink>
         <Button
-          onClick={onSaveConfigBtnClick}
+          onClick={onSaveBtnClick}
           className={classNames(
             'button',
             'main-btn',
@@ -360,6 +363,10 @@ export const DeveloperScreen: React.FC = () => {
           />
         </div>
       </Scrollbars>
+      {
+        isGameSettingsSaving
+          && <Loader />
+      }
     </main>
   );
 };
