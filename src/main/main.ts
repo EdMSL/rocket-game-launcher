@@ -18,7 +18,7 @@ import { getSystemInfo } from '$utils/data';
 import { createBackupFolders } from '$utils/backup';
 import { createFolderSync, getPathFromFileInput } from '$utils/files';
 import { USER_THEMES_DIR } from '$constants/paths';
-import { IConfigRootState } from '$types/config';
+import { IMainRootState } from '$types/main';
 
 require('@electron/remote/main').initialize();
 
@@ -28,7 +28,7 @@ const start = async (): Promise<void> => {
 
   const store = createStorage();
 
-  createWindow(store.getState().config);
+  createWindow(store.getState().main.config);
 
   if (process.env.NODE_ENV === 'production') {
     createBackupFolders();
@@ -46,7 +46,7 @@ ipcMain.handle(
   'get path from native window',
   (
     event,
-    customPaths: IConfigRootState['customPaths'],
+    customPaths: IMainRootState['config']['customPaths'],
     isPathToFile: boolean,
   ) => getPathFromFileInput(
     customPaths,

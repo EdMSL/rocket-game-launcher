@@ -8,7 +8,7 @@ import { IUserSettingsRootState } from '$types/userSettings';
 import {
   defaultLauncherConfig,
   ILauncherConfig,
-  minimalLauncherConfig,
+  // minimalLauncherConfig,
 } from '$constants/defaultParameters';
 import {
   LogMessageType,
@@ -24,7 +24,7 @@ import {
   CONFIG_FILE_PATH,
   GAME_DIR,
 } from '$constants/paths';
-import { IConfigRootState } from '$types/config';
+// import { IConfigRootState } from '$types/main';
 import {
   CustomError,
   ErrorName,
@@ -40,7 +40,7 @@ import {
   getUserThemes,
 } from '$utils/data';
 import { INITIAL_STATE as mainInitialState } from '$reducers/main';
-import { INITIAL_STATE as configInitialState } from '$reducers/config';
+// import { INITIAL_STATE as configInitialState } from '$reducers/main';
 import { INITIAL_STATE as userSettingsInitialState } from '$reducers/userSettings';
 import { IUserMessage } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
@@ -56,7 +56,7 @@ const getConfigurationData = (): ILauncherConfig => {
   // Считываем данные из файла конфигурации лаунчера. Эти данные затем передаются в стейт Redux.
   // Если файл не найден, то создаем новый с дефолтными настройками.
   try {
-    const configData = readJSONFileSync<IConfigRootState>(CONFIG_FILE_PATH);
+    const configData = readJSONFileSync<ILauncherConfig>(CONFIG_FILE_PATH);
 
     return configData;
   } catch (error: any) {
@@ -73,7 +73,8 @@ const getConfigurationData = (): ILauncherConfig => {
           'warning',
         );
 
-        writeJSONFile(CONFIG_FILE_PATH, minimalLauncherConfig)
+        writeJSONFile(CONFIG_FILE_PATH, defaultLauncherConfig)
+        // writeJSONFile(CONFIG_FILE_PATH, minimalLauncherConfig)
           .then(() => {
             writeToLogFile('New config file config.json successfully created.');
           })
@@ -81,7 +82,8 @@ const getConfigurationData = (): ILauncherConfig => {
             writeToLogFile('New config file config.json not created.', LogMessageType.WARNING);
           });
 
-        return minimalLauncherConfig;
+        return defaultLauncherConfig;
+        // return minimalLauncherConfig;
       }
 
       throw new Error('Found problems with config.json.');
@@ -134,7 +136,7 @@ export const createStorage = (): Store<IAppState> => {
   }
 
   // Обработка данных Mod Organizer
-  if (configurationData.modOrganizer.isUsed) {
+  if (configurationData.modOrganizer?.isUsed) {
     //@ts-ignore
     configurationData.modOrganizer = getNewModOrganizerParams(configurationData.modOrganizer);
   }
@@ -145,9 +147,9 @@ export const createStorage = (): Store<IAppState> => {
     app,
   );
 
-  if (configurationData.playButton.path) {
+  if (configurationData.playButton?.path) {
     configurationData.playButton.path = getPathToFile(
-      configurationData.playButton.path,
+      configurationData.playButton?.path,
       customPaths,
       '',
     );
@@ -155,7 +157,7 @@ export const createStorage = (): Store<IAppState> => {
     messages.push(CreateUserMessage.warning('Не указан путь для файла запуска игры.')); //eslint-disable-line max-len
   }
 
-  if (!configurationData.playButton.label) {
+  if (!configurationData.playButton?.label) {
     configurationData.playButton.label = defaultLauncherConfig.playButton.label;
   }
 
@@ -176,21 +178,21 @@ export const createStorage = (): Store<IAppState> => {
       ...userSettingsInitialState,
       ...userSettingsStorage,
     },
-    config: {
-      ...configInitialState,
-      ...configurationData,
-      modOrganizer: {
-        ...configInitialState.modOrganizer,
-        ...configurationData.modOrganizer,
-      },
-      playButton: {
-        ...configInitialState.playButton,
-        ...configurationData.playButton,
-      },
-      customPaths: { ...customPaths },
-    },
     main: {
       ...mainInitialState,
+      config: {
+        ...mainInitialState,
+        ...configurationData,
+        modOrganizer: {
+          ...mainInitialState.config.modOrganizer,
+          ...configurationData.modOrganizer,
+        },
+        playButton: {
+          ...mainInitialState.config.playButton,
+          ...configurationData.playButton,
+        },
+        customPaths: { ...customPaths },
+      },
       userThemes,
       messages,
     },

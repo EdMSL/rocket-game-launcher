@@ -2,8 +2,25 @@ import { createReducer } from 'reduxsauce';
 
 import { MAIN_HANDLERS } from '$handlers/main';
 import { IMainRootState } from '$types/main';
+import { defaultLauncherConfig } from '$constants/defaultParameters';
 
 export const INITIAL_STATE: IMainRootState = {
+  config: {
+    isResizable: defaultLauncherConfig.isResizable,
+    minWidth: defaultLauncherConfig.minWidth,
+    minHeight: defaultLauncherConfig.minHeight,
+    maxWidth: defaultLauncherConfig.maxWidth,
+    maxHeight: defaultLauncherConfig.maxHeight,
+    width: defaultLauncherConfig.width,
+    height: defaultLauncherConfig.height,
+    isFirstLaunch: defaultLauncherConfig.isFirstLaunch,
+    modOrganizer: defaultLauncherConfig.modOrganizer,
+    documentsPath: defaultLauncherConfig.documentsPath,
+    customPaths: defaultLauncherConfig.customPaths,
+    gameName: defaultLauncherConfig.gameName,
+    playButton: defaultLauncherConfig.playButton,
+    customButtons: defaultLauncherConfig.customButtons,
+  },
   isLauncherInitialised: false,
   isGameRunning: false,
   isGameSettingsLoaded: false,

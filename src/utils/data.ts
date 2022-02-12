@@ -30,7 +30,7 @@ import {
   IGameSettingsOptionContent,
   IGameSettingsFiles,
 } from '$types/gameSettings';
-import { IUserMessage } from '$types/main';
+// import { IUserMessage } from '$types/main';
 import { ISelectOption } from '$components/UI/Select';
 import { IIncorrectGameSettingsFiles } from '$sagas/gameSettings';
 import {
@@ -41,9 +41,11 @@ import {
 import {
   ILauncherAppButton,
   ILauncherCustomButton,
+  IMainRootState,
   IModOrganizerParams,
-  IConfigRootState,
-} from '$types/config';
+  IUserMessage,
+  // IConfigRootState,
+} from '$types/main';
 import { defaultModOrganizerParams } from '$constants/defaultParameters';
 import { getReadWriteError } from './errors';
 
@@ -545,7 +547,7 @@ export const getNewModOrganizerParams = (data: IModOrganizerParams): IModOrganiz
  * @returns Объект с пользовательскими путями.
 */
 export const createCustomPaths = (
-  configData: IConfigRootState,
+  configData: IMainRootState['config'],
   app: Electron.App,
 ): ICustomPaths => {
   const newCustomPaths = Object.keys(configData.customPaths).reduce((paths, currentPathKey) => ({

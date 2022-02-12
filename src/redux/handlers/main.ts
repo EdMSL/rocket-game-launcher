@@ -4,6 +4,19 @@ import * as MAIN_ACTIONS from '$actions/main';
 
 type IMainActionHadler<P> = IActionHandler<IMainRootState, P>;
 
+const setIsFirstLaunch: IMainActionHadler<
+  typeof MAIN_ACTIONS.setIsFirstLaunch
+> = (
+  state,
+  { payload: isFirstLaunch },
+) => ({
+  ...state,
+  config: {
+    ...state.config,
+    isFirstLaunch,
+  },
+});
+
 const setIsGameRunning: IMainActionHadler<
   typeof MAIN_ACTIONS.setIsGameRunning
 > = (
@@ -118,6 +131,7 @@ const deleteMessages: IMainActionHadler<
 });
 
 export const MAIN_HANDLERS = {
+  [MAIN_TYPES.SET_IS_FIRST_LAUNCH]: setIsFirstLaunch,
   [MAIN_TYPES.SET_IS_GAME_RUNNING]: setIsGameRunning,
   [MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED]: setIsLauncherInitialised,
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_LOADED]: setIsGameSettingsLoaded,

@@ -17,8 +17,8 @@ import { LauncherSettings } from '$components/LauncherSettings';
 
 export const MainScreen: React.FC = () => {
   /* eslint-disable max-len */
-  const playButton = useAppSelector((state) => state.config.playButton);
-  const appButtons = useAppSelector((state) => state.config.customButtons);
+  const playButton = useAppSelector((state) => state.main.config.playButton);
+  const appButtons = useAppSelector((state) => state.main.config.customButtons);
   const isGameRunning = useAppSelector((state) => state.main.isGameRunning);
   const userThemes = useAppSelector((state) => state.main.userThemes);
   const userTheme = useAppSelector((state) => state.userSettings.theme);

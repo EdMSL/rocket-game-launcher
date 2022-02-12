@@ -9,13 +9,13 @@ import windowStateKeeper from 'electron-window-state';
 
 import { createWaitForWebpackDevServer } from './waitDevServer';
 import { defaultLauncherResolution } from '$constants/defaultParameters';
-import { IConfigRootState } from '$types/config';
+import { IMainRootState } from '$types/main';
 import { getDisplaysInfo } from '$utils/data';
 
 /**
  * Функция для создания и показа окна приложения
 */
-export const createWindow = (config: IConfigRootState): void => {
+export const createWindow = (config: IMainRootState['config']): void => {
   const mainWindowState = windowStateKeeper({
     defaultWidth: defaultLauncherResolution.width,
     defaultHeight: defaultLauncherResolution.height,

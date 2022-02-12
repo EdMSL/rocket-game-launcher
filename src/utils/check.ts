@@ -21,11 +21,12 @@ import {
 import {
   defaultLauncherConfig,
   ILauncherConfig,
-  minimalLauncherConfig,
+  // minimalLauncherConfig,
 } from '$constants/defaultParameters';
-import { IConfigRootState } from '$types/config';
+// import { IConfigRootState } from '$types/config';
 import { CustomError, ErrorName } from './errors';
 import { getRandomId } from './strings';
+import { IMainRootState } from '$types/main';
 
 interface IGameSettingsFileError {
   parent: string,
@@ -55,7 +56,7 @@ const configFileDataSchema = Joi.object({
     profileSection: Joi.string().optional(),
     profileParam: Joi.string().optional(),
     profileParamValueRegExp: Joi.string().optional().allow(''),
-  }).default(minimalLauncherConfig.modOrganizer),
+  }).default(defaultLauncherConfig.modOrganizer),
   documentsPath: Joi.string().optional().allow('').default(defaultLauncherConfig.documentsPath)
     .pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
   isFirstLaunch: Joi.bool().optional().default(defaultLauncherConfig.isFirstLaunch),
@@ -78,7 +79,7 @@ const configFileDataSchema = Joi.object({
     })).optional().default([]),
 });
 
-export const checkConfigFileData = (configObj: ILauncherConfig): IConfigRootState => {
+export const checkConfigFileData = (configObj: ILauncherConfig): IMainRootState['config'] => {
   writeToLogFileSync('Started checking the config.json file.');
 
   const validateResult = configFileDataSchema.validate(configObj, {

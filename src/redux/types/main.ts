@@ -1,6 +1,7 @@
 import { IMessage } from '$utils/message';
 
 export const MAIN_TYPES = {
+  SET_IS_FIRST_LAUNCH: 'SET_IS_FIRST_LAUNCH',
   SET_IS_GAME_RUNNING: 'SET_IS_GAME_RUNNING',
   SET_IS_LAUNCHER_INITIALISED: 'SET_IS_LAUNCHER_INITIALISED',
   SET_IS_GAME_SETTINGS_LOADED: 'SET_IS_GAME_SETTINGS_LOADED',
@@ -19,6 +20,29 @@ export const MAIN_TYPES = {
   DELETE_MESSAGES: 'DELETE_MESSAGES',
 };
 
+export interface IModOrganizerParams {
+  isUsed: boolean,
+  version: number,
+  path: string,
+  pathToINI: string,
+  pathToProfiles: string,
+  pathToMods: string,
+  profileSection: string,
+  profileParam: string,
+  profileParamValueRegExp: string,
+}
+
+export interface ILauncherAppButton {
+  path: string,
+  label: string,
+  args?: string[],
+}
+
+export interface ILauncherCustomButton extends ILauncherAppButton {
+  id: string,
+  action: string,
+}
+
 export interface IUserMessage extends IMessage {
   id: string,
 }
@@ -35,6 +59,22 @@ export interface IGameSettingsBackup {
 }
 
 export type IMainRootState = Readonly<{
+  config: {
+    isResizable: boolean,
+    minWidth: number,
+    minHeight: number,
+    maxWidth: number,
+    maxHeight: number,
+    width: number,
+    height: number,
+    isFirstLaunch: boolean,
+    modOrganizer: IModOrganizerParams,
+    documentsPath: string,
+    customPaths: { [label: string]: string, },
+    gameName: string,
+    playButton: ILauncherAppButton,
+    customButtons: ILauncherCustomButton[],
+  },
   isLauncherInitialised: boolean,
   isGameRunning: boolean,
   isGameSettingsLoaded: boolean,

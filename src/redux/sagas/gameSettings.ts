@@ -138,9 +138,11 @@ export function* getInitialGameSettingsConfigSaga(
 */
 function* getMOProfilesSaga(): SagaIterator {
   const {
-    config: {
-      modOrganizer: {
-        pathToProfiles,
+    main: {
+      config: {
+        modOrganizer: {
+          pathToProfiles,
+        },
       },
     },
   }: ReturnType<typeof getState> = yield select(getState);
@@ -180,13 +182,15 @@ function* getMOProfilesSaga(): SagaIterator {
 function* getDataFromMOIniSaga(): SagaIterator<string> {
   try {
     const {
-      config: {
-        modOrganizer: {
-          version,
-          pathToINI,
-          profileSection,
-          profileParam,
-          profileParamValueRegExp,
+      main: {
+        config: {
+          modOrganizer: {
+            version,
+            pathToINI,
+            profileSection,
+            profileParam,
+            profileParamValueRegExp,
+          },
         },
       },
     }: ReturnType<typeof getState> = yield select(getState);
@@ -262,7 +266,7 @@ function* getDataFromGameSettingsFilesSaga(
 ): SagaIterator<IGetDataFromFilesResult> {
   try {
     const {
-      config: { customPaths },
+      main: { config: { customPaths } },
     }: ReturnType<typeof getState> = yield select(getState);
 
     const currentFilesData: IUnwrap<typeof readFileForGameSettingsOptions>[] = yield all(
@@ -455,9 +459,11 @@ export function* initGameSettingsSaga(
         baseFilesEncoding,
         gameSettingsGroups,
       },
-      config: {
-        modOrganizer: {
-          isUsed: isMOUsed,
+      main: {
+        config: {
+          modOrganizer: {
+            isUsed: isMOUsed,
+          },
         },
       },
     }: ReturnType<typeof getState> = yield select(getState);
@@ -559,12 +565,14 @@ function* changeMOProfileSaga(
 
     const {
       gameSettings: { gameSettingsFiles, gameSettingsOptions },
-      config: {
-        modOrganizer: {
-          pathToINI,
-          profileSection,
-          profileParam,
-          version,
+      main: {
+        config: {
+          modOrganizer: {
+            pathToINI,
+            profileSection,
+            profileParam,
+            version,
+          },
         },
       },
     }: ReturnType<typeof getState> = yield select(getState);
@@ -654,7 +662,7 @@ function* saveGameSettingsFilesSaga(
       gameSettings: {
         moProfile, gameSettingsFiles, gameSettingsOptions,
       },
-      config: { customPaths },
+      main: { config: { customPaths } },
     }: ReturnType<typeof getState> = yield select(getState);
     const changedFilesNames = Object.keys(changedGameSettingsOptions);
 

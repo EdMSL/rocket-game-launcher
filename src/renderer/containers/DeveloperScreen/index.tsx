@@ -5,6 +5,7 @@ import React, {
   ReactElement,
 } from 'react';
 import { useDispatch } from 'react-redux';
+import { NavLink } from 'react-router-dom';
 import classNames from 'classnames';
 import Scrollbars from 'react-custom-scrollbars-2';
 
@@ -14,24 +15,25 @@ import { NumberField } from '$components/UI/NumberField';
 import { TextField } from '$components/UI/TextField';
 import { Switcher } from '$components/UI/Switcher';
 import { defaultLauncherConfig, defaultLauncherCustomButton } from '$constants/defaultParameters';
-import { ILauncherCustomButton, IConfigRootState } from '$types/config';
+// import { ILauncherCustomButton, IConfigRootState } from '$types/config';
 import { Select } from '$components/UI/Select';
 import { PathSelector } from '$components/UI/PathSelector';
-import { addMessages } from '$actions/main';
+import { setIsFirstLaunch, addMessages } from '$actions/main';
 import { CreateUserMessage } from '$utils/message';
 import { Checkbox } from '$components/UI/Checkbox';
 import { LauncherButtonAction } from '$constants/misc';
 import { Button } from '$components/UI/Button';
 import { CustomBtnItem } from '$components/CustomBtnItem';
+import { Routes } from '$constants/routes';
+import { IMainRootState, ILauncherCustomButton } from '$types/main';
 
 export const DeveloperScreen: React.FC = () => {
-  const customPaths = useAppSelector((state) => state.config.customPaths);
-  const customButtons = useAppSelector((state) => state.config.customButtons);
+  const launcherConfig = useAppSelector((state) => state.main.config);
 
   const dispatch = useDispatch();
 
-  const [currentConfig, setCurrentConfig] = useState<IConfigRootState>(defaultLauncherConfig);
-  const [configCustomButtons, setConfigCustomButtons] = useState<ILauncherCustomButton[]>(customButtons);
+  const [currentConfig, setCurrentConfig] = useState<IMainRootState['config']>(launcherConfig);
+  const [configCustomButtons, setConfigCustomButtons] = useState<ILauncherCustomButton[]>(launcherConfig.customButtons);
 
   const changeCurrentConfig = useCallback((id, value, parent) => {
     if (parent) {
@@ -53,7 +55,7 @@ export const DeveloperScreen: React.FC = () => {
   const onSelectPathBtnClick = useCallback(async (id: string, parent: string) => {
     let pathStr: string = await ipcRenderer.invoke(
       'get path from native window',
-      customPaths,
+      currentConfig.customPaths,
       (parent === 'playButton' || parent === 'customButton') && id === 'path',
     );
 
@@ -70,7 +72,7 @@ export const DeveloperScreen: React.FC = () => {
     } else {
       dispatch(addMessages([CreateUserMessage.error('Выбран некорректный путь до папки. Подробности в файле лога.')])); //eslint-disable-line max-len
     }
-  }, [dispatch, customPaths, currentConfig, changeCurrentConfig]);
+  }, [dispatch, currentConfig, changeCurrentConfig]);
 
   const onSelectPathTextInputChange = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
@@ -97,6 +99,10 @@ export const DeveloperScreen: React.FC = () => {
   const onAddCustomBtnBtnClick = useCallback(() => {}, []);
 
   const onAddCustomPathBtnClick = useCallback(() => {}, []);
+
+  const onSaveConfigBtnClick = useCallback(() => {
+    dispatch(setIsFirstLaunch(false));
+  }, [dispatch]);
 
   /* eslint-disable react/jsx-props-no-spreading */
   return (
@@ -307,6 +313,19 @@ export const DeveloperScreen: React.FC = () => {
             onButtonClick={onSelectPathBtnClick}
           />
         </div>
+        {/* <Button onClick={onSaveConfigBtnClick}>Сохранить</Button> */}
+        <NavLink
+          exact
+          to={Routes.MAIN_SCREEN}
+          className={classNames(
+            'button',
+            'main-btn',
+            'control-panel__btn',
+          )}
+          onClick={onSaveConfigBtnClick}
+        >
+          Сохранить
+        </NavLink>
       </Scrollbars>
     </main>
   );

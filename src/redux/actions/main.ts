@@ -3,6 +3,14 @@ import {
 } from '$types/main';
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+
+export const setIsFirstLaunch = (
+  isFirstLaunch: IMainRootState['config']['isFirstLaunch'],
+) => ({
+  type: MAIN_TYPES.SET_IS_FIRST_LAUNCH,
+  payload: isFirstLaunch,
+});
+
 export const setIsGameRunning = (
   isGameRunning: IMainRootState['isGameRunning'],
 ) => ({
