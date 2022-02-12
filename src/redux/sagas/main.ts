@@ -24,6 +24,7 @@ import {
   renameGameSettingsFilesBackup,
   setIsGameSettingsLoaded,
   setIsGameSettingsAvailable,
+  setIsFirstLaunch,
 } from '$actions/main';
 import {
   generateGameSettingsOptionsSaga,
@@ -391,6 +392,7 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
   }: ReturnType<typeof getState> = yield select(getState);
   if (!isLauncherInitialised && location.pathname === `${Routes.MAIN_SCREEN}`) {
     if (isFirstLaunch) {
+      yield put(setIsFirstLaunch(false));
       yield put(push(`${Routes.DEVELOPER_SCREEN}`));
     } else {
       yield call(initLauncherSaga);

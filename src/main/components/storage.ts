@@ -8,7 +8,6 @@ import { IUserSettingsRootState } from '$types/userSettings';
 import {
   defaultLauncherConfig,
   ILauncherConfig,
-  // minimalLauncherConfig,
 } from '$constants/defaultParameters';
 import {
   LogMessageType,
@@ -24,7 +23,6 @@ import {
   CONFIG_FILE_PATH,
   GAME_DIR,
 } from '$constants/paths';
-// import { IConfigRootState } from '$types/main';
 import {
   CustomError,
   ErrorName,
@@ -181,7 +179,6 @@ export const createStorage = (): Store<IAppState> => {
     main: {
       ...mainInitialState,
       config: {
-        ...mainInitialState,
         ...configurationData,
         modOrganizer: {
           ...mainInitialState.config.modOrganizer,

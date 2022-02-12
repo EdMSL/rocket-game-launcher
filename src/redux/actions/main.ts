@@ -4,6 +4,13 @@ import {
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
+export const setLauncherConfig = (
+  newConfig: IMainRootState['config'],
+) => ({
+  type: MAIN_TYPES.SET_LAUNCHER_CONFIG,
+  payload: newConfig,
+});
+
 export const setIsFirstLaunch = (
   isFirstLaunch: IMainRootState['config']['isFirstLaunch'],
 ) => ({

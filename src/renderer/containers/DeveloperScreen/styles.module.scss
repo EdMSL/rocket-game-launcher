@@ -1,5 +1,13 @@
 .developer-screen__main {
-  padding: 20px 10px 10px;
+  padding: 0 10px 10px;
+}
+
+.develover-screen__controller {
+  margin: 10px 0;
+
+  & .control-panel__btn {
+    margin-right: 10px;
+  }
 }
 
 .developer-screen__block {

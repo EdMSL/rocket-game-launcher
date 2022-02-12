@@ -16,7 +16,9 @@ import { TextField } from '$components/UI/TextField';
 import { Switcher } from '$components/UI/Switcher';
 import { Select } from '$components/UI/Select';
 import { PathSelector } from '$components/UI/PathSelector';
-import { setIsFirstLaunch, addMessages } from '$actions/main';
+import {
+  setLauncherConfig, addMessages,
+} from '$actions/main';
 import { CreateUserMessage } from '$utils/message';
 import { Checkbox } from '$components/UI/Checkbox';
 import { LauncherButtonAction } from '$constants/misc';
@@ -78,7 +80,7 @@ export const DeveloperScreen: React.FC = () => {
   }, [changeCurrentConfig]);
 
   const onNumberInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    changeCurrentConfig(target.id, target.value, target.dataset.parent);
+    changeCurrentConfig(target.id, +target.value, target.dataset.parent);
   }, [changeCurrentConfig]);
 
   const OnTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,13 +100,62 @@ export const DeveloperScreen: React.FC = () => {
   const onAddCustomPathBtnClick = useCallback(() => {}, []);
 
   const onSaveConfigBtnClick = useCallback(() => {
-    dispatch(setIsFirstLaunch(false));
-  }, [dispatch]);
+    dispatch(setLauncherConfig(currentConfig));
+  }, [dispatch, currentConfig]);
+
+  const onResetBtnClick = useCallback(() => {
+    setCurrentConfig(launcherConfig);
+  }, [launcherConfig]);
 
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <main className={classNames('main', styles['developer-screen__main'])}>
-      <p>Developer Screen</p>
+      <p className={styles['develover-screen__controller']}>
+        <NavLink
+          exact
+          to={Routes.MAIN_SCREEN}
+          className={classNames(
+            'button',
+            'main-btn',
+            'control-panel__btn',
+          )}
+          onClick={onResetBtnClick}
+        >
+          ОК
+        </NavLink>
+        <NavLink
+          exact
+          to={Routes.MAIN_SCREEN}
+          className={classNames(
+            'button',
+            'main-btn',
+            'control-panel__btn',
+          )}
+          onClick={onResetBtnClick}
+        >
+          Отмена
+        </NavLink>
+        <Button
+          onClick={onSaveConfigBtnClick}
+          className={classNames(
+            'button',
+            'main-btn',
+            'control-panel__btn',
+          )}
+        >
+          Сохранить
+        </Button>
+        <Button
+          onClick={onResetBtnClick}
+          className={classNames(
+            'button',
+            'main-btn',
+            'control-panel__btn',
+          )}
+        >
+          Сбросить
+        </Button>
+      </p>
       <Scrollbars
         autoHeight
         autoHide
@@ -308,19 +359,6 @@ export const DeveloperScreen: React.FC = () => {
             onButtonClick={onSelectPathBtnClick}
           />
         </div>
-        {/* <Button onClick={onSaveConfigBtnClick}>Сохранить</Button> */}
-        <NavLink
-          exact
-          to={Routes.MAIN_SCREEN}
-          className={classNames(
-            'button',
-            'main-btn',
-            'control-panel__btn',
-          )}
-          onClick={onSaveConfigBtnClick}
-        >
-          Сохранить
-        </NavLink>
       </Scrollbars>
     </main>
   );
