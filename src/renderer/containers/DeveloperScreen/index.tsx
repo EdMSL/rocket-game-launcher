@@ -14,8 +14,6 @@ import { useAppSelector } from '$store/store';
 import { NumberField } from '$components/UI/NumberField';
 import { TextField } from '$components/UI/TextField';
 import { Switcher } from '$components/UI/Switcher';
-import { defaultLauncherConfig, defaultLauncherCustomButton } from '$constants/defaultParameters';
-// import { ILauncherCustomButton, IConfigRootState } from '$types/config';
 import { Select } from '$components/UI/Select';
 import { PathSelector } from '$components/UI/PathSelector';
 import { setIsFirstLaunch, addMessages } from '$actions/main';
@@ -25,7 +23,7 @@ import { LauncherButtonAction } from '$constants/misc';
 import { Button } from '$components/UI/Button';
 import { CustomBtnItem } from '$components/CustomBtnItem';
 import { Routes } from '$constants/routes';
-import { IMainRootState, ILauncherCustomButton } from '$types/main';
+import { IMainRootState } from '$types/main';
 
 export const DeveloperScreen: React.FC = () => {
   const launcherConfig = useAppSelector((state) => state.main.config);
@@ -33,7 +31,6 @@ export const DeveloperScreen: React.FC = () => {
   const dispatch = useDispatch();
 
   const [currentConfig, setCurrentConfig] = useState<IMainRootState['config']>(launcherConfig);
-  const [configCustomButtons, setConfigCustomButtons] = useState<ILauncherCustomButton[]>(launcherConfig.customButtons);
 
   const changeCurrentConfig = useCallback((id, value, parent) => {
     if (parent) {
@@ -205,23 +202,21 @@ export const DeveloperScreen: React.FC = () => {
           <p className={styles['developer-screen__custom-block']}>
             {
               Object.keys(currentConfig.customPaths).map((currentCustomPath) => (
-                <React.Fragment>
+                <div className={styles['developer-screen__custom-item']}>
                   <TextField
-                    className={styles['developer-screen__item']}
                     id="gameName"
                     value={currentCustomPath}
-                    label="Название игры"
+                    label="Имя"
                     onChange={OnTextFieldChange}
                   />
                   <PathSelector
-                    className={styles['developer-screen__item']}
                     id="documentsPath"
-                    label="Путь до папки файлов игры в Documents пользователя"
+                    label="Путь"
                     value={currentConfig[currentCustomPath]}
                     onChange={onSelectPathTextInputChange}
                     onButtonClick={onSelectPathBtnClick}
                   />
-                </React.Fragment>
+                </div>
               ))
             }
           </p>
@@ -258,7 +253,7 @@ export const DeveloperScreen: React.FC = () => {
             </p>
             <ul className={styles['developer-screen__custom-btns-container']}>
               {
-                configCustomButtons.map((item) => (
+                currentConfig.customButtons.map((item) => (
                   <CustomBtnItem
                     key={item.id}
                     item={item}

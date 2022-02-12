@@ -41,6 +41,30 @@
   }
 }
 
+.developer-screen__custom-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-right: 10px;
+
+  & .text-field__container {
+    flex-grow: 1;
+    margin-right: 10px;
+  }
+
+  & .text-field__input {
+    width: 100%;
+  }
+
+  & .path-selector__container {
+    flex-grow: 8;
+  }
+
+  & .path-selector__input-block {
+    max-width: 100%;
+  }
+}
+
 .developer-screen__custom-btns {
   display: flex;
   flex-direction: column;

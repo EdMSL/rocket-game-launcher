@@ -22,14 +22,12 @@ export const CustomBtnItem: React.FC<IProps> = ({
   return (
     <li className={styles['developer-screen__custom-btn-item']}>
       <Checkbox
-        className={styles['developer-screen__item']}
         id={`item_checkbox-${item.id}`}
         label="Кнопка запуска приложения?"
         isChecked={item.action === LauncherButtonAction.RUN}
         onChange={onCheckboxChange}
       />
       <PathSelector
-        className={styles['developer-screen__item']}
         id={`item_path-${item.id}`}
         label="Путь до файла\папки"
         value={item.path}
@@ -37,14 +35,12 @@ export const CustomBtnItem: React.FC<IProps> = ({
         onChange={onSelectPathTextInputChange}
       />
       <TextField
-        className={styles['developer-screen__item']}
         id={`item_args-${item.id}`}
         value={item.args?.toString()}
         label="Аргументы запуска"
         onChange={OnTextFieldChange}
       />
       <TextField
-        className={styles['developer-screen__item']}
         id={`item_label-${item.id}`}
         value={item.label}
         label="Заголовок кнопки"
