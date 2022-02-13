@@ -9,7 +9,8 @@ import { ISelectOption } from '../Select';
 interface IProps extends IUIElementProps<HTMLInputElement> {
   options: ISelectOption[],
   isSelectDisabled?: boolean,
-  onButtonClick: (id: string, parent: string) => void,
+  onButtonClick: (id: string, parent: string, customPathVariable: string) => void,
+  onSelectChange?: (id: string, parent: string) => void,
 }
 
 export const PathSelector: React.FC<IProps> = ({
@@ -27,17 +28,24 @@ export const PathSelector: React.FC<IProps> = ({
   isDisabled = false,
   isSelectDisabled = options.length <= 1,
   onChange,
+  onSelectChange,
   onButtonClick,
   onHover = null,
   onLeave = null,
 }) => {
-  const onSelectPatchBtnClick = useCallback(() => {
-    onButtonClick(id, parent);
-  }, [id, parent, onButtonClick]);
+  const onSelectPatchTextFieldChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(event, options[0].label);
+  }, [options, onChange]);
 
-  const onSelectChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
-    onButtonClick(id, parent);
-  }, [id, parent, onButtonClick]);
+  const onSelectPatchBtnClick = useCallback(() => {
+    onButtonClick(id, parent, options[0].label);
+  }, [id, parent, options, onButtonClick]);
+
+  const onCustomPathSelectChange = useCallback(() => {
+    if (onSelectChange) {
+      onSelectChange(id, parent);
+    }
+  }, [id, parent, onSelectChange]);
 
   return (
     <div className={classNames(
@@ -69,7 +77,7 @@ export const PathSelector: React.FC<IProps> = ({
       <div className="path-selector__input-block">
         <select
           className="path-selector__select"
-          onChange={onSelectChange}
+          onChange={onCustomPathSelectChange}
           value={options[0].value}
           disabled={isSelectDisabled}
         >
@@ -93,7 +101,7 @@ export const PathSelector: React.FC<IProps> = ({
           data-parent={parent}
           data-multiparameters={multiparameters}
           disabled={isDisabled}
-          onChange={onChange}
+          onChange={onSelectPatchTextFieldChange}
         />
         <Button
           className="path-selector__input-btn"
