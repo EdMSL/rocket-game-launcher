@@ -23,6 +23,7 @@ import {
   GAME_DIR,
   ICustomPaths,
   IDefaultCustomPaths,
+  ITotalCustomPaths,
 } from '$constants/paths';
 import {
   CustomError,
@@ -146,7 +147,7 @@ export const createStorage = (): Store<IAppState> => {
     app,
   );
 
-  const totalCustomPaths: ICustomPaths & IDefaultCustomPaths = {
+  const totalCustomPaths: ITotalCustomPaths = {
     ...customPaths.default,
     ...customPaths.custom,
   };

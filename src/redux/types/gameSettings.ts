@@ -100,7 +100,7 @@ export interface IUIElementProps<E> {
   parent?: string,
   description?: string,
   currentHintId?: string,
-  onChange: (event: React.ChangeEvent<E>) => void,
+  onChange: (event: React.ChangeEvent<E>, envVariable?: string) => void,
   onHover?: (id: string) => void,
   onLeave?: () => void,
 }

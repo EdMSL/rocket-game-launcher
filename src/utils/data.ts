@@ -16,6 +16,7 @@ import {
 } from './log';
 import { CreateUserMessage } from './message';
 import {
+  clearPathVaribale,
   getLineIniParameterValue,
   getParameterRegExp,
   getPathToFile,
@@ -552,19 +553,20 @@ export const createCustomPaths = (
 ): { default: IDefaultCustomPaths, custom: ICustomPaths, } => {
   const newCustomPaths = Object.keys(configData.customPaths).reduce((paths, currentPathKey) => ({
     ...paths,
-    [currentPathKey]: path.join(GAME_DIR, configData.customPaths[currentPathKey]),
+    [currentPathKey]: path.join(GAME_DIR, clearPathVaribale(configData.customPaths[currentPathKey])),
   }), {});
 
   return {
     default: {
       ...DefaultCustomPath,
+      '%DOCUMENTS%': app.getPath('documents'),
       ...configData.documentsPath ? {
-        '%DOCUMENTS%': path.join(app.getPath('documents'), configData.documentsPath),
+        '%DOCS_GAME%': path.join(app.getPath('documents'), clearPathVaribale(configData.documentsPath)),
       } : {},
       ...configData.modOrganizer.isUsed ? {
-        '%MO_DIR%': path.join(GAME_DIR, configData.modOrganizer.path),
-        '%MO_MODS%': path.join(GAME_DIR, configData.modOrganizer.pathToMods),
-        '%MO_PROFILE%': path.join(GAME_DIR, configData.modOrganizer.pathToProfiles),
+        '%MO_DIR%': path.join(GAME_DIR, clearPathVaribale(configData.modOrganizer.path)),
+        '%MO_MODS%': path.join(GAME_DIR, clearPathVaribale(configData.modOrganizer.pathToMods)),
+        '%MO_PROFILE%': path.join(GAME_DIR, clearPathVaribale(configData.modOrganizer.pathToProfiles)),
       } : {},
     },
     custom: {

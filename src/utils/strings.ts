@@ -4,7 +4,7 @@ import { IMainRootState } from '$types/main';
 import { CustomError } from './errors';
 import { CustomPathName, DefaultCustomPathName } from '$constants/misc';
 import {
-  GAME_DIR, ICustomPaths, IDefaultCustomPaths,
+  GAME_DIR, ICustomPaths, IDefaultCustomPaths, ITotalCustomPaths,
 } from '$constants/paths';
 
 const HEXADECIMAL = 16;
@@ -112,9 +112,11 @@ export const getValueFromRange = (
   return +max;
 };
 
+export const clearPathVaribale = (currPath: string): string => currPath.replace(/%.*%\\/, '').trim();
+
 export const getPathWithoutRootDir = (
   pathToFile: string,
-  customPaths: IMainRootState['config']['customPaths'],
+  customPaths: ITotalCustomPaths,
 ): string => {
   if (new RegExp(GAME_DIR.replaceAll('\\', '\\\\')).test(pathToFile)) {
     return pathToFile.replace(GAME_DIR, '').substr(1);
@@ -130,7 +132,7 @@ export const getPathWithoutRootDir = (
 
 export const checkIsPathIsNotOutsideValidFolder = (
   pathForCheck: string,
-  customPaths: IMainRootState['config']['customPaths'],
+  customPaths: ITotalCustomPaths,
 ): string => {
   const newPath = path.normalize(pathForCheck);
 
@@ -155,7 +157,7 @@ export const checkIsPathIsNotOutsideValidFolder = (
 */
 export const getPathToFile = (
   pathToFile: string,
-  customPaths: ICustomPaths & IDefaultCustomPaths,
+  customPaths: ITotalCustomPaths,
   profileMO: string,
 ): string => {
   let newPath = pathToFile;

@@ -25,6 +25,7 @@ import {
   Encoding, GameSettingsFileView,
 } from '$constants/misc';
 import {
+  ITotalCustomPaths,
   USER_THEMES_DIR,
 } from '$constants/paths';
 // import { IMainRootState } from '$types/config';
@@ -609,16 +610,17 @@ export const getUserThemesFolders = (): string[] => {
  * @param currentWindow Текущее окно, из которого вызывается команда выбора пути.
 */
 export const getPathFromFileInput = async (
-  customPaths: IMainRootState['config']['customPaths'],
+  customPaths: ITotalCustomPaths,
   isPathToFile: boolean,
   dialog: Electron.Dialog,
   currentWindow: Electron.BrowserWindow,
+  extensions = ['*'],
 ): Promise<string|undefined> => {
   try {
     const pathObj = await dialog.showOpenDialog(currentWindow, {
 
       properties: [isPathToFile ? 'openFile' : 'openDirectory'],
-      filters: [{ name: 'Executable', extensions: ['exe', 'lnk'] }],
+      filters: [{ name: 'File', extensions }],
     });
 
     if (pathObj.filePaths.length === 0) {

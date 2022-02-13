@@ -41,3 +41,5 @@ export interface IDefaultCustomPaths {
 export interface ICustomPaths {
   [label: string]: string,
 }
+
+export type ITotalCustomPaths = IDefaultCustomPaths & ICustomPaths;
