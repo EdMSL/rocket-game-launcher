@@ -3,7 +3,9 @@ import path from 'path';
 import { IMainRootState } from '$types/main';
 import { CustomError } from './errors';
 import { CustomPathName, DefaultCustomPathName } from '$constants/misc';
-import { GAME_DIR } from '$constants/paths';
+import {
+  GAME_DIR, ICustomPaths, IDefaultCustomPaths,
+} from '$constants/paths';
 
 const HEXADECIMAL = 16;
 const HEXADECIMAL_FACTOR = 1e8;
@@ -153,7 +155,7 @@ export const checkIsPathIsNotOutsideValidFolder = (
 */
 export const getPathToFile = (
   pathToFile: string,
-  customPaths: IMainRootState['config']['customPaths'],
+  customPaths: ICustomPaths & IDefaultCustomPaths,
   profileMO: string,
 ): string => {
   let newPath = pathToFile;
@@ -227,7 +229,7 @@ export const getObjectAsList = (obj: { [key: string]: any, }): string => Object.
   .join('\n');
 
 /**
- * Получить до родительской папки файла.
+ * Получить путь до родительской папки файла.
  * @param pathToFile Путь до файла, для которого нужно получить путь до папки.
  * @returns Строка абсолютного пути до папки.
 */

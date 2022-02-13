@@ -266,13 +266,13 @@ function* getDataFromGameSettingsFilesSaga(
 ): SagaIterator<IGetDataFromFilesResult> {
   try {
     const {
-      main: { config: { customPaths } },
+      main: { config: { customPaths }, defaultPaths },
     }: ReturnType<typeof getState> = yield select(getState);
 
     const currentFilesData: IUnwrap<typeof readFileForGameSettingsOptions>[] = yield all(
       Object.keys(filesForRead).map((fileName) => call(
         readFileForGameSettingsOptions,
-        getPathToFile(filesForRead[fileName].path, customPaths, moProfile),
+        getPathToFile(filesForRead[fileName].path, { ...customPaths, ...defaultPaths }, moProfile),
         filesForRead[fileName].view,
         fileName,
         filesForRead[fileName].encoding,
@@ -662,7 +662,7 @@ function* saveGameSettingsFilesSaga(
       gameSettings: {
         moProfile, gameSettingsFiles, gameSettingsOptions,
       },
-      main: { config: { customPaths } },
+      main: { config: { customPaths }, defaultPaths },
     }: ReturnType<typeof getState> = yield select(getState);
     const changedFilesNames = Object.keys(changedGameSettingsOptions);
 
@@ -745,7 +745,7 @@ function* saveGameSettingsFilesSaga(
 
         return call(
           writeGameSettingsFile,
-          getPathToFile(changedGameSettingsFiles[fileName].path, customPaths, moProfile),
+          getPathToFile(changedGameSettingsFiles[fileName].path, { ...customPaths, ...defaultPaths }, moProfile),
           file[fileName],
           changedGameSettingsFiles[fileName].view,
           changedGameSettingsFiles[fileName].encoding,

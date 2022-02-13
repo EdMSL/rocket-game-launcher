@@ -21,6 +21,8 @@ import {
 import {
   CONFIG_FILE_PATH,
   GAME_DIR,
+  ICustomPaths,
+  IDefaultCustomPaths,
 } from '$constants/paths';
 import {
   CustomError,
@@ -144,10 +146,15 @@ export const createStorage = (): Store<IAppState> => {
     app,
   );
 
+  const totalCustomPaths: ICustomPaths & IDefaultCustomPaths = {
+    ...customPaths.default,
+    ...customPaths.custom,
+  };
+
   if (configurationData.playButton?.path) {
     configurationData.playButton.path = getPathToFile(
       configurationData.playButton?.path,
-      customPaths,
+      totalCustomPaths,
       '',
     );
   } else {
@@ -159,7 +166,7 @@ export const createStorage = (): Store<IAppState> => {
   }
 
   if (configurationData.customButtons && configurationData.customButtons.length > 0) {
-    const newButtons = getCustomButtons(configurationData.customButtons, customPaths);
+    const newButtons = getCustomButtons(configurationData.customButtons, totalCustomPaths);
 
     if (configurationData.customButtons.length !== newButtons.length) {
       messages.push(CreateUserMessage.warning('В процессе обработки списка пользовательских кнопок возникла ошибка. Не все кнопки будут доступны. Подробности в файле лога.')); //eslint-disable-line max-len
@@ -187,8 +194,9 @@ export const createStorage = (): Store<IAppState> => {
           ...mainInitialState.config.playButton,
           ...configurationData.playButton,
         },
-        customPaths: { ...customPaths },
+        customPaths: { ...customPaths.custom },
       },
+      defaultPaths: { ...customPaths.default },
       userThemes,
       messages,
     },

@@ -1,3 +1,4 @@
+import { IDefaultCustomPaths } from '$constants/paths';
 import { IMessage } from '$utils/message';
 
 export const MAIN_TYPES = {
@@ -79,6 +80,7 @@ export interface ILauncherConfig {
 
 export type IMainRootState = Readonly<{
   config: ILauncherConfig,
+  defaultPaths: IDefaultCustomPaths,
   isLauncherInitialised: boolean,
   isGameRunning: boolean,
   isGameSettingsLoaded: boolean,

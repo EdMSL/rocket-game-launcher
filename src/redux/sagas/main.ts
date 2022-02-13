@@ -224,11 +224,13 @@ function* createGameSettingsBackupSaga(
     yield put(setIsGameSettingsFilesBackuping(true));
 
     const {
-      main: { config: { customPaths } },
+      main: { config: { customPaths }, defaultPaths },
       gameSettings: { gameSettingsFiles, moProfile },
     }: ReturnType<typeof getState> = yield select(getState);
 
-    const filesForBackupPaths = Object.keys(gameSettingsFiles).map((fileName) => getPathToFile(gameSettingsFiles[fileName].path, customPaths, moProfile));
+    const filesForBackupPaths = Object.keys(gameSettingsFiles).map((fileName) => getPathToFile(
+      gameSettingsFiles[fileName].path, { ...customPaths, ...defaultPaths }, moProfile,
+    ));
 
     yield call(createGameSettingsFilesBackup, filesForBackupPaths);
 
@@ -432,7 +434,6 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
   }: ReturnType<typeof getState> = yield select(getState);
   if (!isLauncherInitialised && location.pathname === `${Routes.MAIN_SCREEN}`) {
     if (isFirstLaunch) {
-      yield put(setIsFirstLaunch(false));
       yield put(push(`${Routes.DEVELOPER_SCREEN}`));
     } else {
       yield call(initLauncherSaga);

@@ -37,6 +37,7 @@ import {
   DefaultCustomPath,
   GAME_DIR,
   ICustomPaths,
+  IDefaultCustomPaths,
 } from '$constants/paths';
 import {
   ILauncherAppButton,
@@ -44,7 +45,6 @@ import {
   IMainRootState,
   IModOrganizerParams,
   IUserMessage,
-  // IConfigRootState,
 } from '$types/main';
 import { defaultModOrganizerParams } from '$constants/defaultParameters';
 import { getReadWriteError } from './errors';
@@ -486,7 +486,7 @@ export const getApplicationArgs = (args: string[]): string[] => args.map((arg) =
   let newArg = arg;
 
   if (CustomPathName.GAME_DIR_REGEXP.test(arg)) {
-    newArg = getPathToFile(arg, DefaultCustomPath, '');
+    newArg = getPathToFile(arg, { ...DefaultCustomPath }, '');
   }
 
   if (/^-.+$/.test(newArg)) {
@@ -549,23 +549,27 @@ export const getNewModOrganizerParams = (data: IModOrganizerParams): IModOrganiz
 export const createCustomPaths = (
   configData: IMainRootState['config'],
   app: Electron.App,
-): ICustomPaths => {
+): { default: IDefaultCustomPaths, custom: ICustomPaths, } => {
   const newCustomPaths = Object.keys(configData.customPaths).reduce((paths, currentPathKey) => ({
     ...paths,
     [currentPathKey]: path.join(GAME_DIR, configData.customPaths[currentPathKey]),
   }), {});
 
   return {
-    ...DefaultCustomPath,
-    ...configData.documentsPath ? {
-      '%DOCUMENTS%': path.join(app.getPath('documents'), configData.documentsPath),
-    } : {},
-    ...configData.modOrganizer.isUsed ? {
-      '%MO_DIR%': path.join(GAME_DIR, configData.modOrganizer.path),
-      '%MO_MODS%': path.join(GAME_DIR, configData.modOrganizer.pathToMods),
-      '%MO_PROFILE%': path.join(GAME_DIR, configData.modOrganizer.pathToProfiles),
-    } : {},
-    ...newCustomPaths,
+    default: {
+      ...DefaultCustomPath,
+      ...configData.documentsPath ? {
+        '%DOCUMENTS%': path.join(app.getPath('documents'), configData.documentsPath),
+      } : {},
+      ...configData.modOrganizer.isUsed ? {
+        '%MO_DIR%': path.join(GAME_DIR, configData.modOrganizer.path),
+        '%MO_MODS%': path.join(GAME_DIR, configData.modOrganizer.pathToMods),
+        '%MO_PROFILE%': path.join(GAME_DIR, configData.modOrganizer.pathToProfiles),
+      } : {},
+    },
+    custom: {
+      ...newCustomPaths,
+    },
   };
 };
 
@@ -577,13 +581,13 @@ export const createCustomPaths = (
 */
 export const getCustomButtons = (
   buttonsData: ILauncherAppButton[],
-  customPaths: ICustomPaths,
+  customPaths: IDefaultCustomPaths,
   // Типы определяются неверно, после filter отсекутся все undefined,
   // но ts все равно считает, что они там есть.
   //@ts-ignore
 ): ILauncherCustomButton[] => buttonsData.map<ILauncherCustomButton|undefined>((btn) => {
   try {
-    const pathTo = getPathToFile(btn.path, customPaths, '');
+    const pathTo = getPathToFile(btn.path, { ...customPaths }, '');
 
     return {
       ...btn,
