@@ -4,8 +4,11 @@ import classNames from 'classnames';
 import { IUIElementProps } from '$types/gameSettings';
 import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
 import { Button } from '../Button';
+import { ISelectOption } from '../Select';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {
+  options: ISelectOption[],
+  isSelectDisabled?: boolean,
   onButtonClick: (id: string, parent: string) => void,
 }
 
@@ -14,6 +17,7 @@ export const PathSelector: React.FC<IProps> = ({
   label,
   name = id,
   value,
+  options,
   className = '',
   parentClassname = '',
   description = '',
@@ -21,12 +25,17 @@ export const PathSelector: React.FC<IProps> = ({
   parent = '',
   multiparameters = '',
   isDisabled = false,
+  isSelectDisabled = options.length <= 1,
   onChange,
   onButtonClick,
   onHover = null,
   onLeave = null,
 }) => {
   const onSelectPatchBtnClick = useCallback(() => {
+    onButtonClick(id, parent);
+  }, [id, parent, onButtonClick]);
+
+  const onSelectChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
     onButtonClick(id, parent);
   }, [id, parent, onButtonClick]);
 
@@ -58,6 +67,23 @@ export const PathSelector: React.FC<IProps> = ({
       }
       </label>
       <div className="path-selector__input-block">
+        <select
+          className="path-selector__select"
+          onChange={onSelectChange}
+          value={options[0].value}
+          disabled={isSelectDisabled}
+        >
+          {
+          options.map((option) => (
+            <option
+              key={`option-${option.label}`}
+              value={option.value}
+            >
+              {option.label}
+            </option>
+          ))
+        }
+        </select>
         <input
           className="path-selector__input"
           id={id}

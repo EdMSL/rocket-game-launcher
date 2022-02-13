@@ -5,7 +5,8 @@ import { Checkbox } from '$components/UI/Checkbox';
 import { PathSelector } from '$components/UI/PathSelector';
 import { TextField } from '$components/UI/TextField';
 import { ILauncherCustomButton } from '$types/main';
-import { LauncherButtonAction } from '$constants/misc';
+import { DefaultCustomPathName, LauncherButtonAction } from '$constants/misc';
+import { generateSelectOptions } from '$utils/data';
 
 interface IProps {
   item: ILauncherCustomButton,
@@ -31,6 +32,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         id={`item_path-${item.id}`}
         label="Путь до файла\папки"
         value={item.path}
+        options={generateSelectOptions([DefaultCustomPathName.GAME_DIR])}
         onButtonClick={onSelectPathBtnClick}
         onChange={onSelectPathTextInputChange}
       />
