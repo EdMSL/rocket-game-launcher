@@ -325,6 +325,10 @@ $checkbox-size: 20px;
 
 .number-field__input {
   padding: 10px;
+
+  &:focus {
+    @include focus;
+  }
 }
 
 .text-field__container {

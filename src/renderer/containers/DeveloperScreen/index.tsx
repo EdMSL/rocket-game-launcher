@@ -21,12 +21,13 @@ import {
   addMessages,
 } from '$actions/main';
 import { CreateUserMessage } from '$utils/message';
-import { LauncherButtonAction } from '$constants/misc';
+import { LauncherButtonAction, DefaultCustomPathName } from '$constants/misc';
 import { Button } from '$components/UI/Button';
 import { CustomBtnItem } from '$components/CustomBtnItem';
 import { Routes } from '$constants/routes';
 import { IMainRootState } from '$types/main';
 import { Loader } from '$components/UI/Loader';
+import { getClearLauncherConfig } from '$utils/data';
 
 export const DeveloperScreen: React.FC = () => {
   const launcherConfig = useAppSelector((state) => state.main.config);
@@ -34,7 +35,7 @@ export const DeveloperScreen: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const [currentConfig, setCurrentConfig] = useState<IMainRootState['config']>(launcherConfig);
+  const [currentConfig, setCurrentConfig] = useState<IMainRootState['config']>(getClearLauncherConfig(launcherConfig));
 
   const changeCurrentConfig = useCallback((id, value, parent) => {
     if (parent) {
@@ -82,7 +83,7 @@ export const DeveloperScreen: React.FC = () => {
   }, [changeCurrentConfig]);
 
   const onNumberInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    changeCurrentConfig(target.id, +target.value, target.dataset.parent);
+    changeCurrentConfig(target.id, Math.round(+target.value), target.dataset.parent);
   }, [changeCurrentConfig]);
 
   const OnTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
@@ -247,7 +248,7 @@ export const DeveloperScreen: React.FC = () => {
           <PathSelector
             className={styles['developer-screen__item']}
             id="documentsPath"
-            label="Путь до папки файлов игры в Documents пользователя"
+            label="Путь до папки файлов игры в [User]/Documents"
             value={currentConfig.documentsPath}
             onChange={onSelectPathTextInputChange}
             onButtonClick={onSelectPathBtnClick}
@@ -256,7 +257,10 @@ export const DeveloperScreen: React.FC = () => {
           <p className={styles['developer-screen__custom-block']}>
             {
               Object.keys(currentConfig.customPaths).map((currentCustomPath) => (
-                <div className={styles['developer-screen__custom-item']}>
+                <div
+                  key={currentCustomPath}
+                  className={styles['developer-screen__custom-item']}
+                >
                   <TextField
                     id="gameName"
                     value={currentCustomPath}

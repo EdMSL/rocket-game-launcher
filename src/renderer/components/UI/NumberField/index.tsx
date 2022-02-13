@@ -53,6 +53,7 @@ export const NumberField: React.FunctionComponent<IProps> = ({
     <input
       className="number-field__input"
       type="number"
+      min={0}
       id={id}
       name={name}
       value={value}
