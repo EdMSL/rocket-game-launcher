@@ -47,12 +47,14 @@ ipcMain.handle(
     event,
     customPaths: ITotalCustomPaths,
     isPathToFile: boolean,
+    isGameDocuments: boolean,
     extensions: string[],
   ) => getPathFromFileInput(
     customPaths,
     isPathToFile,
     dialog,
     BrowserWindow.getFocusedWindow()!,
+    isGameDocuments,
     extensions,
   ),
 );

@@ -32,7 +32,9 @@ import {
   showMessageBox,
 } from '$utils/errors';
 import { checkConfigFileData } from '$utils/check';
-import { getObjectAsList, getPathToFile } from '$utils/strings';
+import {
+  checkIsPathIsNotOutsideValidFolder, getObjectAsList, getPathToFile, replacePathVariableByRootDir,
+} from '$utils/strings';
 import {
   createCustomPaths,
   getCustomButtons,
@@ -44,7 +46,7 @@ import { INITIAL_STATE as mainInitialState } from '$reducers/main';
 import { INITIAL_STATE as userSettingsInitialState } from '$reducers/userSettings';
 import { ILauncherConfig, IUserMessage } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
-import { Scope } from '$constants/misc';
+import { DefaultCustomPathName, Scope } from '$constants/misc';
 
 interface IStorage {
   userSettings: IUserSettingsRootState,
@@ -153,11 +155,25 @@ export const createStorage = (): Store<IAppState> => {
   };
 
   if (configurationData.playButton?.path) {
-    configurationData.playButton.path = getPathToFile(
-      configurationData.playButton?.path,
-      totalCustomPaths,
-      '',
+    let pathStr = replacePathVariableByRootDir(
+      configurationData.playButton.path,
+      DefaultCustomPathName.GAME_DIR,
+      GAME_DIR,
     );
+    configurationData.playButton.path = replacePathVariableByRootDir(
+      configurationData.playButton.path,
+      DefaultCustomPathName.GAME_DIR,
+      GAME_DIR,
+    );
+
+    try {
+      pathStr = checkIsPathIsNotOutsideValidFolder(configurationData.playButton?.path, totalCustomPaths);
+    } catch (error) {
+      pathStr = '';
+      messages.push(CreateUserMessage.warning('Указан недопустимый путь для файла запуска игры.')); //eslint-disable-line max-len
+    }
+
+    configurationData.playButton.path = pathStr;
   } else {
     messages.push(CreateUserMessage.warning('Не указан путь для файла запуска игры.')); //eslint-disable-line max-len
   }

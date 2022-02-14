@@ -50,12 +50,13 @@ import {
   renameGameSettingsFilesBackups,
   restoreBackupFiles,
 } from '$utils/backup';
-import { getPathToFile } from '$utils/strings';
+import { getPathToFile, replaceRootDirByPathVariable } from '$utils/strings';
 import { IUnwrap } from '$types/common';
 import { setGameSettingsOptions } from '$actions/gameSettings';
 import { getGameSettingsOptionsWithDefaultValues } from '$utils/data';
 import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
 import { writeJSONFile } from '$utils/files';
+import { DefaultCustomPathName } from '$constants/misc';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -99,7 +100,23 @@ function* saveLauncherConfigSaga(
   yield put(setIsGameSettingsSaving(true));
 
   try {
-    yield call(writeJSONFile, CONFIG_FILE_PATH, newConfig);
+    const {
+      main: { defaultPaths },
+    }: ReturnType<typeof getState> = yield select(getState);
+
+    const configForSave = {
+      ...newConfig,
+      playButton: {
+        ...newConfig.playButton,
+        path: replaceRootDirByPathVariable(
+          newConfig.playButton.path,
+          DefaultCustomPathName.GAME_DIR,
+          defaultPaths['%GAME_DIR%'],
+        ),
+      },
+    };
+
+    yield call(writeJSONFile, CONFIG_FILE_PATH, configForSave);
     yield put(setLauncherConfig(newConfig));
 
     if (isGoToMainScreen) {

@@ -614,6 +614,7 @@ export const getPathFromFileInput = async (
   isPathToFile: boolean,
   dialog: Electron.Dialog,
   currentWindow: Electron.BrowserWindow,
+  isGameDocuments: boolean,
   extensions = ['*'],
 ): Promise<string|undefined> => {
   try {
@@ -627,9 +628,13 @@ export const getPathFromFileInput = async (
       return '';
     }
 
-    const pathStr = checkIsPathIsNotOutsideValidFolder(pathObj.filePaths[0], customPaths);
+    const pathStr = checkIsPathIsNotOutsideValidFolder(
+      pathObj.filePaths[0],
+      customPaths,
+      isGameDocuments,
+    );
 
-    return getPathWithoutRootDir(pathStr, customPaths);
+    return pathStr;
   } catch (error: any) {
     writeToLogFile(`Can't get path from file input. Reason: ${error.message}`);
 

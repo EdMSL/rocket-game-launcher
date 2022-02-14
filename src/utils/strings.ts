@@ -112,7 +112,51 @@ export const getValueFromRange = (
   return +max;
 };
 
-export const clearPathVaribale = (currPath: string): string => currPath.replace(/%.*%\\/, '').trim();
+/**
+ * Получить путь с отсеченной переменной пути.
+ * @param currPath Путь для очистки.
+ * @returns Строка пути без переменной пути.
+*/
+export const clearPathVaribaleFromPathString = (
+  currPath: string,
+): string => currPath.replace(/%.*%\\/, '').trim();
+
+/**
+ * Получить путь с отсеченной корневой папкой.
+ * @param currPath Путь для очистки.
+ * @param rootPath Корневой путь, который нужно удалить.
+ * @returns Строка пути без корня.
+*/
+export const clearRootDirFromPathString = (
+  currPath: string,
+  rootPath: string,
+): string => currPath.replace(new RegExp(`${rootPath.replaceAll('\\', '\\\\')}\\\\?`), '').trim();
+
+/**
+ * Заменить корневой путь на переменную пути.
+ * @param currPath Изменяемый путь.
+ * @param pathVariable Переменная для замены.
+ * @param rootDirPathStr Корневая папка в изменяемом пути, которую нужно заменить.
+ * @returns Строка пути с переменной вместо корневой папки.
+*/
+export const replaceRootDirByPathVariable = (
+  pathStr: string,
+  pathVariable: string,
+  rootDirPathStr: string,
+): string => pathStr.replace(rootDirPathStr, pathVariable).trim();
+
+/**
+ * Заменить корневой путь на переменную пути.
+ * @param currPath Изменяемый путь.
+ * @param pathVariable Переменная которую меняем.
+ * @param rootDirPathStr Корневая папка для замены.
+ * @returns Строка пути с корневой папкой вместо переменной.
+*/
+export const replacePathVariableByRootDir = (
+  pathStr: string,
+  pathVariable: string,
+  rootDirPathStr: string,
+): string => pathStr.replace(pathVariable, rootDirPathStr).trim();
 
 export const getPathWithoutRootDir = (
   pathToFile: string,
@@ -133,12 +177,13 @@ export const getPathWithoutRootDir = (
 export const checkIsPathIsNotOutsideValidFolder = (
   pathForCheck: string,
   customPaths: ITotalCustomPaths,
+  isGameDocuments = true,
 ): string => {
   const newPath = path.normalize(pathForCheck);
 
   if (
     !new RegExp(GAME_DIR.replaceAll('\\', '\\\\')).test(pathForCheck)
-    && !new RegExp(customPaths[CustomPathName.DOCUMENTS]
+    && !new RegExp(customPaths[isGameDocuments ? CustomPathName.DOCS_GAME : CustomPathName.DOCUMENTS]
       .replaceAll('\\', '\\\\'))
       .test(pathForCheck)
   ) {
