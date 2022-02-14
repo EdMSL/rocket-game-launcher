@@ -52,7 +52,7 @@ export interface IGameSettingsBackup {
 export interface IModOrganizerParams {
   isUsed: boolean,
   version: number,
-  path: string,
+  pathToMOFolder: string,
   pathToINI: string,
   pathToProfiles: string,
   pathToMods: string,

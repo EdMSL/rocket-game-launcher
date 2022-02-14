@@ -63,7 +63,7 @@ export const defaultLauncherCustomButton: ILauncherCustomButton = {
 export const defaultModOrganizerParams: IModOrganizerParams = {
   isUsed: false,
   version: 2,
-  path: 'Mod Organizer',
+  pathToMOFolder: 'Mod Organizer',
   pathToINI: 'Mod Organizer\\ModOrganizer.ini',
   pathToProfiles: 'Mod Organizer\\profiles',
   pathToMods: 'Mod Organizer\\mods',
