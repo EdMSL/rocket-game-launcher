@@ -5,8 +5,6 @@ import React, {
   ReactElement,
   useEffect,
 } from 'react';
-import path from 'path';
-import fs from 'fs';
 import { useDispatch } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import classNames from 'classnames';
@@ -134,9 +132,23 @@ export const DeveloperScreen: React.FC = () => {
     changeCurrentConfig(target.id, target.checked, target.dataset.parent);
   }, [changeCurrentConfig]);
 
-  const onSelectChange = useCallback(() => {}, []);
+  const onSelectChange = useCallback(({ target }: React.ChangeEvent<HTMLSelectElement>) => {
+    changeCurrentConfig(target.id, target.value, target.dataset.parent);
+  }, [changeCurrentConfig]);
 
-  const onCustomBtnCheckboxChange = useCallback(() => {}, []);
+  const onCustomBtnDeleteClick = useCallback((id: string) => {
+    const newConfig: ILauncherConfig = {
+      ...currentConfig,
+      customButtons: currentConfig.customButtons
+        .filter((currentBtn) => currentBtn.id !== id)
+        .map((currentBtn, index) => ({
+          ...currentBtn,
+          id: `customBtn${index}`,
+        })),
+    };
+
+    setCurrentConfig(newConfig);
+  }, [currentConfig]);
 
   const onAddCustomBtnBtnClick = useCallback(() => {
     const newConfig: ILauncherConfig = {
@@ -146,7 +158,7 @@ export const DeveloperScreen: React.FC = () => {
         {
           path: GAME_DIR,
           action: LauncherButtonAction.OPEN,
-          id: `customBtn${currentConfig.customButtons.length + 1}`,
+          id: `customBtn${currentConfig.customButtons.length}`,
           label: 'Запуск',
           args: [],
         }],
@@ -154,6 +166,8 @@ export const DeveloperScreen: React.FC = () => {
 
     setCurrentConfig(newConfig);
   }, [currentConfig]);
+
+  const onCustomBtnCheckboxChange = useCallback(() => {}, []);
 
   const onAddCustomPathBtnClick = useCallback(() => {}, []);
 
@@ -358,7 +372,6 @@ export const DeveloperScreen: React.FC = () => {
             onClick={onAddCustomPathBtnClick}
           >
             Добавить путь
-
           </Button>
           <p className={styles['developer-screen__text']}>Настройки запуска игры</p>
           <PathSelector
@@ -398,6 +411,7 @@ export const DeveloperScreen: React.FC = () => {
                   <CustomBtnItem
                     key={item.id}
                     item={item}
+                    onDeleteBtnClick={onCustomBtnDeleteClick}
                   />
                 ))
               }

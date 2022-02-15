@@ -1,4 +1,6 @@
 .developer-screen__custom-btn-item {
+  display: flex;
+  flex-direction: column;
   margin-bottom: 10px;
   padding-right: 10px;
   padding-left: 10px;
@@ -15,5 +17,9 @@
 
   & .checkbox__label::after {
     right: 7px;
+  }
+
+  & .main-btn {
+    align-self: center;
   }
 }
