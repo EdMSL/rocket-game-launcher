@@ -29,7 +29,7 @@ import { LauncherButtonAction, DefaultCustomPathName } from '$constants/misc';
 import { Button } from '$components/UI/Button';
 import { CustomBtnItem } from '$components/CustomBtnItem';
 import { Routes } from '$constants/routes';
-import { IMainRootState } from '$types/main';
+import { ILauncherConfig, IMainRootState } from '$types/main';
 import { Loader } from '$components/UI/Loader';
 import { generateSelectOptions } from '$utils/data';
 import {
@@ -138,7 +138,22 @@ export const DeveloperScreen: React.FC = () => {
 
   const onCustomBtnCheckboxChange = useCallback(() => {}, []);
 
-  const onAddCustomBtnBtnClick = useCallback(() => {}, []);
+  const onAddCustomBtnBtnClick = useCallback(() => {
+    const newConfig: ILauncherConfig = {
+      ...currentConfig,
+      customButtons: [
+        ...currentConfig.customButtons,
+        {
+          path: GAME_DIR,
+          action: LauncherButtonAction.OPEN,
+          id: `customBtn${currentConfig.customButtons.length + 1}`,
+          label: 'Запуск',
+          args: [],
+        }],
+    };
+
+    setCurrentConfig(newConfig);
+  }, [currentConfig]);
 
   const onAddCustomPathBtnClick = useCallback(() => {}, []);
 
@@ -338,7 +353,13 @@ export const DeveloperScreen: React.FC = () => {
               ))
             }
           </p>
-          <Button onClick={onAddCustomPathBtnClick}>Добавить путь</Button>
+          <Button
+            className={classNames('button', 'main-btn', 'developer-screen__btn')}
+            onClick={onAddCustomPathBtnClick}
+          >
+            Добавить путь
+
+          </Button>
           <p className={styles['developer-screen__text']}>Настройки запуска игры</p>
           <PathSelector
             className={styles['developer-screen__item']}
@@ -381,7 +402,13 @@ export const DeveloperScreen: React.FC = () => {
                 ))
               }
             </ul>
-            <Button onClick={onAddCustomBtnBtnClick}>Добавить кнопку</Button>
+            <Button
+              className={classNames('button', 'main-btn', 'developer-screen__btn')}
+              onClick={onAddCustomBtnBtnClick}
+            >
+              Добавить кнопку
+
+            </Button>
           </div>
         </div>
         <div className={styles['developer-screen__block']}>

@@ -3,11 +3,18 @@
 }
 
 .develover-screen__controller {
+  display: flex;
   margin: 10px 0 10px 10px;
 
   & .control-panel__btn {
+    flex-basis: 15%;
     margin-right: 10px;
   }
+}
+
+.developer-screen__btn {
+  align-self: center;
+  width: 200px;
 }
 
 .developer-screen__block {
