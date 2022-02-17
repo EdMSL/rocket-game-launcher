@@ -25,7 +25,7 @@ import {
   Encoding, GameSettingsFileView,
 } from '$constants/misc';
 import {
-  ITotalCustomPaths,
+  IPathVariables,
   USER_THEMES_DIR,
 } from '$constants/paths';
 // import { IMainRootState } from '$types/config';
@@ -604,13 +604,13 @@ export const getUserThemesFolders = (): string[] => {
 /**
  * Вызывает диалоговое окно для выбора пути и возвращает путь к файлу,
  * отсекая директорию до папки игры.
- * @param customPaths Кастомные пути из `state`.
+ * @param pathVariables Переменные пути из `state`.
  * @param isPathToFile Выбирается путь до файла или папки?
  * @param dialog Компонент `dialog` из Electron.
  * @param currentWindow Текущее окно, из которого вызывается команда выбора пути.
 */
 export const getPathFromFileInput = async (
-  customPaths: ITotalCustomPaths,
+  pathVariables: IPathVariables,
   isPathToFile: boolean,
   dialog: Electron.Dialog,
   currentWindow: Electron.BrowserWindow,
@@ -630,7 +630,7 @@ export const getPathFromFileInput = async (
 
     const pathStr = checkIsPathIsNotOutsideValidFolder(
       pathObj.filePaths[0],
-      customPaths,
+      pathVariables,
       isGameDocuments,
     );
 

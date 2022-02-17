@@ -1,68 +1,38 @@
 {
-  "isResizable": true,
+  "isResizable": false,
   "minWidth": 400,
   "minHeight": 400,
-  "width": 800,
-  "height": 600,
+  "width": 1200,
+  "height": 800,
   "maxWidth": 0,
-  "maxHeight": 0,
+  "maxHeight": 14,
   "modOrganizer": {
     "isUsed": true,
     "version": 2,
-    "path": "MO2"
+    "pathToMOFolder": "Mod Organizer",
+    "pathToINI": "Mod Organizer\\ModOrganizer.ini",
+    "pathToProfiles": "Mod Organizer\\profiles",
+    "pathToMods": "Mod Organizer\\logs",
+    "profileSection": "General",
+    "profileParam": "selected_profile",
+    "profileParamValueRegExp": ""
   },
-  "documentsPath": "My Games\\Oblivion",
+  "documentsPath": "My Games\\Oblivion_GBR-bac\\__MO_Saves",
   "isFirstLaunch": false,
-  "customPaths": {
-    "%CUSTOM%": "Data\\OBSE\\Plugins"
-  },
   "gameName": "Oblivion Association",
   "playButton": {
-    "path": "%GAME_DIR%\\Mod Organizer\\ModOrganizer.exe",
+    "path": "%GAME_DIR%\\Oblivion.exe",
     "args": [
       "%GAME_DIR%\\obse_loader.exe"
     ],
-    "label": ""
+    "label": "Играть"
   },
   "customButtons": [
     {
-      "path": "%GAME_DIR%\\Editor.lnk",
-      "label": "CSE MO1 ярлык"
-    },
-    {
-      "path": "%MO_DIR%\\ModOrganizer.exe",
-      "args": [
-        "%GAME_DIR%\\obse loader.exe",
-        "-editor"
-      ],
-      "label": "CSE MO1 exe"
-    },
-    {
-      "path": "%GAME_DIR%\\Editor2.lnk",
-      "label": "CSE MO2 ярлык"
-    },
-    {
-      "path": "%GAME_DIR%\\MO2\\ModOrganizer.exe",
-      "args": [
-        "\"moshortcut://:Construction Set\""
-      ],
-      "label": "CSE MO2 exe"
-    },
-    {
-      "path": "%GAME_DIR%",
-      "label": "Открыть папку игры"
-    },
-    {
-      "path": "%CUSTOM%\\CSE",
-      "label": "Открыть"
-    },
-    {
-      "path": "%DOCUMENTS%",
-      "label": "Доки"
-    },
-    {
-      "path": "%MO_DIR%",
-      "label": "Папка МО"
+      "path": "D:\\Oblivion\\Data",
+      "action": "open",
+      "label": "Запуск",
+      "args": []
     }
   ]
 }

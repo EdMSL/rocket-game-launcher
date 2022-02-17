@@ -36,7 +36,7 @@ import {
 import { GAME_DIR } from '$constants/paths';
 
 export const DeveloperScreen: React.FC = () => {
-  const defaultPaths = useAppSelector((state) => state.main.defaultPaths);
+  const pathVariables = useAppSelector((state) => state.main.pathVariables);
   const launcherConfig = useAppSelector((state) => state.main.config);
   const isGameSettingsSaving = useAppSelector((state) => state.main.isGameSettingsSaving);
 
@@ -82,7 +82,7 @@ export const DeveloperScreen: React.FC = () => {
 
     let pathStr: string = await ipcRenderer.invoke(
       'get path from native window',
-      { ...defaultPaths, ...currentConfig.customPaths },
+      { ...pathVariables },
       ((parent === 'playButton' || parent === 'customButton') && id === 'path')
       || id === 'pathToINI',
       id !== 'documentsPath',
@@ -100,13 +100,13 @@ export const DeveloperScreen: React.FC = () => {
 
       changeCurrentConfig(
         id,
-        (parent === 'playButton' || parent === 'customButton') && id === 'path' ? pathStr : clearRootDirFromPathString(pathStr, id === 'documentsPath' ? defaultPaths['%DOCUMENTS%'] : GAME_DIR),
+        (parent === 'playButton' || parent === 'customButton') && id === 'path' ? pathStr : clearRootDirFromPathString(pathStr, id === 'documentsPath' ? pathVariables['%DOCUMENTS%'] : GAME_DIR),
         parent,
       );
     } else {
       dispatch(addMessages([CreateUserMessage.error('Выбран некорректный путь до папки. Подробности в файле лога.')])); //eslint-disable-line max-len
     }
-  }, [dispatch, currentConfig, changeCurrentConfig, defaultPaths]);
+  }, [dispatch, currentConfig, changeCurrentConfig, pathVariables]);
 
   const onSelectPathTextInputChange = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
@@ -341,38 +341,6 @@ export const DeveloperScreen: React.FC = () => {
             onChange={onSelectPathTextInputChange}
             onButtonClick={onSelectPathBtnClick}
           />
-          <p className={styles['developer-screen__text']}>Настройка пользовательских путей</p>
-          <p className={styles['developer-screen__custom-block']}>
-            {
-              Object.keys(currentConfig.customPaths).map((currentCustomPath) => (
-                <div
-                  key={currentCustomPath}
-                  className={styles['developer-screen__custom-item']}
-                >
-                  <TextField
-                    id="gameName"
-                    value={currentCustomPath}
-                    label="Имя"
-                    onChange={OnTextFieldChange}
-                  />
-                  <PathSelector
-                    id="documentsPath"
-                    label="Путь"
-                    value={currentConfig[currentCustomPath]}
-                    options={generateSelectOptions([DefaultCustomPathName.GAME_DIR])}
-                    onChange={onSelectPathTextInputChange}
-                    onButtonClick={onSelectPathBtnClick}
-                  />
-                </div>
-              ))
-            }
-          </p>
-          <Button
-            className={classNames('button', 'main-btn', 'developer-screen__btn')}
-            onClick={onAddCustomPathBtnClick}
-          >
-            Добавить путь
-          </Button>
           <p className={styles['developer-screen__text']}>Настройки запуска игры</p>
           <PathSelector
             className={styles['developer-screen__item']}

@@ -4,7 +4,7 @@ import { IMainRootState } from '$types/main';
 import { CustomError } from './errors';
 import { CustomPathName, DefaultCustomPathName } from '$constants/misc';
 import {
-  GAME_DIR, ICustomPaths, IDefaultCustomPaths, ITotalCustomPaths,
+  GAME_DIR, IPathVariables,
 } from '$constants/paths';
 
 const HEXADECIMAL = 16;
@@ -160,15 +160,15 @@ export const replacePathVariableByRootDir = (
 
 export const getPathWithoutRootDir = (
   pathToFile: string,
-  customPaths: ITotalCustomPaths,
+  pathVariables: IPathVariables,
 ): string => {
   if (new RegExp(GAME_DIR.replaceAll('\\', '\\\\')).test(pathToFile)) {
     return pathToFile.replace(GAME_DIR, '').substr(1);
   } else if (
-    customPaths[CustomPathName.DOCUMENTS]
-    && new RegExp(customPaths[CustomPathName.DOCUMENTS].replaceAll('\\', '\\\\')).test(pathToFile)
+    pathVariables[CustomPathName.DOCUMENTS]
+    && new RegExp(pathVariables[CustomPathName.DOCUMENTS].replaceAll('\\', '\\\\')).test(pathToFile)
   ) {
-    return pathToFile.replace(customPaths[CustomPathName.DOCUMENTS], '').substr(1);
+    return pathToFile.replace(pathVariables[CustomPathName.DOCUMENTS], '').substr(1);
   }
 
   throw new CustomError(`Recieved incorrect path: ${pathToFile}`);
@@ -176,14 +176,14 @@ export const getPathWithoutRootDir = (
 
 export const checkIsPathIsNotOutsideValidFolder = (
   pathForCheck: string,
-  customPaths: ITotalCustomPaths,
+  pathVariables: IPathVariables,
   isGameDocuments = true,
 ): string => {
   const newPath = path.normalize(pathForCheck);
 
   if (
     !new RegExp(GAME_DIR.replaceAll('\\', '\\\\')).test(pathForCheck)
-    && !new RegExp(customPaths[isGameDocuments ? CustomPathName.DOCS_GAME : CustomPathName.DOCUMENTS]
+    && !new RegExp(pathVariables[isGameDocuments ? CustomPathName.DOCS_GAME : CustomPathName.DOCUMENTS]
       .replaceAll('\\', '\\\\'))
       .test(pathForCheck)
   ) {
@@ -196,27 +196,27 @@ export const checkIsPathIsNotOutsideValidFolder = (
 /**
  * Получить путь до файла с учетом кастомных путей.
  * @param pathToFile Путь до файла из settings.json.
- * @param customPaths Кастомные пути из `state`.
+ * @param pathVariables Переменные пути из `state`.
  * @param profileMO Профиль Mod Organizer.
  * @returns Строка с абсолютным путем к файлу.
 */
 export const getPathToFile = (
   pathToFile: string,
-  customPaths: ITotalCustomPaths,
+  pathVariables: IPathVariables,
   profileMO: string,
 ): string => {
   let newPath = pathToFile;
 
   if (CustomPathName.MO_PROFILE_REGEXP.test(pathToFile)) {
     if (profileMO) {
-      newPath = path.join(customPaths[CustomPathName.MO_PROFILE], profileMO, path.basename(pathToFile));
+      newPath = path.join(pathVariables[CustomPathName.MO_PROFILE], profileMO, path.basename(pathToFile));
     } else {
       throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
     }
   } else if (CustomPathName.MO_DIR_REGEXP.test(pathToFile)) {
-    if (customPaths[CustomPathName.MO_DIR]) {
+    if (pathVariables[CustomPathName.MO_DIR]) {
       newPath = path.join(
-        customPaths[CustomPathName.MO_DIR],
+        pathVariables[CustomPathName.MO_DIR],
         pathToFile.replace(CustomPathName.MO_DIR, ''),
       );
     } else {
@@ -227,9 +227,9 @@ export const getPathToFile = (
       throw new CustomError(`Incorrect path received. Path variable ${DefaultCustomPathName.MO_DIR} is not available.`); //eslint-disable-line max-len
     }
   } else if (CustomPathName.MO_MODS_REGEXP.test(pathToFile)) {
-    if (customPaths[CustomPathName.MO_DIR]) {
+    if (pathVariables[CustomPathName.MO_DIR]) {
       newPath = path.join(
-        customPaths[CustomPathName.MO_MODS],
+        pathVariables[CustomPathName.MO_MODS],
         pathToFile.replace(CustomPathName.MO_MODS, ''),
       );
     } else {
@@ -240,9 +240,9 @@ export const getPathToFile = (
       throw new CustomError(`Incorrect path received. Path variable ${DefaultCustomPathName.MO_MODS} is not available.`); //eslint-disable-line max-len
     }
   } else if (CustomPathName.DOCUMENTS_REGEXP.test(pathToFile)) {
-    if (customPaths[CustomPathName.DOCUMENTS]) {
+    if (pathVariables[CustomPathName.DOCUMENTS]) {
       newPath = path.join(
-        customPaths[CustomPathName.DOCUMENTS],
+        pathVariables[CustomPathName.DOCUMENTS],
         pathToFile.replace(CustomPathName.DOCUMENTS, ''),
       );
     } else {
@@ -250,14 +250,14 @@ export const getPathToFile = (
     }
   } else if (CustomPathName.GAME_DIR_REGEXP.test(pathToFile)) {
     newPath = path.join(
-      customPaths[CustomPathName.GAME_DIR],
+      pathVariables[CustomPathName.GAME_DIR],
       pathToFile.replace(CustomPathName.GAME_DIR, ''),
     );
   } else if (CustomPathName.CUSTOM_PATH_REGEXP.test(pathToFile)) {
     const customPathName = pathToFile.match(CustomPathName.CUSTOM_PATH_REGEXP)![0];
 
-    if (customPaths[customPathName]) {
-      newPath = path.join(customPaths[customPathName], pathToFile.replace(customPathName, ''));
+    if (pathVariables[customPathName]) {
+      newPath = path.join(pathVariables[customPathName], pathToFile.replace(customPathName, ''));
     } else {
       throw new CustomError(`Custom path name "${customPathName}" does not exists in config.json.`);
     }
@@ -265,7 +265,7 @@ export const getPathToFile = (
     newPath = path.join(GAME_DIR, pathToFile);
   }
 
-  return checkIsPathIsNotOutsideValidFolder(newPath, customPaths);
+  return checkIsPathIsNotOutsideValidFolder(newPath, pathVariables);
 };
 
 /**

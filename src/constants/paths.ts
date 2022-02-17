@@ -22,12 +22,12 @@ export const USER_THEMES_DIR = process.env.NODE_ENV === 'development'
   ? path.resolve('./app/themes')
   : path.resolve('./themes');
 
-export const DefaultCustomPath: IDefaultCustomPaths = {
+export const DefaultCustomPath: IPathVariables = {
   '%GAME_DIR%': GAME_DIR,
   '%DOCUMENTS%': '',
 };
 
-export interface IDefaultCustomPaths {
+export interface IPathVariables {
   '%GAME_DIR%': string,
   '%DOCUMENTS%': string,
   //@ts-ignore
@@ -37,9 +37,3 @@ export interface IDefaultCustomPaths {
   //@ts-ignore
   '%MO_PROFILE%'?: string|undefined,
 }
-
-export interface ICustomPaths {
-  [label: string]: string,
-}
-
-export type ITotalCustomPaths = IDefaultCustomPaths & ICustomPaths;

@@ -101,7 +101,7 @@ function* saveLauncherConfigSaga(
 
   try {
     const {
-      main: { defaultPaths },
+      main: { pathVariables },
     }: ReturnType<typeof getState> = yield select(getState);
     const customBtnsForSave = newConfig.customButtons.map((btn) => ({
       path: btn.path,
@@ -117,7 +117,7 @@ function* saveLauncherConfigSaga(
         path: replaceRootDirByPathVariable(
           newConfig.playButton.path,
           DefaultCustomPathName.GAME_DIR,
-          defaultPaths['%GAME_DIR%'],
+          pathVariables['%GAME_DIR%'],
         ),
       },
       customButtons: customBtnsForSave,
@@ -248,12 +248,12 @@ function* createGameSettingsBackupSaga(
     yield put(setIsGameSettingsFilesBackuping(true));
 
     const {
-      main: { config: { customPaths }, defaultPaths },
+      main: { pathVariables },
       gameSettings: { gameSettingsFiles, moProfile },
     }: ReturnType<typeof getState> = yield select(getState);
 
     const filesForBackupPaths = Object.keys(gameSettingsFiles).map((fileName) => getPathToFile(
-      gameSettingsFiles[fileName].path, { ...customPaths, ...defaultPaths }, moProfile,
+      gameSettingsFiles[fileName].path, pathVariables, moProfile,
     ));
 
     yield call(createGameSettingsFilesBackup, filesForBackupPaths);

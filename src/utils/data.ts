@@ -40,8 +40,7 @@ import { IIncorrectGameSettingsFiles } from '$sagas/gameSettings';
 import {
   DefaultCustomPath,
   GAME_DIR,
-  ICustomPaths,
-  IDefaultCustomPaths,
+  IPathVariables,
 } from '$constants/paths';
 import {
   ILauncherAppButton,
@@ -553,40 +552,31 @@ export const getNewModOrganizerParams = (data: IModOrganizerParams): IModOrganiz
 export const createCustomPaths = (
   configData: IMainRootState['config'],
   app: Electron.App,
-): { default: IDefaultCustomPaths, custom: ICustomPaths, } => {
-  const newCustomPaths = Object.keys(configData.customPaths).reduce((paths, currentPathKey) => ({
-    ...paths,
-    [currentPathKey]: path.join(GAME_DIR, clearPathVaribaleFromPathString(configData.customPaths[currentPathKey])),
-  }), {});
-
-  return {
-    default: {
-      ...DefaultCustomPath,
-      '%DOCUMENTS%': app.getPath('documents'),
-      ...configData.documentsPath ? {
-        '%DOCS_GAME%': path.join(app.getPath('documents'), clearPathVaribaleFromPathString(configData.documentsPath)),
-      } : {},
-      ...configData.modOrganizer.isUsed ? {
-        '%MO_DIR%': path.join(GAME_DIR, clearPathVaribaleFromPathString(configData.modOrganizer.pathToMOFolder)),
-        '%MO_MODS%': path.join(GAME_DIR, clearPathVaribaleFromPathString(configData.modOrganizer.pathToMods)),
-        '%MO_PROFILE%': path.join(GAME_DIR, clearPathVaribaleFromPathString(configData.modOrganizer.pathToProfiles)),
-      } : {},
-    },
-    custom: {
-      ...newCustomPaths,
-    },
-  };
-};
+): IPathVariables => ({
+  ...DefaultCustomPath,
+  '%DOCUMENTS%': app.getPath('documents'),
+  ...configData.documentsPath ? {
+    '%DOCS_GAME%': path.join(app.getPath('documents'), clearPathVaribaleFromPathString(configData.documentsPath)),
+  } : {},
+  ...configData.modOrganizer.isUsed ? {
+    '%MO_DIR%': path.join(GAME_DIR, clearPathVaribaleFromPathString(configData.modOrganizer.pathToMOFolder)),
+    '%MO_MODS%': path.join(GAME_DIR, clearPathVaribaleFromPathString(configData.modOrganizer.pathToMods)),
+    '%MO_PROFILE%': path.join(GAME_DIR, clearPathVaribaleFromPathString(configData.modOrganizer.pathToProfiles)),
+  } : {},
+  // custom: {
+  //   ...newCustomPaths,
+  // },
+});
 
 /**
  * Получить данные для генерации пользовательских кнопок.
  * @param buttonsData Данные о кнопках из config.json.
- * @param customPaths Объект с переменными путей.
+ * @param pathVariables Объект с переменными путей.
  * @returns Массив объектов пользовательских кнопок.
 */
 export const getCustomButtons = (
   buttonsData: ILauncherAppButton[],
-  customPaths: IDefaultCustomPaths,
+  pathVariables: IPathVariables,
   // Типы определяются неверно, после filter отсекутся все undefined,
   // но ts все равно считает, что они там есть.
   //@ts-ignore
@@ -598,7 +588,7 @@ export const getCustomButtons = (
       GAME_DIR,
     );
 
-    pathTo = checkIsPathIsNotOutsideValidFolder(pathTo, { ...customPaths });
+    pathTo = checkIsPathIsNotOutsideValidFolder(pathTo, pathVariables);
 
     return {
       ...btn,

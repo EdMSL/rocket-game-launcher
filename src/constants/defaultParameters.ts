@@ -52,7 +52,7 @@ export const defaultLauncherCustomButton: ILauncherCustomButton = {
 //   },
 //   documentsPath: '',
 //   isFirstLaunch: true,
-//   customPaths: {},
+//   pathVariables: {},
 //   playButton: {
 //     path: '',
 //     label: 'Играть',
@@ -83,7 +83,6 @@ export const defaultLauncherConfig: ILauncherConfig = {
   isFirstLaunch: true,
   modOrganizer: defaultModOrganizerParams,
   documentsPath: '',
-  customPaths: {},
   gameName: '',
   playButton: {
     path: '',

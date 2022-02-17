@@ -60,10 +60,6 @@ const configFileDataSchema = Joi.object({
   documentsPath: Joi.string().optional().allow('').default(defaultLauncherConfig.documentsPath)
     .pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
   isFirstLaunch: Joi.bool().optional().default(defaultLauncherConfig.isFirstLaunch),
-  customPaths: Joi.object().pattern(
-    Joi.string().pattern(CustomPathName.CUSTOM_PATH_NAME_REGEXP).not(...Object.values(DefaultCustomPathName)),
-    Joi.string(),
-  ).optional().default(defaultLauncherConfig.customPaths),
   gameName: Joi.string().optional().allow(''),
   playButton: Joi.object({
     path: Joi.string().optional().allow('').default(''),

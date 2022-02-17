@@ -17,7 +17,7 @@ import { showErrorBox } from '$utils/errors';
 import { getSystemInfo } from '$utils/data';
 import { createBackupFolders } from '$utils/backup';
 import { createFolderSync, getPathFromFileInput } from '$utils/files';
-import { ITotalCustomPaths, USER_THEMES_DIR } from '$constants/paths';
+import { IPathVariables, USER_THEMES_DIR } from '$constants/paths';
 
 require('@electron/remote/main').initialize();
 
@@ -45,12 +45,12 @@ ipcMain.handle(
   'get path from native window',
   (
     event,
-    customPaths: ITotalCustomPaths,
+    pathVariables: IPathVariables,
     isPathToFile: boolean,
     isGameDocuments: boolean,
     extensions: string[],
   ) => getPathFromFileInput(
-    customPaths,
+    pathVariables,
     isPathToFile,
     dialog,
     BrowserWindow.getFocusedWindow()!,

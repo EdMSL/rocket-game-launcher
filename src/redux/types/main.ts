@@ -1,4 +1,4 @@
-import { IDefaultCustomPaths } from '$constants/paths';
+import { IPathVariables } from '$constants/paths';
 import { IMessage } from '$utils/message';
 
 export const MAIN_TYPES = {
@@ -72,7 +72,6 @@ export interface ILauncherConfig {
   isFirstLaunch: boolean,
   modOrganizer: IModOrganizerParams,
   documentsPath: string,
-  customPaths: { [label: string]: string, },
   gameName: string,
   playButton: ILauncherAppButton,
   customButtons: ILauncherCustomButton[],
@@ -80,7 +79,7 @@ export interface ILauncherConfig {
 
 export type IMainRootState = Readonly<{
   config: ILauncherConfig,
-  defaultPaths: IDefaultCustomPaths,
+  pathVariables: IPathVariables,
   isLauncherInitialised: boolean,
   isGameRunning: boolean,
   isGameSettingsLoaded: boolean,

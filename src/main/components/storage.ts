@@ -21,9 +21,7 @@ import {
 import {
   CONFIG_FILE_PATH,
   GAME_DIR,
-  ICustomPaths,
-  IDefaultCustomPaths,
-  ITotalCustomPaths,
+  IPathVariables,
 } from '$constants/paths';
 import {
   CustomError,
@@ -144,15 +142,10 @@ export const createStorage = (): Store<IAppState> => {
   }
 
   // Переменные путей и настройка кнопок
-  const customPaths = createCustomPaths(
+  const pathVariables = createCustomPaths(
     configurationData,
     app,
   );
-
-  const totalCustomPaths: ITotalCustomPaths = {
-    ...customPaths.default,
-    ...customPaths.custom,
-  };
 
   if (configurationData.playButton?.path) {
     let pathStr = replacePathVariableByRootDir(
@@ -167,7 +160,7 @@ export const createStorage = (): Store<IAppState> => {
     );
 
     try {
-      pathStr = checkIsPathIsNotOutsideValidFolder(configurationData.playButton?.path, totalCustomPaths);
+      pathStr = checkIsPathIsNotOutsideValidFolder(configurationData.playButton?.path, pathVariables);
     } catch (error) {
       pathStr = '';
       messages.push(CreateUserMessage.warning('Указан недопустимый путь для файла запуска игры.')); //eslint-disable-line max-len
@@ -183,7 +176,7 @@ export const createStorage = (): Store<IAppState> => {
   }
 
   if (configurationData.customButtons && configurationData.customButtons.length > 0) {
-    const newButtons = getCustomButtons(configurationData.customButtons, totalCustomPaths);
+    const newButtons = getCustomButtons(configurationData.customButtons, pathVariables);
 
     if (configurationData.customButtons.length !== newButtons.length) {
       messages.push(CreateUserMessage.warning('В процессе обработки списка пользовательских кнопок возникла ошибка. Не все кнопки будут доступны. Подробности в файле лога.')); //eslint-disable-line max-len
@@ -211,9 +204,8 @@ export const createStorage = (): Store<IAppState> => {
           ...mainInitialState.config.playButton,
           ...configurationData.playButton,
         },
-        customPaths: { ...customPaths.custom },
       },
-      defaultPaths: { ...customPaths.default },
+      pathVariables,
       userThemes,
       messages,
     },
@@ -241,7 +233,7 @@ export const createStorage = (): Store<IAppState> => {
   });
 
   writeToLogFileSync(`Working directory: ${GAME_DIR}`);
-  writeToLogFileSync(`Custom paths: \n${getObjectAsList(customPaths)}`);
+  writeToLogFileSync(`Paths variables: \n${getObjectAsList(pathVariables)}`);
 
   if (configurationFileData.modOrganizer) {
     writeToLogFileSync(`MO information: \n${getObjectAsList(configurationFileData.modOrganizer!)}`);
