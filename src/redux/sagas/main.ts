@@ -103,6 +103,12 @@ function* saveLauncherConfigSaga(
     const {
       main: { defaultPaths },
     }: ReturnType<typeof getState> = yield select(getState);
+    const customBtnsForSave = newConfig.customButtons.map((btn) => ({
+      path: btn.path,
+      action: btn.action,
+      label: btn.label,
+      args: btn.args,
+    }));
 
     const configForSave = {
       ...newConfig,
@@ -114,6 +120,7 @@ function* saveLauncherConfigSaga(
           defaultPaths['%GAME_DIR%'],
         ),
       },
+      customButtons: customBtnsForSave,
     };
 
     yield call(writeJSONFile, CONFIG_FILE_PATH, configForSave);
