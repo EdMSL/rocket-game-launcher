@@ -9,6 +9,8 @@ import { ILauncherCustomButton } from '$types/main';
 import { DefaultCustomPathName, LauncherButtonAction } from '$constants/misc';
 import { generateSelectOptions } from '$utils/data';
 import { Button } from '$components/UI/Button';
+import { GAME_DIR } from '$constants/paths';
+import { clearRootDirFromPathString } from '$utils/strings';
 
 interface IProps {
   item: ILauncherCustomButton,
@@ -39,7 +41,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
       <PathSelector
         id={`item_path-${item.id}`}
         label="Путь до файла\папки"
-        value={item.path}
+        value={clearRootDirFromPathString(item.path, GAME_DIR)}
         options={generateSelectOptions([DefaultCustomPathName.GAME_DIR])}
         onButtonClick={onSelectPathBtnClick}
         onChange={onSelectPathTextInputChange}

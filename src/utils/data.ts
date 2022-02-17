@@ -5,6 +5,7 @@ import path from 'path';
 
 import {
   CustomPathName,
+  DefaultCustomPathName,
   GameSettingsFileView,
   LauncherButtonAction,
 } from '$constants/misc';
@@ -16,10 +17,12 @@ import {
 } from './log';
 import { CreateUserMessage } from './message';
 import {
+  checkIsPathIsNotOutsideValidFolder,
   clearPathVaribaleFromPathString,
   getLineIniParameterValue,
   getParameterRegExp,
   getPathToFile,
+  replacePathVariableByRootDir,
 } from './strings';
 import {
   IGameSettingsItemParameter,
@@ -589,7 +592,13 @@ export const getCustomButtons = (
   //@ts-ignore
 ): ILauncherCustomButton[] => buttonsData.map<ILauncherCustomButton|undefined>((btn) => {
   try {
-    const pathTo = getPathToFile(btn.path, { ...customPaths }, '');
+    let pathTo = replacePathVariableByRootDir(
+      btn.path,
+      DefaultCustomPathName.GAME_DIR,
+      GAME_DIR,
+    );
+
+    pathTo = checkIsPathIsNotOutsideValidFolder(pathTo, { ...customPaths });
 
     return {
       ...btn,
@@ -602,7 +611,7 @@ export const getCustomButtons = (
     const err = getReadWriteError(error);
 
     writeToLogFileSync(
-      `Can't create custom button. ${btn.label}. ${err.message} Path: ${btn.path}`,
+      `Can't create custom button. "${btn.label}". ${err.message}. Path: ${btn.path}`,
       LogMessageType.WARNING,
     );
 
