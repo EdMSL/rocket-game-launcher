@@ -329,6 +329,12 @@ $checkbox-size: 20px;
   &:focus {
     @include focus;
   }
+
+  &:disabled {
+    background-color: var(--disabled-color);
+    border-color: transparent;
+    border-radius: 0;
+  }
 }
 
 .text-field__container {

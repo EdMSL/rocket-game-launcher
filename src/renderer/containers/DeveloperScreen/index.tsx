@@ -322,7 +322,7 @@ export const DeveloperScreen: React.FC = () => {
         </div>
         <div className={styles['developer-screen__block']}>
           <p className={styles['developer-screen__block-title']}>
-            Настройки приложений и пользовательских путей
+            Настройки путей и запуска программ
           </p>
           <TextField
             className={styles['developer-screen__item']}
