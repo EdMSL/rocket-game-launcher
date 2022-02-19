@@ -13,7 +13,7 @@
 @mixin main-text {
   font-family: "Arial", sans-serif;
   color: var(--text-main);
-  font-size: 16px;
+  font-size: var(--text-size);
   line-height: 1.5;
   font-weight: 400;
 }

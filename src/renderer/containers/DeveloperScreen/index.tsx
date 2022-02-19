@@ -23,7 +23,9 @@ import {
   setIsFirstLaunch,
 } from '$actions/main';
 import { CreateUserMessage } from '$utils/message';
-import { LauncherButtonAction, DefaultCustomPathName } from '$constants/misc';
+import {
+  LauncherButtonAction, DefaultCustomPathName, CustomPathName,
+} from '$constants/misc';
 import { Button } from '$components/UI/Button';
 import { CustomBtnItem } from '$components/CustomBtnItem';
 import { Routes } from '$constants/routes';
@@ -34,6 +36,7 @@ import {
   clearPathVaribaleFromPathString, clearRootDirFromPathString, getPathToFile, replaceRootDirByPathVariable,
 } from '$utils/strings';
 import { GAME_DIR } from '$constants/paths';
+import { ArgumentsBlock } from '$components/ArgumentsBlock';
 
 export const DeveloperScreen: React.FC = () => {
   const pathVariables = useAppSelector((state) => state.main.pathVariables);
@@ -169,7 +172,7 @@ export const DeveloperScreen: React.FC = () => {
 
   const onCustomBtnCheckboxChange = useCallback(() => {}, []);
 
-  const onAddCustomPathBtnClick = useCallback(() => {}, []);
+  const onAddNewArgumentBtnClick = useCallback((id: string) => {}, []);
 
   const onSaveBtnClick = useCallback((
     { currentTarget }: React.MouseEvent<HTMLButtonElement>,
@@ -202,7 +205,6 @@ export const DeveloperScreen: React.FC = () => {
           id="ok_btn"
           onClick={onSaveBtnClick}
           className={classNames(
-            'button',
             'main-btn',
             'control-panel__btn',
           )}
@@ -228,7 +230,6 @@ export const DeveloperScreen: React.FC = () => {
         <Button
           onClick={onSaveBtnClick}
           className={classNames(
-            'button',
             'main-btn',
             'control-panel__btn',
           )}
@@ -238,7 +239,6 @@ export const DeveloperScreen: React.FC = () => {
         <Button
           onClick={onResetBtnClick}
           className={classNames(
-            'button',
             'main-btn',
             'control-panel__btn',
           )}
@@ -336,7 +336,6 @@ export const DeveloperScreen: React.FC = () => {
             id="documentsPath"
             label="Путь до папки файлов игры в [User]/Documents"
             value={currentConfig.documentsPath}
-            // value={clearPathVaribaleFromPathString(currentConfig.documentsPath)}
             options={generateSelectOptions([DefaultCustomPathName.DOCUMENTS])}
             onChange={onSelectPathTextInputChange}
             onButtonClick={onSelectPathBtnClick}
@@ -348,18 +347,15 @@ export const DeveloperScreen: React.FC = () => {
             parent="playButton"
             label="Путь до исполняемого файла игры"
             value={clearRootDirFromPathString(currentConfig.playButton.path, GAME_DIR)}
-            // value={clearPathVaribaleFromPathString(currentConfig.playButton.path)}
             options={generateSelectOptions([DefaultCustomPathName.GAME_DIR])}
             onChange={onSelectPathTextInputChange}
             onButtonClick={onSelectPathBtnClick}
           />
-          <TextField
-            className={styles['developer-screen__item']}
-            id="args"
+          <ArgumentsBlock
+            args={currentConfig.playButton.args!}
             parent="playButton"
-            value={currentConfig.playButton.args?.toString()}
-            label="Аргументы запуска"
-            onChange={OnTextFieldChange}
+            className={styles['developer-screen__item']}
+            addArgumentItem={onAddNewArgumentBtnClick}
           />
           <TextField
             className={styles['developer-screen__item']}
@@ -385,11 +381,10 @@ export const DeveloperScreen: React.FC = () => {
               }
             </ul>
             <Button
-              className={classNames('button', 'main-btn', 'developer-screen__btn')}
+              className={classNames('main-btn', 'developer-screen__btn')}
               onClick={onAddCustomBtnBtnClick}
             >
               Добавить кнопку
-
             </Button>
           </div>
         </div>
@@ -399,7 +394,7 @@ export const DeveloperScreen: React.FC = () => {
             className={styles['developer-screen__item']}
             id="isUsed"
             parent="modOrganizer"
-            label="Используется ли Mod Organizer?"
+            label="Используется ли MO?"
             isChecked={currentConfig.modOrganizer.isUsed}
             onChange={onSwitcherChange}
           />
@@ -407,7 +402,7 @@ export const DeveloperScreen: React.FC = () => {
             className={styles['developer-screen__item']}
             id="version"
             parent="modOrganizer"
-            label="Версия Mod Organizer"
+            label="Версия MO"
             optionsArr={[
               { label: 'Mod Organizer', value: '1' },
               { label: 'Mod Organizer 2', value: '2' },
@@ -419,9 +414,8 @@ export const DeveloperScreen: React.FC = () => {
           <PathSelector
             className={styles['developer-screen__item']}
             id="pathToMOFolder"
-            label="Путь до папки Mod Organizer"
+            label="Путь до папки MO"
             parent="modOrganizer"
-            // value={clearPathVaribaleFromPathString(currentConfig.modOrganizer.path)}
             value={clearRootDirFromPathString(currentConfig.modOrganizer.pathToMOFolder, GAME_DIR)}
             options={generateSelectOptions([DefaultCustomPathName.GAME_DIR])}
             isDisabled={!currentConfig.modOrganizer.isUsed}
@@ -431,9 +425,8 @@ export const DeveloperScreen: React.FC = () => {
           <PathSelector
             className={styles['developer-screen__item']}
             id="pathToMods"
-            label="Путь до папки модов Mod Organizer"
+            label="Путь до папки модов MO"
             parent="modOrganizer"
-            // value={clearPathVaribaleFromPathString(currentConfig.modOrganizer.pathToMods)}
             value={clearRootDirFromPathString(currentConfig.modOrganizer.pathToMods, GAME_DIR)}
             options={generateSelectOptions([DefaultCustomPathName.GAME_DIR])}
             isDisabled={!currentConfig.modOrganizer.isUsed}
@@ -443,9 +436,8 @@ export const DeveloperScreen: React.FC = () => {
           <PathSelector
             className={styles['developer-screen__item']}
             id="pathToProfiles"
-            label="Путь до папки профилей Mod Organizer"
+            label="Путь до папки профилей MO"
             parent="modOrganizer"
-            // value={clearPathVaribaleFromPathString(currentConfig.modOrganizer.pathToProfiles)}
             value={clearRootDirFromPathString(currentConfig.modOrganizer.pathToProfiles, GAME_DIR)}
             options={generateSelectOptions([DefaultCustomPathName.GAME_DIR])}
             isDisabled={!currentConfig.modOrganizer.isUsed}
@@ -455,9 +447,8 @@ export const DeveloperScreen: React.FC = () => {
           <PathSelector
             className={styles['developer-screen__item']}
             id="pathToINI"
-            label="Путь до конфигурационного файла Mod Organizer"
+            label="Путь до конфигурационного файла MO"
             parent="modOrganizer"
-            // value={clearPathVaribaleFromPathString(currentConfig.modOrganizer.pathToINI)}
             value={clearRootDirFromPathString(currentConfig.modOrganizer.pathToINI, GAME_DIR)}
             options={generateSelectOptions([DefaultCustomPathName.GAME_DIR])}
             isDisabled={!currentConfig.modOrganizer.isUsed}
