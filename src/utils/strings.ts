@@ -253,8 +253,8 @@ export const getPathToFile = (
       pathVariables[CustomPathName.GAME_DIR],
       pathToFile.replace(CustomPathName.GAME_DIR, ''),
     );
-  } else if (CustomPathName.CUSTOM_PATH_REGEXP.test(pathToFile)) {
-    const customPathName = pathToFile.match(CustomPathName.CUSTOM_PATH_REGEXP)![0];
+  } else if (CustomPathName.PATH_VARIABLE_REGEXP.test(pathToFile)) {
+    const customPathName = pathToFile.match(CustomPathName.PATH_VARIABLE_REGEXP)![0];
 
     if (pathVariables[customPathName]) {
       newPath = path.join(pathVariables[customPathName], pathToFile.replace(customPathName, ''));

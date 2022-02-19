@@ -58,8 +58,8 @@ export const CustomPathName = {
   DOCUMENTS_REGEXP: new RegExp('%DOCUMENTS%'),
   DOCS_GAME_REGEXP: new RegExp('%DOCS_GAME%'),
   GAME_DIR_REGEXP: new RegExp('%GAME_DIR%'),
-  CUSTOM_PATH_NAME_REGEXP: /^%[A-Z_]+%$/,
-  CUSTOM_PATH_REGEXP: /^%[A-Z_]+%/,
+  PATH_VARIABLE_NAME_REGEXP: /^%[A-Z_]+%$/,
+  PATH_VARIABLE_REGEXP: /^%[A-Z_]+%/,
   CORRECT_PATH_REGEXP: /^[^.]/,
 };
 
