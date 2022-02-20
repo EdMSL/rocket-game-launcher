@@ -43,30 +43,13 @@ export const defaultLauncherCustomButton: ILauncherCustomButton = {
   args: [],
 };
 
-// export const minimalLauncherConfig: ILauncherConfig = {
-//   isResizable: false,
-//   width: defaultLauncherResolution.width,
-//   height: defaultLauncherResolution.height,
-//   modOrganizer: {
-//     isUsed: false,
-//   },
-//   documentsPath: '',
-//   isFirstLaunch: true,
-//   pathVariables: {},
-//   playButton: {
-//     path: '',
-//     label: 'Играть',
-//   },
-//   customButtons: [],
-// };
-
 export const defaultModOrganizerParams: IModOrganizerParams = {
   isUsed: false,
   version: 2,
-  pathToMOFolder: 'Mod Organizer',
-  pathToINI: 'Mod Organizer\\ModOrganizer.ini',
-  pathToProfiles: 'Mod Organizer\\profiles',
-  pathToMods: 'Mod Organizer\\mods',
+  pathToMOFolder: '%GAME_DIR%\\Mod Organizer',
+  pathToINI: '%MO_DIR%\\ModOrganizer.ini',
+  pathToProfiles: '%MO_DIR%\\profiles',
+  pathToMods: '%MO_DIR%\\mods',
   profileSection: 'General',
   profileParam: 'selected_profile',
   profileParamValueRegExp: '',

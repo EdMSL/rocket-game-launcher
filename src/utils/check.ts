@@ -6,8 +6,8 @@ import {
   GameSettingParameterControllerType,
   GameSettingsFileView,
   GameSettingsOptionType,
-  CustomPathName,
-  DefaultCustomPathName,
+  PathRegExp,
+  PathVariableName,
   LauncherButtonAction,
 } from '$constants/misc';
 import {
@@ -47,31 +47,32 @@ const configFileDataSchema = Joi.object({
   width: Joi.number().optional().default(defaultLauncherConfig.width),
   height: Joi.number().optional().default(defaultLauncherConfig.height),
   modOrganizer: Joi.object({
-    isUsed: Joi.bool().optional(),
+    isUsed: Joi.bool().optional().default(false),
     version: Joi.number().valid(1, 2).when(Joi.ref('isUsed'), { is: true, then: Joi.required() }),
-    pathToMOFolder: Joi.string().optional().pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
-    pathToINI: Joi.string().optional().pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
-    pathToProfiles: Joi.string().optional().pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
-    pathToMods: Joi.string().optional().pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
+    pathToMOFolder: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToMOFolder).pattern(PathRegExp.GAME_DIR_REGEXP, 'correct path'),
+    pathToINI: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToINI).pattern(PathRegExp.MO_DIR_REGEXP, 'correct path'),
+    pathToProfiles: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToProfiles).pattern(PathRegExp.MO_DIR_REGEXP, 'correct path'),
+    pathToMods: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToMods).pattern(PathRegExp.MO_DIR_REGEXP, 'correct path'),
     profileSection: Joi.string().optional(),
     profileParam: Joi.string().optional(),
     profileParamValueRegExp: Joi.string().optional().allow(''),
-  }).default(defaultLauncherConfig.modOrganizer),
+  }).optional().default(defaultLauncherConfig.modOrganizer),
   documentsPath: Joi.string().optional().allow('').default(defaultLauncherConfig.documentsPath)
-    .pattern(CustomPathName.CORRECT_PATH_REGEXP, 'correct path'),
+    .pattern(PathRegExp.DOCUMENTS_REGEXP, 'correct path'),
   isFirstLaunch: Joi.bool().optional().default(defaultLauncherConfig.isFirstLaunch),
-  gameName: Joi.string().optional().allow(''),
+  gameName: Joi.string().optional().allow('').default(defaultLauncherConfig.gameName),
   playButton: Joi.object({
-    path: Joi.string().optional().allow('').default(''),
-    args: Joi.array().items(Joi.string()).optional().default([]),
-    label: Joi.string().optional().allow('').default('Играть'),
-  }).optional().default(defaultLauncherConfig.playButton),
+    path: Joi.string().optional().allow('').default(defaultLauncherConfig.playButton.path)
+      .pattern(PathRegExp.GAME_DIR_REGEXP, 'correct path'),
+    args: Joi.array().items(Joi.string()).optional().default(defaultLauncherConfig.playButton.args),
+    label: Joi.string().optional().allow('').default(defaultLauncherConfig.playButton.label),
+  }).required(),
   customButtons: Joi.array()
     .items(Joi.object({
       id: Joi.string().optional().default(() => getRandomId('custom-btn')),
       path: Joi.string().required(),
       args: Joi.array().items(Joi.string()).optional().default([]),
-      label: Joi.string().required(),
+      label: Joi.string().optional().default('Запуск'),
       action: Joi.string().optional().valid(...Object.values(LauncherButtonAction)).default(LauncherButtonAction.RUN),
     })).optional().default([]),
 });

@@ -4,8 +4,8 @@ import fs from 'fs';
 import path from 'path';
 
 import {
-  CustomPathName,
-  DefaultCustomPathName,
+  PathRegExp,
+  PathVariableName,
   GameSettingsFileView,
   LauncherButtonAction,
 } from '$constants/misc';
@@ -18,11 +18,11 @@ import {
 import { CreateUserMessage } from './message';
 import {
   checkIsPathIsNotOutsideValidFolder,
-  clearPathVaribaleFromPathString,
   getLineIniParameterValue,
   getParameterRegExp,
   getPathToFile,
   replacePathVariableByRootDir,
+  replaceRootDirByPathVariable,
 } from './strings';
 import {
   IGameSettingsItemParameter,
@@ -38,14 +38,14 @@ import {
 import { ISelectOption } from '$components/UI/Select';
 import { IIncorrectGameSettingsFiles } from '$sagas/gameSettings';
 import {
-  DefaultCustomPath,
+  DefaultPathVariable,
   GAME_DIR,
   IPathVariables,
 } from '$constants/paths';
 import {
   ILauncherAppButton,
+  ILauncherConfig,
   ILauncherCustomButton,
-  IMainRootState,
   IModOrganizerParams,
   IUserMessage,
 } from '$types/main';
@@ -488,8 +488,8 @@ export const changeSectionalIniParameter = (
 export const getApplicationArgs = (args: string[]): string[] => args.map((arg) => {
   let newArg = arg;
 
-  if (CustomPathName.GAME_DIR_REGEXP.test(arg)) {
-    newArg = getPathToFile(arg, { ...DefaultCustomPath }, '');
+  if (PathRegExp.GAME_DIR_REGEXP.test(arg)) {
+    newArg = getPathToFile(arg, DefaultPathVariable, '');
   }
 
   if (/^-.+$/.test(newArg)) {
@@ -549,24 +549,51 @@ export const getNewModOrganizerParams = (data: IModOrganizerParams): IModOrganiz
  * @param app Объект Electron.app.
  * @returns Объект с пользовательскими путями.
 */
-export const createCustomPaths = (
-  configData: IMainRootState['config'],
+export const createPathVariables = (
+  configData: ILauncherConfig,
   app: Electron.App,
-): IPathVariables => ({
-  ...DefaultCustomPath,
-  '%DOCUMENTS%': app.getPath('documents'),
-  ...configData.documentsPath ? {
-    '%DOCS_GAME%': path.join(app.getPath('documents'), clearPathVaribaleFromPathString(configData.documentsPath)),
-  } : {},
-  ...configData.modOrganizer.isUsed ? {
-    '%MO_DIR%': path.join(GAME_DIR, clearPathVaribaleFromPathString(configData.modOrganizer.pathToMOFolder)),
-    '%MO_MODS%': path.join(GAME_DIR, clearPathVaribaleFromPathString(configData.modOrganizer.pathToMods)),
-    '%MO_PROFILE%': path.join(GAME_DIR, clearPathVaribaleFromPathString(configData.modOrganizer.pathToProfiles)),
-  } : {},
-  // custom: {
-  //   ...newCustomPaths,
-  // },
-});
+): IPathVariables => {
+  let pathVariables: IPathVariables = {
+    ...DefaultPathVariable,
+    '%DOCUMENTS%': app.getPath('documents'),
+  };
+
+  if (configData.documentsPath) {
+    pathVariables = {
+      ...pathVariables,
+      '%DOCS_GAME%': configData.documentsPath.replace(
+        PathVariableName.DOCUMENTS,
+        pathVariables['%DOCUMENTS%'],
+      ),
+    };
+  }
+
+  if (configData.modOrganizer.isUsed) {
+    const MO_DIR_BASE = configData.modOrganizer.pathToMOFolder.replace(
+      PathVariableName.GAME_DIR,
+      pathVariables['%GAME_DIR%'],
+    );
+
+    pathVariables = {
+      ...pathVariables,
+      '%MO_DIR%': MO_DIR_BASE,
+      '%MO_INI%': configData.modOrganizer.pathToINI.replace(
+        PathVariableName.MO_DIR,
+        MO_DIR_BASE,
+      ),
+      '%MO_MODS%': configData.modOrganizer.pathToMods.replace(
+        PathVariableName.MO_DIR,
+        MO_DIR_BASE,
+      ),
+      '%MO_PROFILE%': configData.modOrganizer.pathToProfiles.replace(
+        PathVariableName.MO_DIR,
+        MO_DIR_BASE,
+      ),
+    };
+  }
+
+  return pathVariables;
+};
 
 /**
  * Получить данные для генерации пользовательских кнопок.
@@ -582,20 +609,18 @@ export const getCustomButtons = (
   //@ts-ignore
 ): ILauncherCustomButton[] => buttonsData.map<ILauncherCustomButton|undefined>((btn) => {
   try {
-    let pathTo = replacePathVariableByRootDir(
+    const pathTo = replacePathVariableByRootDir(
       btn.path,
-      DefaultCustomPathName.GAME_DIR,
-      GAME_DIR,
     );
 
-    pathTo = checkIsPathIsNotOutsideValidFolder(pathTo, pathVariables);
+    checkIsPathIsNotOutsideValidFolder(pathTo, pathVariables);
 
     return {
       ...btn,
       action: fs.statSync(pathTo).isDirectory()
         ? LauncherButtonAction.OPEN
         : LauncherButtonAction.RUN,
-      path: pathTo,
+      path: btn.path,
     };
   } catch (error: any) {
     const err = getReadWriteError(error);

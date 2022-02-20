@@ -41,23 +41,24 @@ export const RangeButtonName = {
   INCREASE: 'increase',
 };
 
-export const DefaultCustomPathName = {
+export const PathVariableName = {
   GAME_DIR: '%GAME_DIR%',
   DOCUMENTS: '%DOCUMENTS%',
   DOCS_GAME: '%DOCS_GAME%',
   MO_DIR: '%MO_DIR%',
+  MO_INI: '%MO_INI%',
   MO_MODS: '%MO_MODS%',
   MO_PROFILE: '%MO_PROFILE%',
 };
 
-export const CustomPathName = {
-  ...DefaultCustomPathName,
-  MO_DIR_REGEXP: new RegExp('%MO_DIR%'),
-  MO_MODS_REGEXP: new RegExp('%MO_MODS%'),
-  MO_PROFILE_REGEXP: new RegExp('%MO_PROFILE%'),
-  DOCUMENTS_REGEXP: new RegExp('%DOCUMENTS%'),
-  DOCS_GAME_REGEXP: new RegExp('%DOCS_GAME%'),
-  GAME_DIR_REGEXP: new RegExp('%GAME_DIR%'),
+export const PathRegExp = {
+  GAME_DIR_REGEXP: new RegExp('^%GAME_DIR%'),
+  DOCUMENTS_REGEXP: new RegExp('^%DOCUMENTS%'),
+  DOCS_GAME_REGEXP: new RegExp('^%DOCS_GAME%'),
+  MO_DIR_REGEXP: new RegExp('^%MO_DIR%'),
+  MO_INI_REGEXP: new RegExp('^%MO_INI%'),
+  MO_MODS_REGEXP: new RegExp('^%MO_MODS%'),
+  MO_PROFILE_REGEXP: new RegExp('^%MO_PROFILE%'),
   PATH_VARIABLE_NAME_REGEXP: /^%[A-Z_]+%$/,
   PATH_VARIABLE_REGEXP: /^%[A-Z_]+%/,
   CORRECT_PATH_REGEXP: /^[^.]/,

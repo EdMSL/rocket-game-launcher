@@ -30,11 +30,9 @@ import {
   showMessageBox,
 } from '$utils/errors';
 import { checkConfigFileData } from '$utils/check';
+import { getObjectAsList } from '$utils/strings';
 import {
-  checkIsPathIsNotOutsideValidFolder, getObjectAsList, getPathToFile, replacePathVariableByRootDir,
-} from '$utils/strings';
-import {
-  createCustomPaths,
+  createPathVariables,
   getCustomButtons,
   getNewModOrganizerParams,
   getUserThemes,
@@ -44,7 +42,7 @@ import { INITIAL_STATE as mainInitialState } from '$reducers/main';
 import { INITIAL_STATE as userSettingsInitialState } from '$reducers/userSettings';
 import { ILauncherConfig, IUserMessage } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
-import { DefaultCustomPathName, Scope } from '$constants/misc';
+import { Scope } from '$constants/misc';
 
 interface IStorage {
   userSettings: IUserSettingsRootState,
@@ -142,40 +140,16 @@ export const createStorage = (): Store<IAppState> => {
   }
 
   // Переменные путей и настройка кнопок
-  const pathVariables = createCustomPaths(
+  const pathVariables = createPathVariables(
     configurationData,
     app,
   );
 
-  if (configurationData.playButton?.path) {
-    let pathStr = replacePathVariableByRootDir(
-      configurationData.playButton.path,
-      DefaultCustomPathName.GAME_DIR,
-      GAME_DIR,
-    );
-    configurationData.playButton.path = replacePathVariableByRootDir(
-      configurationData.playButton.path,
-      DefaultCustomPathName.GAME_DIR,
-      GAME_DIR,
-    );
-
-    try {
-      pathStr = checkIsPathIsNotOutsideValidFolder(configurationData.playButton?.path, pathVariables);
-    } catch (error) {
-      pathStr = '';
-      messages.push(CreateUserMessage.warning('Указан недопустимый путь для файла запуска игры.')); //eslint-disable-line max-len
-    }
-
-    configurationData.playButton.path = pathStr;
-  } else {
+  if (!configurationData.playButton.path) {
     messages.push(CreateUserMessage.warning('Не указан путь для файла запуска игры.')); //eslint-disable-line max-len
   }
 
-  if (!configurationData.playButton?.label) {
-    configurationData.playButton.label = defaultLauncherConfig.playButton.label;
-  }
-
-  if (configurationData.customButtons && configurationData.customButtons.length > 0) {
+  if (configurationData.customButtons.length > 0) {
     const newButtons = getCustomButtons(configurationData.customButtons, pathVariables);
 
     if (configurationData.customButtons.length !== newButtons.length) {

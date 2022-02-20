@@ -56,7 +56,7 @@
       ]
     },
     "BlockheadIni": {
-      "path": "%CUSTOM%\\Blockhead.ini",
+      "path": "%GAME_DIR%\\Data\\Obse\\Plugins\\Blockhead.ini",
       "view": "sectional",
       "optionsList": [
         {
@@ -82,7 +82,7 @@
       ]
     },
     "MenuIni": {
-      "path": "Data\\Ini\\DMS\\Menu.ini",
+      "path": "%GAME_DIR%\\Data\\Ini\\DMS\\Menu.ini",
       "view": "line",
       "encoding": "utf-8",
       "optionsList": [
@@ -101,7 +101,7 @@
       ]
     },
     "OblivionReloaded": {
-      "path": "%CUSTOM%\\OblivionReloaded.dll.config",
+      "path": "%GAME_DIR%\\Data\\Obse\\Plugins\\OblivionReloaded.ini",
       "view": "tag",
       "optionsList": [
         {
@@ -119,7 +119,7 @@
       ]
     },
     "TQPIni": {
-      "path": "Data\\Ini\\TQP.ini",
+      "path": "%GAME_DIR%\\Data\\Ini\\TQP.ini",
       "view": "line",
       "optionsList": [
         {
@@ -151,7 +151,7 @@
       ]
     },
     "FormIDFinderIni": {
-      "path": "Data\\Ini\\formID Finder.ini",
+      "path": "%GAME_DIR%\\Data\\Ini\\formID Finder.ini",
       "view": "line",
       "optionsList": [
         {
