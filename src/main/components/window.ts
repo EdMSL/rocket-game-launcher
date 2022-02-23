@@ -66,6 +66,19 @@ export const createWindow = (config: IMainRootState['config']): void => {
     }
   });
 
+  ipcMain.on('resize window', (event, width, height) => {
+    if (mainWindow.isFullScreen()) {
+      mainWindow.unmaximize();
+    }
+
+    mainWindow.setMinimumSize(width, height);
+    mainWindow.setSize(width, height);
+  });
+
+  ipcMain.on('set resizable window', (event, isResizable) => {
+    mainWindow.setResizable(isResizable);
+  });
+
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
     mainWindow.webContents.send('max-unmax window', mainWindow.isMaximized());

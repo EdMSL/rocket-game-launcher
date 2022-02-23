@@ -90,7 +90,10 @@ export const ArgumentsBlock: React.FC<IProps> = ({
       <div className={styles['developer-screen__agrs-block']}>
         {
         args.map((currentArg, index) => (
-          <div className={styles['developer-screen__agrs-item']}>
+          <div
+            className={styles['developer-screen__agrs-item']}
+            key={`${parent}-${index}`} //eslint-disable-line react/no-array-index-key
+          >
             {
               PathRegExp.PATH_VARIABLE_REGEXP.test(currentArg)
                 ? (

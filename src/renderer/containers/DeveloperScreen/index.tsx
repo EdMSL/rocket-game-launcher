@@ -1,3 +1,4 @@
+import { ipcRenderer } from 'electron';
 import React, {
   useCallback,
   useState,
@@ -169,6 +170,17 @@ export const DeveloperScreen: React.FC = () => {
   ) => {
     const newConfig = { ...currentConfig, isFirstLaunch: false };
 
+    if (
+      launcherConfig.width !== +currentConfig.width
+      || launcherConfig.height !== +currentConfig.height
+    ) {
+      ipcRenderer.send('resize window', +currentConfig.width, +currentConfig.height);
+    }
+
+    if (launcherConfig.isResizable !== currentConfig.isResizable) {
+      ipcRenderer.send('set resizable window', currentConfig.isResizable);
+    }
+
     dispatch(saveLauncherConfig(
       newConfig,
       currentTarget.id === 'ok_btn',
@@ -177,7 +189,11 @@ export const DeveloperScreen: React.FC = () => {
     if (currentConfig.isFirstLaunch) {
       setCurrentConfig(newConfig);
     }
-  }, [dispatch, currentConfig]);
+  }, [dispatch,
+    currentConfig,
+    launcherConfig.width,
+    launcherConfig.height,
+    launcherConfig.isResizable]);
 
   const onResetBtnClick = useCallback((event) => {
     if (currentConfig.isFirstLaunch) {
