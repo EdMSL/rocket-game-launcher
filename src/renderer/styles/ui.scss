@@ -229,6 +229,8 @@ $checkbox-size: 20px;
   padding: 10px;
 
   color: var(--text-secondary);
+
+  font-size: var(--text-size-input);
   text-align: center;
 
   border-color: var(--border-color);
@@ -327,6 +329,8 @@ $checkbox-size: 20px;
 
 .number-field__input {
   padding: 10px;
+
+  font-size: var(--text-size-input);
 
   &:focus {
     @include focus;
@@ -433,7 +437,7 @@ $checkbox-size: 20px;
   background-color: var(--btn-color);
 
   &::before {
-    content: '...';
+    content: '. . .';
 
     position: absolute;
     bottom: 50%;
@@ -442,8 +446,8 @@ $checkbox-size: 20px;
     display: inline-block;
     width: 100%;
 
-    font-size: 14px;
-    line-height: 14px;
+    font-size: var(--text-size-input);
+    line-height: calc(var(--text-size-input) / 2);
     font-weight: 700;
     text-align: center;
   }

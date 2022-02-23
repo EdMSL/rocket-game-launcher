@@ -451,6 +451,8 @@ export const DeveloperScreen: React.FC = () => {
             value={currentConfig.modOrganizer.pathToINI}
             options={generateSelectOptions([PathVariableName.MO_DIR])}
             pathVariables={pathVariables}
+            isSelectFile
+            extensions={FileExtension.INI}
             isDisabled={!currentConfig.modOrganizer.isUsed}
             onChange={onPathSelectorChange}
           />

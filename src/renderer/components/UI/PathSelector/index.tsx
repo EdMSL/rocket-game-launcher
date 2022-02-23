@@ -170,7 +170,7 @@ export const PathSelector: React.FC<IProps> = ({
           onClick={onSelectPatchBtnClick}
           isDisabled={isDisabled}
         >
-          Выбрать папку
+          Выбрать путь
         </Button>
       </div>
     </div>
