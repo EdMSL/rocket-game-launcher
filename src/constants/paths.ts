@@ -32,12 +32,15 @@ export const DefaultPathVariable: IPathVariables = {
   '%MO_PROFILE%': '',
 };
 
-export interface IPathVariables {
-  '%GAME_DIR%': string,
-  '%DOCUMENTS%': string,
-  '%DOCS_GAME%': string,
+export interface IModOrganizerPathVariables {
   '%MO_INI%': string,
   '%MO_DIR%': string,
   '%MO_MODS%': string,
   '%MO_PROFILE%': string,
+}
+
+export interface IPathVariables extends IModOrganizerPathVariables{
+  '%GAME_DIR%': string,
+  '%DOCUMENTS%': string,
+  '%DOCS_GAME%': string,
 }

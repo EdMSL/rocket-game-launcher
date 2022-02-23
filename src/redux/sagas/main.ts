@@ -27,6 +27,7 @@ import {
   saveLauncherConfig,
   setLauncherConfig,
   setIsGameSettingsSaving,
+  setPathVariables,
 } from '$actions/main';
 import {
   generateGameSettingsOptionsSaga,
@@ -54,7 +55,7 @@ import {
 import { getPathToFile } from '$utils/strings';
 import { IUnwrap } from '$types/common';
 import { setGameSettingsOptions } from '$actions/gameSettings';
-import { getGameSettingsOptionsWithDefaultValues } from '$utils/data';
+import { getGameSettingsOptionsWithDefaultValues, updatePathVariables } from '$utils/data';
 import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
 import { writeJSONFile } from '$utils/files';
 
@@ -115,6 +116,12 @@ function* saveLauncherConfigSaga(
 
     yield call(writeJSONFile, CONFIG_FILE_PATH, configForSave);
     yield put(setLauncherConfig(newConfig));
+
+    const {
+      main: { pathVariables },
+    }: ReturnType<typeof getState> = yield select(getState);
+
+    yield put(setPathVariables(updatePathVariables(pathVariables, newConfig)));
 
     if (isGoToMainScreen) {
       yield put(push(`${Routes.MAIN_SCREEN}`));
@@ -457,7 +464,7 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
   if (GAME_SETTINGS_PATH_REGEXP.test(location.pathname)) {
     if (isLauncherInitialised) {
       if (!isGameSettingsLoaded) {
-        yield call(initGameSettingsSaga);
+        yield call(initGameSettingsSaga, false);
       } else {
         const {
           gameSettings: { gameSettingsOptions },

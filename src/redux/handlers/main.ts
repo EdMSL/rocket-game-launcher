@@ -14,6 +14,16 @@ const setLauncherConfig: IMainActionHadler<
   config: newConfig,
 });
 
+const setPathVariables: IMainActionHadler<
+  typeof MAIN_ACTIONS.setPathVariables
+> = (
+  state,
+  { payload: newPathVariables },
+) => ({
+  ...state,
+  pathVariables: newPathVariables,
+});
+
 const setIsFirstLaunch: IMainActionHadler<
   typeof MAIN_ACTIONS.setIsFirstLaunch
 > = (
@@ -142,6 +152,7 @@ const deleteMessages: IMainActionHadler<
 
 export const MAIN_HANDLERS = {
   [MAIN_TYPES.SET_LAUNCHER_CONFIG]: setLauncherConfig,
+  [MAIN_TYPES.SET_PATH_VARIABLES]: setPathVariables,
   [MAIN_TYPES.SET_IS_FIRST_LAUNCH]: setIsFirstLaunch,
   [MAIN_TYPES.SET_IS_GAME_RUNNING]: setIsGameRunning,
   [MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED]: setIsLauncherInitialised,

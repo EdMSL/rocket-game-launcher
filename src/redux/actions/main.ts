@@ -11,6 +11,13 @@ export const setLauncherConfig = (
   payload: newConfig,
 });
 
+export const setPathVariables = (
+  newPathVariables: IMainRootState['pathVariables'],
+) => ({
+  type: MAIN_TYPES.SET_PATH_VARIABLES,
+  payload: newPathVariables,
+});
+
 export const setIsFirstLaunch = (
   isFirstLaunch: IMainRootState['config']['isFirstLaunch'],
 ) => ({

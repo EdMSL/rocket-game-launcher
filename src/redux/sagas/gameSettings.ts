@@ -538,7 +538,9 @@ export function* initGameSettingsSaga(
     yield put(setGameSettingsOptions({}));
     yield put(setGameSettingsFiles({}));
 
-    throw new SagaError('Init game settings', errorMessage);
+    if (isFromUpdateAction) {
+      throw new SagaError('Init game settings', errorMessage);
+    }
   } finally {
     yield take(GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_FILES);
     yield put(setIsGameSettingsLoaded(true));

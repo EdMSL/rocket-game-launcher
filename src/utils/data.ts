@@ -37,6 +37,8 @@ import { ISelectOption } from '$components/UI/Select';
 import { IIncorrectGameSettingsFiles } from '$sagas/gameSettings';
 import {
   DefaultPathVariable,
+  GAME_DIR,
+  IModOrganizerPathVariables,
   IPathVariables,
 } from '$constants/paths';
 import {
@@ -540,11 +542,36 @@ export const getNewModOrganizerParams = (data: IModOrganizerParams): IModOrganiz
   };
 };
 
+const updateModOrganizerPathVariables = (
+  configData: ILauncherConfig,
+): IModOrganizerPathVariables => {
+  const MO_DIR_BASE = configData.modOrganizer.pathToMOFolder.replace(
+    PathVariableName.GAME_DIR,
+    GAME_DIR,
+  );
+
+  return {
+    '%MO_DIR%': MO_DIR_BASE,
+    '%MO_INI%': configData.modOrganizer.pathToINI.replace(
+      PathVariableName.MO_DIR,
+      MO_DIR_BASE,
+    ),
+    '%MO_MODS%': configData.modOrganizer.pathToMods.replace(
+      PathVariableName.MO_DIR,
+      MO_DIR_BASE,
+    ),
+    '%MO_PROFILE%': configData.modOrganizer.pathToProfiles.replace(
+      PathVariableName.MO_DIR,
+      MO_DIR_BASE,
+    ),
+  };
+};
+
 /**
  * Генерация переменных путей.
  * @param configData Данные из файла config.json.
  * @param app Объект Electron.app.
- * @returns Объект с пользовательскими путями.
+ * @returns Объект с переменными путей.
 */
 export const createPathVariables = (
   configData: ILauncherConfig,
@@ -566,31 +593,32 @@ export const createPathVariables = (
   }
 
   if (configData.modOrganizer.isUsed) {
-    const MO_DIR_BASE = configData.modOrganizer.pathToMOFolder.replace(
-      PathVariableName.GAME_DIR,
-      pathVariables['%GAME_DIR%'],
-    );
-
     pathVariables = {
       ...pathVariables,
-      '%MO_DIR%': MO_DIR_BASE,
-      '%MO_INI%': configData.modOrganizer.pathToINI.replace(
-        PathVariableName.MO_DIR,
-        MO_DIR_BASE,
-      ),
-      '%MO_MODS%': configData.modOrganizer.pathToMods.replace(
-        PathVariableName.MO_DIR,
-        MO_DIR_BASE,
-      ),
-      '%MO_PROFILE%': configData.modOrganizer.pathToProfiles.replace(
-        PathVariableName.MO_DIR,
-        MO_DIR_BASE,
-      ),
+      ...updateModOrganizerPathVariables(configData),
     };
   }
 
   return pathVariables;
 };
+
+/**
+ * Обновить переменные путей.
+ * @param pathVariables Текущие переменные путей.
+ * @param launcherConfig Данные о конфигурации из state.
+ * @returns Объект с переменными путей.
+*/
+export const updatePathVariables = (
+  pathVariables: IPathVariables,
+  launcherConfig: ILauncherConfig,
+): IPathVariables => ({
+  ...pathVariables,
+  '%DOCS_GAME%': launcherConfig.documentsPath.replace(
+    PathVariableName.DOCUMENTS,
+    pathVariables['%DOCUMENTS%'],
+  ),
+  ...launcherConfig.modOrganizer.isUsed ? updateModOrganizerPathVariables(launcherConfig) : {},
+});
 
 /**
  * Получить данные для генерации пользовательских кнопок.
