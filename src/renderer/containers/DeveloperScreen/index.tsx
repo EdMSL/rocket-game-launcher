@@ -196,6 +196,8 @@ export const DeveloperScreen: React.FC = () => {
     if (currentConfig.isFirstLaunch) {
       setCurrentConfig(newConfig);
     }
+
+    setIsConfigChanged(false);
   }, [dispatch,
     currentConfig,
     launcherConfig.width,
