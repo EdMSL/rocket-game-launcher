@@ -5,7 +5,7 @@ import { IUIElementProps } from '$types/gameSettings';
 import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {
-
+  value: string,
 }
 
 export const TextField: React.FunctionComponent<IProps> = ({

@@ -7,6 +7,7 @@ import { PathSelector } from '$components/UI/PathSelector';
 import { IPathVariables } from '$constants/paths';
 import { generateSelectOptions } from '$utils/data';
 import { Button } from '$components/UI/Button';
+import { TextField } from '$components/UI/TextField';
 
 interface IProps {
   args: string[],
@@ -107,9 +108,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
                   />
                   )
                 : (
-                  <input
-                    className={classNames('text-field__input')}
-                    type="text"
+                  <TextField
                     id={`${parent}-arg-${index}`}
                     value={currentArg}
                     onChange={onArgumentTextFieldChange}

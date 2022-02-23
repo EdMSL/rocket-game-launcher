@@ -477,3 +477,11 @@ export const checkGameSettingsFiles = (
     isError: validationErrors.length > 0,
   };
 };
+
+/**
+  Сравнение двух объектов на равенство полей с помощью JSON.stringify.
+  @param a Первый объект.
+  @param b Второй объект.
+  @returns Равны ли объекты.
+*/
+export const checkObjectForEqual = (a: object, b: object): boolean => JSON.stringify(a) === JSON.stringify(b);

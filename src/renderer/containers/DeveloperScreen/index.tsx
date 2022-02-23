@@ -39,6 +39,7 @@ import {
 import { Loader } from '$components/UI/Loader';
 import { generateSelectOptions } from '$utils/data';
 import { ArgumentsBlock } from '$components/ArgumentsBlock';
+import { checkObjectForEqual } from '$utils/check';
 
 export const DeveloperScreen: React.FC = () => {
   const pathVariables = useAppSelector((state) => state.main.pathVariables);
@@ -48,6 +49,7 @@ export const DeveloperScreen: React.FC = () => {
   const dispatch = useDispatch();
 
   const [currentConfig, setCurrentConfig] = useState<IMainRootState['config']>(launcherConfig);
+  const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
 
   useEffect(() => {
     if (launcherConfig.isFirstLaunch) {
@@ -56,21 +58,26 @@ export const DeveloperScreen: React.FC = () => {
   }, [dispatch, launcherConfig.isFirstLaunch, currentConfig]);
 
   const changeCurrentConfig = useCallback((fieldName, value, parent?) => {
+    let newConfig: ILauncherConfig;
+
     if (parent) {
-      setCurrentConfig({
+      newConfig = {
         ...currentConfig,
         [parent]: {
           ...currentConfig[parent],
           [fieldName]: value,
         },
-      });
+      };
     } else {
-      setCurrentConfig({
+      newConfig = {
         ...currentConfig,
         [fieldName]: value,
-      });
+      };
     }
-  }, [currentConfig]);
+
+    setCurrentConfig(newConfig);
+    setIsConfigChanged(!checkObjectForEqual(launcherConfig, newConfig));
+  }, [launcherConfig, currentConfig]);
 
   const sendIncorrectPathErrorMessage = useCallback(() => {
     dispatch(addMessages([CreateUserMessage.error('Выбран некорректный путь до папки. Подробности в файле лога.')])); //eslint-disable-line max-len
@@ -196,6 +203,8 @@ export const DeveloperScreen: React.FC = () => {
     launcherConfig.isResizable]);
 
   const onResetBtnClick = useCallback((event) => {
+    setIsConfigChanged(false);
+
     if (currentConfig.isFirstLaunch) {
       event.preventDefault();
     } else {
@@ -214,6 +223,7 @@ export const DeveloperScreen: React.FC = () => {
             'main-btn',
             'control-panel__btn',
           )}
+          isDisabled={!isConfigChanged}
         >
           ОК
         </Button>
@@ -239,6 +249,7 @@ export const DeveloperScreen: React.FC = () => {
             'main-btn',
             'control-panel__btn',
           )}
+          isDisabled={!isConfigChanged}
         >
           Сохранить
         </Button>
@@ -248,6 +259,7 @@ export const DeveloperScreen: React.FC = () => {
             'main-btn',
             'control-panel__btn',
           )}
+          isDisabled={!isConfigChanged}
         >
           Сбросить
         </Button>
