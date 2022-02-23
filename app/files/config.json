@@ -9,27 +9,25 @@
   "modOrganizer": {
     "isUsed": true,
     "version": 2,
-    "pathToMOFolder": "Mod Organizer",
-    "pathToINI": "Mod Organizer\\ModOrganizer.ini",
-    "pathToProfiles": "Mod Organizer\\profiles",
-    "pathToMods": "Mod Organizer\\logs",
+    "pathToMOFolder": "%GAME_DIR%\\loot",
+    "pathToINI": "%MO_DIR%\\ModOrganizer.ini",
+    "pathToProfiles": "%MO_DIR%\\profiles",
+    "pathToMods": "%MO_DIR%\\logs",
     "profileSection": "General",
     "profileParam": "selected_profile",
     "profileParamValueRegExp": ""
   },
-  "documentsPath": "My Games\\Oblivion_GBR-bac\\__MO_Saves",
+  "documentsPath": "%DOCUMENTS%\\My Games\\Oblivion_GBR-bac\\__MO_Saves",
   "isFirstLaunch": false,
   "gameName": "Oblivion Association",
   "playButton": {
     "path": "%GAME_DIR%\\Oblivion.exe",
-    "args": [
-      "%GAME_DIR%\\obse_loader.exe"
-    ],
+    "args": [],
     "label": "Играть"
   },
   "customButtons": [
     {
-      "path": "D:\\Oblivion\\Data",
+      "path": "%GAME_DIR%\\Data",
       "action": "open",
       "label": "Запуск",
       "args": []
