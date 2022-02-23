@@ -21,6 +21,7 @@
       "optionsList": [
         {
           "name": "Any name",
+          "optionType": "default",
           "iniGroup": "Display",
           "settingGroup": "Graphic",
           "controllerType": "range",
@@ -31,6 +32,7 @@
         },
         {
           "name": "Any new name",
+          "optionType": "default",
           "iniGroup": "Display",
           "settingGroup": "Control",
           "controllerType": "checkbox"
@@ -61,6 +63,7 @@
       "optionsList": [
         {
           "name": "New name",
+          "optionType": "default",
           "settingGroup": "Control",
           "controllerType": "checkbox",
           "label": "New label"
@@ -73,8 +76,9 @@
       "optionsList": [
         {
           "name": "AnisotropicFilter",
-          "attributeName": "Value",
-          "attributePath": "_Main/Main/Misc",
+          "optionType": "default",
+          "valueName": "Value",
+          "valuePath": "_Main/Main/Misc",
           "settingGroup": "Audio",
           "controllerType": "checkbox",
           "label": "Фильтрация"
