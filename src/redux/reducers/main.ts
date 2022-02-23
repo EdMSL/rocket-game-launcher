@@ -23,6 +23,7 @@ export const INITIAL_STATE: IMainRootState = {
   },
   pathVariables: DefaultPathVariable,
   isLauncherInitialised: false,
+  isLauncherConfigChanged: false,
   isGameRunning: false,
   isGameSettingsLoaded: false,
   isGameSettingsAvailable: false,

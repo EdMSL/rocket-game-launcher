@@ -28,6 +28,7 @@ import {
   setLauncherConfig,
   setIsGameSettingsSaving,
   setPathVariables,
+  setIsLauncherConfigChanged,
 } from '$actions/main';
 import {
   generateGameSettingsOptionsSaga,
@@ -116,6 +117,7 @@ function* saveLauncherConfigSaga(
 
     yield call(writeJSONFile, CONFIG_FILE_PATH, configForSave);
     yield put(setLauncherConfig(newConfig));
+    yield put(setIsLauncherConfigChanged(true));
 
     const {
       main: { pathVariables },
@@ -450,8 +452,12 @@ function* restoreGameSettingsFilesBackupSaga({
 
 function* locationChangeSaga({ payload: { location } }: LocationChangeAction): SagaIterator {
   const {
-    main: { isLauncherInitialised, isGameSettingsLoaded },
-    main: { config: { isFirstLaunch } },
+    main: {
+      isLauncherInitialised,
+      isGameSettingsLoaded,
+      isLauncherConfigChanged,
+      config: { isFirstLaunch },
+    },
   }: ReturnType<typeof getState> = yield select(getState);
   if (!isLauncherInitialised && location.pathname === `${Routes.MAIN_SCREEN}`) {
     if (isFirstLaunch) {
@@ -463,7 +469,7 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
 
   if (GAME_SETTINGS_PATH_REGEXP.test(location.pathname)) {
     if (isLauncherInitialised) {
-      if (!isGameSettingsLoaded) {
+      if (!isGameSettingsLoaded || isLauncherConfigChanged) {
         yield call(initGameSettingsSaga, false);
       } else {
         const {

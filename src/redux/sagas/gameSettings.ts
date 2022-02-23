@@ -28,6 +28,7 @@ import {
   setIsGameSettingsAvailable,
   setIsGameSettingsLoaded,
   setIsGameSettingsSaving,
+  setIsLauncherConfigChanged,
 } from '$actions/main';
 import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import { checkGameSettingsFiles, checkGameSettingsConfigMainFields } from '$utils/check';
@@ -457,6 +458,7 @@ export function* initGameSettingsSaga(
             isUsed: isMOUsed,
           },
         },
+        isLauncherConfigChanged,
       },
     }: ReturnType<typeof getState> = yield select(getState);
 
@@ -511,6 +513,10 @@ export function* initGameSettingsSaga(
 
     yield put(setGameSettingsOptions(totalGameSettingsOptions));
     yield put(setGameSettingsFiles(newGameSettingsFilesObj));
+
+    if (isLauncherConfigChanged) {
+      yield put(setIsLauncherConfigChanged(false));
+    }
 
     writeToLogFileSync('Game settings initialisation completed.');
   } catch (error: any) {

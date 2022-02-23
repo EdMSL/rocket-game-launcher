@@ -25,6 +25,13 @@ export const setIsFirstLaunch = (
   payload: isFirstLaunch,
 });
 
+export const setIsLauncherConfigChanged = (
+  isLauncherConfigChanged: IMainRootState['isLauncherConfigChanged'],
+) => ({
+  type: MAIN_TYPES.SET_IS_LAUNCHER_CONFIG_CHANGED,
+  payload: isLauncherConfigChanged,
+});
+
 export const saveLauncherConfig = (
   newConfig: IMainRootState['config'],
   isGoToMainScreen = false,
