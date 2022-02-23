@@ -24,7 +24,6 @@ import {
   renameGameSettingsFilesBackup,
   setIsGameSettingsLoaded,
   setIsGameSettingsAvailable,
-  setIsFirstLaunch,
   saveLauncherConfig,
   setLauncherConfig,
   setIsGameSettingsSaving,
@@ -34,7 +33,9 @@ import {
   initGameSettingsSaga,
   getInitialGameSettingsConfigSaga,
 } from '$sagas/gameSettings';
-import { GAME_SETTINGS_FILE_PATH, CONFIG_FILE_PATH } from '$constants/paths';
+import {
+  GAME_SETTINGS_FILE_PATH, CONFIG_FILE_PATH,
+} from '$constants/paths';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';
@@ -50,13 +51,12 @@ import {
   renameGameSettingsFilesBackups,
   restoreBackupFiles,
 } from '$utils/backup';
-import { getPathToFile, replaceRootDirByPathVariable } from '$utils/strings';
+import { getPathToFile } from '$utils/strings';
 import { IUnwrap } from '$types/common';
 import { setGameSettingsOptions } from '$actions/gameSettings';
 import { getGameSettingsOptionsWithDefaultValues } from '$utils/data';
 import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
 import { writeJSONFile } from '$utils/files';
-import { DefaultCustomPathName } from '$constants/misc';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -100,9 +100,7 @@ function* saveLauncherConfigSaga(
   yield put(setIsGameSettingsSaving(true));
 
   try {
-    const {
-      main: { pathVariables },
-    }: ReturnType<typeof getState> = yield select(getState);
+    // Здесь мы оставляем только нужные поля, отсекая id, который используется в компоненте.
     const customBtnsForSave = newConfig.customButtons.map((btn) => ({
       path: btn.path,
       action: btn.action,
@@ -112,14 +110,6 @@ function* saveLauncherConfigSaga(
 
     const configForSave = {
       ...newConfig,
-      playButton: {
-        ...newConfig.playButton,
-        path: replaceRootDirByPathVariable(
-          newConfig.playButton.path,
-          DefaultCustomPathName.GAME_DIR,
-          pathVariables['%GAME_DIR%'],
-        ),
-      },
       customButtons: customBtnsForSave,
     };
 

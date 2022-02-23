@@ -29,7 +29,7 @@ import {
   setIsGameSettingsLoaded,
   setIsGameSettingsSaving,
 } from '$actions/main';
-import { GAME_DIR, GAME_SETTINGS_FILE_PATH } from '$constants/paths';
+import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import { checkGameSettingsFiles, checkGameSettingsConfigMainFields } from '$utils/check';
 import {
   GAME_SETTINGS_TYPES,
@@ -68,7 +68,7 @@ import {
 } from '$utils/data';
 import { IUserMessage } from '$types/main';
 import {
-  CustomPathName,
+  PathRegExp,
   Encoding,
   GameSettingsOptionType,
   GameSettingsFileView,
@@ -138,21 +138,13 @@ export function* getInitialGameSettingsConfigSaga(
 */
 function* getMOProfilesSaga(): SagaIterator {
   const {
-    main: {
-      config: {
-        modOrganizer: {
-          pathToProfiles,
-        },
-      },
-    },
+    main: { pathVariables },
   }: ReturnType<typeof getState> = yield select(getState);
-
-  const profilesPath = path.resolve(GAME_DIR, pathToProfiles);
 
   try {
     const profiles: IUnwrap<typeof readDirectory> = yield call(
       readDirectory,
-      profilesPath,
+      pathVariables['%MO_PROFILE%'],
     );
 
     if (profiles.length > 0) {
@@ -166,7 +158,7 @@ function* getMOProfilesSaga(): SagaIterator {
     if (error instanceof CustomError) {
       errorMessage = error.message;
     } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${profilesPath}'.`;
+      errorMessage = `${error.message}. Path '${pathVariables['%MO_PROFILE%']}'.`;
     } else {
       errorMessage = `Unknown error. Message: ${error.message}`;
     }
@@ -186,18 +178,18 @@ function* getDataFromMOIniSaga(): SagaIterator<string> {
         config: {
           modOrganizer: {
             version,
-            pathToINI,
             profileSection,
             profileParam,
             profileParamValueRegExp,
           },
         },
+        pathVariables,
       },
     }: ReturnType<typeof getState> = yield select(getState);
 
     const iniData: IUnwrap<typeof readINIFile> = yield call(
       readINIFile,
-      path.resolve(GAME_DIR, pathToINI),
+      pathVariables['%MO_INI%'],
     );
 
     const currentMOProfileIniSection = iniData.getSection(profileSection);
@@ -568,18 +560,18 @@ function* changeMOProfileSaga(
       main: {
         config: {
           modOrganizer: {
-            pathToINI,
             profileSection,
             profileParam,
             version,
           },
         },
+        pathVariables,
       },
     }: ReturnType<typeof getState> = yield select(getState);
 
     const iniData: IUnwrap<typeof readINIFile> = yield call(
       readINIFile,
-      path.resolve(GAME_DIR, pathToINI),
+      pathVariables['%MO_INI%'],
     );
 
     changeSectionalIniParameter(
@@ -592,14 +584,14 @@ function* changeMOProfileSaga(
 
     yield call(
       writeINIFile,
-      path.resolve(GAME_DIR, pathToINI),
+      pathVariables['%MO_INI%'],
       iniData,
       Encoding.WIN1251,
     );
 
     const MOProfileGameSettingsOnly = Object.keys(gameSettingsFiles)
       .reduce<IGameSettingsFiles>((acc, curr) => {
-        if (new RegExp(CustomPathName.MO_PROFILE).test(gameSettingsFiles[curr].path)) {
+        if (new RegExp(PathRegExp.MO_PROFILE_REGEXP).test(gameSettingsFiles[curr].path)) {
           return {
             ...acc,
             [curr]: {

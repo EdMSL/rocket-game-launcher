@@ -1,7 +1,11 @@
 import path from 'path';
 
 import { CustomError } from './errors';
-import { PathRegExp, PathVariableName } from '$constants/misc';
+import {
+  PathRegExp,
+  PathVariableName,
+  pathVariablesCheckOrderArr,
+} from '$constants/misc';
 import {
   GAME_DIR, IPathVariables,
 } from '$constants/paths';
@@ -118,7 +122,11 @@ export const getValueFromRange = (
 */
 export const clearPathVaribaleFromPathString = (
   currPath: string,
-): string => currPath.replace(/%.*%\\/, '').trim();
+): string => {
+  const newStr = currPath;
+
+  return newStr.replace(/%.*%\\/, '').trim();
+};
 
 /**
  * Получить путь с отсеченной корневой папкой.
@@ -140,12 +148,29 @@ export const clearRootDirFromPathString = (
 */
 export const replaceRootDirByPathVariable = (
   pathStr: string,
-  pathVariable = PathVariableName.GAME_DIR,
-  rootDirPathStr = GAME_DIR,
-): string => {
-  const newStr = pathStr;
+  availablePathVariables: string[],
+  pathVariables: IPathVariables,
+): string|undefined => {
+  const newPathStr = pathStr;
 
-  return newStr.replace(rootDirPathStr, pathVariable).trim();
+  const availablePathVariablesOrder = pathVariablesCheckOrderArr.filter((current) => availablePathVariables.includes(current));
+  let variableIndex = -1;
+
+  const pathVariableName = availablePathVariablesOrder.find((curr, index) => {
+    if (pathStr.includes(pathVariables[curr])) {
+      variableIndex = index;
+
+      return true;
+    }
+
+    return false;
+  });
+
+  if (pathVariableName && variableIndex >= 0) {
+    return newPathStr.replace(pathVariables[availablePathVariablesOrder[variableIndex]], pathVariableName).trim();
+  }
+
+  return undefined;
 };
 
 /**

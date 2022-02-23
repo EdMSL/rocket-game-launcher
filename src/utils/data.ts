@@ -1,7 +1,6 @@
 import { screen } from 'electron';
 import si from 'systeminformation';
 import fs from 'fs';
-import path from 'path';
 
 import {
   PathRegExp,
@@ -18,11 +17,11 @@ import {
 import { CreateUserMessage } from './message';
 import {
   checkIsPathIsNotOutsideValidFolder,
+  clearPathVaribaleFromPathString,
   getLineIniParameterValue,
   getParameterRegExp,
   getPathToFile,
   replacePathVariableByRootDir,
-  replaceRootDirByPathVariable,
 } from './strings';
 import {
   IGameSettingsItemParameter,
@@ -34,12 +33,10 @@ import {
   IGameSettingsOptionContent,
   IGameSettingsFiles,
 } from '$types/gameSettings';
-// import { IUserMessage } from '$types/main';
 import { ISelectOption } from '$components/UI/Select';
 import { IIncorrectGameSettingsFiles } from '$sagas/gameSettings';
 import {
   DefaultPathVariable,
-  GAME_DIR,
   IPathVariables,
 } from '$constants/paths';
 import {
@@ -633,3 +630,15 @@ export const getCustomButtons = (
     return undefined;
   }
 }).filter(Boolean);
+
+/**
+ * Получить переменную пути и остаточный путь из строки пути.
+ * @param pathStr Путь для обработки.
+ * @returns Массив из строк переменной и остатка пути.
+*/
+export const getVariableAndValueFromPath = (pathStr: string): [string, string] => {
+  const pathVariable = pathStr.match(PathRegExp.PATH_VARIABLE_REGEXP)![0];
+  const pathValue = clearPathVaribaleFromPathString(pathStr);
+
+  return [pathVariable, pathValue];
+};

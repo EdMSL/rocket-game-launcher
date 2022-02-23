@@ -610,16 +610,17 @@ export const getUserThemesFolders = (): string[] => {
  * @param currentWindow Текущее окно, из которого вызывается команда выбора пути.
 */
 export const getPathFromFileInput = async (
-  pathVariables: IPathVariables,
-  isPathToFile: boolean,
   dialog: Electron.Dialog,
   currentWindow: Electron.BrowserWindow,
-  isGameDocuments: boolean,
+  pathVariables: IPathVariables,
+  startPath = '',
+  isPathToFile = false,
   extensions = ['*'],
+  isGameDocuments = false,
 ): Promise<string|undefined> => {
   try {
     const pathObj = await dialog.showOpenDialog(currentWindow, {
-
+      defaultPath: startPath,
       properties: [isPathToFile ? 'openFile' : 'openDirectory'],
       filters: [{ name: 'File', extensions }],
     });
@@ -628,13 +629,13 @@ export const getPathFromFileInput = async (
       return '';
     }
 
-    const pathStr = checkIsPathIsNotOutsideValidFolder(
+    checkIsPathIsNotOutsideValidFolder(
       pathObj.filePaths[0],
       pathVariables,
       isGameDocuments,
     );
 
-    return pathStr;
+    return pathObj.filePaths[0];
   } catch (error: any) {
     writeToLogFile(`Can't get path from file input. Reason: ${error.message}`);
 

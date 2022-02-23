@@ -51,6 +51,15 @@ export const PathVariableName = {
   MO_PROFILE: '%MO_PROFILE%',
 };
 
+export const pathVariablesCheckOrderArr = [
+  PathVariableName.MO_PROFILE,
+  PathVariableName.MO_MODS,
+  PathVariableName.MO_DIR,
+  PathVariableName.DOCS_GAME,
+  PathVariableName.DOCUMENTS,
+  PathVariableName.GAME_DIR,
+];
+
 export const PathRegExp = {
   GAME_DIR_REGEXP: new RegExp('^%GAME_DIR%'),
   DOCUMENTS_REGEXP: new RegExp('^%DOCUMENTS%'),
@@ -67,4 +76,9 @@ export const PathRegExp = {
 export const LauncherButtonAction = {
   RUN: 'run',
   OPEN: 'open',
+};
+
+export const FileExtension = {
+  EXECUTABLE: ['exe', 'lnk'],
+  INI: ['ini'],
 };

@@ -46,16 +46,18 @@ ipcMain.handle(
   (
     event,
     pathVariables: IPathVariables,
-    isPathToFile: boolean,
-    isGameDocuments: boolean,
-    extensions: string[],
+    startPath?: string,
+    isPathToFile?: boolean,
+    extensions?: string[],
+    isGameDocuments?: boolean,
   ) => getPathFromFileInput(
-    pathVariables,
-    isPathToFile,
     dialog,
     BrowserWindow.getFocusedWindow()!,
-    isGameDocuments,
+    pathVariables,
+    startPath,
+    isPathToFile,
     extensions,
+    isGameDocuments,
   ),
 );
 

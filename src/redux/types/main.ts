@@ -26,7 +26,7 @@ export const MAIN_TYPES = {
 export interface ILauncherAppButton {
   path: string,
   label: string,
-  args?: string[],
+  args: string[],
 }
 
 export interface ILauncherCustomButton extends ILauncherAppButton {
