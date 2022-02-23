@@ -14,12 +14,14 @@ import { CreateUserMessage } from '$utils/message';
 import { LauncherButtonAction } from '$constants/misc';
 import { Modal } from '$components/UI/Modal';
 import { LauncherSettings } from '$components/LauncherSettings';
+import { getPathToFile } from '$utils/strings';
 
 export const MainScreen: React.FC = () => {
   /* eslint-disable max-len */
   const playButton = useAppSelector((state) => state.main.config.playButton);
   const appButtons = useAppSelector((state) => state.main.config.customButtons);
   const isGameRunning = useAppSelector((state) => state.main.isGameRunning);
+  const pathVariables = useAppSelector((state) => state.main.pathVariables);
   const userThemes = useAppSelector((state) => state.main.userThemes);
   const userTheme = useAppSelector((state) => state.userSettings.theme);
   const isAutoclose = useAppSelector((state) => state.userSettings.isAutoclose);
@@ -53,8 +55,13 @@ export const MainScreen: React.FC = () => {
 
   const onPlayGameBtnClick = useCallback(() => {
     dispatch(setIsGameRunning(true));
-    runApplication(playButton.path, playButton.args, 'Game', changeGameState);
-  }, [dispatch, playButton, changeGameState]);
+    runApplication(
+      getPathToFile(playButton.path, pathVariables),
+      playButton.args,
+      'Game',
+      changeGameState,
+    );
+  }, [dispatch, playButton, pathVariables, changeGameState]);
 
   const onRunApplicationBtnClick = useCallback(({ currentTarget }) => {
     runApplication(
@@ -92,7 +99,7 @@ export const MainScreen: React.FC = () => {
             <Button
               key={button.id}
               className={classNames('main-btn', 'control-panel__btn')}
-              btnPath={button.path}
+              btnPath={getPathToFile(button.path, pathVariables)}
               btnArgs={button.args}
               btnLabel={button.label}
               onClick={button.action === LauncherButtonAction.RUN

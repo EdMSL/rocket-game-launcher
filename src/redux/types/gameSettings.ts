@@ -88,7 +88,7 @@ export type IGameSettingsRootState = Readonly<{
   gameSettingsOptions: IGameSettingsOptions,
 }>;
 
-export interface IUIElementProps<E> {
+export interface IUIElementParams {
   id: string,
   className?: string,
   parentClassname?: string,
@@ -100,7 +100,10 @@ export interface IUIElementProps<E> {
   parent?: string,
   description?: string,
   currentHintId?: string,
-  onChange: (event: React.ChangeEvent<E>, envVariable?: string) => void,
+}
+
+export interface IUIElementProps<E> extends IUIElementParams{
+  onChange: (event: React.ChangeEvent<E>) => void,
   onHover?: (id: string) => void,
   onLeave?: () => void,
 }

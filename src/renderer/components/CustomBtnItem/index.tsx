@@ -6,32 +6,71 @@ import { Checkbox } from '$components/UI/Checkbox';
 import { PathSelector } from '$components/UI/PathSelector';
 import { TextField } from '$components/UI/TextField';
 import { ILauncherCustomButton } from '$types/main';
-import { DefaultCustomPathName, LauncherButtonAction } from '$constants/misc';
+import {
+  PathVariableName,
+  LauncherButtonAction,
+  FileExtension,
+} from '$constants/misc';
 import { generateSelectOptions } from '$utils/data';
 import { Button } from '$components/UI/Button';
-import { GAME_DIR } from '$constants/paths';
-import { clearRootDirFromPathString } from '$utils/strings';
+import { IPathVariables } from '$constants/paths';
+import { ArgumentsBlock } from '$components/ArgumentsBlock';
 
 interface IProps {
   item: ILauncherCustomButton,
+  fieldName: string,
+  pathVariables: IPathVariables,
   onDeleteBtnClick: (id: string) => void,
+  onChangeBtnData: (newBtnData: ILauncherCustomButton, fieldName: string) => void,
+  onPathError: () => void,
 }
 
 export const CustomBtnItem: React.FC<IProps> = ({
   item,
+  fieldName,
+  pathVariables,
+  onChangeBtnData,
   onDeleteBtnClick,
+  onPathError,
 }) => {
-  const onCheckboxChange = useCallback(() => {}, []);
-  const OnTextFieldChange = useCallback(() => {}, []);
-  const onSelectPathBtnClick = useCallback(() => {}, []);
-  const onSelectPathTextInputChange = useCallback(() => {}, []);
+  const onCheckboxChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    onChangeBtnData({
+      ...item,
+      action: target.checked ? LauncherButtonAction.RUN : LauncherButtonAction.OPEN,
+    },
+    fieldName);
+  }, [item, fieldName, onChangeBtnData]);
+
+  const OnTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    onChangeBtnData({ ...item, label: target.value }, fieldName);
+  }, [item, fieldName, onChangeBtnData]);
+
+  const onPathSelectorChange = useCallback((value) => {
+    if (value !== undefined) {
+      if (value !== '') {
+        onChangeBtnData({ ...item, path: value }, fieldName);
+      }
+    } else {
+      onPathError();
+    }
+  }, [item, fieldName, onChangeBtnData, onPathError]);
 
   const onDeleteCustomBtnBtnClick = useCallback(() => {
     onDeleteBtnClick(item.id);
   }, [onDeleteBtnClick, item.id]);
 
+  const onChangeArguments = useCallback((newArgs: string[]) => {
+    onChangeBtnData({ ...item, args: newArgs }, fieldName);
+  }, [item, fieldName, onChangeBtnData]);
+
   return (
     <li className={styles['developer-screen__custom-btn-item']}>
+      <TextField
+        id={`item_label-${item.id}`}
+        value={item.label}
+        label="Заголовок кнопки"
+        onChange={OnTextFieldChange}
+      />
       <Checkbox
         id={`item_checkbox-${item.id}`}
         label="Кнопка запуска приложения?"
@@ -41,22 +80,20 @@ export const CustomBtnItem: React.FC<IProps> = ({
       <PathSelector
         id={`item_path-${item.id}`}
         label="Путь до файла\папки"
-        value={clearRootDirFromPathString(item.path, GAME_DIR)}
-        options={generateSelectOptions([DefaultCustomPathName.GAME_DIR])}
-        onButtonClick={onSelectPathBtnClick}
-        onChange={onSelectPathTextInputChange}
+        value={item.path}
+        options={generateSelectOptions([PathVariableName.GAME_DIR])}
+        pathVariables={pathVariables}
+        isSelectFile={item.action === LauncherButtonAction.RUN}
+        extensions={FileExtension.EXECUTABLE}
+        onChange={onPathSelectorChange}
       />
-      <TextField
-        id={`item_args-${item.id}`}
-        value={item.args?.toString()}
-        label="Аргументы запуска"
-        onChange={OnTextFieldChange}
-      />
-      <TextField
-        id={`item_label-${item.id}`}
-        value={item.label}
-        label="Заголовок кнопки"
-        onChange={OnTextFieldChange}
+      <ArgumentsBlock
+        args={item.args!}
+        parent={fieldName}
+        className={styles['developer-screen__item']}
+        changeArguments={onChangeArguments}
+        onPathError={onPathError}
+        pathVariables={pathVariables}
       />
       <Button
         className={classNames('button', 'main-btn')}

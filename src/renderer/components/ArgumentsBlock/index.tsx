@@ -2,31 +2,84 @@ import React, { useCallback } from 'react';
 import classNames from 'classnames';
 
 import styles from './styles.module.scss';
-import { CustomPathName, DefaultCustomPathName } from '$constants/misc';
+import { PathRegExp, PathVariableName } from '$constants/misc';
 import { PathSelector } from '$components/UI/PathSelector';
-import { GAME_DIR } from '$constants/paths';
-import { clearRootDirFromPathString } from '$utils/strings';
+import { IPathVariables } from '$constants/paths';
 import { generateSelectOptions } from '$utils/data';
 import { Button } from '$components/UI/Button';
 
 interface IProps {
   args: string[],
   parent: string,
+  pathVariables: IPathVariables,
   className?: string,
-  addArgumentItem: (id: string) => void,
+  changeArguments: (newArgs: string[], parent: string) => void,
+  onPathError: () => void,
 }
 
 export const ArgumentsBlock: React.FC<IProps> = ({
   args,
   parent,
+  pathVariables,
   className = '',
-  addArgumentItem,
+  changeArguments,
+  onPathError,
 }) => {
-  const onSelectPathTextInputChange = useCallback(() => {}, []);
-  const onSelectPathBtnClick = useCallback(() => {}, []);
-  const OnAddArgumentBtnClick = useCallback(({ currentTarget }: React.MouseEvent<HTMLButtonElement>) => {
-    addArgumentItem(currentTarget.id);
-  }, [addArgumentItem]);
+  const onPathSelectorChange = useCallback((value: string|undefined, id: string) => {
+    if (value !== undefined) {
+      if (value !== '') {
+        changeArguments(
+          args.map((currentArg, index) => {
+            if (index === Number(id.split('-')[2])) {
+              return value;
+            }
+
+            return currentArg;
+          }),
+          parent,
+        );
+      }
+    } else {
+      onPathError();
+    }
+  }, [args, parent, changeArguments, onPathError]);
+
+  const onArgumentTextFieldChange = useCallback((
+    { target }: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    changeArguments(
+      args.map((currentArg, index) => {
+        if (index === Number(target.id.split('-')[2])) {
+          return target.value;
+        }
+
+        return currentArg;
+      }),
+      parent,
+    );
+  }, [args, parent, changeArguments]);
+
+  const onDeleteArgBtnClick = useCallback(({
+    currentTarget,
+  }: React.MouseEvent<HTMLButtonElement>) => {
+    changeArguments(
+      args.filter((currentArg, index) => index !== Number(currentTarget.id.split('-')[2])),
+      parent,
+    );
+  }, [args, parent, changeArguments]);
+
+  const OnAddArgumentBtnClick = useCallback(({
+    currentTarget,
+  }: React.MouseEvent<HTMLButtonElement>) => {
+    const newArgs = [...args,
+      currentTarget.id === `${parent}-add_arg_path`
+        ? `${PathVariableName.GAME_DIR}\\`
+        : '',
+    ];
+
+    changeArguments(newArgs, parent);
+  }, [args, parent, changeArguments]);
+
   return (
     <div className={classNames(
       styles['developer-screen__args'],
@@ -39,35 +92,40 @@ export const ArgumentsBlock: React.FC<IProps> = ({
         args.map((currentArg, index) => (
           <div className={styles['developer-screen__agrs-item']}>
             {
-              CustomPathName.PATH_VARIABLE_REGEXP.test(currentArg)
+              PathRegExp.PATH_VARIABLE_REGEXP.test(currentArg)
                 ? (
                   <PathSelector
-                    // className={styles['developer-screen__agrs-item']}
-                    id={`play_btn_arg${index}`}
-                    parent={parent}
-                    value={clearRootDirFromPathString(currentArg, GAME_DIR)}
-                    options={generateSelectOptions([DefaultCustomPathName.GAME_DIR])}
-                    onChange={onSelectPathTextInputChange}
-                    onButtonClick={onSelectPathBtnClick}
+                    id={`${parent}-arg-${index}`}
+                    value={currentArg}
+                    options={generateSelectOptions([PathVariableName.GAME_DIR])}
+                    pathVariables={pathVariables}
+                    isSelectFile
+                    onChange={onPathSelectorChange}
                   />
                   )
                 : (
                   <input
                     className={classNames('text-field__input')}
                     type="text"
-                    id={`play_btn_arg${index}`}
+                    id={`${parent}-arg-${index}`}
                     value={currentArg}
-                    onChange={onSelectPathTextInputChange}
+                    onChange={onArgumentTextFieldChange}
                   />
                   )
             }
-            <Button className={styles['developer-screen__args-delete-btn']}>Удалить</Button>
+            <Button
+              id={`${parent}-arg_delete-${index}`}
+              className={styles['developer-screen__args-delete-btn']}
+              onClick={onDeleteArgBtnClick}
+            >
+              Удалить
+            </Button>
           </div>
         ))
         }
         <div className={styles['developer-screen__agrs-btns']}>
           <Button
-            id="add_arg_path"
+            id={`${parent}-add_arg_path`}
             className={classNames('main-btn', styles['developer-screen__agrs-btn'])}
             onClick={OnAddArgumentBtnClick}
           >
@@ -86,7 +144,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
             </div>
           </Button>
           <Button
-            id="add_arg_str"
+            id={`${parent}-add_arg_str`}
             className={classNames('main-btn', styles['developer-screen__agrs-btn'])}
             onClick={OnAddArgumentBtnClick}
           >

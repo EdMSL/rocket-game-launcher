@@ -1,4 +1,3 @@
-import { ipcRenderer } from 'electron';
 import React, {
   useCallback,
   useState,
@@ -24,18 +23,20 @@ import {
 } from '$actions/main';
 import { CreateUserMessage } from '$utils/message';
 import {
-  LauncherButtonAction, DefaultCustomPathName, CustomPathName,
+  FileExtension,
+  LauncherButtonAction,
+  PathVariableName,
 } from '$constants/misc';
 import { Button } from '$components/UI/Button';
 import { CustomBtnItem } from '$components/CustomBtnItem';
 import { Routes } from '$constants/routes';
-import { ILauncherConfig, IMainRootState } from '$types/main';
+import {
+  ILauncherConfig,
+  ILauncherCustomButton,
+  IMainRootState,
+} from '$types/main';
 import { Loader } from '$components/UI/Loader';
 import { generateSelectOptions } from '$utils/data';
-import {
-  clearPathVaribaleFromPathString, clearRootDirFromPathString, getPathToFile, replaceRootDirByPathVariable,
-} from '$utils/strings';
-import { GAME_DIR } from '$constants/paths';
 import { ArgumentsBlock } from '$components/ArgumentsBlock';
 
 export const DeveloperScreen: React.FC = () => {
@@ -53,44 +54,33 @@ export const DeveloperScreen: React.FC = () => {
     }
   }, [dispatch, launcherConfig.isFirstLaunch, currentConfig]);
 
-  const changeCurrentConfig = useCallback((id, value, parent) => {
+  const changeCurrentConfig = useCallback((fieldName, value, parent?) => {
     if (parent) {
       setCurrentConfig({
         ...currentConfig,
         [parent]: {
           ...currentConfig[parent],
-          [id]: value,
+          [fieldName]: value,
         },
       });
     } else {
       setCurrentConfig({
         ...currentConfig,
-        [id]: value,
+        [fieldName]: value,
       });
     }
   }, [currentConfig]);
 
-  const onSelectPathBtnClick = useCallback(async (
+  const sendIncorrectPathErrorMessage = useCallback(() => {
+    dispatch(addMessages([CreateUserMessage.error('Выбран некорректный путь до папки. Подробности в файле лога.')])); //eslint-disable-line max-len
+  }, [dispatch]);
+
+  const onPathSelectorChange = useCallback((
+    value: string|undefined,
     id: string,
     parent: string,
-    customPathVariable: string,
   ) => {
-    let fileExtensions: string[] = [];
-
-    if (id === 'pathToINI') {
-      fileExtensions = ['ini'];
-    } else if ((parent === 'playButton' || parent === 'customButton') && id === 'path') {
-      fileExtensions = ['exe', 'lnk'];
-    }
-
-    let pathStr: string = await ipcRenderer.invoke(
-      'get path from native window',
-      { ...pathVariables },
-      ((parent === 'playButton' || parent === 'customButton') && id === 'path')
-      || id === 'pathToINI',
-      id !== 'documentsPath',
-      fileExtensions,
-    );
+    let pathStr = value;
 
     if (pathStr !== undefined) {
       if (pathStr === '') {
@@ -103,25 +93,13 @@ export const DeveloperScreen: React.FC = () => {
 
       changeCurrentConfig(
         id,
-        (parent === 'playButton' || parent === 'customButton') && id === 'path' ? pathStr : clearRootDirFromPathString(pathStr, id === 'documentsPath' ? pathVariables['%DOCUMENTS%'] : GAME_DIR),
+        pathStr,
         parent,
       );
     } else {
       dispatch(addMessages([CreateUserMessage.error('Выбран некорректный путь до папки. Подробности в файле лога.')])); //eslint-disable-line max-len
     }
-  }, [dispatch, currentConfig, changeCurrentConfig, pathVariables]);
-
-  const onSelectPathTextInputChange = useCallback((
-    { target }: React.ChangeEvent<HTMLInputElement>,
-    customPathVariable,
-  ) => {
-    changeCurrentConfig(
-      target.id,
-      (target.dataset.parent === 'playButton' || target.dataset.parent === 'customButton') && target.id === 'path' ? target.value : clearRootDirFromPathString(target.value, GAME_DIR),
-      // target.value,
-      target.dataset.parent,
-    );
-  }, [changeCurrentConfig]);
+  }, [dispatch, currentConfig, changeCurrentConfig]);
 
   const onNumberInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     changeCurrentConfig(target.id, Math.round(+target.value), target.dataset.parent);
@@ -154,25 +132,37 @@ export const DeveloperScreen: React.FC = () => {
   }, [currentConfig]);
 
   const onAddCustomBtnBtnClick = useCallback(() => {
-    const newConfig: ILauncherConfig = {
-      ...currentConfig,
-      customButtons: [
-        ...currentConfig.customButtons,
-        {
-          path: GAME_DIR,
-          action: LauncherButtonAction.OPEN,
-          id: `customBtn${currentConfig.customButtons.length}`,
-          label: 'Запуск',
-          args: [],
-        }],
-    };
+    const newButtons = [
+      ...currentConfig.customButtons,
+      {
+        path: `${PathVariableName.GAME_DIR}\\`,
+        action: LauncherButtonAction.OPEN,
+        id: `customBtn${currentConfig.customButtons.length}`,
+        label: 'Запуск',
+        args: [],
+      }];
 
-    setCurrentConfig(newConfig);
-  }, [currentConfig]);
+    changeCurrentConfig('customButtons', newButtons);
+  }, [currentConfig, changeCurrentConfig]);
 
-  const onCustomBtnCheckboxChange = useCallback(() => {}, []);
+  const onCustomBtnChange = useCallback((newBtnData: ILauncherCustomButton, fieldName: string) => {
+    const newButtons = currentConfig.customButtons.map((currentBtn) => {
+      if (currentBtn.id === newBtnData.id) {
+        return newBtnData;
+      }
 
-  const onAddNewArgumentBtnClick = useCallback((id: string) => {}, []);
+      return currentBtn;
+    });
+
+    changeCurrentConfig(fieldName, newButtons);
+  }, [currentConfig, changeCurrentConfig]);
+
+  const changeArguments = useCallback((
+    newArgs: string[],
+    parent: string,
+  ) => {
+    changeCurrentConfig('args', newArgs, parent);
+  }, [changeCurrentConfig]);
 
   const onSaveBtnClick = useCallback((
     { currentTarget }: React.MouseEvent<HTMLButtonElement>,
@@ -336,27 +326,12 @@ export const DeveloperScreen: React.FC = () => {
             id="documentsPath"
             label="Путь до папки файлов игры в [User]/Documents"
             value={currentConfig.documentsPath}
-            options={generateSelectOptions([DefaultCustomPathName.DOCUMENTS])}
-            onChange={onSelectPathTextInputChange}
-            onButtonClick={onSelectPathBtnClick}
+            options={generateSelectOptions([PathVariableName.DOCUMENTS])}
+            pathVariables={pathVariables}
+            isGameDocuments={false}
+            onChange={onPathSelectorChange}
           />
           <p className={styles['developer-screen__text']}>Настройки запуска игры</p>
-          <PathSelector
-            className={styles['developer-screen__item']}
-            id="path"
-            parent="playButton"
-            label="Путь до исполняемого файла игры"
-            value={clearRootDirFromPathString(currentConfig.playButton.path, GAME_DIR)}
-            options={generateSelectOptions([DefaultCustomPathName.GAME_DIR])}
-            onChange={onSelectPathTextInputChange}
-            onButtonClick={onSelectPathBtnClick}
-          />
-          <ArgumentsBlock
-            args={currentConfig.playButton.args!}
-            parent="playButton"
-            className={styles['developer-screen__item']}
-            addArgumentItem={onAddNewArgumentBtnClick}
-          />
           <TextField
             className={styles['developer-screen__item']}
             id="label"
@@ -364,6 +339,26 @@ export const DeveloperScreen: React.FC = () => {
             value={currentConfig.playButton.label}
             label="Текст кнопки запуска"
             onChange={OnTextFieldChange}
+          />
+          <PathSelector
+            className={styles['developer-screen__item']}
+            id="path"
+            parent="playButton"
+            label="Путь до исполняемого файла игры"
+            value={currentConfig.playButton.path}
+            options={generateSelectOptions([PathVariableName.GAME_DIR])}
+            pathVariables={pathVariables}
+            extensions={FileExtension.EXECUTABLE}
+            isSelectFile
+            onChange={onPathSelectorChange}
+          />
+          <ArgumentsBlock
+            args={currentConfig.playButton.args!}
+            parent="playButton"
+            pathVariables={pathVariables}
+            className={styles['developer-screen__item']}
+            changeArguments={changeArguments}
+            onPathError={sendIncorrectPathErrorMessage}
           />
           <div className={styles['developer-screen__custom-btns']}>
             <p className={styles['developer-screen__text']}>
@@ -375,7 +370,11 @@ export const DeveloperScreen: React.FC = () => {
                   <CustomBtnItem
                     key={item.id}
                     item={item}
+                    fieldName="customButtons"
+                    pathVariables={pathVariables}
                     onDeleteBtnClick={onCustomBtnDeleteClick}
+                    onChangeBtnData={onCustomBtnChange}
+                    onPathError={sendIncorrectPathErrorMessage}
                   />
                 ))
               }
@@ -416,44 +415,44 @@ export const DeveloperScreen: React.FC = () => {
             id="pathToMOFolder"
             label="Путь до папки MO"
             parent="modOrganizer"
-            value={clearRootDirFromPathString(currentConfig.modOrganizer.pathToMOFolder, GAME_DIR)}
-            options={generateSelectOptions([DefaultCustomPathName.GAME_DIR])}
+            value={currentConfig.modOrganizer.pathToMOFolder}
+            options={generateSelectOptions([PathVariableName.GAME_DIR])}
+            pathVariables={pathVariables}
             isDisabled={!currentConfig.modOrganizer.isUsed}
-            onChange={onSelectPathTextInputChange}
-            onButtonClick={onSelectPathBtnClick}
+            onChange={onPathSelectorChange}
           />
           <PathSelector
             className={styles['developer-screen__item']}
             id="pathToMods"
             label="Путь до папки модов MO"
             parent="modOrganizer"
-            value={clearRootDirFromPathString(currentConfig.modOrganizer.pathToMods, GAME_DIR)}
-            options={generateSelectOptions([DefaultCustomPathName.GAME_DIR])}
+            value={currentConfig.modOrganizer.pathToMods}
+            options={generateSelectOptions([PathVariableName.MO_DIR])}
+            pathVariables={pathVariables}
             isDisabled={!currentConfig.modOrganizer.isUsed}
-            onChange={onSelectPathTextInputChange}
-            onButtonClick={onSelectPathBtnClick}
+            onChange={onPathSelectorChange}
           />
           <PathSelector
             className={styles['developer-screen__item']}
             id="pathToProfiles"
             label="Путь до папки профилей MO"
             parent="modOrganizer"
-            value={clearRootDirFromPathString(currentConfig.modOrganizer.pathToProfiles, GAME_DIR)}
-            options={generateSelectOptions([DefaultCustomPathName.GAME_DIR])}
+            value={currentConfig.modOrganizer.pathToProfiles}
+            options={generateSelectOptions([PathVariableName.MO_DIR])}
+            pathVariables={pathVariables}
             isDisabled={!currentConfig.modOrganizer.isUsed}
-            onChange={onSelectPathTextInputChange}
-            onButtonClick={onSelectPathBtnClick}
+            onChange={onPathSelectorChange}
           />
           <PathSelector
             className={styles['developer-screen__item']}
             id="pathToINI"
             label="Путь до конфигурационного файла MO"
             parent="modOrganizer"
-            value={clearRootDirFromPathString(currentConfig.modOrganizer.pathToINI, GAME_DIR)}
-            options={generateSelectOptions([DefaultCustomPathName.GAME_DIR])}
+            value={currentConfig.modOrganizer.pathToINI}
+            options={generateSelectOptions([PathVariableName.MO_DIR])}
+            pathVariables={pathVariables}
             isDisabled={!currentConfig.modOrganizer.isUsed}
-            onChange={onSelectPathTextInputChange}
-            onButtonClick={onSelectPathBtnClick}
+            onChange={onPathSelectorChange}
           />
         </div>
       </Scrollbars>
