@@ -284,10 +284,6 @@ $checkbox-size: 20px;
   align-items: center;
 }
 
-.switcher__input {
-  display: none;
-}
-
 .switcher__toggler {
   position: relative;
 
@@ -319,6 +315,10 @@ $checkbox-size: 20px;
   .switcher__input:checked + &::before {
     left: calc(100% - 16px - 1px);
   }
+
+  .switcher__input:focus + & {
+    @include focus;
+  }
 }
 
 .number-field__container {
@@ -328,9 +328,11 @@ $checkbox-size: 20px;
 }
 
 .number-field__input {
-  padding: 10px;
+  padding: 12px 10px;
 
   font-size: var(--text-size-input);
+
+  border: none;
 
   &:focus {
     @include focus;
@@ -338,8 +340,6 @@ $checkbox-size: 20px;
 
   &:disabled {
     background-color: var(--disabled-color);
-    border-color: transparent;
-    border-radius: 0;
   }
 
   &--error {
@@ -359,9 +359,11 @@ $checkbox-size: 20px;
 
 .text-field__input {
   width: 50%;
-  padding: 10px;
+  padding: 12px 10px;
 
   font-size: var(--text-size-input);
+
+  border: none;
 
   &:focus {
     @include focus;
