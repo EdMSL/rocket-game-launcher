@@ -343,7 +343,7 @@ $checkbox-size: 20px;
   }
 
   &--error {
-    background-color: var(--error-color);
+    @include inputError;
   }
 }
 
@@ -371,6 +371,10 @@ $checkbox-size: 20px;
 
   &:disabled {
     background-color: var(--disabled-color);
+  }
+
+  &--error {
+    @include inputError;
   }
 }
 

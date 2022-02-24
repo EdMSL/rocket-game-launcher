@@ -22,3 +22,9 @@
   outline: 2px dotted var(--focus-color);
   outline-offset: -2px;
 }
+
+@mixin inputError {
+  color: var(--text-main);
+
+  background-color: var(--error-color);
+}

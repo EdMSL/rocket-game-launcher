@@ -20,6 +20,7 @@ export const TextField: React.FunctionComponent<IProps> = ({
   parent = '',
   multiparameters = '',
   isDisabled = false,
+  isValidationError,
   onChange,
   onHover = null,
   onLeave = null,
@@ -51,7 +52,7 @@ export const TextField: React.FunctionComponent<IProps> = ({
       }
     </label>
     <input
-      className="text-field__input"
+      className={classNames('text-field__input', isValidationError && 'text-field__input--error')}
       type="text"
       id={id}
       name={name}

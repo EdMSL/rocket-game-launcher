@@ -88,8 +88,8 @@ export const DeveloperScreen: React.FC = () => {
     }
   }, [validationErrors]);
 
-  const clearFromValidationErrors = useCallback((id: string) => {
-    setValidationErrors(validationErrors.filter((currentId) => currentId !== id));
+  const clearFromValidationErrors = useCallback((ids: string[]) => {
+    setValidationErrors(validationErrors.filter((currentId) => !ids.includes(currentId)));
   }, [validationErrors]);
 
   const sendIncorrectPathErrorMessage = useCallback(() => {
@@ -125,11 +125,18 @@ export const DeveloperScreen: React.FC = () => {
   const onNumberInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     if (+target.value < +target.min) {
       setValidationError(target.id);
+    } else if (currentConfig.isResizable) {
+      if (target.id === 'width' && (+target.value < currentConfig.minWidth)) {
+        setValidationError(target.id);
+        setValidationError('minWidth');
+      } else {
+        clearFromValidationErrors([target.id, 'minWidth']);
+      }
     } else {
-      clearFromValidationErrors(target.id);
+      clearFromValidationErrors([target.id]);
     }
     changeCurrentConfig(target.id, Math.round(+target.value), target.dataset.parent);
-  }, [changeCurrentConfig, setValidationError, clearFromValidationErrors]);
+  }, [currentConfig, changeCurrentConfig, setValidationError, clearFromValidationErrors]);
 
   const OnTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     changeCurrentConfig(target.id, target.value, target.dataset.parent);

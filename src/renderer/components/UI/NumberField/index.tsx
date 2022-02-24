@@ -60,7 +60,10 @@ export const NumberField: React.FunctionComponent<IProps> = ({
       }
       </label>
       <input
-        className={classNames('number-field__input', isValidationError && 'number-field__input--error')}
+        className={classNames(
+          'number-field__input',
+          isValidationError && 'number-field__input--error',
+        )}
         type="number"
         min={min}
         id={id}
