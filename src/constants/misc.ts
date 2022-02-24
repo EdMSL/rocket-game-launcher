@@ -87,3 +87,34 @@ export const MinWindowSize = {
   HEIGHT: 400,
   WIDTH: 400,
 };
+
+export interface IWindowField {
+  id: string,
+  label: string,
+}
+
+export const appWindowFields: IWindowField[] = [{
+  id: 'width',
+  label: 'Ширина',
+},
+{
+  id: 'height',
+  label: 'Высота',
+},
+{
+  id: 'minWidth',
+  label: 'Минимальная ширина',
+},
+{
+  id: 'minHeight',
+  label: 'Минимальная высота',
+},
+{
+  id: 'maxWidth',
+  label: 'Максимальная ширина',
+},
+{
+  id: 'maxHeight',
+  label: 'Максимальная высота',
+},
+];

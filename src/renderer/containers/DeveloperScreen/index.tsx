@@ -24,6 +24,7 @@ import {
 } from '$actions/main';
 import { CreateUserMessage } from '$utils/message';
 import {
+  appWindowFields,
   FileExtension,
   LauncherButtonAction,
   MinWindowSize,
@@ -232,6 +233,25 @@ export const DeveloperScreen: React.FC = () => {
     }
   }, [launcherConfig, currentConfig.isFirstLaunch, setValidationErrors]);
 
+  const getNumberFieldMinValue = useCallback((id: string): number => {
+    if (!currentConfig.isResizable) {
+      if (id === 'width') {
+        return MinWindowSize.WIDTH;
+      } else if (id === 'height') {
+        return MinWindowSize.HEIGHT;
+      }
+    }
+
+    return 0;
+  }, [currentConfig]);
+
+  const getNumberFieldIsDisabled = useCallback((id: string): boolean => !currentConfig.isResizable && (
+    id === 'minWidth'
+    || id === 'minHeight'
+    || id === 'maxWidth'
+    || id === 'maxHeight'
+  ), [currentConfig]);
+
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <main className={classNames('main', styles['developer-screen__main'])}>
@@ -315,55 +335,20 @@ export const DeveloperScreen: React.FC = () => {
               isChecked={currentConfig.isResizable}
               onChange={onSwitcherChange}
             />
-            <NumberField
-              className={styles['developer-screen__item']}
-              id="width"
-              value={currentConfig.width}
-              label="Ширина"
-              min={currentConfig.isResizable ? 0 : MinWindowSize.WIDTH}
-              isValidationError={validationErrors.includes('width')}
-              onChange={onNumberInputChange}
-            />
-            <NumberField
-              className={styles['developer-screen__item']}
-              id="height"
-              value={currentConfig.height}
-              label="Высота"
-              min={currentConfig.isResizable ? 0 : MinWindowSize.HEIGHT}
-              onChange={onNumberInputChange}
-            />
-            <NumberField
-              className={styles['developer-screen__item']}
-              id="minWidth"
-              value={currentConfig.minWidth}
-              label="Минимальная ширина"
-              isDisabled={!currentConfig.isResizable}
-              onChange={onNumberInputChange}
-            />
-            <NumberField
-              className={styles['developer-screen__item']}
-              id="minHeight"
-              value={currentConfig.minHeight}
-              label="Минимальная высота"
-              isDisabled={!currentConfig.isResizable}
-              onChange={onNumberInputChange}
-            />
-            <NumberField
-              className={styles['developer-screen__item']}
-              id="maxWidth"
-              value={currentConfig.maxWidth}
-              label="Максимальная ширина"
-              isDisabled={!currentConfig.isResizable}
-              onChange={onNumberInputChange}
-            />
-            <NumberField
-              className={styles['developer-screen__item']}
-              id="maxHeight"
-              value={currentConfig.maxHeight}
-              label="Максимальная высота"
-              isDisabled={!currentConfig.isResizable}
-              onChange={onNumberInputChange}
-            />
+            {
+              appWindowFields.map((field) => (
+                <NumberField
+                  className={styles['developer-screen__item']}
+                  id={field.id}
+                  value={currentConfig[field.id]}
+                  label={field.label}
+                  min={getNumberFieldMinValue(field.id)}
+                  isDisabled={getNumberFieldIsDisabled(field.id)}
+                  isValidationError={validationErrors.includes(field.id)}
+                  onChange={onNumberInputChange}
+                />
+              ))
+            }
           </div>
           <div className={styles['developer-screen__block']}>
             <p className={styles['developer-screen__block-title']}>
