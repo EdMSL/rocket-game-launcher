@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import classNames from 'classnames';
 
 import { IUIElementProps } from '$types/gameSettings';
 import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {
-
+  min?: number,
 }
 
 export const NumberField: React.FunctionComponent<IProps> = ({
@@ -20,22 +20,28 @@ export const NumberField: React.FunctionComponent<IProps> = ({
   parent = '',
   multiparameters = '',
   isDisabled = false,
+  min = 0,
   onChange,
   onHover = null,
   onLeave = null,
-}) => (
-  <div className={classNames(
-    'number-field__container',
-    parentClassname && `${parentClassname}-number-field__container`,
-    className,
-  )}
-  >
-    <label
-      className="number-field__label"
-      htmlFor={id}
+}) => {
+  const onInputBlur = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(event);
+  }, [onChange]);
+
+  return (
+    <div className={classNames(
+      'number-field__container',
+      parentClassname && `${parentClassname}-number-field__container`,
+      className,
+    )}
     >
-      <span>{label}</span>
-      {
+      <label
+        className="number-field__label"
+        htmlFor={id}
+      >
+        <span>{label}</span>
+        {
         description
         && onHover
         && onLeave
@@ -49,18 +55,20 @@ export const NumberField: React.FunctionComponent<IProps> = ({
           />
         )
       }
-    </label>
-    <input
-      className="number-field__input"
-      type="number"
-      min={0}
-      id={id}
-      name={name}
-      value={value}
-      data-parent={parent}
-      data-multiparameters={multiparameters}
-      disabled={isDisabled}
-      onChange={onChange}
-    />
-  </div>
-);
+      </label>
+      <input
+        className="number-field__input"
+        type="number"
+        min={min}
+        id={id}
+        name={name}
+        value={value}
+        data-parent={parent}
+        data-multiparameters={multiparameters}
+        disabled={isDisabled}
+        onChange={onChange}
+        onBlur={onInputBlur}
+      />
+    </div>
+  );
+};
