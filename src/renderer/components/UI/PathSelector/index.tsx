@@ -1,4 +1,6 @@
-import React, { useCallback, useState } from 'react';
+import React, {
+  useCallback, useEffect, useState,
+} from 'react';
 import classNames from 'classnames';
 import { ipcRenderer } from 'electron';
 
@@ -49,6 +51,15 @@ export const PathSelector: React.FC<IProps> = ({
 
   const [currentPathVariable, setCurrentPathVariable] = useState<string>(pathVariable);
   const [currentPathValue, setCurrentPathValue] = useState<string>(pathValue);
+
+  useEffect(() => {
+    if (currentPathValue !== pathValue) {
+      setCurrentPathValue(pathValue);
+    }
+    if (currentPathVariable !== pathVariable) {
+      setCurrentPathValue(pathVariable);
+    }
+  }, [currentPathValue, currentPathVariable, pathValue, pathVariable]);
 
   const getPathFromPathSelector = useCallback(async (
   ): Promise<string> => {
