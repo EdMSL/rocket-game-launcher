@@ -21,13 +21,16 @@ export const NumberField: React.FunctionComponent<IProps> = ({
   multiparameters = '',
   isDisabled = false,
   min = 0,
+  isValidationError,
   onChange,
   onHover = null,
   onLeave = null,
 }) => {
   const onInputBlur = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(event);
-  }, [onChange]);
+    if (+event.target.value !== +value!) {
+      onChange(event);
+    }
+  }, [value, onChange]);
 
   return (
     <div className={classNames(
@@ -57,7 +60,7 @@ export const NumberField: React.FunctionComponent<IProps> = ({
       }
       </label>
       <input
-        className="number-field__input"
+        className={classNames('number-field__input', isValidationError && 'number-field__input--error')}
         type="number"
         min={min}
         id={id}

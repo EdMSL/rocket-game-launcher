@@ -82,3 +82,8 @@ export const FileExtension = {
   EXECUTABLE: ['exe', 'lnk'],
   INI: ['ini'],
 };
+
+export const MinWindowSize = {
+  HEIGHT: 400,
+  WIDTH: 400,
+};

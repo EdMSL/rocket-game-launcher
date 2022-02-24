@@ -100,6 +100,7 @@ export interface IUIElementParams {
   parent?: string,
   description?: string,
   currentHintId?: string,
+  isValidationError?: boolean,
 }
 
 export interface IUIElementProps<E> extends IUIElementParams{

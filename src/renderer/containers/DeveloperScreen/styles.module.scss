@@ -2,6 +2,15 @@
   padding: 0 10px 10px;
 }
 
+.develover-screen__form {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: var(--content-width);
+  height: 100%;
+  overflow: hidden;
+}
+
 .develover-screen__controller {
   display: flex;
   margin: 10px 0 10px 10px;

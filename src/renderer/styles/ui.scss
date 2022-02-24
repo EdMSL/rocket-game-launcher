@@ -341,6 +341,10 @@ $checkbox-size: 20px;
     border-color: transparent;
     border-radius: 0;
   }
+
+  &--error {
+    background-color: var(--error-color);
+  }
 }
 
 .text-field__container {
