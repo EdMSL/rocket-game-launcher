@@ -22,6 +22,8 @@ import { IPathVariables, USER_THEMES_DIR } from '$constants/paths';
 
 require('@electron/remote/main').initialize();
 
+let devWindow: BrowserWindow|null = null;
+
 const start = async (): Promise<void> => {
   createLogFile();
   getSystemInfo();
@@ -63,7 +65,11 @@ ipcMain.handle(
 );
 
 ipcMain.on('dev window', () => {
-  createDevWindow();
+  if (!devWindow) {
+    devWindow = createDevWindow();
+  } else {
+    devWindow.show();
+  }
 });
 
 ipcMain.on('close app', () => {

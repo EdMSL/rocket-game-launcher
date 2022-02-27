@@ -4,7 +4,9 @@ import React, {
 import {
   Switch,
   Route,
+  useLocation,
 } from 'react-router-dom';
+import { ipcRenderer } from 'electron';
 
 import styles from './styles.module.scss';
 import { Routes } from '$constants/routes';
@@ -32,6 +34,8 @@ export const App = (): JSX.Element => {
     // Дальше изменение стилей идет через UI. Поэтому у useEffect нет заваисимостей.
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const { pathname } = useLocation<{ [key: string]: string, }>();
+
   const openAppInfo = useCallback(() => {
     if (isOpenAppInfo) {
       return;
@@ -44,9 +48,21 @@ export const App = (): JSX.Element => {
     setIsOpenAppInfo(false);
   }, []);
 
+  const closeApp = useCallback(() => {
+    ipcRenderer.send('close app');
+  }, []);
+
   return (
     <div className={styles.app}>
-      <Header openAppInfo={openAppInfo} />
+      {
+        !pathname.includes(Routes.DEVELOPER_SCREEN)
+          && (
+          <Header
+            openAppInfo={openAppInfo}
+            onClose={closeApp}
+          />
+          )
+      }
       <Switch>
         <Route
           exact
@@ -62,7 +78,10 @@ export const App = (): JSX.Element => {
           component={DeveloperScreen}
         />
       </Switch>
-      <Messages />
+      {
+        !pathname.includes(Routes.DEVELOPER_SCREEN)
+          && <Messages />
+      }
       {
         isOpenAppInfo && (
           <Modal onCloseBtnClick={onCloseAppInfoModal}>

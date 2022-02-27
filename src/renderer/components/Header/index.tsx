@@ -10,12 +10,15 @@ import { useAppSelector } from '$store/store';
 
 const launcherIcon = require('$images/icon.png');
 
+// передача функции openAppInfo в компонент означает, что окно с этим компонетом является главным
 interface IProps {
-  openAppInfo: () => any,
+  onClose: (event) => void,
+  openAppInfo?: () => void,
 }
 
 export const Header: React.FunctionComponent<IProps> = ({
-  openAppInfo,
+  onClose,
+  openAppInfo = null,
 }) => {
   const isResizable = useAppSelector((state) => state.main.config.isResizable);
   const gameName = useAppSelector((state) => state.main.config.gameName);
@@ -23,7 +26,7 @@ export const Header: React.FunctionComponent<IProps> = ({
   const [isMaximize, setIsMaximize] = useState(false);
 
   useEffect(() => {
-    ipcRenderer.on('max-unmax window', (evt, isMax) => {
+    ipcRenderer.on('max-unmax window', (evt, isMax, windowType) => {
       setIsMaximize(isMax);
     });
 
@@ -31,20 +34,22 @@ export const Header: React.FunctionComponent<IProps> = ({
   }, []);
 
   const onInfoAppClick = useCallback(() => {
-    openAppInfo();
+    if (openAppInfo) {
+      openAppInfo();
+    }
   }, [openAppInfo]);
 
-  const onMinimizeAppClick = useCallback(() => {
-    ipcRenderer.send('minimize window');
-  }, []);
+  const onMinimizeWindowClick = useCallback(() => {
+    ipcRenderer.send('minimize window', openAppInfo ? 'main' : 'dev');
+  }, [openAppInfo]);
 
-  const onMaximizeAppClick = useCallback(() => {
-    ipcRenderer.send('max-unmax window', isMaximize);
-  }, [isMaximize]);
+  const onMaximizeWindowClick = useCallback(() => {
+    ipcRenderer.send('max-unmax window', isMaximize, openAppInfo ? 'main' : 'dev');
+  }, [isMaximize, openAppInfo]);
 
-  const onCloseAppClick = useCallback(() => {
-    ipcRenderer.send('close app');
-  }, []);
+  const onCloseWindowBtnClick = useCallback((event) => {
+    onClose(event);
+  }, [onClose]);
 
   return (
     <header
@@ -70,15 +75,19 @@ export const Header: React.FunctionComponent<IProps> = ({
           && <p className={styles['header__game-name']}>{gameName}</p>
         }
         <div className={styles.header__controls}>
-          <Button
-            className={classNames(styles.header__btn, styles['header__btn--info'])}
-            onClick={onInfoAppClick}
-          >
-            <span className={styles['header__btn-text']}>Info</span>
-          </Button>
+          {
+            openAppInfo && (
+              <Button
+                className={classNames(styles.header__btn, styles['header__btn--info'])}
+                onClick={onInfoAppClick}
+              >
+                <span className={styles['header__btn-text']}>Info</span>
+              </Button>
+            )
+          }
           <Button
             className={classNames(styles.header__btn, styles['header__btn--fold'])}
-            onClick={onMinimizeAppClick}
+            onClick={onMinimizeWindowClick}
           >
             <span className={styles['header__btn-text']}>Fold</span>
           </Button>
@@ -89,7 +98,7 @@ export const Header: React.FunctionComponent<IProps> = ({
                 styles.header__btn,
                 styles[`header__btn--${isMaximize ? 'unmaximize' : 'maximize'}`],
               )}
-              onClick={onMaximizeAppClick}
+              onClick={onMaximizeWindowClick}
             >
               <span className={styles['header__btn-text']}>
                 {isMaximize ? 'Unmaximize' : 'Maximize'}
@@ -99,7 +108,7 @@ export const Header: React.FunctionComponent<IProps> = ({
         }
           <Button
             className={classNames(styles.header__btn, styles['header__btn--close'])}
-            onClick={onCloseAppClick}
+            onClick={onCloseWindowBtnClick}
           >
             <span className={styles['header__btn-text']}>Close</span>
           </Button>

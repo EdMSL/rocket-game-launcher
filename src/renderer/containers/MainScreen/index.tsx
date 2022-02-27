@@ -87,69 +87,70 @@ export const MainScreen: React.FC = () => {
   const onDeveloperScreenBtnClick = useCallback(() => { ipcRenderer.send('dev window'); }, []);
 
   return (
-    <main className={classNames('main', styles['main-screen__main'])}>
-      <div className={classNames('control-panel', styles['main-screen__control-panel'])}>
-        <Button
-          className={classNames('main-btn', 'control-panel__btn')}
-          isDisabled={isGameRunning || !playButton.path}
-          onClick={onPlayGameBtnClick}
-        >
-          {playButton.label}
-        </Button>
+    <React.Fragment>
+      <main className={classNames('main', styles['main-screen__main'])}>
+        <div className={classNames('control-panel', styles['main-screen__control-panel'])}>
+          <Button
+            className={classNames('main-btn', 'control-panel__btn')}
+            isDisabled={isGameRunning || !playButton.path}
+            onClick={onPlayGameBtnClick}
+          >
+            {playButton.label}
+          </Button>
+          {
+            appButtons.map((button) => (
+              <Button
+                key={button.id}
+                className={classNames('main-btn', 'control-panel__btn')}
+                btnPath={getPathToFile(button.path, pathVariables)}
+                btnArgs={button.args}
+                btnLabel={button.label}
+                onClick={button.action === LauncherButtonAction.RUN
+                  ? onRunApplicationBtnClick
+                  : onOpenFolderBtnClick}
+              >
+                {button.label}
+              </Button>
+            ))
+          }
+          <NavLink
+            exact
+            to={gameSettingsGroups.length > 0
+              ? `${Routes.GAME_SETTINGS_SCREEN}/${gameSettingsGroups[0].name}`
+              : Routes.GAME_SETTINGS_SCREEN}
+            className={classNames(
+              'button',
+              'main-btn',
+              'control-panel__btn',
+              (isGameRunning || !isGameSettingsAvailable || !playButton.path) && 'control-panel__btn--disabled',
+              styles['main-screen__btn'],
+            )}
+            onClick={onDisabledNavLinkClick}
+          >
+            Настройки
+          </NavLink>
+          <Button
+            className={classNames(
+              'main-btn',
+              styles['main-screen__bottom-btn'],
+              styles['main-screen__bottom-btn--settings'],
+            )}
+            onClick={onLauncherSettingsBtnClick}
+          >
+            <span className={styles['main-screen__bottom-btn-text']}>Настройки программы</span>
+          </Button>
+          <Button
+            className={classNames(
+              'main-btn',
+              styles['main-screen__bottom-btn'],
+              styles['main-screen__bottom-btn--developer'],
+            )}
+            onClick={onDeveloperScreenBtnClick}
+          >
+            <span className={styles['main-screen__bottom-btn-text']}>Экран разработчика</span>
+          </Button>
+        </div>
         {
-          appButtons.map((button) => (
-            <Button
-              key={button.id}
-              className={classNames('main-btn', 'control-panel__btn')}
-              btnPath={getPathToFile(button.path, pathVariables)}
-              btnArgs={button.args}
-              btnLabel={button.label}
-              onClick={button.action === LauncherButtonAction.RUN
-                ? onRunApplicationBtnClick
-                : onOpenFolderBtnClick}
-            >
-              {button.label}
-            </Button>
-          ))
-        }
-        <NavLink
-          exact
-          to={gameSettingsGroups.length > 0
-            ? `${Routes.GAME_SETTINGS_SCREEN}/${gameSettingsGroups[0].name}`
-            : Routes.GAME_SETTINGS_SCREEN}
-          className={classNames(
-            'button',
-            'main-btn',
-            'control-panel__btn',
-            (isGameRunning || !isGameSettingsAvailable || !playButton.path) && 'control-panel__btn--disabled',
-            styles['main-screen__btn'],
-          )}
-          onClick={onDisabledNavLinkClick}
-        >
-          Настройки
-        </NavLink>
-        <Button
-          className={classNames(
-            'main-btn',
-            styles['main-screen__bottom-btn'],
-            styles['main-screen__bottom-btn--settings'],
-          )}
-          onClick={onLauncherSettingsBtnClick}
-        >
-          <span className={styles['main-screen__bottom-btn-text']}>Настройки программы</span>
-        </Button>
-        <Button
-          className={classNames(
-            'main-btn',
-            styles['main-screen__bottom-btn'],
-            styles['main-screen__bottom-btn--developer'],
-          )}
-          onClick={onDeveloperScreenBtnClick}
-        >
-          <span className={styles['main-screen__bottom-btn-text']}>Экран разработчика</span>
-        </Button>
-      </div>
-      {
         isModalOpen && (
         <Modal
           modalParentClassname="launcher-settings"
@@ -164,6 +165,7 @@ export const MainScreen: React.FC = () => {
         </Modal>
         )
       }
-    </main>
+      </main>
+    </React.Fragment>
   );
 };

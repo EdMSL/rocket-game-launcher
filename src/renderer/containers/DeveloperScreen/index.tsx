@@ -32,7 +32,6 @@ import {
 } from '$constants/misc';
 import { Button } from '$components/UI/Button';
 import { CustomBtnItem } from '$components/CustomBtnItem';
-import { Routes } from '$constants/routes';
 import {
   ILauncherConfig,
   ILauncherCustomButton,
@@ -42,6 +41,7 @@ import { Loader } from '$components/UI/Loader';
 import { generateSelectOptions } from '$utils/data';
 import { ArgumentsBlock } from '$components/ArgumentsBlock';
 import { checkObjectForEqual } from '$utils/check';
+import { Header } from '$components/Header';
 
 export const DeveloperScreen: React.FC = () => {
   const pathVariables = useAppSelector((state) => state.main.pathVariables);
@@ -229,7 +229,7 @@ export const DeveloperScreen: React.FC = () => {
     launcherConfig.height,
     launcherConfig.isResizable]);
 
-  const onResetBtnClick = useCallback((event) => {
+  const resetConfigChanges = useCallback((event) => {
     setIsConfigChanged(false);
     setValidationErrors([]);
 
@@ -239,6 +239,15 @@ export const DeveloperScreen: React.FC = () => {
       setCurrentConfig(launcherConfig);
     }
   }, [launcherConfig, currentConfig.isFirstLaunch, setValidationErrors]);
+
+  const onResetBtnClick = useCallback((event) => {
+    resetConfigChanges(event);
+  }, [resetConfigChanges]);
+
+  const onCancelBtnClick = useCallback((event) => {
+    resetConfigChanges(event);
+    ipcRenderer.send('close window');
+  }, [resetConfigChanges]);
 
   const getNumberFieldMinValue = useCallback((id: string): number => {
     if (!currentConfig.isResizable) {
@@ -261,88 +270,87 @@ export const DeveloperScreen: React.FC = () => {
 
   /* eslint-disable react/jsx-props-no-spreading */
   return (
-    <main className={classNames('main', styles['developer-screen__main'])}>
-      <form
-        className={styles['develover-screen__form']}
-        // onSubmit={onSaveBtnClick}
-      >
-        <div className={styles['develover-screen__controller']}>
-          <Button
-            id="ok_btn"
-            onClick={onSaveBtnClick}
-            className={classNames(
-              'main-btn',
-              'control-panel__btn',
-            )}
-            isDisabled={!isConfigChanged || validationErrors.length > 0}
-          >
-            ОК
-          </Button>
-          {
-          !currentConfig.isFirstLaunch && (
-            <NavLink
-              exact
-              to={Routes.MAIN_SCREEN}
+    <React.Fragment>
+      <Header onClose={onCancelBtnClick} />
+      <main className={classNames('main', styles['developer-screen__main'])}>
+        <form
+          className={styles['develover-screen__form']}
+        >
+          <div className={styles['develover-screen__controller']}>
+            <Button
+              id="ok_btn"
+              onClick={onSaveBtnClick}
               className={classNames(
-                'button',
                 'main-btn',
                 'control-panel__btn',
               )}
-              onClick={onResetBtnClick}
+              isDisabled={!isConfigChanged || validationErrors.length > 0}
             >
-              Отмена
-            </NavLink>
-          )
-        }
-          <Button
-            onClick={onSaveBtnClick}
-            className={classNames(
-              'main-btn',
-              'control-panel__btn',
-            )}
-            isDisabled={!isConfigChanged || validationErrors.length > 0}
-          >
-            Сохранить
-          </Button>
-          <Button
-            onClick={onResetBtnClick}
-            className={classNames(
-              'main-btn',
-              'control-panel__btn',
-            )}
-            isDisabled={!isConfigChanged}
-          >
-            Сбросить
-          </Button>
-        </div>
-        <Scrollbars
-          autoHeight
-          autoHide
-          autoHeightMax="100%"
-          hideTracksWhenNotNeeded
-          renderTrackVertical={(props): ReactElement => (
-            <div
-              {...props}
-              className="scrollbar__track"
-            />
-          )}
-          renderThumbVertical={(props): ReactElement => (
-            <div
-              {...props}
-              className="scrollbar__thumb"
-            />
-          )}
-        >
-          <div className={styles['developer-screen__block']}>
-            <p className={styles['developer-screen__block-title']}>Настройки резмеров окна</p>
-            <Switcher
-              className={styles['developer-screen__item']}
-              id="isResizable"
-              label="Изменяемый размер окна?"
-              isChecked={currentConfig.isResizable}
-              onChange={onSwitcherChange}
-            />
+              ОК
+            </Button>
             {
+              !currentConfig.isFirstLaunch && (
+                <Button
+                  onClick={onCancelBtnClick}
+                  className={classNames(
+                    'main-btn',
+                    'control-panel__btn',
+                  )}
+                  isDisabled={!isConfigChanged || validationErrors.length > 0}
+                >
+                  Отмена
+                </Button>
+              )
+            }
+            <Button
+              onClick={onSaveBtnClick}
+              className={classNames(
+                'main-btn',
+                'control-panel__btn',
+              )}
+              isDisabled={!isConfigChanged || validationErrors.length > 0}
+            >
+              Сохранить
+            </Button>
+            <Button
+              onClick={onResetBtnClick}
+              className={classNames(
+                'main-btn',
+                'control-panel__btn',
+              )}
+              isDisabled={!isConfigChanged}
+            >
+              Сбросить
+            </Button>
+          </div>
+          <Scrollbars
+            autoHeight
+            autoHide
+            autoHeightMax="100%"
+            hideTracksWhenNotNeeded
+            renderTrackVertical={(props): ReactElement => (
+              <div
+                {...props}
+                className="scrollbar__track"
+              />
+            )}
+            renderThumbVertical={(props): ReactElement => (
+              <div
+                {...props}
+                className="scrollbar__thumb"
+              />
+            )}
+          >
+            <div className={styles['developer-screen__block']}>
+              <p className={styles['developer-screen__block-title']}>Настройки резмеров окна</p>
+              <Switcher
+                className={styles['developer-screen__item']}
+                id="isResizable"
+                label="Изменяемый размер окна?"
+                isChecked={currentConfig.isResizable}
+                onChange={onSwitcherChange}
+              />
+              {
               appWindowFields.map((field) => (
                 <NumberField
                   className={styles['developer-screen__item']}
@@ -356,63 +364,63 @@ export const DeveloperScreen: React.FC = () => {
                 />
               ))
             }
-          </div>
-          <div className={styles['developer-screen__block']}>
-            <p className={styles['developer-screen__block-title']}>
-              Настройки путей и запуска программ
-            </p>
-            <TextField
-              className={styles['developer-screen__item']}
-              id="gameName"
-              value={currentConfig.gameName}
-              label="Название игры"
-              onChange={OnTextFieldChange}
-            />
-            <PathSelector
-              className={styles['developer-screen__item']}
-              id="documentsPath"
-              label="Путь до папки файлов игры в [User]/Documents"
-              value={currentConfig.documentsPath}
-              options={generateSelectOptions([PathVariableName.DOCUMENTS])}
-              pathVariables={pathVariables}
-              isGameDocuments={false}
-              onChange={onPathSelectorChange}
-            />
-            <p className={styles['developer-screen__text']}>Настройки запуска игры</p>
-            <TextField
-              className={styles['developer-screen__item']}
-              id="label"
-              parent="playButton"
-              value={currentConfig.playButton.label}
-              label="Текст кнопки запуска"
-              onChange={OnTextFieldChange}
-            />
-            <PathSelector
-              className={styles['developer-screen__item']}
-              id="path"
-              parent="playButton"
-              label="Путь до исполняемого файла игры"
-              value={currentConfig.playButton.path}
-              options={generateSelectOptions([PathVariableName.GAME_DIR])}
-              pathVariables={pathVariables}
-              extensions={FileExtension.EXECUTABLE}
-              isSelectFile
-              onChange={onPathSelectorChange}
-            />
-            <ArgumentsBlock
-              args={currentConfig.playButton.args!}
-              parent="playButton"
-              pathVariables={pathVariables}
-              className={styles['developer-screen__item']}
-              changeArguments={changeArguments}
-              onPathError={sendIncorrectPathErrorMessage}
-            />
-            <div className={styles['developer-screen__custom-btns']}>
-              <p className={styles['developer-screen__text']}>
-                Кнопки запуска дополнительных программ
+            </div>
+            <div className={styles['developer-screen__block']}>
+              <p className={styles['developer-screen__block-title']}>
+                Настройки путей и запуска программ
               </p>
-              <ul className={styles['developer-screen__custom-btns-container']}>
-                {
+              <TextField
+                className={styles['developer-screen__item']}
+                id="gameName"
+                value={currentConfig.gameName}
+                label="Название игры"
+                onChange={OnTextFieldChange}
+              />
+              <PathSelector
+                className={styles['developer-screen__item']}
+                id="documentsPath"
+                label="Путь до папки файлов игры в [User]/Documents"
+                value={currentConfig.documentsPath}
+                options={generateSelectOptions([PathVariableName.DOCUMENTS])}
+                pathVariables={pathVariables}
+                isGameDocuments={false}
+                onChange={onPathSelectorChange}
+              />
+              <p className={styles['developer-screen__text']}>Настройки запуска игры</p>
+              <TextField
+                className={styles['developer-screen__item']}
+                id="label"
+                parent="playButton"
+                value={currentConfig.playButton.label}
+                label="Текст кнопки запуска"
+                onChange={OnTextFieldChange}
+              />
+              <PathSelector
+                className={styles['developer-screen__item']}
+                id="path"
+                parent="playButton"
+                label="Путь до исполняемого файла игры"
+                value={currentConfig.playButton.path}
+                options={generateSelectOptions([PathVariableName.GAME_DIR])}
+                pathVariables={pathVariables}
+                extensions={FileExtension.EXECUTABLE}
+                isSelectFile
+                onChange={onPathSelectorChange}
+              />
+              <ArgumentsBlock
+                args={currentConfig.playButton.args!}
+                parent="playButton"
+                pathVariables={pathVariables}
+                className={styles['developer-screen__item']}
+                changeArguments={changeArguments}
+                onPathError={sendIncorrectPathErrorMessage}
+              />
+              <div className={styles['developer-screen__custom-btns']}>
+                <p className={styles['developer-screen__text']}>
+                  Кнопки запуска дополнительных программ
+                </p>
+                <ul className={styles['developer-screen__custom-btns-container']}>
+                  {
                 currentConfig.customButtons.map((item) => (
                   <CustomBtnItem
                     key={item.id}
@@ -425,91 +433,92 @@ export const DeveloperScreen: React.FC = () => {
                   />
                 ))
               }
-              </ul>
-              <Button
-                className={classNames('main-btn', 'developer-screen__btn')}
-                onClick={onAddCustomBtnBtnClick}
-              >
-                Добавить кнопку
-              </Button>
+                </ul>
+                <Button
+                  className={classNames('main-btn', 'developer-screen__btn')}
+                  onClick={onAddCustomBtnBtnClick}
+                >
+                  Добавить кнопку
+                </Button>
+              </div>
             </div>
-          </div>
-          <div className={styles['developer-screen__block']}>
-            <p className={styles['developer-screen__block-title']}>Настройки Mod Organizer</p>
-            <Switcher
-              className={styles['developer-screen__item']}
-              id="isUsed"
-              parent="modOrganizer"
-              label="Используется ли MO?"
-              isChecked={currentConfig.modOrganizer.isUsed}
-              onChange={onSwitcherChange}
-            />
-            <Select
-              className={styles['developer-screen__item']}
-              id="version"
-              parent="modOrganizer"
-              label="Версия MO"
-              optionsArr={[
-                { label: 'Mod Organizer', value: '1' },
-                { label: 'Mod Organizer 2', value: '2' },
-              ]}
-              value={currentConfig.modOrganizer.version.toString()}
-              isDisabled={!currentConfig.modOrganizer.isUsed}
-              onChange={onSelectChange}
-            />
-            <PathSelector
-              className={styles['developer-screen__item']}
-              id="pathToMOFolder"
-              label="Путь до папки MO"
-              parent="modOrganizer"
-              value={currentConfig.modOrganizer.pathToMOFolder}
-              options={generateSelectOptions([PathVariableName.GAME_DIR])}
-              pathVariables={pathVariables}
-              isDisabled={!currentConfig.modOrganizer.isUsed}
-              onChange={onPathSelectorChange}
-            />
-            <PathSelector
-              className={styles['developer-screen__item']}
-              id="pathToMods"
-              label="Путь до папки модов MO"
-              parent="modOrganizer"
-              value={currentConfig.modOrganizer.pathToMods}
-              options={generateSelectOptions([PathVariableName.MO_DIR])}
-              pathVariables={pathVariables}
-              isDisabled={!currentConfig.modOrganizer.isUsed}
-              onChange={onPathSelectorChange}
-            />
-            <PathSelector
-              className={styles['developer-screen__item']}
-              id="pathToProfiles"
-              label="Путь до папки профилей MO"
-              parent="modOrganizer"
-              value={currentConfig.modOrganizer.pathToProfiles}
-              options={generateSelectOptions([PathVariableName.MO_DIR])}
-              pathVariables={pathVariables}
-              isDisabled={!currentConfig.modOrganizer.isUsed}
-              onChange={onPathSelectorChange}
-            />
-            <PathSelector
-              className={styles['developer-screen__item']}
-              id="pathToINI"
-              label="Путь до конфигурационного файла MO"
-              parent="modOrganizer"
-              value={currentConfig.modOrganizer.pathToINI}
-              options={generateSelectOptions([PathVariableName.MO_DIR])}
-              pathVariables={pathVariables}
-              isSelectFile
-              extensions={FileExtension.INI}
-              isDisabled={!currentConfig.modOrganizer.isUsed}
-              onChange={onPathSelectorChange}
-            />
-          </div>
-        </Scrollbars>
-      </form>
-      {
+            <div className={styles['developer-screen__block']}>
+              <p className={styles['developer-screen__block-title']}>Настройки Mod Organizer</p>
+              <Switcher
+                className={styles['developer-screen__item']}
+                id="isUsed"
+                parent="modOrganizer"
+                label="Используется ли MO?"
+                isChecked={currentConfig.modOrganizer.isUsed}
+                onChange={onSwitcherChange}
+              />
+              <Select
+                className={styles['developer-screen__item']}
+                id="version"
+                parent="modOrganizer"
+                label="Версия MO"
+                optionsArr={[
+                  { label: 'Mod Organizer', value: '1' },
+                  { label: 'Mod Organizer 2', value: '2' },
+                ]}
+                value={currentConfig.modOrganizer.version.toString()}
+                isDisabled={!currentConfig.modOrganizer.isUsed}
+                onChange={onSelectChange}
+              />
+              <PathSelector
+                className={styles['developer-screen__item']}
+                id="pathToMOFolder"
+                label="Путь до папки MO"
+                parent="modOrganizer"
+                value={currentConfig.modOrganizer.pathToMOFolder}
+                options={generateSelectOptions([PathVariableName.GAME_DIR])}
+                pathVariables={pathVariables}
+                isDisabled={!currentConfig.modOrganizer.isUsed}
+                onChange={onPathSelectorChange}
+              />
+              <PathSelector
+                className={styles['developer-screen__item']}
+                id="pathToMods"
+                label="Путь до папки модов MO"
+                parent="modOrganizer"
+                value={currentConfig.modOrganizer.pathToMods}
+                options={generateSelectOptions([PathVariableName.MO_DIR])}
+                pathVariables={pathVariables}
+                isDisabled={!currentConfig.modOrganizer.isUsed}
+                onChange={onPathSelectorChange}
+              />
+              <PathSelector
+                className={styles['developer-screen__item']}
+                id="pathToProfiles"
+                label="Путь до папки профилей MO"
+                parent="modOrganizer"
+                value={currentConfig.modOrganizer.pathToProfiles}
+                options={generateSelectOptions([PathVariableName.MO_DIR])}
+                pathVariables={pathVariables}
+                isDisabled={!currentConfig.modOrganizer.isUsed}
+                onChange={onPathSelectorChange}
+              />
+              <PathSelector
+                className={styles['developer-screen__item']}
+                id="pathToINI"
+                label="Путь до конфигурационного файла MO"
+                parent="modOrganizer"
+                value={currentConfig.modOrganizer.pathToINI}
+                options={generateSelectOptions([PathVariableName.MO_DIR])}
+                pathVariables={pathVariables}
+                isSelectFile
+                extensions={FileExtension.INI}
+                isDisabled={!currentConfig.modOrganizer.isUsed}
+                onChange={onPathSelectorChange}
+              />
+            </div>
+          </Scrollbars>
+        </form>
+        {
         isGameSettingsSaving
         && <Loader />
       }
-    </main>
+      </main>
+    </React.Fragment>
   );
 };

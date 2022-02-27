@@ -35,6 +35,15 @@ export const defaultLauncherResolution = {
   maxHeight: 0,
 };
 
+export const defaultDevWindowResolution = {
+  width: 1024,
+  height: 768,
+  minWidth: 800,
+  minHeight: 600,
+  maxWidth: 0,
+  maxHeight: 0,
+};
+
 export const defaultLauncherCustomButton: ILauncherCustomButton = {
   id: '',
   action: LauncherButtonAction.OPEN,

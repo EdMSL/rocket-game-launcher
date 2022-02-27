@@ -17,8 +17,9 @@ import { getDisplaysInfo } from '$utils/data';
 */
 export const createMainWindow = (config: IMainRootState['config']): void => {
   const mainWindowState = windowStateKeeper({
-    defaultWidth: defaultLauncherResolution.width,
-    defaultHeight: defaultLauncherResolution.height,
+    defaultWidth: config.width ? config.width : defaultLauncherResolution.width,
+    defaultHeight: config.height ? config.height : defaultLauncherResolution.height,
+    file: 'window-main-state.json',
   });
 
   const mainWindow = new BrowserWindow({
@@ -56,15 +57,19 @@ export const createMainWindow = (config: IMainRootState['config']): void => {
 
   getDisplaysInfo();
 
-  ipcMain.on('minimize window', () => {
-    mainWindow.minimize();
+  ipcMain.on('minimize window', (event, windowType) => {
+    if (windowType === 'main') {
+      mainWindow.minimize();
+    }
   });
 
-  ipcMain.on('max-unmax window', (evt, isMax) => {
-    if (isMax) {
-      mainWindow.unmaximize();
-    } else {
-      mainWindow.maximize();
+  ipcMain.on('max-unmax window', (event, isMax, windowType) => {
+    if (windowType === 'main') {
+      if (isMax) {
+        mainWindow.unmaximize();
+      } else {
+        mainWindow.maximize();
+      }
     }
   });
 
@@ -83,15 +88,15 @@ export const createMainWindow = (config: IMainRootState['config']): void => {
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
-    mainWindow.webContents.send('max-unmax window', mainWindow.isMaximized());
+    mainWindow.webContents.send('max-unmax window', mainWindow.isMaximized(), 'main');
   });
 
   mainWindow.on('maximize', () => {
-    mainWindow.webContents.send('max-unmax window', true);
+    mainWindow.webContents.send('max-unmax window', true, 'main');
   });
 
   mainWindow.on('unmaximize', () => {
-    mainWindow.webContents.send('max-unmax window', false);
+    mainWindow.webContents.send('max-unmax window', false, 'main');
   });
 
   if (process.env.NODE_ENV === 'production') {

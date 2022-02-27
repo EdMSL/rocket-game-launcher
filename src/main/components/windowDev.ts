@@ -2,16 +2,30 @@ import {
   BrowserWindow,
   ipcMain,
 } from 'electron';
+import windowStateKeeper from 'electron-window-state';
 
 import { createWaitForWebpackDevServer } from './waitDevServer';
+import { defaultDevWindowResolution } from '$constants/defaultParameters';
 
 /**
  * Функция для создания и показа окна разработчика
 */
-export const createDevWindow = (): void => {
-  const devWindow = new BrowserWindow({
-    width: 1024,
-    height: 650,
+export const createDevWindow = (): BrowserWindow|null => {
+  const devWindowState = windowStateKeeper({
+    defaultWidth: defaultDevWindowResolution.width,
+    defaultHeight: defaultDevWindowResolution.height,
+    file: 'window-dev-state.json',
+  });
+
+  let devWindow: BrowserWindow|null = new BrowserWindow({
+    x: devWindowState.x,
+    y: devWindowState.y,
+    minWidth: defaultDevWindowResolution.minWidth,
+    minHeight: defaultDevWindowResolution.minHeight,
+    maxWidth: defaultDevWindowResolution.maxWidth,
+    maxHeight: defaultDevWindowResolution.maxHeight,
+    width: devWindowState.width,
+    height: devWindowState.height,
     resizable: true,
     frame: false,
     webPreferences: {
@@ -30,7 +44,53 @@ export const createDevWindow = (): void => {
     waitForWebpackDevServer();
   }
 
-  ipcMain.on('ready-to-show', () => {
-    devWindow.show();
+  ipcMain.on('minimize window', (event, windowType) => {
+    if (windowType === 'dev') {
+      devWindow!.minimize();
+    }
   });
+
+  ipcMain.on('max-unmax window', (evt, isMax, windowType) => {
+    if (windowType === 'dev') {
+      if (isMax) {
+        devWindow!.unmaximize();
+      } else {
+        devWindow!.maximize();
+      }
+    }
+  });
+
+  ipcMain.on('resize window', (event, width, height) => {
+    if (devWindow!.isFullScreen()) {
+      devWindow!.unmaximize();
+    }
+
+    devWindow!.setMinimumSize(width, height);
+    devWindow!.setSize(width, height);
+  });
+
+  ipcMain.on('set resizable window', (event, isResizable) => {
+    devWindow!.setResizable(isResizable);
+  });
+
+  ipcMain.on('ready-to-show', () => {
+    devWindow!.show();
+    devWindow!.webContents.send('max-unmax window', devWindow!.isMaximized(), 'dev');
+  });
+
+  ipcMain.on('close window', () => {
+    devWindow!.hide();
+  });
+
+  devWindow.on('close', () => {
+    devWindow = null;
+  });
+
+  devWindow.on('closed', () => {
+    devWindow = null;
+  });
+
+  devWindowState.manage(devWindow);
+
+  return devWindow;
 };
