@@ -7,7 +7,8 @@ import {
 } from 'electron';
 
 import { createStorage } from './components/storage';
-import { createWindow } from './components/window';
+import { createMainWindow } from './components/windowMain';
+import { createDevWindow } from './components/windowDev';
 import {
   createLogFile,
   LogMessageType,
@@ -27,7 +28,7 @@ const start = async (): Promise<void> => {
 
   const store = createStorage();
 
-  createWindow(store.getState().main.config);
+  createMainWindow(store.getState().main.config);
 
   if (process.env.NODE_ENV === 'production') {
     createBackupFolders();
@@ -60,6 +61,10 @@ ipcMain.handle(
     isGameDocuments,
   ),
 );
+
+ipcMain.on('dev window', () => {
+  createDevWindow();
+});
 
 ipcMain.on('close app', () => {
   app.quit();

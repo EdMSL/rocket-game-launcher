@@ -8,8 +8,10 @@ import {
   takeLatest,
   select,
   SagaReturnType,
+  take,
 } from 'redux-saga/effects';
 import fs from 'fs';
+import { ipcRenderer } from 'electron';
 
 import { IAppState } from '$store/store';
 import { GAME_SETTINGS_PATH_REGEXP, Routes } from '$constants/routes';
@@ -460,10 +462,11 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
     },
   }: ReturnType<typeof getState> = yield select(getState);
   if (!isLauncherInitialised && location.pathname === `${Routes.MAIN_SCREEN}`) {
+    yield call(initLauncherSaga);
+
     if (isFirstLaunch) {
-      yield put(push(`${Routes.DEVELOPER_SCREEN}`));
-    } else {
-      yield call(initLauncherSaga);
+      yield take(MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED);
+      ipcRenderer.send('dev window');
     }
   }
 

@@ -13,9 +13,9 @@ import { IMainRootState } from '$types/main';
 import { getDisplaysInfo } from '$utils/data';
 
 /**
- * Функция для создания и показа окна приложения
+ * Функция для создания и показа главного окна приложения
 */
-export const createWindow = (config: IMainRootState['config']): void => {
+export const createMainWindow = (config: IMainRootState['config']): void => {
   const mainWindowState = windowStateKeeper({
     defaultWidth: defaultLauncherResolution.width,
     defaultHeight: defaultLauncherResolution.height,
@@ -42,7 +42,9 @@ export const createWindow = (config: IMainRootState['config']): void => {
   if (process.env.NODE_ENV === 'production') {
     mainWindow.loadFile('./dist/index.html');
   } else {
-    const waitForWebpackDevServer = createWaitForWebpackDevServer(mainWindow);
+    const waitForWebpackDevServer = createWaitForWebpackDevServer(
+      mainWindow, 'http://localhost:8081/build/index.html',
+    );
     waitForWebpackDevServer();
   }
 
@@ -99,12 +101,12 @@ export const createWindow = (config: IMainRootState['config']): void => {
   }
 
   if (process.env.NODE_ENV === 'development') {
-    globalShortcut.register('F11', () => {
-      mainWindow.webContents.openDevTools();
-    });
-
     globalShortcut.register('F5', () => {
       mainWindow.reload();
+    });
+
+    globalShortcut.register('F11', () => {
+      mainWindow.webContents.openDevTools();
     });
   }
 

@@ -84,6 +84,8 @@ export const MainScreen: React.FC = () => {
     setIsModalOpen(true);
   }, []);
 
+  const onDeveloperScreenBtnClick = useCallback(() => { ipcRenderer.send('dev window'); }, []);
+
   return (
     <main className={classNames('main', styles['main-screen__main'])}>
       <div className={classNames('control-panel', styles['main-screen__control-panel'])}>
@@ -136,18 +138,16 @@ export const MainScreen: React.FC = () => {
         >
           <span className={styles['main-screen__bottom-btn-text']}>Настройки программы</span>
         </Button>
-        <NavLink
-          exact
-          to={Routes.DEVELOPER_SCREEN}
+        <Button
           className={classNames(
             'main-btn',
             styles['main-screen__bottom-btn'],
             styles['main-screen__bottom-btn--developer'],
           )}
-          onClick={onDisabledNavLinkClick}
+          onClick={onDeveloperScreenBtnClick}
         >
           <span className={styles['main-screen__bottom-btn-text']}>Экран разработчика</span>
-        </NavLink>
+        </Button>
       </div>
       {
         isModalOpen && (
