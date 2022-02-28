@@ -27,14 +27,17 @@ let devWindow: BrowserWindow|null = null;
 
 const quitApp = (): void => {
   if (process.env.NODE_ENV === 'development') {
-    if (mainWindow) {
-      mainWindow.webContents.closeDevTools();
-    }
-
     if (devWindow) {
       devWindow.webContents.closeDevTools();
     }
+
+    if (mainWindow) {
+      mainWindow.webContents.closeDevTools();
+    }
   }
+
+  devWindow = null;
+  mainWindow = null;
 
   app.quit();
 };
@@ -45,7 +48,7 @@ const start = async (): Promise<void> => {
 
   const store = createStorage();
   devWindow = createDevWindow();
-  mainWindow = createMainWindow(store.getState().main.config, devWindow);
+  mainWindow = createMainWindow(store.getState().main.config, quitApp, devWindow);
 
   if (process.env.NODE_ENV === 'production') {
     createBackupFolders();

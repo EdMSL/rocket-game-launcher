@@ -37,7 +37,7 @@ export const createMainWindow = (
     height: config.isResizable ? mainWindowState.height : config.height,
     resizable: config.isResizable,
     frame: false,
-    title: config.gameName || 'Game Launcher',
+    title: config.gameName ? `${config.gameName} Launcher` : 'Game Launcher',
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
