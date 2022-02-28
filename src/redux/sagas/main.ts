@@ -466,7 +466,7 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
 
     if (isFirstLaunch) {
       yield take(MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED);
-      ipcRenderer.send('dev window');
+      ipcRenderer.send('open dev window');
     }
   }
 

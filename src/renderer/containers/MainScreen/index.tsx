@@ -84,7 +84,7 @@ export const MainScreen: React.FC = () => {
     setIsModalOpen(true);
   }, []);
 
-  const onDeveloperScreenBtnClick = useCallback(() => { ipcRenderer.send('dev window'); }, []);
+  const onDeveloperScreenBtnClick = useCallback(() => { ipcRenderer.send('open dev window'); }, []);
 
   return (
     <React.Fragment>

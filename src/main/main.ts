@@ -82,7 +82,7 @@ ipcMain.handle(
   ),
 );
 
-ipcMain.on('dev window', () => {
+ipcMain.on('open dev window', () => {
   if (!devWindow) {
     devWindow = createDevWindow();
   } else {
