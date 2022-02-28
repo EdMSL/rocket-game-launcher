@@ -80,7 +80,7 @@ export const defaultLauncherConfig: ILauncherConfig = {
   isFirstLaunch: true,
   modOrganizer: defaultModOrganizerParams,
   documentsPath: '',
-  gameName: '',
+  gameName: 'Rocket Game Launcher',
   playButton: {
     path: '',
     args: [],
