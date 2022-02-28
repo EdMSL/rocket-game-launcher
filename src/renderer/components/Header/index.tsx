@@ -76,7 +76,7 @@ export const Header: React.FunctionComponent<IProps> = ({
         </div>
         {
           gameName
-          && <p className={styles['header__game-name']}>{gameName}</p>
+          && <p className={styles['header__game-name']}>{openAppInfo ? gameName : 'Developer Screen'}</p>
         }
         <div className={styles.header__controls}>
           {

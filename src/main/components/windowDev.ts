@@ -30,6 +30,7 @@ export const createDevWindow = (): BrowserWindow|null => {
     resizable: true,
     frame: false,
     show: false,
+    title: 'Developer Screen',
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,

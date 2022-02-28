@@ -17,6 +17,7 @@ import { getDisplaysInfo } from '$utils/data';
 */
 export const createMainWindow = (
   config: IMainRootState['config'],
+  windowCloseCallback: () => void,
   devWindow?: BrowserWindow|null,
 ): BrowserWindow => {
   const mainWindowState = windowStateKeeper({
@@ -36,6 +37,7 @@ export const createMainWindow = (
     height: config.isResizable ? mainWindowState.height : config.height,
     resizable: config.isResizable,
     frame: false,
+    title: config.gameName || 'Game Launcher',
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -103,6 +105,10 @@ export const createMainWindow = (
 
   mainWindow.on('unmaximize', () => {
     mainWindow.webContents.send('max-unmax window', false);
+  });
+
+  mainWindow.on('close', () => {
+    windowCloseCallback();
   });
 
   if (process.env.NODE_ENV === 'production') {
