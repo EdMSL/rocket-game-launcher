@@ -296,7 +296,6 @@ export const DeveloperScreen: React.FC = () => {
                     'main-btn',
                     'control-panel__btn',
                   )}
-                  isDisabled={!isConfigChanged || validationErrors.length > 0}
                 >
                   Отмена
                 </Button>

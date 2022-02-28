@@ -88,15 +88,15 @@ export const createMainWindow = (config: IMainRootState['config']): void => {
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
-    mainWindow.webContents.send('max-unmax window', mainWindow.isMaximized(), 'main');
+    mainWindow.webContents.send('max-unmax window', mainWindow.isMaximized());
   });
 
   mainWindow.on('maximize', () => {
-    mainWindow.webContents.send('max-unmax window', true, 'main');
+    mainWindow.webContents.send('max-unmax window', true);
   });
 
   mainWindow.on('unmaximize', () => {
-    mainWindow.webContents.send('max-unmax window', false, 'main');
+    mainWindow.webContents.send('max-unmax window', false);
   });
 
   if (process.env.NODE_ENV === 'production') {

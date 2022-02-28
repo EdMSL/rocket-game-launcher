@@ -10,7 +10,7 @@ import { useAppSelector } from '$store/store';
 
 const launcherIcon = require('$images/icon.png');
 
-// передача функции openAppInfo в компонент означает, что окно с этим компонетом является главным
+// передача функции openAppInfo в компонент означает, что окно с этим компонентом является главным
 interface IProps {
   onClose: (event) => void,
   openAppInfo?: () => void,
@@ -20,13 +20,17 @@ export const Header: React.FunctionComponent<IProps> = ({
   onClose,
   openAppInfo = null,
 }) => {
-  const isResizable = useAppSelector((state) => state.main.config.isResizable);
   const gameName = useAppSelector((state) => state.main.config.gameName);
+  let isResizable = useAppSelector((state) => state.main.config.isResizable);
+
+  if (!openAppInfo) {
+    isResizable = true;
+  }
 
   const [isMaximize, setIsMaximize] = useState(false);
 
   useEffect(() => {
-    ipcRenderer.on('max-unmax window', (evt, isMax, windowType) => {
+    ipcRenderer.on('max-unmax window', (evt, isMax) => {
       setIsMaximize(isMax);
     });
 

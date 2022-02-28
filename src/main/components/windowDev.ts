@@ -1,5 +1,6 @@
 import {
   BrowserWindow,
+  globalShortcut,
   ipcMain,
 } from 'electron';
 import windowStateKeeper from 'electron-window-state';
@@ -44,6 +45,12 @@ export const createDevWindow = (): BrowserWindow|null => {
     waitForWebpackDevServer();
   }
 
+  if (process.env.NODE_ENV === 'development') {
+    globalShortcut.register('F10', () => {
+      devWindow!.webContents.openDevTools();
+    });
+  }
+
   ipcMain.on('minimize window', (event, windowType) => {
     if (windowType === 'dev') {
       devWindow!.minimize();
@@ -60,22 +67,17 @@ export const createDevWindow = (): BrowserWindow|null => {
     }
   });
 
-  ipcMain.on('resize window', (event, width, height) => {
-    if (devWindow!.isFullScreen()) {
-      devWindow!.unmaximize();
-    }
-
-    devWindow!.setMinimumSize(width, height);
-    devWindow!.setSize(width, height);
+  devWindow.on('maximize', () => {
+    devWindow!.webContents.send('max-unmax window', true);
   });
 
-  ipcMain.on('set resizable window', (event, isResizable) => {
-    devWindow!.setResizable(isResizable);
+  devWindow.on('unmaximize', () => {
+    devWindow!.webContents.send('max-unmax window', false);
   });
 
-  ipcMain.on('ready-to-show', () => {
+  devWindow.once('ready-to-show', () => {
     devWindow!.show();
-    devWindow!.webContents.send('max-unmax window', devWindow!.isMaximized(), 'dev');
+    devWindow!.webContents.send('max-unmax window', devWindow!.isMaximized());
   });
 
   ipcMain.on('close window', () => {
