@@ -39,7 +39,10 @@ const quitApp = (): void => {
   devWindow = null;
   mainWindow = null;
 
-  app.quit();
+  globalShortcut.unregisterAll();
+
+  // Изменено ввиду проблем с закрытием окон из панели задач системы
+  app.exit();
 };
 
 const start = async (): Promise<void> => {
@@ -102,14 +105,4 @@ app.on('ready', () => {
       showErrorBox(`${error.message} See log for more details\nApplication will be closed.`, "Can't run application."); //eslint-disable-line max-len
       quitApp();
     });
-});
-
-app.on('will-quit', () => {
-  globalShortcut.unregisterAll();
-});
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    quitApp();
-  }
 });

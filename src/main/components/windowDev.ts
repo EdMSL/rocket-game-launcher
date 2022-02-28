@@ -85,8 +85,10 @@ export const createDevWindow = (): BrowserWindow|null => {
     devWindow!.hide();
   });
 
-  devWindow.on('close', () => {
-    devWindow = null;
+  devWindow.on('close', (event) => {
+    // Изменено ввиду проблем с закрытием окон из панели задач системы
+    event.preventDefault();
+    devWindow!.hide();
   });
 
   devWindow.on('closed', () => {
