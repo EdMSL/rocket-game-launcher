@@ -21,6 +21,7 @@ export const INITIAL_STATE: IMainRootState = {
     playButton: defaultLauncherConfig.playButton,
     customButtons: defaultLauncherConfig.customButtons,
   },
+  launcherVersion: '',
   pathVariables: DefaultPathVariable,
   isLauncherInitialised: false,
   isLauncherConfigChanged: false,

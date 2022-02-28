@@ -3,7 +3,11 @@ import React, { useCallback } from 'react';
 import styles from './styles.module.scss';
 import { openSite } from '$utils/process';
 
-export const AppInfo: React.FC = () => {
+interface IProps {
+  launcherVersion: string,
+}
+
+export const AppInfo: React.FC<IProps> = ({ launcherVersion }) => {
   const onOpenSiteBtnClick = useCallback((event) => {
     event.preventDefault();
     openSite(event.currentTarget.href);
@@ -12,7 +16,7 @@ export const AppInfo: React.FC = () => {
   return (
     <div className={styles['app-info__container']}>
       <p className={styles['app-info__title']}>Rocket Game Launcher</p>
-      <p>Version: 1.1.0</p>
+      <p>{`Version: ${launcherVersion}`}</p>
       <p>
         Created by
         <a

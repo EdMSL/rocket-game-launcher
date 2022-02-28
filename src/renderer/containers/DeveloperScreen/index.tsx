@@ -301,19 +301,15 @@ export const DeveloperScreen: React.FC = () => {
             >
               ОК
             </Button>
-            {
-              !currentConfig.isFirstLaunch && (
-                <Button
-                  onClick={onCancelBtnClick}
-                  className={classNames(
-                    'main-btn',
-                    'control-panel__btn',
-                  )}
-                >
-                  Отмена
-                </Button>
-              )
-            }
+            <Button
+              onClick={onCancelBtnClick}
+              className={classNames(
+                'main-btn',
+                'control-panel__btn',
+              )}
+            >
+              Отмена
+            </Button>
             <Button
               onClick={onSaveBtnClick}
               className={classNames(

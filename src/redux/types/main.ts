@@ -81,6 +81,7 @@ export interface ILauncherConfig {
 
 export type IMainRootState = Readonly<{
   config: ILauncherConfig,
+  launcherVersion: string,
   pathVariables: IPathVariables,
   isLauncherInitialised: boolean,
   isLauncherConfigChanged: boolean,

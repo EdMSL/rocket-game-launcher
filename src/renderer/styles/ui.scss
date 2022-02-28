@@ -519,6 +519,15 @@ $checkbox-size: 20px;
   background-color: var(--text-secondary);
 }
 
+.modal__title {
+  @include reset-indents;
+  flex-grow: 1;
+  padding-left: calc(var(--modal-btn-padding) * 2);
+
+  line-height: calc(var(--modal-btn-padding) * 2);
+  text-align: center;
+}
+
 .modal__content {
   flex-grow: 1;
   display: flex;
@@ -533,7 +542,7 @@ $checkbox-size: 20px;
 }
 
 .modal__btn {
-  padding: 16px;
+  padding: var(--modal-btn-padding);
   /* stylelint-disable string-no-newline, max-line-length */
   background-image:
     url(

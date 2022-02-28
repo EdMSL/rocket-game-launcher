@@ -21,6 +21,7 @@ import { DeveloperScreen } from '$containers/DeveloperScreen';
 
 export const App = (): JSX.Element => {
   const userTheme = useAppSelector((state) => state.userSettings.theme);
+  const launcherVersion = useAppSelector((state) => state.main.launcherVersion);
 
   const [isOpenAppInfo, setIsOpenAppInfo] = useState<boolean>(false);
 
@@ -84,8 +85,11 @@ export const App = (): JSX.Element => {
       }
       {
         isOpenAppInfo && (
-          <Modal onCloseBtnClick={onCloseAppInfoModal}>
-            <AppInfo />
+          <Modal
+            title="About app"
+            onCloseBtnClick={onCloseAppInfoModal}
+          >
+            <AppInfo launcherVersion={launcherVersion} />
           </Modal>
         )
       }

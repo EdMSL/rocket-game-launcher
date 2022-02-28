@@ -179,6 +179,7 @@ export const createStorage = (): Store<IAppState> => {
           ...configurationData.playButton,
         },
       },
+      launcherVersion: app.getVersion(),
       pathVariables,
       userThemes,
       messages,
