@@ -29,6 +29,7 @@ export const createDevWindow = (): BrowserWindow|null => {
     height: devWindowState.height,
     resizable: true,
     frame: false,
+    show: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -75,8 +76,7 @@ export const createDevWindow = (): BrowserWindow|null => {
     devWindow!.webContents.send('max-unmax window', false);
   });
 
-  devWindow.once('ready-to-show', () => {
-    devWindow!.show();
+  devWindow.on('show', () => {
     devWindow!.webContents.send('max-unmax window', devWindow!.isMaximized());
   });
 

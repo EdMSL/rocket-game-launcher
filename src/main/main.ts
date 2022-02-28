@@ -22,15 +22,30 @@ import { IPathVariables, USER_THEMES_DIR } from '$constants/paths';
 
 require('@electron/remote/main').initialize();
 
+let mainWindow: BrowserWindow|null = null;
 let devWindow: BrowserWindow|null = null;
+
+const quitApp = (): void => {
+  if (process.env.NODE_ENV === 'development') {
+    if (mainWindow) {
+      mainWindow.webContents.closeDevTools();
+    }
+
+    if (devWindow) {
+      devWindow.webContents.closeDevTools();
+    }
+  }
+
+  app.quit();
+};
 
 const start = async (): Promise<void> => {
   createLogFile();
   getSystemInfo();
 
   const store = createStorage();
-
-  createMainWindow(store.getState().main.config);
+  devWindow = createDevWindow();
+  mainWindow = createMainWindow(store.getState().main.config, devWindow);
 
   if (process.env.NODE_ENV === 'production') {
     createBackupFolders();
@@ -38,7 +53,7 @@ const start = async (): Promise<void> => {
   }
 
   globalShortcut.register('Alt+Q', () => {
-    app.quit();
+    quitApp();
   });
 
   writeToLogFileSync('Application ready.');
@@ -69,11 +84,12 @@ ipcMain.on('dev window', () => {
     devWindow = createDevWindow();
   } else {
     devWindow.show();
+    devWindow.focus();
   }
 });
 
 ipcMain.on('close app', () => {
-  app.quit();
+  quitApp();
 });
 
 app.on('ready', () => {
@@ -81,7 +97,7 @@ app.on('ready', () => {
     .catch((error: Error) => {
       writeToLogFileSync(error.message, LogMessageType.ERROR);
       showErrorBox(`${error.message} See log for more details\nApplication will be closed.`, "Can't run application."); //eslint-disable-line max-len
-      app.quit();
+      quitApp();
     });
 });
 
@@ -91,6 +107,6 @@ app.on('will-quit', () => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit();
+    quitApp();
   }
 });

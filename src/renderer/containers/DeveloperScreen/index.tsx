@@ -58,7 +58,20 @@ export const DeveloperScreen: React.FC = () => {
     if (launcherConfig.isFirstLaunch) {
       dispatch(setIsFirstLaunch(false));
     }
-  }, [dispatch, launcherConfig.isFirstLaunch, currentConfig]);
+
+    ipcRenderer.on('window resized', (event, windowSize) => {
+      const newConfig = {
+        ...currentConfig,
+        width: windowSize[0],
+        height: windowSize[1],
+      };
+
+      setCurrentConfig(newConfig);
+      setIsConfigChanged(!checkObjectForEqual(launcherConfig, newConfig));
+    });
+
+    return (): void => { ipcRenderer.removeAllListeners('window resized'); };
+  }, [dispatch, launcherConfig, currentConfig]);
 
   const changeCurrentConfig = useCallback((fieldName, value, parent?) => {
     let newConfig: ILauncherConfig;

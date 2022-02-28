@@ -15,7 +15,10 @@ import { getDisplaysInfo } from '$utils/data';
 /**
  * Функция для создания и показа главного окна приложения
 */
-export const createMainWindow = (config: IMainRootState['config']): void => {
+export const createMainWindow = (
+  config: IMainRootState['config'],
+  devWindow?: BrowserWindow|null,
+): BrowserWindow => {
   const mainWindowState = windowStateKeeper({
     defaultWidth: config.width ? config.width : defaultLauncherResolution.width,
     defaultHeight: config.height ? config.height : defaultLauncherResolution.height,
@@ -87,8 +90,11 @@ export const createMainWindow = (config: IMainRootState['config']): void => {
   });
 
   mainWindow.once('ready-to-show', () => {
-    mainWindow.show();
     mainWindow.webContents.send('max-unmax window', mainWindow.isMaximized());
+  });
+
+  mainWindow.on('resized', () => {
+    devWindow!.webContents.send('window resized', mainWindow.getSize());
   });
 
   mainWindow.on('maximize', () => {
@@ -116,4 +122,6 @@ export const createMainWindow = (config: IMainRootState['config']): void => {
   }
 
   mainWindowState.manage(mainWindow);
+
+  return mainWindow;
 };
