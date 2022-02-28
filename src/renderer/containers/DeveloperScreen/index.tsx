@@ -27,9 +27,9 @@ import {
   appWindowFields,
   FileExtension,
   LauncherButtonAction,
-  MinWindowSize,
   PathVariableName,
 } from '$constants/misc';
+import { MinWindowSize } from '$constants/defaultParameters';
 import { Button } from '$components/UI/Button';
 import { CustomBtnItem } from '$components/CustomBtnItem';
 import {
@@ -264,9 +264,9 @@ export const DeveloperScreen: React.FC = () => {
 
   const getNumberFieldMinValue = useCallback((id: string): number => {
     if (!currentConfig.isResizable) {
-      if (id === 'width') {
+      if (id === 'width' || id === 'minWidth') {
         return MinWindowSize.WIDTH;
-      } else if (id === 'height') {
+      } else if (id === 'height' || id === 'minHeight') {
         return MinWindowSize.HEIGHT;
       }
     }

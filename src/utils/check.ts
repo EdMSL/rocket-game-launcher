@@ -20,7 +20,7 @@ import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';
 import {
-  defaultLauncherConfig,
+  defaultLauncherConfig, MinWindowSize,
   // minimalLauncherConfig,
 } from '$constants/defaultParameters';
 // import { IConfigRootState } from '$types/config';
@@ -40,12 +40,16 @@ export interface IGameSettingsConfigCheckResult {
 
 const configFileDataSchema = Joi.object({
   isResizable: Joi.bool().optional().default(defaultLauncherConfig.isResizable),
-  minWidth: Joi.number().optional().default(defaultLauncherConfig.minWidth),
-  minHeight: Joi.number().optional().default(defaultLauncherConfig.minHeight),
-  maxWidth: Joi.number().optional().default(defaultLauncherConfig.maxWidth),
-  maxHeight: Joi.number().optional().default(defaultLauncherConfig.maxHeight),
-  width: Joi.number().optional().default(defaultLauncherConfig.width),
-  height: Joi.number().optional().default(defaultLauncherConfig.height),
+  minWidth: Joi.number().integer().min(MinWindowSize.WIDTH).optional()
+    .default(defaultLauncherConfig.minWidth),
+  minHeight: Joi.number().integer().min(MinWindowSize.HEIGHT).optional()
+    .default(defaultLauncherConfig.minHeight),
+  maxWidth: Joi.number().integer().optional().default(defaultLauncherConfig.maxWidth),
+  maxHeight: Joi.number().integer().optional().default(defaultLauncherConfig.maxHeight),
+  width: Joi.number().integer().min(MinWindowSize.WIDTH).optional()
+    .default(defaultLauncherConfig.width),
+  height: Joi.number().integer().min(MinWindowSize.HEIGHT).optional()
+    .default(defaultLauncherConfig.height),
   modOrganizer: Joi.object({
     isUsed: Joi.bool().optional().default(false),
     version: Joi.number().valid(1, 2).when(Joi.ref('isUsed'), { is: true, then: Joi.required() }),

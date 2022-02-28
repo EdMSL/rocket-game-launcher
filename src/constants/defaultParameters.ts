@@ -26,11 +26,16 @@ interface ILauncherConfigModOrganizerParams {
   profileParamValueRegExp?: string,
 }
 
+export const MinWindowSize = {
+  HEIGHT: 400,
+  WIDTH: 400,
+};
+
 export const defaultLauncherResolution = {
   width: 800,
   height: 600,
-  minWidth: 0,
-  minHeight: 0,
+  minWidth: MinWindowSize.WIDTH,
+  minHeight: MinWindowSize.HEIGHT,
   maxWidth: 0,
   maxHeight: 0,
 };

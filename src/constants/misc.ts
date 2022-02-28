@@ -83,11 +83,6 @@ export const FileExtension = {
   INI: ['ini'],
 };
 
-export const MinWindowSize = {
-  HEIGHT: 400,
-  WIDTH: 400,
-};
-
 export interface IWindowField {
   id: string,
   label: string,
