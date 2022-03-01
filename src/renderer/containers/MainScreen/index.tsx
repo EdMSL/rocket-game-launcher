@@ -15,7 +15,7 @@ import {
 } from '$actions/main';
 import { useAppSelector } from '$store/store';
 import { CreateUserMessage } from '$utils/message';
-import { LauncherButtonAction, AppEvent } from '$constants/misc';
+import { LauncherButtonAction, AppChannel } from '$constants/misc';
 import { Modal } from '$components/UI/Modal';
 import { LauncherSettings } from '$components/LauncherSettings';
 import { getPathToFile } from '$utils/strings';
@@ -39,11 +39,11 @@ export const MainScreen: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    ipcRenderer.on(AppEvent.DEV_WINDOW_CLOSED, () => {
+    ipcRenderer.on(AppChannel.DEV_WINDOW_CLOSED, () => {
       dispatch(setIsDevWindowOpen(false));
     });
 
-    return (): void => { ipcRenderer.removeAllListeners(AppEvent.DEV_WINDOW_CLOSED); };
+    return (): void => { ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED); };
   }, [dispatch]);
 
   const changeGameState = useCallback((errorMessage: string, isRunning: boolean, close = false) => {
@@ -52,7 +52,7 @@ export const MainScreen: React.FC = () => {
     if (errorMessage) {
       dispatch(addMessages([CreateUserMessage.error(errorMessage)]));
     } else if (isAutoclose && close) {
-      ipcRenderer.send(AppEvent.CLOSE_APP);
+      ipcRenderer.send(AppChannel.CLOSE_APP);
     }
   }, [dispatch, isAutoclose]);
 
@@ -98,7 +98,7 @@ export const MainScreen: React.FC = () => {
   }, []);
 
   const onDeveloperScreenBtnClick = useCallback(() => {
-    ipcRenderer.send(AppEvent.OPEN_DEV_WINDOW);
+    ipcRenderer.send(AppChannel.OPEN_DEV_WINDOW);
     dispatch(setIsDevWindowOpen(true));
   }, [dispatch]);
 

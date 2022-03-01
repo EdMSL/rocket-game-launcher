@@ -19,7 +19,7 @@ import { getSystemInfo } from '$utils/data';
 import { createBackupFolders } from '$utils/backup';
 import { createFolderSync, getPathFromFileInput } from '$utils/files';
 import { IPathVariables, USER_THEMES_DIR } from '$constants/paths';
-import { AppEvent } from '$constants/misc';
+import { AppChannel } from '$constants/misc';
 
 require('@electron/remote/main').initialize();
 
@@ -71,7 +71,7 @@ const start = async (): Promise<void> => {
 };
 
 ipcMain.handle(
-  AppEvent.GET_PATH_BY_PATH_SELECTOR,
+  AppChannel.GET_PATH_BY_PATH_SELECTOR,
   (
     event,
     pathVariables: IPathVariables,
@@ -90,7 +90,7 @@ ipcMain.handle(
   ),
 );
 
-ipcMain.on(AppEvent.CLOSE_APP, () => {
+ipcMain.on(AppChannel.CLOSE_APP, () => {
   quitApp();
 });
 

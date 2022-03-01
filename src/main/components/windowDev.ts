@@ -7,7 +7,7 @@ import windowStateKeeper from 'electron-window-state';
 
 import { createWaitForWebpackDevServer } from './waitDevServer';
 import { defaultDevWindowResolution } from '$constants/defaultParameters';
-import { AppEvent, AppWindowName } from '$constants/misc';
+import { AppChannel, AppWindowName } from '$constants/misc';
 
 /**
  * Функция для создания и показа окна разработчика
@@ -64,18 +64,18 @@ export const addDevWindowListeners = (
   devWindow: BrowserWindow,
   mainWindow: BrowserWindow,
 ): void => {
-  ipcMain.on(AppEvent.OPEN_DEV_WINDOW, () => {
+  ipcMain.on(AppChannel.OPEN_DEV_WINDOW, () => {
     devWindow.show();
     devWindow.focus();
   });
 
-  ipcMain.on(AppEvent.MINIMIZE_WINDOW, (event, windowName) => {
+  ipcMain.on(AppChannel.MINIMIZE_WINDOW, (event, windowName) => {
     if (windowName === AppWindowName.DEV) {
       devWindow.minimize();
     }
   });
 
-  ipcMain.on(AppEvent.MAX_UNMAX_WINDOW, (evt, isMax, windowName) => {
+  ipcMain.on(AppChannel.MAX_UNMAX_WINDOW, (evt, isMax, windowName) => {
     if (windowName === AppWindowName.DEV) {
       if (isMax) {
         devWindow.unmaximize();
@@ -86,25 +86,25 @@ export const addDevWindowListeners = (
   });
 
   devWindow.on('maximize', () => {
-    devWindow.webContents.send(AppEvent.MAX_UNMAX_WINDOW, true);
+    devWindow.webContents.send(AppChannel.MAX_UNMAX_WINDOW, true);
   });
 
   devWindow.on('unmaximize', () => {
-    devWindow.webContents.send(AppEvent.MAX_UNMAX_WINDOW, false);
+    devWindow.webContents.send(AppChannel.MAX_UNMAX_WINDOW, false);
   });
 
   devWindow.on('show', () => {
-    devWindow.webContents.send(AppEvent.MAX_UNMAX_WINDOW, devWindow.isMaximized());
+    devWindow.webContents.send(AppChannel.MAX_UNMAX_WINDOW, devWindow.isMaximized());
   });
 
-  ipcMain.on(AppEvent.CLOSE_DEV_WINDOW, () => {
-    mainWindow.webContents.send(AppEvent.DEV_WINDOW_CLOSED);
+  ipcMain.on(AppChannel.CLOSE_DEV_WINDOW, () => {
+    mainWindow.webContents.send(AppChannel.DEV_WINDOW_CLOSED);
     devWindow.hide();
   });
 
   devWindow.on('close', (event) => {
     // Изменено ввиду проблем с закрытием окон из панели задач системы
-    mainWindow.webContents.send(AppEvent.DEV_WINDOW_CLOSED);
+    mainWindow.webContents.send(AppChannel.DEV_WINDOW_CLOSED);
     event.preventDefault();
     devWindow.hide();
   });

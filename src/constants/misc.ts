@@ -83,7 +83,7 @@ export const FileExtension = {
   INI: ['ini'],
 };
 
-export const AppEvent = {
+export const AppChannel = {
   OPEN_DEV_WINDOW: 'open dev window',
   CLOSE_DEV_WINDOW: 'close dev window',
   DEV_WINDOW_CLOSED: 'dev window closed',

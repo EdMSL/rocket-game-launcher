@@ -18,7 +18,7 @@ import { useAppSelector } from '$store/store';
 import { Modal } from '$components/UI/Modal';
 import { AppInfo } from '$components/AppInfo';
 import { DeveloperScreen } from '$containers/DeveloperScreen';
-import { AppEvent } from '$constants/misc';
+import { AppChannel } from '$constants/misc';
 
 export const App = (): JSX.Element => {
   const userTheme = useAppSelector((state) => state.userSettings.theme);
@@ -51,7 +51,7 @@ export const App = (): JSX.Element => {
   }, []);
 
   const closeApp = useCallback(() => {
-    ipcRenderer.send(AppEvent.CLOSE_APP);
+    ipcRenderer.send(AppChannel.CLOSE_APP);
   }, []);
 
   return (
