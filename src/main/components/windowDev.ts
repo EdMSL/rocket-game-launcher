@@ -90,6 +90,10 @@ export const addDevWindowListeners = (
     afterCreateCallback();
   });
 
+  devWindow.on('show', () => {
+    mainWindow.webContents.send(AppChannel.DEV_WINDOW_OPENED);
+  });
+
   devWindow.on('maximize', () => {
     devWindow.webContents.send(AppChannel.MAX_UNMAX_WINDOW, true);
   });

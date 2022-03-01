@@ -86,6 +86,7 @@ export const FileExtension = {
 export const AppChannel = {
   OPEN_DEV_WINDOW: 'open dev window',
   CLOSE_DEV_WINDOW: 'close dev window',
+  DEV_WINDOW_OPENED: 'dev window opened',
   DEV_WINDOW_CLOSED: 'dev window closed',
   MINIMIZE_WINDOW: 'minimize window',
   RESIZE_WINDOW: 'resize window',

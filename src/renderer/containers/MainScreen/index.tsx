@@ -19,6 +19,7 @@ import { LauncherButtonAction, AppChannel } from '$constants/misc';
 import { Modal } from '$components/UI/Modal';
 import { LauncherSettings } from '$components/LauncherSettings';
 import { getPathToFile } from '$utils/strings';
+import { Loader } from '$components/UI/Loader';
 
 export const MainScreen: React.FC = () => {
   /* eslint-disable max-len */
@@ -37,10 +38,15 @@ export const MainScreen: React.FC = () => {
   const dispatch = useDispatch();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isDevWindowOpening, setIsDevWinwodOpening] = useState<boolean>(false);
 
   useEffect(() => {
     ipcRenderer.on(AppChannel.DEV_WINDOW_CLOSED, () => {
       dispatch(setIsDevWindowOpen(false));
+    });
+
+    ipcRenderer.on(AppChannel.DEV_WINDOW_OPENED, () => {
+      setIsDevWinwodOpening(false);
     });
 
     return (): void => { ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED); };
@@ -100,6 +106,7 @@ export const MainScreen: React.FC = () => {
   const onDeveloperScreenBtnClick = useCallback(() => {
     ipcRenderer.send(AppChannel.OPEN_DEV_WINDOW);
     dispatch(setIsDevWindowOpen(true));
+    setIsDevWinwodOpening(true);
   }, [dispatch]);
 
   return (
@@ -168,20 +175,23 @@ export const MainScreen: React.FC = () => {
           </Button>
         </div>
         {
-        isModalOpen && (
-        <Modal
-          modalParentClassname="launcher-settings"
-          onCloseBtnClick={closeModal}
-        >
-          <LauncherSettings
-            isAutoclose={isAutoclose}
-            userTheme={userTheme}
-            userThemes={userThemes}
-          />
+          isModalOpen && (
+          <Modal
+            modalParentClassname="launcher-settings"
+            onCloseBtnClick={closeModal}
+          >
+            <LauncherSettings
+              isAutoclose={isAutoclose}
+              userTheme={userTheme}
+              userThemes={userThemes}
+            />
 
-        </Modal>
-        )
-      }
+          </Modal>
+          )
+        }
+        {
+          isDevWindowOpening && <Loader />
+        }
       </main>
     </React.Fragment>
   );
