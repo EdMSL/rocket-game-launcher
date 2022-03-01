@@ -11,6 +11,7 @@ import { ISelectOption } from '../Select';
 import { getVariableAndValueFromPath } from '$utils/data';
 import { IPathVariables } from '$constants/paths';
 import { checkIsPathIsNotOutsideValidFolder, replaceRootDirByPathVariable } from '$utils/strings';
+import { AppEvent } from '$constants/misc';
 
 interface IProps extends IUIElementParams {
   options: ISelectOption[],
@@ -64,7 +65,7 @@ export const PathSelector: React.FC<IProps> = ({
   const getPathFromPathSelector = useCallback(async (
   ): Promise<string> => {
     const pathStr = await ipcRenderer.invoke(
-      'get path from native window',
+      AppEvent.GET_PATH_BY_PATH_SELECTOR,
       pathVariables,
       currentPathValue
         ? `${pathVariables[currentPathVariable]}\\${currentPathValue}`

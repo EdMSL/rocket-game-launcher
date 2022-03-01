@@ -1,5 +1,7 @@
 import { ipcRenderer } from 'electron';
-import React, { useCallback, useState } from 'react';
+import React, {
+  useCallback, useEffect, useState,
+} from 'react';
 import { NavLink } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import classNames from 'classnames';
@@ -8,7 +10,9 @@ import styles from './styles.module.scss';
 import { Routes } from '$constants/routes';
 import { runApplication, openFolder } from '$utils/process';
 import { Button } from '$components/UI/Button';
-import { setIsGameRunning, addMessages } from '$actions/main';
+import {
+  setIsGameRunning, addMessages, setIsDevWindowOpen,
+} from '$actions/main';
 import { useAppSelector } from '$store/store';
 import { CreateUserMessage } from '$utils/message';
 import { LauncherButtonAction, AppEvent } from '$constants/misc';
@@ -22,6 +26,7 @@ export const MainScreen: React.FC = () => {
   const appButtons = useAppSelector((state) => state.main.config.customButtons);
   const isGameRunning = useAppSelector((state) => state.main.isGameRunning);
   const pathVariables = useAppSelector((state) => state.main.pathVariables);
+  const isDevWindowOpen = useAppSelector((state) => state.main.isDevWindowOpen);
   const userThemes = useAppSelector((state) => state.main.userThemes);
   const userTheme = useAppSelector((state) => state.userSettings.theme);
   const isAutoclose = useAppSelector((state) => state.userSettings.isAutoclose);
@@ -32,6 +37,14 @@ export const MainScreen: React.FC = () => {
   const dispatch = useDispatch();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    ipcRenderer.on(AppEvent.DEV_WINDOW_CLOSED, () => {
+      dispatch(setIsDevWindowOpen(false));
+    });
+
+    return (): void => { ipcRenderer.removeAllListeners(AppEvent.DEV_WINDOW_CLOSED); };
+  }, [dispatch]);
 
   const changeGameState = useCallback((errorMessage: string, isRunning: boolean, close = false) => {
     dispatch(setIsGameRunning(isRunning));
@@ -86,7 +99,8 @@ export const MainScreen: React.FC = () => {
 
   const onDeveloperScreenBtnClick = useCallback(() => {
     ipcRenderer.send(AppEvent.OPEN_DEV_WINDOW);
-  }, []);
+    dispatch(setIsDevWindowOpen(true));
+  }, [dispatch]);
 
   return (
     <React.Fragment>
@@ -148,6 +162,7 @@ export const MainScreen: React.FC = () => {
               styles['main-screen__bottom-btn--developer'],
             )}
             onClick={onDeveloperScreenBtnClick}
+            isDisabled={isDevWindowOpen}
           >
             <span className={styles['main-screen__bottom-btn-text']}>Экран разработчика</span>
           </Button>

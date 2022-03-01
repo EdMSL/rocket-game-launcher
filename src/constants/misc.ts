@@ -86,12 +86,14 @@ export const FileExtension = {
 export const AppEvent = {
   OPEN_DEV_WINDOW: 'open dev window',
   CLOSE_DEV_WINDOW: 'close dev window',
+  DEV_WINDOW_CLOSED: 'dev window closed',
   MINIMIZE_WINDOW: 'minimize window',
   RESIZE_WINDOW: 'resize window',
   MAX_UNMAX_WINDOW: 'max-unmax window',
   SET_RESIZABLE_WINDOW: 'set resizable window',
   WINDOW_RESIZED: 'window resized',
   CLOSE_APP: 'close app',
+  GET_PATH_BY_PATH_SELECTOR: 'get path from native window',
 };
 
 export const AppWindowName = {

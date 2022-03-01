@@ -32,19 +32,18 @@
   background-repeat: no-repeat;
   background-position: 0 0;
 
+  &:disabled {
+    background-color: transparent;
+    opacity: 0.5;
+  }
+
   &:hover {
     background-color: transparent;
     outline: none;
-
-    // animation: var(--animation-rotate);
   }
 
   &:focus {
     @include focus;
-
-    // &:hover {
-    //   animation: none;
-    // }
   }
 
   &--settings {

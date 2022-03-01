@@ -30,6 +30,7 @@ export const INITIAL_STATE: IMainRootState = {
   isGameSettingsAvailable: false,
   isGameSettingsSaving: false,
   isGameSettingsFilesBackuping: false,
+  isDevWindowOpen: false,
   gameSettingsFilesBackup: [],
   userThemes: {},
   messages: [],
