@@ -63,6 +63,7 @@ export const createDevWindow = (): BrowserWindow => {
 export const addDevWindowListeners = (
   devWindow: BrowserWindow,
   mainWindow: BrowserWindow,
+  afterCreateCallback: () => void,
 ): void => {
   ipcMain.on(AppChannel.OPEN_DEV_WINDOW, () => {
     devWindow.show();
@@ -85,6 +86,10 @@ export const addDevWindowListeners = (
     }
   });
 
+  devWindow.on('ready-to-show', () => {
+    afterCreateCallback();
+  });
+
   devWindow.on('maximize', () => {
     devWindow.webContents.send(AppChannel.MAX_UNMAX_WINDOW, true);
   });
@@ -104,8 +109,8 @@ export const addDevWindowListeners = (
 
   devWindow.on('close', (event) => {
     // Изменено ввиду проблем с закрытием окон из панели задач системы
-    mainWindow.webContents.send(AppChannel.DEV_WINDOW_CLOSED);
     event.preventDefault();
+    mainWindow.webContents.send(AppChannel.DEV_WINDOW_CLOSED);
     devWindow.hide();
   });
 };

@@ -121,10 +121,6 @@ export const addMainWindowListeners = (
     mainWindow.webContents.send(AppChannel.MAX_UNMAX_WINDOW, mainWindow.isMaximized());
   });
 
-  mainWindow.on('resized', () => {
-    devWindow.webContents.send(AppChannel.WINDOW_RESIZED, mainWindow.getSize());
-  });
-
   mainWindow.on('maximize', () => {
     mainWindow.webContents.send(AppChannel.MAX_UNMAX_WINDOW, true);
   });

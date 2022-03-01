@@ -53,10 +53,8 @@ const start = async (): Promise<void> => {
   const store = createStorage();
 
   mainWindow = createMainWindow(store.getState().main.config);
-  devWindow = createDevWindow();
 
   addMainWindowListeners(mainWindow!, devWindow!, quitApp);
-  addDevWindowListeners(devWindow!, mainWindow!);
 
   if (process.env.NODE_ENV === 'production') {
     createBackupFolders();
@@ -69,6 +67,25 @@ const start = async (): Promise<void> => {
 
   writeToLogFileSync('Application ready.');
 };
+
+const showDevWindow = (): void => {
+  devWindow!.show();
+  devWindow!.focus();
+};
+
+ipcMain.on(AppChannel.OPEN_DEV_WINDOW, () => {
+  if (!devWindow) {
+    devWindow = createDevWindow();
+    addDevWindowListeners(devWindow, mainWindow!, showDevWindow);
+
+    //FIXME ресайз срабатывает только при повторном открытии окна
+    mainWindow!.on('resized', () => {
+      devWindow!.webContents.send(AppChannel.WINDOW_RESIZED, mainWindow!.getSize());
+    });
+  } else {
+    showDevWindow();
+  }
+});
 
 ipcMain.handle(
   AppChannel.GET_PATH_BY_PATH_SELECTOR,
