@@ -7,6 +7,7 @@ import windowStateKeeper from 'electron-window-state';
 
 import { createWaitForWebpackDevServer } from './waitDevServer';
 import { defaultDevWindowResolution } from '$constants/defaultParameters';
+import { AppEvent, AppWindowName } from '$constants/misc';
 
 /**
  * Функция для создания и показа окна разработчика
@@ -53,14 +54,14 @@ export const createDevWindow = (): BrowserWindow|null => {
     });
   }
 
-  ipcMain.on('minimize window', (event, windowType) => {
-    if (windowType === 'dev') {
+  ipcMain.on(AppEvent.MINIMIZE_WINDOW, (event, windowName) => {
+    if (windowName === AppWindowName.DEV) {
       devWindow!.minimize();
     }
   });
 
-  ipcMain.on('max-unmax window', (evt, isMax, windowType) => {
-    if (windowType === 'dev') {
+  ipcMain.on(AppEvent.MAX_UNMAX_WINDOW, (evt, isMax, windowName) => {
+    if (windowName === AppWindowName.DEV) {
       if (isMax) {
         devWindow!.unmaximize();
       } else {
@@ -70,18 +71,18 @@ export const createDevWindow = (): BrowserWindow|null => {
   });
 
   devWindow.on('maximize', () => {
-    devWindow!.webContents.send('max-unmax window', true);
+    devWindow!.webContents.send(AppEvent.MAX_UNMAX_WINDOW, true);
   });
 
   devWindow.on('unmaximize', () => {
-    devWindow!.webContents.send('max-unmax window', false);
+    devWindow!.webContents.send(AppEvent.MAX_UNMAX_WINDOW, false);
   });
 
   devWindow.on('show', () => {
-    devWindow!.webContents.send('max-unmax window', devWindow!.isMaximized());
+    devWindow!.webContents.send(AppEvent.MAX_UNMAX_WINDOW, devWindow!.isMaximized());
   });
 
-  ipcMain.on('close window', () => {
+  ipcMain.on(AppEvent.CLOSE_DEV_WINDOW, () => {
     devWindow!.hide();
   });
 

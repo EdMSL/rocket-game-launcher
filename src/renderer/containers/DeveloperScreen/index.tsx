@@ -28,6 +28,7 @@ import {
   FileExtension,
   LauncherButtonAction,
   PathVariableName,
+  AppEvent,
 } from '$constants/misc';
 import { MinWindowSize } from '$constants/defaultParameters';
 import { Button } from '$components/UI/Button';
@@ -59,7 +60,7 @@ export const DeveloperScreen: React.FC = () => {
       dispatch(setIsFirstLaunch(false));
     }
 
-    ipcRenderer.on('window resized', (event, windowSize) => {
+    ipcRenderer.on(AppEvent.WINDOW_RESIZED, (event, windowSize) => {
       const newConfig = {
         ...currentConfig,
         width: windowSize[0],
@@ -70,7 +71,7 @@ export const DeveloperScreen: React.FC = () => {
       setIsConfigChanged(!checkObjectForEqual(launcherConfig, newConfig));
     });
 
-    return (): void => { ipcRenderer.removeAllListeners('window resized'); };
+    return (): void => { ipcRenderer.removeAllListeners(AppEvent.WINDOW_RESIZED); };
   }, [dispatch, launcherConfig, currentConfig]);
 
   const changeCurrentConfig = useCallback((fieldName, value, parent?) => {
@@ -214,11 +215,11 @@ export const DeveloperScreen: React.FC = () => {
       launcherConfig.width !== +currentConfig.width
       || launcherConfig.height !== +currentConfig.height
     ) {
-      ipcRenderer.send('resize window', +currentConfig.width, +currentConfig.height);
+      ipcRenderer.send(AppEvent.RESIZE_WINDOW, +currentConfig.width, +currentConfig.height);
     }
 
     if (launcherConfig.isResizable !== currentConfig.isResizable) {
-      ipcRenderer.send('set resizable window', currentConfig.isResizable);
+      ipcRenderer.send(AppEvent.SET_RESIZABLE_WINDOW, currentConfig.isResizable);
     }
 
     dispatch(saveLauncherConfig(
@@ -254,7 +255,7 @@ export const DeveloperScreen: React.FC = () => {
 
   const onCancelBtnClick = useCallback((event) => {
     resetConfigChanges(event);
-    ipcRenderer.send('close dev window');
+    ipcRenderer.send(AppEvent.CLOSE_DEV_WINDOW);
   }, [resetConfigChanges]);
 
   const getNumberFieldMinValue = useCallback((id: string): number => {

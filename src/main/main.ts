@@ -19,6 +19,7 @@ import { getSystemInfo } from '$utils/data';
 import { createBackupFolders } from '$utils/backup';
 import { createFolderSync, getPathFromFileInput } from '$utils/files';
 import { IPathVariables, USER_THEMES_DIR } from '$constants/paths';
+import { AppEvent } from '$constants/misc';
 
 require('@electron/remote/main').initialize();
 
@@ -85,7 +86,7 @@ ipcMain.handle(
   ),
 );
 
-ipcMain.on('open dev window', () => {
+ipcMain.on(AppEvent.OPEN_DEV_WINDOW, () => {
   if (!devWindow) {
     devWindow = createDevWindow();
   } else {
@@ -94,7 +95,7 @@ ipcMain.on('open dev window', () => {
   }
 });
 
-ipcMain.on('close app', () => {
+ipcMain.on(AppEvent.CLOSE_APP, () => {
   quitApp();
 });
 

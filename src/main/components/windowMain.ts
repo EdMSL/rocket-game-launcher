@@ -11,6 +11,7 @@ import { createWaitForWebpackDevServer } from './waitDevServer';
 import { defaultLauncherResolution } from '$constants/defaultParameters';
 import { IMainRootState } from '$types/main';
 import { getDisplaysInfo } from '$utils/data';
+import { AppEvent, AppWindowName } from '$constants/misc';
 
 /**
  * Функция для создания и показа главного окна приложения
@@ -62,14 +63,14 @@ export const createMainWindow = (
 
   getDisplaysInfo();
 
-  ipcMain.on('minimize window', (event, windowType) => {
-    if (windowType === 'main') {
+  ipcMain.on(AppEvent.MINIMIZE_WINDOW, (event, windowName) => {
+    if (windowName === AppWindowName.MAIN) {
       mainWindow.minimize();
     }
   });
 
-  ipcMain.on('max-unmax window', (event, isMax, windowType) => {
-    if (windowType === 'main') {
+  ipcMain.on(AppEvent.MAX_UNMAX_WINDOW, (event, isMax, windowName) => {
+    if (windowName === AppWindowName.MAIN) {
       if (isMax) {
         mainWindow.unmaximize();
       } else {
@@ -78,7 +79,7 @@ export const createMainWindow = (
     }
   });
 
-  ipcMain.on('resize window', (event, width, height) => {
+  ipcMain.on(AppEvent.RESIZE_WINDOW, (event, width, height) => {
     if (mainWindow.isFullScreen()) {
       mainWindow.unmaximize();
     }
@@ -87,24 +88,24 @@ export const createMainWindow = (
     mainWindow.setSize(width, height);
   });
 
-  ipcMain.on('set resizable window', (event, isResizable) => {
+  ipcMain.on(AppEvent.SET_RESIZABLE_WINDOW, (event, isResizable) => {
     mainWindow.setResizable(isResizable);
   });
 
   mainWindow.once('ready-to-show', () => {
-    mainWindow.webContents.send('max-unmax window', mainWindow.isMaximized());
+    mainWindow.webContents.send(AppEvent.MAX_UNMAX_WINDOW, mainWindow.isMaximized());
   });
 
   mainWindow.on('resized', () => {
-    devWindow!.webContents.send('window resized', mainWindow.getSize());
+    devWindow!.webContents.send(AppEvent.WINDOW_RESIZED, mainWindow.getSize());
   });
 
   mainWindow.on('maximize', () => {
-    mainWindow.webContents.send('max-unmax window', true);
+    mainWindow.webContents.send(AppEvent.MAX_UNMAX_WINDOW, true);
   });
 
   mainWindow.on('unmaximize', () => {
-    mainWindow.webContents.send('max-unmax window', false);
+    mainWindow.webContents.send(AppEvent.MAX_UNMAX_WINDOW, false);
   });
 
   mainWindow.on('close', () => {

@@ -11,7 +11,7 @@ import { Button } from '$components/UI/Button';
 import { setIsGameRunning, addMessages } from '$actions/main';
 import { useAppSelector } from '$store/store';
 import { CreateUserMessage } from '$utils/message';
-import { LauncherButtonAction } from '$constants/misc';
+import { LauncherButtonAction, AppEvent } from '$constants/misc';
 import { Modal } from '$components/UI/Modal';
 import { LauncherSettings } from '$components/LauncherSettings';
 import { getPathToFile } from '$utils/strings';
@@ -39,7 +39,7 @@ export const MainScreen: React.FC = () => {
     if (errorMessage) {
       dispatch(addMessages([CreateUserMessage.error(errorMessage)]));
     } else if (isAutoclose && close) {
-      ipcRenderer.send('close app');
+      ipcRenderer.send(AppEvent.CLOSE_APP);
     }
   }, [dispatch, isAutoclose]);
 
@@ -84,7 +84,9 @@ export const MainScreen: React.FC = () => {
     setIsModalOpen(true);
   }, []);
 
-  const onDeveloperScreenBtnClick = useCallback(() => { ipcRenderer.send('open dev window'); }, []);
+  const onDeveloperScreenBtnClick = useCallback(() => {
+    ipcRenderer.send(AppEvent.OPEN_DEV_WINDOW);
+  }, []);
 
   return (
     <React.Fragment>

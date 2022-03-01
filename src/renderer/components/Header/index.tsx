@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import { Button } from '$components/UI/Button';
 import styles from './styles.module.scss';
 import { useAppSelector } from '$store/store';
+import { AppEvent, AppWindowName } from '$constants/misc';
 
 const launcherIcon = require('$images/icon.png');
 
@@ -30,11 +31,11 @@ export const Header: React.FunctionComponent<IProps> = ({
   const [isMaximize, setIsMaximize] = useState(false);
 
   useEffect(() => {
-    ipcRenderer.on('max-unmax window', (evt, isMax) => {
+    ipcRenderer.on(AppEvent.MAX_UNMAX_WINDOW, (evt, isMax) => {
       setIsMaximize(isMax);
     });
 
-    return (): void => { ipcRenderer.removeAllListeners('max-unmax window'); };
+    return (): void => { ipcRenderer.removeAllListeners(AppEvent.MAX_UNMAX_WINDOW); };
   }, []);
 
   const onInfoAppClick = useCallback(() => {
@@ -44,11 +45,11 @@ export const Header: React.FunctionComponent<IProps> = ({
   }, [openAppInfo]);
 
   const onMinimizeWindowClick = useCallback(() => {
-    ipcRenderer.send('minimize window', openAppInfo ? 'main' : 'dev');
+    ipcRenderer.send(AppEvent.MINIMIZE_WINDOW, openAppInfo ? AppWindowName.MAIN : AppWindowName.DEV);
   }, [openAppInfo]);
 
   const onMaximizeWindowClick = useCallback(() => {
-    ipcRenderer.send('max-unmax window', isMaximize, openAppInfo ? 'main' : 'dev');
+    ipcRenderer.send(AppEvent.MAX_UNMAX_WINDOW, isMaximize, openAppInfo ? AppWindowName.MAIN : AppWindowName.DEV);
   }, [isMaximize, openAppInfo]);
 
   const onCloseWindowBtnClick = useCallback((event) => {

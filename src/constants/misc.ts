@@ -83,6 +83,22 @@ export const FileExtension = {
   INI: ['ini'],
 };
 
+export const AppEvent = {
+  OPEN_DEV_WINDOW: 'open dev window',
+  CLOSE_DEV_WINDOW: 'close dev window',
+  MINIMIZE_WINDOW: 'minimize window',
+  RESIZE_WINDOW: 'resize window',
+  MAX_UNMAX_WINDOW: 'max-unmax window',
+  SET_RESIZABLE_WINDOW: 'set resizable window',
+  WINDOW_RESIZED: 'window resized',
+  CLOSE_APP: 'close app',
+};
+
+export const AppWindowName = {
+  MAIN: 'Main Window',
+  DEV: 'Developer Window',
+};
+
 export interface IWindowField {
   id: string,
   label: string,

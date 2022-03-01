@@ -61,6 +61,7 @@ import { setGameSettingsOptions } from '$actions/gameSettings';
 import { getGameSettingsOptionsWithDefaultValues, updatePathVariables } from '$utils/data';
 import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
 import { writeJSONFile } from '$utils/files';
+import { AppEvent } from '$constants/misc';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -128,7 +129,7 @@ function* saveLauncherConfigSaga(
     yield put(setPathVariables(updatePathVariables(pathVariables, newConfig)));
 
     if (isGoToMainScreen) {
-      yield put(push(`${Routes.MAIN_SCREEN}`));
+      ipcRenderer.send(AppEvent.CLOSE_DEV_WINDOW);
     }
   } catch (error: any) {
     let errorMessage = '';
@@ -466,7 +467,7 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
 
     if (isFirstLaunch) {
       yield take(MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED);
-      ipcRenderer.send('open dev window');
+      ipcRenderer.send(AppEvent.OPEN_DEV_WINDOW);
     }
   }
 
