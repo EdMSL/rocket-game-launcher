@@ -7,8 +7,8 @@ import {
 } from 'electron';
 
 import { createStorage } from './components/storage';
-import { createMainWindow } from './components/windowMain';
-import { createDevWindow } from './components/windowDev';
+import { addMainWindowListeners, createMainWindow } from './components/windowMain';
+import { addDevWindowListeners, createDevWindow } from './components/windowDev';
 import {
   createLogFile,
   LogMessageType,
@@ -51,8 +51,12 @@ const start = async (): Promise<void> => {
   getSystemInfo();
 
   const store = createStorage();
+
+  mainWindow = createMainWindow(store.getState().main.config);
   devWindow = createDevWindow();
-  mainWindow = createMainWindow(store.getState().main.config, quitApp, devWindow);
+
+  addMainWindowListeners(mainWindow!, devWindow!, quitApp);
+  addDevWindowListeners(devWindow!, mainWindow!);
 
   if (process.env.NODE_ENV === 'production') {
     createBackupFolders();
@@ -67,7 +71,7 @@ const start = async (): Promise<void> => {
 };
 
 ipcMain.handle(
-  'get path from native window',
+  AppEvent.GET_PATH_BY_PATH_SELECTOR,
   (
     event,
     pathVariables: IPathVariables,
@@ -89,6 +93,7 @@ ipcMain.handle(
 ipcMain.on(AppEvent.OPEN_DEV_WINDOW, () => {
   if (!devWindow) {
     devWindow = createDevWindow();
+    addDevWindowListeners(devWindow!, mainWindow!);
   } else {
     devWindow.show();
     devWindow.focus();

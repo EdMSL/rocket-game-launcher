@@ -12,14 +12,14 @@ import { AppEvent, AppWindowName } from '$constants/misc';
 /**
  * Функция для создания и показа окна разработчика
 */
-export const createDevWindow = (): BrowserWindow|null => {
+export const createDevWindow = (): BrowserWindow => {
   const devWindowState = windowStateKeeper({
     defaultWidth: defaultDevWindowResolution.width,
     defaultHeight: defaultDevWindowResolution.height,
     file: 'window-dev-state.json',
   });
 
-  let devWindow: BrowserWindow|null = new BrowserWindow({
+  const devWindow: BrowserWindow = new BrowserWindow({
     x: devWindowState.x,
     y: devWindowState.y,
     minWidth: defaultDevWindowResolution.minWidth,
@@ -50,53 +50,56 @@ export const createDevWindow = (): BrowserWindow|null => {
 
   if (process.env.NODE_ENV === 'development') {
     globalShortcut.register('F10', () => {
-      devWindow!.webContents.openDevTools();
+      devWindow.webContents.openDevTools();
     });
   }
 
+  devWindowState.manage(devWindow);
+
+  return devWindow;
+};
+
+export const addDevWindowListeners = (
+  devWindow: BrowserWindow,
+  mainWindow: BrowserWindow,
+): void => {
   ipcMain.on(AppEvent.MINIMIZE_WINDOW, (event, windowName) => {
     if (windowName === AppWindowName.DEV) {
-      devWindow!.minimize();
+      devWindow.minimize();
     }
   });
 
   ipcMain.on(AppEvent.MAX_UNMAX_WINDOW, (evt, isMax, windowName) => {
     if (windowName === AppWindowName.DEV) {
       if (isMax) {
-        devWindow!.unmaximize();
+        devWindow.unmaximize();
       } else {
-        devWindow!.maximize();
+        devWindow.maximize();
       }
     }
   });
 
   devWindow.on('maximize', () => {
-    devWindow!.webContents.send(AppEvent.MAX_UNMAX_WINDOW, true);
+    devWindow.webContents.send(AppEvent.MAX_UNMAX_WINDOW, true);
   });
 
   devWindow.on('unmaximize', () => {
-    devWindow!.webContents.send(AppEvent.MAX_UNMAX_WINDOW, false);
+    devWindow.webContents.send(AppEvent.MAX_UNMAX_WINDOW, false);
   });
 
   devWindow.on('show', () => {
-    devWindow!.webContents.send(AppEvent.MAX_UNMAX_WINDOW, devWindow!.isMaximized());
+    devWindow.webContents.send(AppEvent.MAX_UNMAX_WINDOW, devWindow.isMaximized());
   });
 
   ipcMain.on(AppEvent.CLOSE_DEV_WINDOW, () => {
-    devWindow!.hide();
+    mainWindow.webContents.send(AppEvent.DEV_WINDOW_CLOSED);
+    devWindow.hide();
   });
 
   devWindow.on('close', (event) => {
     // Изменено ввиду проблем с закрытием окон из панели задач системы
+    mainWindow.webContents.send(AppEvent.DEV_WINDOW_CLOSED);
     event.preventDefault();
-    devWindow!.hide();
+    devWindow.hide();
   });
-
-  devWindow.on('closed', () => {
-    devWindow = null;
-  });
-
-  devWindowState.manage(devWindow);
-
-  return devWindow;
 };

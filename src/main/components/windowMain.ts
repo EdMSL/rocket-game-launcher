@@ -18,8 +18,6 @@ import { AppEvent, AppWindowName } from '$constants/misc';
 */
 export const createMainWindow = (
   config: IMainRootState['config'],
-  windowCloseCallback: () => void,
-  devWindow?: BrowserWindow|null,
 ): BrowserWindow => {
   const mainWindowState = windowStateKeeper({
     defaultWidth: config.width ? config.width : defaultLauncherResolution.width,
@@ -63,6 +61,32 @@ export const createMainWindow = (
 
   getDisplaysInfo();
 
+  if (process.env.NODE_ENV === 'production') {
+    globalShortcut.register('F11', () => {
+      // отключаем разворачивание окна приложения
+    });
+  }
+
+  if (process.env.NODE_ENV === 'development') {
+    globalShortcut.register('F5', () => {
+      mainWindow.reload();
+    });
+
+    globalShortcut.register('F11', () => {
+      mainWindow.webContents.openDevTools();
+    });
+  }
+
+  mainWindowState.manage(mainWindow);
+
+  return mainWindow;
+};
+
+export const addMainWindowListeners = (
+  mainWindow: BrowserWindow,
+  devWindow: BrowserWindow,
+  closeWindowCallback: () => void,
+): void => {
   ipcMain.on(AppEvent.MINIMIZE_WINDOW, (event, windowName) => {
     if (windowName === AppWindowName.MAIN) {
       mainWindow.minimize();
@@ -97,7 +121,7 @@ export const createMainWindow = (
   });
 
   mainWindow.on('resized', () => {
-    devWindow!.webContents.send(AppEvent.WINDOW_RESIZED, mainWindow.getSize());
+    devWindow.webContents.send(AppEvent.WINDOW_RESIZED, mainWindow.getSize());
   });
 
   mainWindow.on('maximize', () => {
@@ -109,26 +133,6 @@ export const createMainWindow = (
   });
 
   mainWindow.on('close', () => {
-    windowCloseCallback();
+    closeWindowCallback();
   });
-
-  if (process.env.NODE_ENV === 'production') {
-    globalShortcut.register('F11', () => {
-      // отключаем разворачивание окна приложения
-    });
-  }
-
-  if (process.env.NODE_ENV === 'development') {
-    globalShortcut.register('F5', () => {
-      mainWindow.reload();
-    });
-
-    globalShortcut.register('F11', () => {
-      mainWindow.webContents.openDevTools();
-    });
-  }
-
-  mainWindowState.manage(mainWindow);
-
-  return mainWindow;
 };
