@@ -8,21 +8,24 @@ import { IPathVariables } from '$constants/paths';
 import { generateSelectOptions } from '$utils/data';
 import { Button } from '$components/UI/Button';
 import { TextField } from '$components/UI/TextField';
+import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
 
 interface IProps {
+  className?: string,
   args: string[],
   parent: string,
   pathVariables: IPathVariables,
-  className?: string,
+  description?: string,
   changeArguments: (newArgs: string[], parent: string) => void,
   onPathError: () => void,
 }
 
 export const ArgumentsBlock: React.FC<IProps> = ({
+  className = '',
   args,
   parent,
   pathVariables,
-  className = '',
+  description,
   changeArguments,
   onPathError,
 }) => {
@@ -87,7 +90,12 @@ export const ArgumentsBlock: React.FC<IProps> = ({
       className,
     )}
     >
-      <p className={styles['developer-screen__agrs-title']}>Аргументы запуска</p>
+      <p className={styles['developer-screen__agrs-title']}>
+        <span>Аргументы запуска</span>
+        {
+          description && <GameSettingsHintBlock description={description} />
+        }
+      </p>
       <div className={styles['developer-screen__agrs-block']}>
         {
         args.map((currentArg, index) => (

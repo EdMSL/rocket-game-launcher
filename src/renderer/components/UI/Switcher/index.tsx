@@ -15,14 +15,11 @@ export const Switcher: React.FunctionComponent<IProps> = ({
   className = '',
   parentClassname = '',
   description = '',
-  currentHintId = '',
   parent = '',
   multiparameters = '',
   isDisabled = false,
   isChecked,
   onChange,
-  onHover = null,
-  onLeave = null,
 }) => (
   <div className={classNames(
     'switcher__container',
@@ -35,19 +32,8 @@ export const Switcher: React.FunctionComponent<IProps> = ({
         {label}
       </span>
       {
-          description
-          && onHover
-          && onLeave
-          && (
-            <GameSettingsHintBlock
-              id={id}
-              currentHintId={currentHintId}
-              description={description}
-              onHover={onHover}
-              onLeave={onLeave}
-            />
-          )
-        }
+        description && <GameSettingsHintBlock description={description} />
+      }
     </p>
     <div className={classNames('switcher__block')}>
       <input

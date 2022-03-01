@@ -105,30 +105,37 @@ export const AppWindowName = {
 export interface IWindowField {
   id: string,
   label: string,
+  description: string,
 }
 
 export const appWindowFields: IWindowField[] = [{
   id: 'width',
   label: 'Ширина по умолчанию',
+  description: 'Ширина окна приложения по умолчанию. Является постоянной, если размеры окна установлены как неизменяемые, и начальной, если размеры окна изменяемые' //eslint-disable-line
 },
 {
   id: 'height',
   label: 'Высота по умолчанию',
+  description: 'Высота окна приложения по умолчанию. Является постоянной, если размеры окна установлены как неизменяемые, и начальной, если размеры окна изменяемые' //eslint-disable-line
 },
 {
   id: 'minWidth',
   label: 'Минимальная ширина',
+  description: 'Минимальная ширина окна приложения, до которой пользователь может уменьшить размер окна' //eslint-disable-line
 },
 {
   id: 'minHeight',
   label: 'Минимальная высота',
+  description: 'Минимальная высота окна приложения, до которой пользователь может уменьшить размер окна' //eslint-disable-line
 },
 {
   id: 'maxWidth',
   label: 'Максимальная ширина',
+  description: 'Максимальная ширина окна приложения, до которой пользователь может увеличить размер окна. Значение 0 - нет ограничения' //eslint-disable-line
 },
 {
   id: 'maxHeight',
   label: 'Максимальная высота',
+  description: 'Максимальная высота окна приложения, до которой пользователь может увеличить размер окна. Значение 0 - нет ограничения' //eslint-disable-line
 },
 ];

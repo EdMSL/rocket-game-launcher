@@ -36,7 +36,6 @@ export const PathSelector: React.FC<IProps> = ({
   className = '',
   parentClassname = '',
   description = '',
-  currentHintId = '',
   parent = '',
   multiparameters = '',
   isDisabled = false,
@@ -44,8 +43,6 @@ export const PathSelector: React.FC<IProps> = ({
   isSelectFile = false,
   isGameDocuments = true,
   onChange,
-  onHover,
-  onLeave,
 }) => {
   const [pathVariable, pathValue] = getVariableAndValueFromPath(String(value));
   const availablePathVariables = Object.values(options).map((option) => option.value);
@@ -134,19 +131,8 @@ export const PathSelector: React.FC<IProps> = ({
       >
         <span>{label}</span>
         {
-        description
-        && onHover
-        && onLeave
-        && (
-          <GameSettingsHintBlock
-            id={id}
-            currentHintId={currentHintId}
-            description={description}
-            onHover={onHover}
-            onLeave={onLeave}
-          />
-        )
-      }
+          description && <GameSettingsHintBlock description={description} />
+        }
       </label>
       <div className="path-selector__input-block">
         <select

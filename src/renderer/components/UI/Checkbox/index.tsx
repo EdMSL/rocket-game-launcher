@@ -18,11 +18,8 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
   isDisabled = false,
   className = '',
   parentClassname = '',
-  currentHintId = '',
   multiparameters = '',
   onChange,
-  onHover = null,
-  onLeave = null,
 }) => (
   <div className={classNames(
     'checkbox__container',
@@ -47,19 +44,8 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
     >
       <span>{label}</span>
       {
-          description
-          && onHover
-          && onLeave
-          && (
-            <GameSettingsHintBlock
-              id={id}
-              description={description}
-              currentHintId={currentHintId}
-              onHover={onHover}
-              onLeave={onLeave}
-            />
-          )
-        }
+        description && <GameSettingsHintBlock description={description} />
+      }
     </label>
   </div>
 );

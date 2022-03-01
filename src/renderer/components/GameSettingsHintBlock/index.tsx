@@ -1,51 +1,39 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import styles from './styles.module.scss';
 
 interface IProps {
-  id: string,
-  description?: string,
-  currentHintId: string,
-  onHover: (id: string) => void,
-  onLeave: () => void,
+  description: string,
 }
 
 export const GameSettingsHintBlock: React.FunctionComponent<IProps> = ({
-  id,
   description,
-  currentHintId,
-  onHover,
-  onLeave,
 }) => {
+  const [isVisivle, setIsVisible] = useState<boolean>(false);
+
   const onHintIconHover = useCallback(() => {
-    onHover(id);
-  }, [onHover, id]);
+    setIsVisible(true);
+  }, [setIsVisible]);
 
   const onHintIconLeave = useCallback(() => {
-    onLeave();
-  }, [onLeave]);
+    setIsVisible(false);
+  }, [setIsVisible]);
 
   return (
-    <React.Fragment>
+    <div
+      className={styles['game-settings-hint__icon']}
+      onMouseEnter={onHintIconHover}
+      onMouseLeave={onHintIconLeave}
+    >
       {
-        description && (
+        isVisivle && (
           <div
-            className={styles['game-settings-hint__icon']}
-            onMouseEnter={onHintIconHover}
-            onMouseLeave={onHintIconLeave}
+            className={styles['game-settings-hint__block']}
           >
-            {
-              currentHintId === id && (
-                <div
-                  className={styles['game-settings-hint__block']}
-                >
-                  <p className={styles['game-settings-hint__text']}>{description}</p>
-                </div>
-              )
-            }
+            <p className={styles['game-settings-hint__text']}>{description}</p>
           </div>
         )
       }
-    </React.Fragment>
+    </div>
   );
 };

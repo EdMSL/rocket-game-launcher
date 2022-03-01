@@ -35,10 +35,7 @@ export const Select: (React.FunctionComponent<IProps>) = ({
   optionsArr,
   className = '',
   parentClassname = '',
-  currentHintId = '',
   onChange,
-  onHover = null,
-  onLeave = null,
 }) => {
   const currentOptionsArr = optionsArr.length !== 0 ? optionsArr : defaultOptionsArr;
 
@@ -57,18 +54,7 @@ export const Select: (React.FunctionComponent<IProps>) = ({
           >
             <span className="select__label-text">{label}</span>
             {
-              description
-              && onHover
-              && onLeave
-              && (
-                <GameSettingsHintBlock
-                  id={id}
-                  description={description}
-                  currentHintId={currentHintId}
-                  onHover={onHover}
-                  onLeave={onLeave}
-                />
-              )
+              description && <GameSettingsHintBlock description={description} />
             }
           </label>
         )

@@ -69,12 +69,14 @@ export const CustomBtnItem: React.FC<IProps> = ({
         id={`item_label-${item.id}`}
         value={item.label}
         label="Заголовок кнопки"
+        description="Текст, который будет отображаться на данной кнопке запуска"//eslint-disable-line max-len
         onChange={OnTextFieldChange}
       />
       <Checkbox
         id={`item_checkbox-${item.id}`}
         label="Кнопка запуска приложения?"
         isChecked={item.action === LauncherButtonAction.RUN}
+        description="Определяет действие по нажатию кнопки: запуск приложения\файла иил открываетие папки. Влияет на доступный выбор в селекторе пути ниже"//eslint-disable-line max-len
         onChange={onCheckboxChange}
       />
       <PathSelector
@@ -85,15 +87,17 @@ export const CustomBtnItem: React.FC<IProps> = ({
         pathVariables={pathVariables}
         isSelectFile={item.action === LauncherButtonAction.RUN}
         extensions={FileExtension.EXECUTABLE}
+        description="Путь до файла для запуска или папки для открытия в проводнике"//eslint-disable-line max-len
         onChange={onPathSelectorChange}
       />
       <ArgumentsBlock
         args={item.args!}
         parent={fieldName}
         className={styles['developer-screen__item']}
+        pathVariables={pathVariables}
+        description="Дополнительные агрументы запуска"//eslint-disable-line max-len
         changeArguments={onChangeArguments}
         onPathError={onPathError}
-        pathVariables={pathVariables}
       />
       <Button
         className={classNames('button', 'main-btn')}

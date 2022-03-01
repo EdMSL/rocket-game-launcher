@@ -16,15 +16,12 @@ export const NumberField: React.FunctionComponent<IProps> = ({
   className = '',
   parentClassname = '',
   description = '',
-  currentHintId = '',
   parent = '',
   multiparameters = '',
   isDisabled = false,
   min = 0,
   isValidationError,
   onChange,
-  onHover = null,
-  onLeave = null,
 }) => {
   const onInputBlur = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     if (+event.target.value !== +value!) {
@@ -45,19 +42,8 @@ export const NumberField: React.FunctionComponent<IProps> = ({
       >
         <span>{label}</span>
         {
-        description
-        && onHover
-        && onLeave
-        && (
-          <GameSettingsHintBlock
-            id={id}
-            currentHintId={currentHintId}
-            description={description}
-            onHover={onHover}
-            onLeave={onLeave}
-          />
-        )
-      }
+          description && <GameSettingsHintBlock description={description} />
+        }
       </label>
       <input
         className={classNames(

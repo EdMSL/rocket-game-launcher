@@ -16,14 +16,11 @@ export const TextField: React.FunctionComponent<IProps> = ({
   className = '',
   parentClassname = '',
   description = '',
-  currentHintId = '',
   parent = '',
   multiparameters = '',
   isDisabled = false,
   isValidationError,
   onChange,
-  onHover = null,
-  onLeave = null,
 }) => (
   <div className={classNames(
     'text-field__container',
@@ -37,18 +34,7 @@ export const TextField: React.FunctionComponent<IProps> = ({
     >
       <span>{label}</span>
       {
-        description
-        && onHover
-        && onLeave
-        && (
-          <GameSettingsHintBlock
-            id={id}
-            currentHintId={currentHintId}
-            description={description}
-            onHover={onHover}
-            onLeave={onLeave}
-          />
-        )
+        description && <GameSettingsHintBlock description={description} />
       }
     </label>
     <input

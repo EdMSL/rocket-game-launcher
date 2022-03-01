@@ -356,6 +356,7 @@ export const DeveloperScreen: React.FC = () => {
                 label="Изменяемый размер окна?"
                 isChecked={currentConfig.isResizable}
                 onChange={onSwitcherChange}
+                description="Определяет, может ли пользователь изменять размеры окна программы"
               />
               {
               appWindowFields.map((field) => (
@@ -367,6 +368,7 @@ export const DeveloperScreen: React.FC = () => {
                   min={getNumberFieldMinValue(field.id)}
                   isDisabled={getNumberFieldIsDisabled(field.id)}
                   isValidationError={validationErrors.includes(field.id)}
+                  description={field.description}
                   onChange={onNumberInputChange}
                 />
               ))
@@ -381,16 +383,18 @@ export const DeveloperScreen: React.FC = () => {
                 id="gameName"
                 value={currentConfig.gameName}
                 label="Название игры"
+                description="Название игры или любой текст, который будет отображаться в заголовке окна программы"//eslint-disable-line max-len
                 onChange={OnTextFieldChange}
               />
               <PathSelector
                 className={styles['developer-screen__item']}
                 id="documentsPath"
-                label="Путь до папки файлов игры в [User]/Documents"
+                label="Папка файлов игры в Documents"
                 value={currentConfig.documentsPath}
                 options={generateSelectOptions([PathVariableName.DOCUMENTS])}
                 pathVariables={pathVariables}
                 isGameDocuments={false}
+                description="Путь до папки игры в [User]/Documents. Укажите этот путь, если нужно управлять данными из файлов в этой папке через экран игровых настроек"//eslint-disable-line max-len
                 onChange={onPathSelectorChange}
               />
               <p className={styles['developer-screen__text']}>Настройки запуска игры</p>
@@ -399,26 +403,29 @@ export const DeveloperScreen: React.FC = () => {
                 id="label"
                 parent="playButton"
                 value={currentConfig.playButton.label}
-                label="Текст кнопки запуска"
+                label="Заголовок кнопки запуска"
+                description="Текст, который будет отображаться на основной кнопке запуска игры"//eslint-disable-line max-len
                 onChange={OnTextFieldChange}
               />
               <PathSelector
                 className={styles['developer-screen__item']}
                 id="path"
                 parent="playButton"
-                label="Путь до исполняемого файла игры"
+                label="Исполняемый файл игры"
                 value={currentConfig.playButton.path}
                 options={generateSelectOptions([PathVariableName.GAME_DIR])}
                 pathVariables={pathVariables}
                 extensions={FileExtension.EXECUTABLE}
                 isSelectFile
+                description="Путь до исполняемого файла игры, .exe или .lnk"//eslint-disable-line max-len
                 onChange={onPathSelectorChange}
               />
               <ArgumentsBlock
+                className={styles['developer-screen__item']}
                 args={currentConfig.playButton.args!}
                 parent="playButton"
                 pathVariables={pathVariables}
-                className={styles['developer-screen__item']}
+                description="Дополнительные агрументы запуска приложения"//eslint-disable-line max-len
                 changeArguments={changeArguments}
                 onPathError={sendIncorrectPathErrorMessage}
               />
@@ -428,18 +435,18 @@ export const DeveloperScreen: React.FC = () => {
                 </p>
                 <ul className={styles['developer-screen__custom-btns-container']}>
                   {
-                currentConfig.customButtons.map((item) => (
-                  <CustomBtnItem
-                    key={item.id}
-                    item={item}
-                    fieldName="customButtons"
-                    pathVariables={pathVariables}
-                    onDeleteBtnClick={onCustomBtnDeleteClick}
-                    onChangeBtnData={onCustomBtnChange}
-                    onPathError={sendIncorrectPathErrorMessage}
-                  />
-                ))
-              }
+                    currentConfig.customButtons.map((item) => (
+                      <CustomBtnItem
+                        key={item.id}
+                        item={item}
+                        fieldName="customButtons"
+                        pathVariables={pathVariables}
+                        onDeleteBtnClick={onCustomBtnDeleteClick}
+                        onChangeBtnData={onCustomBtnChange}
+                        onPathError={sendIncorrectPathErrorMessage}
+                      />
+                    ))
+                  }
                 </ul>
                 <Button
                   className={classNames('main-btn', 'developer-screen__btn')}
@@ -457,6 +464,7 @@ export const DeveloperScreen: React.FC = () => {
                 parent="modOrganizer"
                 label="Используется ли MO?"
                 isChecked={currentConfig.modOrganizer.isUsed}
+                description="Определяет, используется ли в игре\сборке Mod Organizer"//eslint-disable-line max-len
                 onChange={onSwitcherChange}
               />
               <Select
@@ -470,6 +478,7 @@ export const DeveloperScreen: React.FC = () => {
                 ]}
                 value={currentConfig.modOrganizer.version.toString()}
                 isDisabled={!currentConfig.modOrganizer.isUsed}
+                description="Задает версию использемого Mod Organizer"//eslint-disable-line max-len
                 onChange={onSelectChange}
               />
               <PathSelector
@@ -481,6 +490,7 @@ export const DeveloperScreen: React.FC = () => {
                 options={generateSelectOptions([PathVariableName.GAME_DIR])}
                 pathVariables={pathVariables}
                 isDisabled={!currentConfig.modOrganizer.isUsed}
+                description="Задает путь до основной папки Mod Organizer."//eslint-disable-line max-len
                 onChange={onPathSelectorChange}
               />
               <PathSelector
@@ -492,6 +502,7 @@ export const DeveloperScreen: React.FC = () => {
                 options={generateSelectOptions([PathVariableName.MO_DIR])}
                 pathVariables={pathVariables}
                 isDisabled={!currentConfig.modOrganizer.isUsed}
+                description="Задает путь до папки модов Mod Organizer. Если вы не меняли этот путь в МО, оставьте значение без изменений"//eslint-disable-line max-len
                 onChange={onPathSelectorChange}
               />
               <PathSelector
@@ -503,6 +514,7 @@ export const DeveloperScreen: React.FC = () => {
                 options={generateSelectOptions([PathVariableName.MO_DIR])}
                 pathVariables={pathVariables}
                 isDisabled={!currentConfig.modOrganizer.isUsed}
+                description="Задает путь до папки профилей Mod Organizer. Если вы не меняли этот путь в МО, оставьте значение без изменений"//eslint-disable-line max-len
                 onChange={onPathSelectorChange}
               />
               <PathSelector
@@ -516,6 +528,7 @@ export const DeveloperScreen: React.FC = () => {
                 isSelectFile
                 extensions={FileExtension.INI}
                 isDisabled={!currentConfig.modOrganizer.isUsed}
+                description="Задает путь до конфигурационного файла Mod Organizer (ModOrganizer.ini)"//eslint-disable-line max-len
                 onChange={onPathSelectorChange}
               />
             </div>

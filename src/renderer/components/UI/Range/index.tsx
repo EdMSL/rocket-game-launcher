@@ -38,11 +38,8 @@ export const Range: React.FunctionComponent<IProps> = ({
   description = '',
   className = '',
   parentClassname = '',
-  currentHintId = '',
   onChange,
   onChangeBtnClick = null,
-  onHover = null,
-  onLeave = null,
 }) => {
   const [value, setValue] = useState(defaultValue);
 
@@ -79,18 +76,7 @@ export const Range: React.FunctionComponent<IProps> = ({
       <div className="range__label">
         <span>{label}</span>
         {
-          description
-          && onHover
-          && onLeave
-          && (
-            <GameSettingsHintBlock
-              id={id}
-              currentHintId={currentHintId}
-              description={description}
-              onHover={onHover}
-              onLeave={onLeave}
-            />
-          )
+          description && <GameSettingsHintBlock description={description} />
         }
       </div>
       <div className="range__controls">

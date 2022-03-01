@@ -99,13 +99,10 @@ export interface IUIElementParams {
   isDisabled?: boolean,
   parent?: string,
   description?: string,
-  currentHintId?: string,
   isValidationError?: boolean,
 }
 
 export interface IUIElementProps<E> extends IUIElementParams{
   onChange: (event: React.ChangeEvent<E>) => void,
-  onHover?: (id: string) => void,
-  onLeave?: () => void,
 }
 
