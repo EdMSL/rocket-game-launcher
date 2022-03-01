@@ -33,6 +33,11 @@ interface IGameSettingsFileError {
   error: string,
 }
 
+export interface IValidationError {
+  id: string,
+  reason: string,
+}
+
 export interface IGameSettingsConfigCheckResult {
   files: IGameSettingsConfig['gameSettingsFiles'],
   isError: boolean,

@@ -41,7 +41,9 @@ import {
 import { Loader } from '$components/UI/Loader';
 import { generateSelectOptions } from '$utils/data';
 import { ArgumentsBlock } from '$components/ArgumentsBlock';
-import { checkObjectForEqual } from '$utils/check';
+import {
+  checkObjectForEqual, IValidationError,
+} from '$utils/check';
 import { Header } from '$components/Header';
 
 export const DeveloperScreen: React.FC = () => {
@@ -54,7 +56,7 @@ export const DeveloperScreen: React.FC = () => {
 
   const [currentConfig, setCurrentConfig] = useState<IMainRootState['config']>(launcherConfig);
   const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
-  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [validationErrors, setValidationErrors] = useState<IValidationError[]>([]);
 
   useEffect(() => {
     if (launcherConfig.isFirstLaunch) {
@@ -99,14 +101,12 @@ export const DeveloperScreen: React.FC = () => {
     setIsConfigChanged(!checkObjectForEqual(launcherConfig, newConfig));
   }, [launcherConfig, currentConfig]);
 
-  const setValidationError = useCallback((id: string) => {
-    if (!validationErrors.includes(id)) {
-      setValidationErrors([...validationErrors, id]);
-    }
+  const setValidationError = useCallback((newValidationErrors: IValidationError[]) => {
+    setValidationErrors(Array.from(new Set([...validationErrors, ...newValidationErrors])));
   }, [validationErrors]);
 
-  const clearFromValidationErrors = useCallback((ids: string[]) => {
-    setValidationErrors(validationErrors.filter((currentId) => !ids.includes(currentId)));
+  const clearFromValidationErrors = useCallback((newErrors: IValidationError[]) => {
+    setValidationErrors(validationErrors.filter((currentError) => !!newErrors.find((currError) => currError.id === currentError.id && currError.reason === currentError.reason)));
   }, [validationErrors]);
 
   const sendIncorrectPathErrorMessage = useCallback(() => {
@@ -141,16 +141,21 @@ export const DeveloperScreen: React.FC = () => {
 
   const onNumberInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     if (+target.value < +target.min) {
-      setValidationError(target.id);
+      setValidationError([{ id: target.id, reason: 'less min value' }]);
     } else if (currentConfig.isResizable) {
       if (target.id === 'width' && (+target.value < currentConfig.minWidth)) {
-        setValidationError(target.id);
-        setValidationError('minWidth');
+        setValidationError([
+          { id: target.id, reason: 'less config min' },
+          { id: 'minWidth', reason: 'less config min' },
+        ]);
       } else {
-        clearFromValidationErrors([target.id, 'minWidth']);
+        clearFromValidationErrors([
+          { id: target.id, reason: 'less config min' },
+          { id: 'minWidth', reason: 'less config min' },
+        ]);
       }
     } else {
-      clearFromValidationErrors([target.id]);
+      clearFromValidationErrors([{ id: target.id, reason: 'less config min' }]);
     }
     changeCurrentConfig(target.id, Math.round(+target.value), target.dataset.parent);
   }, [currentConfig, changeCurrentConfig, setValidationError, clearFromValidationErrors]);
@@ -262,16 +267,14 @@ export const DeveloperScreen: React.FC = () => {
   }, [resetConfigChanges]);
 
   const getNumberFieldMinValue = useCallback((id: string): number => {
-    if (!currentConfig.isResizable) {
-      if (id === 'width' || id === 'minWidth') {
-        return MinWindowSize.WIDTH;
-      } else if (id === 'height' || id === 'minHeight') {
-        return MinWindowSize.HEIGHT;
-      }
+    if (id === 'width' || id === 'minWidth') {
+      return MinWindowSize.WIDTH;
+    } else if (id === 'height' || id === 'minHeight') {
+      return MinWindowSize.HEIGHT;
     }
 
     return 0;
-  }, [currentConfig]);
+  }, []);
 
   const getNumberFieldIsDisabled = useCallback((id: string): boolean => !currentConfig.isResizable && (
     id === 'minWidth'
@@ -367,7 +370,7 @@ export const DeveloperScreen: React.FC = () => {
                   label={field.label}
                   min={getNumberFieldMinValue(field.id)}
                   isDisabled={getNumberFieldIsDisabled(field.id)}
-                  isValidationError={validationErrors.includes(field.id)}
+                  isValidationError={!!validationErrors.find((currError) => currError.id === field.id)}
                   description={field.description}
                   onChange={onNumberInputChange}
                 />
