@@ -90,16 +90,6 @@ ipcMain.handle(
   ),
 );
 
-ipcMain.on(AppEvent.OPEN_DEV_WINDOW, () => {
-  if (!devWindow) {
-    devWindow = createDevWindow();
-    addDevWindowListeners(devWindow!, mainWindow!);
-  } else {
-    devWindow.show();
-    devWindow.focus();
-  }
-});
-
 ipcMain.on(AppEvent.CLOSE_APP, () => {
   quitApp();
 });

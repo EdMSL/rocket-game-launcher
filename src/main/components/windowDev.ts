@@ -36,6 +36,7 @@ export const createDevWindow = (): BrowserWindow => {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true,
+      devTools: process.env.NODE_ENV === 'development',
     },
   });
 
@@ -63,6 +64,11 @@ export const addDevWindowListeners = (
   devWindow: BrowserWindow,
   mainWindow: BrowserWindow,
 ): void => {
+  ipcMain.on(AppEvent.OPEN_DEV_WINDOW, () => {
+    devWindow.show();
+    devWindow.focus();
+  });
+
   ipcMain.on(AppEvent.MINIMIZE_WINDOW, (event, windowName) => {
     if (windowName === AppWindowName.DEV) {
       devWindow.minimize();
