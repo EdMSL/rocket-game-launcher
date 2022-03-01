@@ -164,18 +164,13 @@ export const DeveloperScreen: React.FC = () => {
   }, [changeCurrentConfig]);
 
   const onCustomBtnDeleteClick = useCallback((id: string) => {
-    const newConfig: ILauncherConfig = {
-      ...currentConfig,
-      customButtons: currentConfig.customButtons
-        .filter((currentBtn) => currentBtn.id !== id)
-        .map((currentBtn, index) => ({
-          ...currentBtn,
-          id: `customBtn${index}`,
-        })),
-    };
-
-    setCurrentConfig(newConfig);
-  }, [currentConfig]);
+    changeCurrentConfig('customButtons', currentConfig.customButtons
+      .filter((currentBtn) => currentBtn.id !== id)
+      .map((currentBtn, index) => ({
+        ...currentBtn,
+        id: `customBtn${index}`,
+      })));
+  }, [currentConfig, changeCurrentConfig]);
 
   const onAddCustomBtnBtnClick = useCallback(() => {
     const newButtons = [
@@ -259,7 +254,7 @@ export const DeveloperScreen: React.FC = () => {
 
   const onCancelBtnClick = useCallback((event) => {
     resetConfigChanges(event);
-    ipcRenderer.send('close window');
+    ipcRenderer.send('close dev window');
   }, [resetConfigChanges]);
 
   const getNumberFieldMinValue = useCallback((id: string): number => {
