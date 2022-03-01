@@ -48,6 +48,7 @@ export const DeveloperScreen: React.FC = () => {
   const pathVariables = useAppSelector((state) => state.main.pathVariables);
   const launcherConfig = useAppSelector((state) => state.main.config);
   const isGameSettingsSaving = useAppSelector((state) => state.main.isGameSettingsSaving);
+  const isDevWindowOpen = useAppSelector((state) => state.main.isDevWindowOpen);
 
   const dispatch = useDispatch();
 
@@ -61,18 +62,20 @@ export const DeveloperScreen: React.FC = () => {
     }
 
     ipcRenderer.on(AppChannel.WINDOW_RESIZED, (event, windowSize) => {
-      const newConfig = {
-        ...currentConfig,
-        width: windowSize[0],
-        height: windowSize[1],
-      };
+      if (isDevWindowOpen) {
+        const newConfig = {
+          ...currentConfig,
+          width: windowSize[0],
+          height: windowSize[1],
+        };
 
-      setCurrentConfig(newConfig);
-      setIsConfigChanged(!checkObjectForEqual(launcherConfig, newConfig));
+        setCurrentConfig(newConfig);
+        setIsConfigChanged(!checkObjectForEqual(launcherConfig, newConfig));
+      }
     });
 
     return (): void => { ipcRenderer.removeAllListeners(AppChannel.WINDOW_RESIZED); };
-  }, [dispatch, launcherConfig, currentConfig]);
+  }, [dispatch, launcherConfig, currentConfig, isDevWindowOpen]);
 
   const changeCurrentConfig = useCallback((fieldName, value, parent?) => {
     let newConfig: ILauncherConfig;

@@ -3,6 +3,8 @@ import React, { useCallback } from 'react';
 import styles from './styles.module.scss';
 import { openSite } from '$utils/process';
 
+const launcherIcon = require('$images/icon.png');
+
 interface IProps {
   launcherVersion: string,
 }
@@ -15,8 +17,17 @@ export const AppInfo: React.FC<IProps> = ({ launcherVersion }) => {
 
   return (
     <div className={styles['app-info__container']}>
-      <p className={styles['app-info__title']}>Rocket Game Launcher</p>
-      <p>{`Version: ${launcherVersion}`}</p>
+      <div className={styles['app-info__block']}>
+        <img
+          className={styles['app-info__logo']}
+          src={launcherIcon}
+          alt="game logo"
+        />
+        <div>
+          <p className={styles['app-info__title']}>Rocket Game Launcher</p>
+          <p>{`Version: ${launcherVersion}`}</p>
+        </div>
+      </div>
       <p>
         Created by
         <a

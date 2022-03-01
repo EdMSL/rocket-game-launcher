@@ -87,7 +87,7 @@ export const App = (): JSX.Element => {
       {
         isOpenAppInfo && (
           <Modal
-            title="About app"
+            title="О программе"
             onCloseBtnClick={onCloseAppInfoModal}
           >
             <AppInfo launcherVersion={launcherVersion} />

@@ -108,11 +108,11 @@ export interface IWindowField {
 
 export const appWindowFields: IWindowField[] = [{
   id: 'width',
-  label: 'Ширина',
+  label: 'Ширина по умолчанию',
 },
 {
   id: 'height',
-  label: 'Высота',
+  label: 'Высота по умолчанию',
 },
 {
   id: 'minWidth',

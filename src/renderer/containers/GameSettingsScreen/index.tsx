@@ -200,7 +200,7 @@ export const GameSettingsScreen: React.FC = () => {
           isModalOpen && (
             <Modal
               modalParentClassname="game-settings-screen"
-              title="Backups"
+              title="Бэкапы"
               onCloseBtnClick={closeModal}
             >
               <GameSettingsBackup
