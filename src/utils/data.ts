@@ -50,6 +50,7 @@ import {
 } from '$types/main';
 import { defaultModOrganizerParams } from '$constants/defaultParameters';
 import { getReadWriteError } from './errors';
+import { IValidationError } from './check';
 
 const ONE_GB = 1073741824;
 const SYMBOLS_TO_TYPE = 8;
@@ -670,3 +671,22 @@ export const getVariableAndValueFromPath = (pathStr: string): [string, string] =
 
   return [pathVariable, pathValue];
 };
+
+// export const getUniqueValidationErrorsNew = (
+// currentErrors: IValidationError[],
+// currentErrors: IValidationError[]
+// ): IValidationError[] => {
+//   const filtered = currentErrors.filter((curr) => )
+//   return currentErrors.filter((currentError) => {
+//     return newErrors.find((curr) => {
+//       return currentError.id === curr.id && currentError.reason === curr.reason;
+//     })
+//   })
+// };
+export const getUniqueValidationErrors = (
+  currentErrors: IValidationError[],
+  newErrors: IValidationError[],
+  isFalse = true,
+): IValidationError[] => newErrors.filter((currentError) => currentErrors.find((curr) => (isFalse
+  ? !(currentError.id === curr.id && currentError.reason === curr.reason)
+  : currentError.id === curr.id && currentError.reason === curr.reason)));

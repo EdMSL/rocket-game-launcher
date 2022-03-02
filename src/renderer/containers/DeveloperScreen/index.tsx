@@ -39,7 +39,7 @@ import {
   IMainRootState,
 } from '$types/main';
 import { Loader } from '$components/UI/Loader';
-import { generateSelectOptions } from '$utils/data';
+import { generateSelectOptions, getUniqueValidationErrors } from '$utils/data';
 import { ArgumentsBlock } from '$components/ArgumentsBlock';
 import {
   checkObjectForEqual,
@@ -127,25 +127,53 @@ export const DeveloperScreen: React.FC = () => {
   }, [dispatch, currentConfig, changeCurrentConfig]);
 
   const onNumberInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    const errors: IValidationError[] = [];
+    const clearErrors: IValidationError[] = [];
+
     if (+target.value < +target.min) {
-      setValidationError([{ id: target.id, reason: 'less min value' }]);
-    } else if (currentConfig.isResizable) {
-      if (target.id === 'width' && (+target.value < currentConfig.minWidth)) {
-        setValidationError([
-          { id: target.id, reason: 'less config min' },
-          { id: 'minWidth', reason: 'less config min' },
-        ]);
-      } else {
-        clearFromValidationErrors([
-          { id: target.id, reason: 'less config min' },
-          { id: 'minWidth', reason: 'less config min' },
-        ]);
-      }
+      errors.push({ id: target.id, reason: 'less min value' });
     } else {
-      clearFromValidationErrors([{ id: target.id, reason: 'less config min' }]);
+      clearErrors.push({ id: target.id, reason: 'less min value' });
+    }
+
+    if (currentConfig.isResizable) {
+      if (target.id === 'width') {
+        if (+target.value < currentConfig.minWidth) {
+          errors.push(
+            { id: target.id, reason: 'less config min width' },
+            { id: 'minWidth', reason: 'more config width' },
+          );
+        } else {
+          clearErrors.push(
+            { id: target.id, reason: 'less config min width' },
+            { id: 'minWidth', reason: 'more config width' },
+          );
+        }
+
+        if (+target.value > currentConfig.maxWidth) {
+          errors.push(
+            { id: target.id, reason: 'more config max width' },
+            { id: 'maxWidth', reason: 'less config width' },
+          );
+        } else {
+          clearErrors.push(
+            { id: target.id, reason: 'more config max width' },
+            { id: 'maxWidth', reason: 'less config width' },
+          );
+        }
+      }
+    }
+
+    if (errors.length !== 0) {
+      const a = getUniqueValidationErrors(validationErrors, errors);
+      // const b = getUniqueValidationErrors(a, clearErrors, false);
+      console.log(a);
+      // console.log(b);
+      // setValidationErrors(getUniqueValidationErrors(errors, clearErrors));
     }
     changeCurrentConfig(target.id, Math.round(+target.value), target.dataset.parent);
-  }, [currentConfig, changeCurrentConfig, setValidationError, clearFromValidationErrors]);
+  }, [currentConfig, changeCurrentConfig, validationErrors/* , setValidationError, clearFromValidationErrors */]);
+  // }, [currentConfig, changeCurrentConfig, setValidationError, clearFromValidationErrors]);
 
   const OnTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     changeCurrentConfig(target.id, target.value, target.dataset.parent);
