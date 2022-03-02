@@ -7,7 +7,6 @@ import {
   GameSettingsFileView,
   GameSettingsOptionType,
   PathRegExp,
-  PathVariableName,
   LauncherButtonAction,
 } from '$constants/misc';
 import {
@@ -20,13 +19,11 @@ import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
 } from '$utils/log';
 import {
-  defaultLauncherConfig, MinWindowSize,
-  // minimalLauncherConfig,
+  defaultLauncherConfig, defaultLauncherWindowSettings, MinWindowSize,
 } from '$constants/defaultParameters';
-// import { IConfigRootState } from '$types/config';
 import { CustomError, ErrorName } from './errors';
 import { getRandomId } from './strings';
-import { ILauncherConfig } from '$types/main';
+import { ILauncherConfig, IWindowSettings } from '$types/main';
 
 interface IGameSettingsFileError {
   parent: string,
@@ -494,3 +491,26 @@ export const checkGameSettingsFiles = (
   @returns Равны ли объекты.
 */
 export const checkObjectForEqual = (a: object, b: object): boolean => JSON.stringify(a) === JSON.stringify(b);
+
+const getWindowSettingsFromLauncherConfig = (
+  config: ILauncherConfig,
+): IWindowSettings => Object.keys(defaultLauncherWindowSettings).reduce<IWindowSettings>(
+  (acc, current) => ({
+    ...acc,
+    [current]: config[current],
+  }), {} as IWindowSettings,
+);
+
+/**
+  Сравнение двух объектов настроек окна приложения на равенство полей.
+  @param settingsFirst Первый объект.
+  @param settingsSecond Второй объект.
+  @returns Равны ли объекты.
+*/
+export const getIsWindowSettingEqual = (
+  settingsFirst: ILauncherConfig,
+  settingsSecond: ILauncherConfig,
+): boolean => checkObjectForEqual(
+  getWindowSettingsFromLauncherConfig(settingsFirst),
+  getWindowSettingsFromLauncherConfig(settingsSecond),
+);

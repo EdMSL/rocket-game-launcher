@@ -42,7 +42,9 @@ import { Loader } from '$components/UI/Loader';
 import { generateSelectOptions } from '$utils/data';
 import { ArgumentsBlock } from '$components/ArgumentsBlock';
 import {
-  checkObjectForEqual, IValidationError,
+  checkObjectForEqual,
+  getIsWindowSettingEqual,
+  IValidationError,
 } from '$utils/check';
 import { Header } from '$components/Header';
 
@@ -62,21 +64,6 @@ export const DeveloperScreen: React.FC = () => {
     if (launcherConfig.isFirstLaunch) {
       dispatch(setIsFirstLaunch(false));
     }
-
-    ipcRenderer.on(AppChannel.WINDOW_RESIZED, (event, windowSize) => {
-      if (isDevWindowOpen) {
-        const newConfig = {
-          ...currentConfig,
-          width: windowSize[0],
-          height: windowSize[1],
-        };
-
-        setCurrentConfig(newConfig);
-        setIsConfigChanged(!checkObjectForEqual(launcherConfig, newConfig));
-      }
-    });
-
-    return (): void => { ipcRenderer.removeAllListeners(AppChannel.WINDOW_RESIZED); };
   }, [dispatch, launcherConfig, currentConfig, isDevWindowOpen]);
 
   const changeCurrentConfig = useCallback((fieldName, value, parent?) => {
@@ -219,15 +206,16 @@ export const DeveloperScreen: React.FC = () => {
   ) => {
     const newConfig = { ...currentConfig, isFirstLaunch: false };
 
-    if (
-      launcherConfig.width !== +currentConfig.width
-      || launcherConfig.height !== +currentConfig.height
-    ) {
-      ipcRenderer.send(AppChannel.RESIZE_WINDOW, +currentConfig.width, +currentConfig.height);
-    }
-
-    if (launcherConfig.isResizable !== currentConfig.isResizable) {
-      ipcRenderer.send(AppChannel.SET_RESIZABLE_WINDOW, currentConfig.isResizable);
+    if (!getIsWindowSettingEqual(launcherConfig, currentConfig)) {
+      ipcRenderer.send(AppChannel.CHANGE_WINDOW_SETTINGS, {
+        isResizable: currentConfig.isResizable,
+        width: currentConfig.width,
+        height: currentConfig.height,
+        minWidth: currentConfig.minWidth,
+        maxWidth: currentConfig.maxWidth,
+        minHeight: currentConfig.minHeight,
+        maxHeight: currentConfig.maxHeight,
+      });
     }
 
     dispatch(saveLauncherConfig(
@@ -242,9 +230,7 @@ export const DeveloperScreen: React.FC = () => {
     setIsConfigChanged(false);
   }, [dispatch,
     currentConfig,
-    launcherConfig.width,
-    launcherConfig.height,
-    launcherConfig.isResizable]);
+    launcherConfig]);
 
   const resetConfigChanges = useCallback((event) => {
     setIsConfigChanged(false);
@@ -362,20 +348,20 @@ export const DeveloperScreen: React.FC = () => {
                 description="Определяет, может ли пользователь изменять размеры окна программы"
               />
               {
-              appWindowFields.map((field) => (
-                <NumberField
-                  className={styles['developer-screen__item']}
-                  id={field.id}
-                  value={currentConfig[field.id]}
-                  label={field.label}
-                  min={getNumberFieldMinValue(field.id)}
-                  isDisabled={getNumberFieldIsDisabled(field.id)}
-                  isValidationError={!!validationErrors.find((currError) => currError.id === field.id)}
-                  description={field.description}
-                  onChange={onNumberInputChange}
-                />
-              ))
-            }
+                appWindowFields.map((field) => (
+                  <NumberField
+                    className={styles['developer-screen__item']}
+                    id={field.id}
+                    value={currentConfig[field.id]}
+                    label={field.label}
+                    min={getNumberFieldMinValue(field.id)}
+                    isDisabled={getNumberFieldIsDisabled(field.id)}
+                    isValidationError={!!validationErrors.find((currError) => currError.id === field.id)}
+                    description={field.description}
+                    onChange={onNumberInputChange}
+                  />
+                ))
+              }
             </div>
             <div className={styles['developer-screen__block']}>
               <p className={styles['developer-screen__block-title']}>

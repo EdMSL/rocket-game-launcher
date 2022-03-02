@@ -52,6 +52,16 @@ export interface IGameSettingsBackup {
   files: IBackupFile[],
 }
 
+export interface IWindowSettings {
+  isResizable: boolean,
+  minWidth: number,
+  minHeight: number,
+  maxWidth: number,
+  maxHeight: number,
+  width: number,
+  height: number,
+}
+
 export interface IModOrganizerParams {
   isUsed: boolean,
   version: number,
@@ -64,14 +74,7 @@ export interface IModOrganizerParams {
   profileParamValueRegExp: string,
 }
 
-export interface ILauncherConfig {
-  isResizable: boolean,
-  minWidth: number,
-  minHeight: number,
-  maxWidth: number,
-  maxHeight: number,
-  width: number,
-  height: number,
+export interface ILauncherConfig extends IWindowSettings {
   isFirstLaunch: boolean,
   modOrganizer: IModOrganizerParams,
   documentsPath: string,

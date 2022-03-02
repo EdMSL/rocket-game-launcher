@@ -8,8 +8,8 @@ import path from 'path';
 import windowStateKeeper from 'electron-window-state';
 
 import { createWaitForWebpackDevServer } from './waitDevServer';
-import { defaultLauncherResolution } from '$constants/defaultParameters';
-import { IMainRootState } from '$types/main';
+import { defaultLauncherWindowSettings, MinWindowSize } from '$constants/defaultParameters';
+import { IMainRootState, IWindowSettings } from '$types/main';
 import { getDisplaysInfo } from '$utils/data';
 import { AppChannel, AppWindowName } from '$constants/misc';
 
@@ -20,8 +20,8 @@ export const createMainWindow = (
   config: IMainRootState['config'],
 ): BrowserWindow => {
   const mainWindowState = windowStateKeeper({
-    defaultWidth: config.width ? config.width : defaultLauncherResolution.width,
-    defaultHeight: config.height ? config.height : defaultLauncherResolution.height,
+    defaultWidth: config.width ? config.width : defaultLauncherWindowSettings.width,
+    defaultHeight: config.height ? config.height : defaultLauncherWindowSettings.height,
     file: 'window-main-state.json',
   });
 
@@ -104,17 +104,29 @@ export const addMainWindowListeners = (
     }
   });
 
-  ipcMain.on(AppChannel.RESIZE_WINDOW, (event, width, height) => {
+  ipcMain.on(AppChannel.CHANGE_WINDOW_SETTINGS, (event, windowSettings: IWindowSettings) => {
     if (mainWindow.isFullScreen()) {
       mainWindow.unmaximize();
     }
 
-    mainWindow.setMinimumSize(width, height);
-    mainWindow.setSize(width, height);
-  });
+    mainWindow.setResizable(windowSettings.isResizable);
 
-  ipcMain.on(AppChannel.SET_RESIZABLE_WINDOW, (event, isResizable) => {
-    mainWindow.setResizable(isResizable);
+    if (windowSettings.isResizable) {
+      mainWindow.setMinimumSize(windowSettings.minWidth, windowSettings.minHeight);
+      mainWindow.setMaximumSize(windowSettings.maxWidth, windowSettings.maxHeight);
+
+      const currentSize = mainWindow.getSize();
+
+      if (currentSize[0] < windowSettings.minWidth || currentSize[1] < windowSettings.minHeight) {
+        mainWindow.setSize(windowSettings.minWidth, windowSettings.minHeight);
+      } else if (currentSize[0] > windowSettings.maxWidth || currentSize[1] > windowSettings.maxHeight) {
+        mainWindow.setSize(windowSettings.maxWidth, windowSettings.maxHeight);
+      }
+    } else {
+      mainWindow.setMinimumSize(MinWindowSize.WIDTH, MinWindowSize.HEIGHT);
+      mainWindow.setMaximumSize(0, 0);
+      mainWindow.setSize(windowSettings.width, windowSettings.height);
+    }
   });
 
   mainWindow.once('ready-to-show', () => {

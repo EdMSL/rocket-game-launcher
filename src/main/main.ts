@@ -77,11 +77,6 @@ ipcMain.on(AppChannel.OPEN_DEV_WINDOW, () => {
   if (!devWindow) {
     devWindow = createDevWindow();
     addDevWindowListeners(devWindow, mainWindow!, showDevWindow);
-
-    //FIXME ресайз срабатывает только при повторном открытии окна
-    mainWindow!.on('resized', () => {
-      devWindow!.webContents.send(AppChannel.WINDOW_RESIZED, mainWindow!.getSize());
-    });
   } else {
     showDevWindow();
   }

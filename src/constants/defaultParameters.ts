@@ -3,10 +3,10 @@ import {
   ISuccess,
 } from '$types/common';
 import {
-  ILauncherAppButton,
   ILauncherConfig,
   ILauncherCustomButton,
   IModOrganizerParams,
+  IWindowSettings,
 } from '$types/main';
 import { LauncherButtonAction } from './misc';
 
@@ -27,11 +27,12 @@ interface ILauncherConfigModOrganizerParams {
 }
 
 export const MinWindowSize = {
-  HEIGHT: 400,
-  WIDTH: 400,
+  HEIGHT: 300,
+  WIDTH: 300,
 };
 
-export const defaultLauncherResolution = {
+export const defaultLauncherWindowSettings: IWindowSettings = {
+  isResizable: false,
   width: 800,
   height: 600,
   minWidth: MinWindowSize.WIDTH,
@@ -70,13 +71,13 @@ export const defaultModOrganizerParams: IModOrganizerParams = {
 };
 
 export const defaultLauncherConfig: ILauncherConfig = {
-  isResizable: false,
-  minWidth: defaultLauncherResolution.minWidth,
-  minHeight: defaultLauncherResolution.minHeight,
-  maxWidth: defaultLauncherResolution.maxWidth,
-  maxHeight: defaultLauncherResolution.maxHeight,
-  width: defaultLauncherResolution.width,
-  height: defaultLauncherResolution.height,
+  isResizable: defaultLauncherWindowSettings.isResizable,
+  minWidth: defaultLauncherWindowSettings.minWidth,
+  minHeight: defaultLauncherWindowSettings.minHeight,
+  maxWidth: defaultLauncherWindowSettings.maxWidth,
+  maxHeight: defaultLauncherWindowSettings.maxHeight,
+  width: defaultLauncherWindowSettings.width,
+  height: defaultLauncherWindowSettings.height,
   isFirstLaunch: true,
   modOrganizer: defaultModOrganizerParams,
   documentsPath: '',
