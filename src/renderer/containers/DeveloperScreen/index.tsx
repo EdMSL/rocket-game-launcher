@@ -6,7 +6,6 @@ import React, {
   useEffect,
 } from 'react';
 import { useDispatch } from 'react-redux';
-import { NavLink } from 'react-router-dom';
 import classNames from 'classnames';
 import Scrollbars from 'react-custom-scrollbars-2';
 
@@ -39,7 +38,9 @@ import {
   IMainRootState,
 } from '$types/main';
 import { Loader } from '$components/UI/Loader';
-import { generateSelectOptions, getUniqueValidationErrors } from '$utils/data';
+import {
+  generateSelectOptions, getUniqueValidationErrors,
+} from '$utils/data';
 import { ArgumentsBlock } from '$components/ArgumentsBlock';
 import {
   checkObjectForEqual,
@@ -150,7 +151,7 @@ export const DeveloperScreen: React.FC = () => {
           );
         }
 
-        if (+target.value > currentConfig.maxWidth) {
+        if (+target.value > currentConfig.maxWidth && currentConfig.maxWidth > 0) {
           errors.push(
             { id: target.id, reason: 'more config max width' },
             { id: 'maxWidth', reason: 'less config width' },
@@ -164,16 +165,13 @@ export const DeveloperScreen: React.FC = () => {
       }
     }
 
-    if (errors.length !== 0) {
-      const a = getUniqueValidationErrors(validationErrors, errors);
-      // const b = getUniqueValidationErrors(a, clearErrors, false);
-      console.log(a);
-      // console.log(b);
-      // setValidationErrors(getUniqueValidationErrors(errors, clearErrors));
-    }
+    const newValidationErrors = getUniqueValidationErrors(validationErrors, errors);
+    const completeErrors = getUniqueValidationErrors(newValidationErrors, clearErrors, true);
+
+    setValidationErrors(completeErrors);
+
     changeCurrentConfig(target.id, Math.round(+target.value), target.dataset.parent);
-  }, [currentConfig, changeCurrentConfig, validationErrors/* , setValidationError, clearFromValidationErrors */]);
-  // }, [currentConfig, changeCurrentConfig, setValidationError, clearFromValidationErrors]);
+  }, [currentConfig, changeCurrentConfig, validationErrors]);
 
   const OnTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     changeCurrentConfig(target.id, target.value, target.dataset.parent);

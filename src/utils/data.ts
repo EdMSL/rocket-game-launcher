@@ -672,21 +672,28 @@ export const getVariableAndValueFromPath = (pathStr: string): [string, string] =
   return [pathVariable, pathValue];
 };
 
-// export const getUniqueValidationErrorsNew = (
-// currentErrors: IValidationError[],
-// currentErrors: IValidationError[]
-// ): IValidationError[] => {
-//   const filtered = currentErrors.filter((curr) => )
-//   return currentErrors.filter((currentError) => {
-//     return newErrors.find((curr) => {
-//       return currentError.id === curr.id && currentError.reason === curr.reason;
-//     })
-//   })
-// };
+/**
+ * Получить ошибки валидации полей размеров экрана.
+ * @param currentErrors Текущие ошибки валидации.
+ * @param newErrorsOrForClear Ошибки валидации для добавления или для очистки.
+ * @param isForClear Очищать ошибки из списока или добавлять новые ошибки в список.
+ * @returns Массив из строк переменной и остатка пути.
+*/
 export const getUniqueValidationErrors = (
   currentErrors: IValidationError[],
-  newErrors: IValidationError[],
-  isFalse = true,
-): IValidationError[] => newErrors.filter((currentError) => currentErrors.find((curr) => (isFalse
-  ? !(currentError.id === curr.id && currentError.reason === curr.reason)
-  : currentError.id === curr.id && currentError.reason === curr.reason)));
+  newErrorsOrForClear: IValidationError[],
+  isForClear = false,
+): IValidationError[] => {
+  const errs = (isForClear ? currentErrors : newErrorsOrForClear)
+    .filter((currentError) => {
+      const a = !((isForClear ? newErrorsOrForClear : currentErrors))
+        .find((curr) => currentError.id === curr.id && currentError.reason === curr.reason);
+      return a;
+    });
+
+  if (isForClear) {
+    return errs;
+  }
+
+  return [...currentErrors, ...errs];
+};
