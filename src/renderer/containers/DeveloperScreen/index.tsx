@@ -357,7 +357,7 @@ export const DeveloperScreen: React.FC = () => {
                 className={styles['developer-screen__item']}
                 id="gameName"
                 value={currentConfig.gameName}
-                label="Название игры"
+                label="Заголовок окна программы"
                 description="Название игры или любой текст, который будет отображаться в заголовке окна программы"//eslint-disable-line max-len
                 onChange={OnTextFieldChange}
               />

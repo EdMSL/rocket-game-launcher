@@ -79,7 +79,7 @@ const configFileDataSchema = Joi.object({
       path: Joi.string().required(),
       args: Joi.array().items(Joi.string()).optional().default([]),
       label: Joi.string().optional().default('Запуск'),
-      action: Joi.string().optional().valid(...Object.values(LauncherButtonAction)).default(LauncherButtonAction.RUN),
+      action: Joi.string().required().valid(...Object.values(LauncherButtonAction)),
     })).optional().default([]),
 });
 

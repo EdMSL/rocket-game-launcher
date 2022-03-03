@@ -628,7 +628,7 @@ export const updatePathVariables = (
  * @returns Массив объектов пользовательских кнопок.
 */
 export const getCustomButtons = (
-  buttonsData: ILauncherAppButton[],
+  buttonsData: ILauncherCustomButton[],
   pathVariables: IPathVariables,
   // Типы определяются неверно, после filter отсекутся все undefined,
   // но ts все равно считает, что они там есть.
@@ -641,13 +641,7 @@ export const getCustomButtons = (
 
     checkIsPathIsNotOutsideValidFolder(pathTo, pathVariables);
 
-    return {
-      ...btn,
-      action: fs.statSync(pathTo).isDirectory()
-        ? LauncherButtonAction.OPEN
-        : LauncherButtonAction.RUN,
-      path: btn.path,
-    };
+    return btn;
   } catch (error: any) {
     const err = getReadWriteError(error);
 
