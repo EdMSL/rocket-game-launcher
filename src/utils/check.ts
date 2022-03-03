@@ -77,6 +77,12 @@ const configFileDataSchema = Joi.object({
     .items(Joi.object({
       id: Joi.string().optional().default(() => getRandomId('custom-btn')),
       path: Joi.string().required(),
+      //   .pattern(
+      //   Joi.when(Joi.ref('action'), {
+      //     is: LauncherButtonAction.OPEN, then: PathRegExp.CORRECT_PATH_WITH_VARIABLE_TO_FOLDER_REGEXP, otherwise: PathRegExp.CORRECT_PATH_WITH_VARIABLE_TO_FILE_REGEXP,
+      //   }),
+      //   'correct path',
+      // ),
       args: Joi.array().items(Joi.string()).optional().default([]),
       label: Joi.string().optional().default('Запуск'),
       action: Joi.string().required().valid(...Object.values(LauncherButtonAction)),

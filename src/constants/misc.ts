@@ -70,7 +70,8 @@ export const PathRegExp = {
   MO_PROFILE_REGEXP: new RegExp('^%MO_PROFILE%'),
   PATH_VARIABLE_NAME_REGEXP: /^%[A-Z_]+%$/,
   PATH_VARIABLE_REGEXP: /^%[A-Z_]+%/,
-  CORRECT_PATH_REGEXP: /^[^.]/,
+  CORRECT_PATH_WITH_VARIABLE_TO_FILE_REGEXP: /^%[A-Z_]+%\\(?:[a-zA-Z0-9]+\\)*([a-zA-Z0-9]+\.[a-z0-9]{3})/,
+  CORRECT_PATH_WITH_VARIABLE_TO_FOLDER_REGEXP: /^%[A-Z_]+%\\((?:[a-zA-Z0-9]+\\)*([a-zA-Z0-9]+)\\?)?/,
 };
 
 export const LauncherButtonAction = {
