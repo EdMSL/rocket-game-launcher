@@ -31,6 +31,8 @@ export const MinWindowSize = {
   WIDTH: 300,
 };
 
+export const TEXT_INPUT_MAX_LENGTH = 50;
+
 export const defaultLauncherWindowSettings: IWindowSettings = {
   isResizable: false,
   width: 800,

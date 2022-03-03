@@ -99,6 +99,7 @@ export interface IUIElementParams {
   isDisabled?: boolean,
   parent?: string,
   description?: string,
+  maxLength?: number,
   isValidationError?: boolean,
 }
 

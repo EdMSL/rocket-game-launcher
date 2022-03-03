@@ -3,6 +3,7 @@ import classNames from 'classnames';
 
 import { IUIElementProps } from '$types/gameSettings';
 import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
+import { TEXT_INPUT_MAX_LENGTH } from '$constants/defaultParameters';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {
   value: string,
@@ -16,6 +17,7 @@ export const TextField: React.FunctionComponent<IProps> = ({
   className = '',
   parentClassname = '',
   description = '',
+  maxLength = TEXT_INPUT_MAX_LENGTH,
   parent = '',
   multiparameters = '',
   isDisabled = false,
@@ -43,6 +45,7 @@ export const TextField: React.FunctionComponent<IProps> = ({
       id={id}
       name={name}
       value={value}
+      maxLength={maxLength}
       data-parent={parent}
       data-multiparameters={multiparameters}
       disabled={isDisabled}
