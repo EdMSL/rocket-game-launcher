@@ -399,12 +399,14 @@ $checkbox-size: 20px;
 
 .path-selector__select {
   height: 100%;
-  padding: 10px 4px;
+  padding: 11px 4px;
 
   font-size: var(--text-size-input);
 
-  border-color: var(--no-border);
-  border-right-width: 0;
+  border-width: 0;
+
+  border-color: var(--disabled-color);
+  border-right-width: 2px;
   border-radius: 0;
 
   &:focus {
@@ -412,7 +414,9 @@ $checkbox-size: 20px;
   }
 
   &:disabled {
-    padding: 11px 4px;
+    padding: 12px 4px;
+
+    border-color: transparent;
 
     appearance: none;
   }
