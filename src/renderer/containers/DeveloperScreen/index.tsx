@@ -46,6 +46,7 @@ import {
   checkObjectForEqual,
   getIsWindowSettingEqual,
   IValidationError,
+  validateNumberInputs,
 } from '$utils/check';
 import { Header } from '$components/Header';
 
@@ -89,14 +90,6 @@ export const DeveloperScreen: React.FC = () => {
     setIsConfigChanged(!checkObjectForEqual(launcherConfig, newConfig));
   }, [launcherConfig, currentConfig]);
 
-  const setValidationError = useCallback((newValidationErrors: IValidationError[]) => {
-    setValidationErrors(Array.from(new Set([...validationErrors, ...newValidationErrors])));
-  }, [validationErrors]);
-
-  const clearFromValidationErrors = useCallback((newErrors: IValidationError[]) => {
-    setValidationErrors(validationErrors.filter((currentError) => !!newErrors.find((currError) => currError.id === currentError.id && currError.reason === currentError.reason)));
-  }, [validationErrors]);
-
   const sendIncorrectPathErrorMessage = useCallback(() => {
     dispatch(addMessages([CreateUserMessage.error('Выбран некорректный путь до папки. Подробности в файле лога.')])); //eslint-disable-line max-len
   }, [dispatch]);
@@ -128,47 +121,14 @@ export const DeveloperScreen: React.FC = () => {
   }, [dispatch, currentConfig, changeCurrentConfig]);
 
   const onNumberInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    const errors: IValidationError[] = [];
-    const clearErrors: IValidationError[] = [];
+    const [errors, clearErrors] = validateNumberInputs(target, currentConfig);
 
-    if (+target.value < +target.min) {
-      errors.push({ id: target.id, reason: 'less min value' });
-    } else {
-      clearErrors.push({ id: target.id, reason: 'less min value' });
+    if (errors.length !== 0 || clearErrors.length !== 0) {
+      const newValidationErrors = getUniqueValidationErrors(validationErrors, errors);
+      const completeErrors = getUniqueValidationErrors(newValidationErrors, clearErrors, true);
+
+      setValidationErrors(completeErrors);
     }
-
-    if (currentConfig.isResizable) {
-      if (target.id === 'width') {
-        if (+target.value < currentConfig.minWidth) {
-          errors.push(
-            { id: target.id, reason: 'less config min width' },
-            { id: 'minWidth', reason: 'more config width' },
-          );
-        } else {
-          clearErrors.push(
-            { id: target.id, reason: 'less config min width' },
-            { id: 'minWidth', reason: 'more config width' },
-          );
-        }
-
-        if (+target.value > currentConfig.maxWidth && currentConfig.maxWidth > 0) {
-          errors.push(
-            { id: target.id, reason: 'more config max width' },
-            { id: 'maxWidth', reason: 'less config width' },
-          );
-        } else {
-          clearErrors.push(
-            { id: target.id, reason: 'more config max width' },
-            { id: 'maxWidth', reason: 'less config width' },
-          );
-        }
-      }
-    }
-
-    const newValidationErrors = getUniqueValidationErrors(validationErrors, errors);
-    const completeErrors = getUniqueValidationErrors(newValidationErrors, clearErrors, true);
-
-    setValidationErrors(completeErrors);
 
     changeCurrentConfig(target.id, Math.round(+target.value), target.dataset.parent);
   }, [currentConfig, changeCurrentConfig, validationErrors]);

@@ -514,3 +514,77 @@ export const getIsWindowSettingEqual = (
   getWindowSettingsFromLauncherConfig(settingsFirst),
   getWindowSettingsFromLauncherConfig(settingsSecond),
 );
+
+/**
+  Валидация значений полей `number` в `developer screen`.
+  @param target Поле `target` объекта `event`.
+  @param currentConfig Текущие значения конфигурации лаунчера.
+  @returns Массив из двух массивов: ошибки для добавления и ошибки для удаления.
+*/
+export const validateNumberInputs = (
+  target: EventTarget & HTMLInputElement,
+  currentConfig: ILauncherConfig,
+): IValidationError[][] => {
+  const errors: IValidationError[] = [];
+  const clearErrors: IValidationError[] = [];
+
+  if (+target.value < +target.min) {
+    errors.push({ id: target.id, reason: 'less min value' });
+  } else {
+    clearErrors.push({ id: target.id, reason: 'less min value' });
+  }
+
+  if (currentConfig.isResizable) {
+    const namesAmdValues = target.id.toLowerCase().includes('width')
+      ? {
+          default: currentConfig.width,
+          min: currentConfig.minWidth,
+          max: currentConfig.maxWidth,
+          defaultName: 'width',
+          minName: 'minWidth',
+          maxName: 'maxWidth',
+        }
+      : {
+          default: currentConfig.height,
+          min: currentConfig.minHeight,
+          max: currentConfig.maxHeight,
+          defaultName: 'height',
+          minName: 'minHeight',
+          maxName: 'maxHeight',
+        };
+
+    if (target.id === 'width' || target.id === 'height') {
+      (+target.value < namesAmdValues.min ? errors : clearErrors).push(
+        { id: target.id, reason: `less config ${namesAmdValues.minName}` },
+        { id: namesAmdValues.minName, reason: `more config ${target.id}` },
+      );
+
+      (+target.value > namesAmdValues.max && namesAmdValues.max > 0 ? errors : clearErrors).push(
+        { id: target.id, reason: `more config ${namesAmdValues.maxName}` },
+        { id: namesAmdValues.maxName, reason: `less config ${target.id}` },
+      );
+    } else if (target.id === 'minWidth' || target.id === 'minHeight') {
+      (+target.value > namesAmdValues.default ? errors : clearErrors).push(
+        { id: target.id, reason: `more config ${namesAmdValues.defaultName}` },
+        { id: namesAmdValues.defaultName, reason: `less config ${target.id}` },
+      );
+
+      (+target.value > namesAmdValues.max && namesAmdValues.max > 0 ? errors : clearErrors).push(
+        { id: target.id, reason: `more config ${namesAmdValues.maxName}` },
+        { id: namesAmdValues.maxName, reason: `less config ${target.id}` },
+      );
+    } else if (target.id === 'maxWidth' || target.id === 'maxHeight') {
+      (+target.value < namesAmdValues.default && +target.value > 0 ? errors : clearErrors).push(
+        { id: target.id, reason: `less config ${namesAmdValues.defaultName}` },
+        { id: namesAmdValues.defaultName, reason: `more config ${target.id}` },
+      );
+
+      (+target.value < namesAmdValues.min && +target.value > 0 ? errors : clearErrors).push(
+        { id: target.id, reason: `less config ${namesAmdValues.minName}` },
+        { id: namesAmdValues.minName, reason: `more config ${target.id}` },
+      );
+    }
+  }
+
+  return [errors, clearErrors];
+};
