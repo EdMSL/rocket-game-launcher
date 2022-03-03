@@ -68,10 +68,12 @@ export const PathRegExp = {
   MO_INI_REGEXP: new RegExp('^%MO_INI%'),
   MO_MODS_REGEXP: new RegExp('^%MO_MODS%'),
   MO_PROFILE_REGEXP: new RegExp('^%MO_PROFILE%'),
+  ALL_PATH_VARIABLES_REGEXP: new RegExp(`^%(${Object.keys(PathVariableName).join('|')})%`),
+  CUSTOM_BTNS_AVAILABLE_PATH_VARIABLES: new RegExp('^%(GAME_DIR|DOCS_GAME)%'),
   PATH_VARIABLE_NAME_REGEXP: /^%[A-Z_]+%$/,
   PATH_VARIABLE_REGEXP: /^%[A-Z_]+%/,
-  CORRECT_PATH_WITH_VARIABLE_TO_FILE_REGEXP: /^%[A-Z_]+%\\(?:[a-zA-Z0-9]+\\)*([a-zA-Z0-9]+\.[a-z0-9]{3})/,
-  CORRECT_PATH_WITH_VARIABLE_TO_FOLDER_REGEXP: /^%[A-Z_]+%\\((?:[a-zA-Z0-9]+\\)*([a-zA-Z0-9]+)\\?)?/,
+  CORRECT_PATH_WITH_VARIABLE_TO_FILE_REGEXP: /^%[A-Z_]+%\\(?:[a-zA-Z0-9]+\\)*([a-zA-Z0-9]+\.[a-zA-Z0-9]{3})/,
+  CORRECT_PATH_WITH_VARIABLE_TO_FOLDER_REGEXP: /^%[A-Z_]+%(\\(?:[a-zA-Z0-9]+\\)*([a-zA-Z0-9]+)\\?(?!\.[a-zA-Z0-9]{3}))?/,
 };
 
 export const LauncherButtonAction = {

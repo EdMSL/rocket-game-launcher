@@ -1,5 +1,6 @@
 
 import Joi from 'joi';
+import path from 'path';
 
 import {
   Encoding,
@@ -40,6 +41,44 @@ export interface IGameSettingsConfigCheckResult {
   isError: boolean,
 }
 
+export const checkPathWithVariable = (
+  value: string,
+  action: string,
+  isThrowError = true,
+): string => {
+  if (action === LauncherButtonAction.OPEN) {
+    if (!path.extname(value)) {
+      return value;
+    }
+
+    if (isThrowError) {
+      throw new Error(`path to folder is not correct. Path: ${value}`);
+    } else {
+      return '';
+    }
+  } else if (action === LauncherButtonAction.RUN) {
+    if (path.extname(value) && /\.[a-zA-Z0-9]{2,}/.test(path.extname(value))) {
+      return value;
+    }
+
+    if (isThrowError) {
+      throw new Error(`path to file is not correct. Path: ${value}`);
+    } else {
+      return '';
+    }
+  }
+
+  throw new Error(`path value is not correct. Path: ${value}`);
+};
+
+const checkPathWithVariableForCustomBtn = (value: string, helpers: Joi.CustomHelpers): string => {
+  if (!PathRegExp.CUSTOM_BTNS_AVAILABLE_PATH_VARIABLES.test(value)) {
+    throw new Error(`path variable is not correct or not available for this path. Path: ${value}`);
+  }
+
+  return checkPathWithVariable(value, helpers.state.ancestors[0].action);
+};
+
 const configFileDataSchema = Joi.object({
   isResizable: Joi.bool().optional().default(defaultLauncherConfig.isResizable),
   minWidth: Joi.number().integer().min(MinWindowSize.WIDTH).optional()
@@ -76,13 +115,7 @@ const configFileDataSchema = Joi.object({
   customButtons: Joi.array()
     .items(Joi.object({
       id: Joi.string().optional().default(() => getRandomId('custom-btn')),
-      path: Joi.string().required(),
-      //   .pattern(
-      //   Joi.when(Joi.ref('action'), {
-      //     is: LauncherButtonAction.OPEN, then: PathRegExp.CORRECT_PATH_WITH_VARIABLE_TO_FOLDER_REGEXP, otherwise: PathRegExp.CORRECT_PATH_WITH_VARIABLE_TO_FILE_REGEXP,
-      //   }),
-      //   'correct path',
-      // ),
+      path: Joi.string().required().custom(checkPathWithVariableForCustomBtn),
       args: Joi.array().items(Joi.string()).optional().default([]),
       label: Joi.string().optional().default('Запуск'),
       action: Joi.string().required().valid(...Object.values(LauncherButtonAction)),
