@@ -70,7 +70,8 @@ export const DeveloperScreen: React.FC = () => {
 
   const changeCurrentConfig = useCallback((fieldName, value, parent?) => {
     let newConfig: ILauncherConfig;
-
+    //FIXME Приходит много лишней информации при изменении в pathSelector
+    // console.log(value);
     if (parent) {
       newConfig = {
         ...currentConfig,
@@ -96,6 +97,7 @@ export const DeveloperScreen: React.FC = () => {
 
   const onPathSelectorChange = useCallback((
     value: string|undefined,
+    isError: boolean,
     id: string,
     parent: string,
   ) => {
@@ -118,7 +120,13 @@ export const DeveloperScreen: React.FC = () => {
     } else {
       dispatch(addMessages([CreateUserMessage.error('Выбран некорректный путь до папки. Подробности в файле лога.')])); //eslint-disable-line max-len
     }
-  }, [dispatch, currentConfig, changeCurrentConfig]);
+    console.log(isError);
+    if (isError) {
+      setValidationErrors(getUniqueValidationErrors(validationErrors, [{ id, reason: 'incorrect path' }]));
+    } else {
+      setValidationErrors(getUniqueValidationErrors(validationErrors, [{ id, reason: 'incorrect path' }]));
+    }
+  }, [dispatch, currentConfig, validationErrors, changeCurrentConfig]);
 
   const onNumberInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     const [errors, clearErrors] = validateNumberInputs(target, currentConfig);

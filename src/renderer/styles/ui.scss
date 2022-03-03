@@ -437,6 +437,10 @@ $checkbox-size: 20px;
   &:disabled {
     background-color: var(--disabled-color);
   }
+
+  &--error {
+    background-color: var(--error-color);
+  }
 }
 
 .path-selector__input-btn {

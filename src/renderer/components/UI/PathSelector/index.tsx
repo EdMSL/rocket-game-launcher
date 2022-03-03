@@ -11,7 +11,8 @@ import { ISelectOption } from '../Select';
 import { getVariableAndValueFromPath } from '$utils/data';
 import { IPathVariables } from '$constants/paths';
 import { checkIsPathIsNotOutsideValidFolder, replaceRootDirByPathVariable } from '$utils/strings';
-import { AppChannel } from '$constants/misc';
+import { AppChannel, LauncherButtonAction } from '$constants/misc';
+import { checkPathWithVariable } from '$utils/check';
 
 interface IProps extends IUIElementParams {
   options: ISelectOption[],
@@ -20,7 +21,7 @@ interface IProps extends IUIElementParams {
   isSelectDisabled?: boolean,
   isSelectFile?: boolean,
   isGameDocuments?: boolean,
-  onChange: (value: string|undefined, id: string, parent: string) => void,
+  onChange: (value: string|undefined, isError: boolean, id: string, parent: string) => void,
   onHover?: (id: string) => void,
   onLeave?: () => void,
 }
@@ -49,6 +50,7 @@ export const PathSelector: React.FC<IProps> = ({
 
   const [currentPathVariable, setCurrentPathVariable] = useState<string>(pathVariable);
   const [currentPathValue, setCurrentPathValue] = useState<string>(pathValue);
+  const [isError, setIsError] = useState<boolean>(false);
 
   useEffect(() => {
     if (currentPathValue !== pathValue) {
@@ -81,9 +83,21 @@ export const PathSelector: React.FC<IProps> = ({
     currentPathValue]);
 
   const ontPatchTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    const a = checkPathWithVariable(
+      target.value,
+      isSelectFile ? LauncherButtonAction.RUN : LauncherButtonAction.OPEN,
+      false,
+    );
+
+    if (!a) {
+      setIsError(true);
+    } else {
+      setIsError(false);
+    }
+
     setCurrentPathValue(target.value);
-    onChange(`${currentPathVariable}\\${target.value}`, id, parent);
-  }, [currentPathVariable, id, parent, onChange]);
+    onChange(`${currentPathVariable}\\${target.value}`, isError, id, parent);
+  }, [currentPathVariable, id, parent, isSelectFile, isError, onChange]);
 
   const onSelectPatchBtnClick = useCallback(async () => {
     let pathStr: string|undefined = await getPathFromPathSelector();
@@ -102,12 +116,13 @@ export const PathSelector: React.FC<IProps> = ({
       }
     }
 
-    onChange(pathStr, id, parent);
+    onChange(pathStr, isError, id, parent);
   }, [id,
     parent,
     pathVariables,
     isGameDocuments,
     availablePathVariables,
+    isError,
     onChange,
     getPathFromPathSelector]);
 
@@ -115,8 +130,8 @@ export const PathSelector: React.FC<IProps> = ({
     { target }: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     setCurrentPathVariable(target.value);
-    onChange(`${target.value}\\${currentPathValue}`, id, parent);
-  }, [currentPathValue, id, parent, onChange]);
+    onChange(`${target.value}\\${currentPathValue}`, isError, id, parent);
+  }, [currentPathValue, id, parent, isError, onChange]);
 
   return (
     <div className={classNames(
@@ -153,7 +168,7 @@ export const PathSelector: React.FC<IProps> = ({
         }
         </select>
         <input
-          className="path-selector__input"
+          className={classNames('path-selector__input', isError && 'path-selector__input--error')}
           id={id}
           name={name}
           type="text"

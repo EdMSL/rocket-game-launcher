@@ -29,7 +29,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
   changeArguments,
   onPathError,
 }) => {
-  const onPathSelectorChange = useCallback((value: string|undefined, id: string) => {
+  const onPathSelectorChange = useCallback((value: string|undefined, isError: boolean, id: string) => {
     if (value !== undefined) {
       if (value !== '') {
         changeArguments(
