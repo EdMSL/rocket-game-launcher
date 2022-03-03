@@ -4,6 +4,7 @@ Thumbs.db
 *.ini
 *.log*
 *.txt*
+*.lnk
 !src/tests/**/*.txt*
 !src/tests/**/*.ini*
 
