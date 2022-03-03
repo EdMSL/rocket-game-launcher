@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 
 import { IUIElementProps } from '$types/gameSettings';
-import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
+import { HintItem } from '$components/HintItem';
 import { TEXT_INPUT_MAX_LENGTH } from '$constants/defaultParameters';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {
@@ -36,7 +36,7 @@ export const TextField: React.FunctionComponent<IProps> = ({
     >
       <span>{label}</span>
       {
-        description && <GameSettingsHintBlock description={description} />
+        description && <HintItem description={description} />
       }
     </label>
     <input

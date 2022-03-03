@@ -1,4 +1,4 @@
-.game-settings-hint__icon {
+.hint__icon {
   position: relative;
 
   display: inline-flex;
@@ -24,7 +24,7 @@
   /* stylelint-enable string-no-newline, max-line-length */
 }
 
-.game-settings-hint__block {
+.hint__block {
   position: absolute;
   top: 0;
   left: calc(100% + 4px);
@@ -37,7 +37,7 @@
   border-radius: 4px;
 }
 
-.game-settings-hint__text {
+.hint__text {
   @include reset-indents;
   color: var(--text-accent);
   font-size: 12px;

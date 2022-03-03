@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import classNames from 'classnames';
 
 import { IUIElementProps } from '$types/gameSettings';
-import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
+import { HintItem } from '$components/HintItem';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {
   min?: number,
@@ -42,7 +42,7 @@ export const NumberField: React.FunctionComponent<IProps> = ({
       >
         <span>{label}</span>
         {
-          description && <GameSettingsHintBlock description={description} />
+          description && <HintItem description={description} />
         }
       </label>
       <input
@@ -55,6 +55,7 @@ export const NumberField: React.FunctionComponent<IProps> = ({
         id={id}
         name={name}
         value={value}
+        title=""
         data-parent={parent}
         data-multiparameters={multiparameters}
         disabled={isDisabled}

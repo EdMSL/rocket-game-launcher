@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import { ipcRenderer } from 'electron';
 
 import { IUIElementParams } from '$types/gameSettings';
-import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
+import { HintItem } from '$components/HintItem';
 import { Button } from '../Button';
 import { ISelectOption } from '../Select';
 import { getVariableAndValueFromPath } from '$utils/data';
@@ -131,7 +131,7 @@ export const PathSelector: React.FC<IProps> = ({
       >
         <span>{label}</span>
         {
-          description && <GameSettingsHintBlock description={description} />
+          description && <HintItem description={description} />
         }
       </label>
       <div className="path-selector__input-block">

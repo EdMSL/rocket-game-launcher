@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 import classNames from 'classnames';
 
-import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
+import { HintItem } from '$components/HintItem';
 import { RangeButtonName } from '$constants/misc';
 import { IUIElementProps } from '$types/gameSettings';
 import { getNumberOfDecimalPlaces } from '$utils/strings';
@@ -76,7 +76,7 @@ export const Range: React.FunctionComponent<IProps> = ({
       <div className="range__label">
         <span>{label}</span>
         {
-          description && <GameSettingsHintBlock description={description} />
+          description && <HintItem description={description} />
         }
       </div>
       <div className="range__controls">

@@ -8,7 +8,7 @@ import { IPathVariables } from '$constants/paths';
 import { generateSelectOptions } from '$utils/data';
 import { Button } from '$components/UI/Button';
 import { TextField } from '$components/UI/TextField';
-import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
+import { HintItem } from '$components/HintItem';
 
 interface IProps {
   className?: string,
@@ -93,7 +93,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
       <p className={styles['developer-screen__agrs-title']}>
         <span>Аргументы запуска</span>
         {
-          description && <GameSettingsHintBlock description={description} />
+          description && <HintItem description={description} />
         }
       </p>
       <div className={styles['developer-screen__agrs-block']}>

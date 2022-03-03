@@ -66,6 +66,11 @@
   &:last-child {
     margin-bottom: 0;
   }
+
+  &:nth-last-of-type(-n+2) .hint__block {
+    top: auto;
+    bottom: 0;
+  }
 }
 
 .developer-screen__custom-item {

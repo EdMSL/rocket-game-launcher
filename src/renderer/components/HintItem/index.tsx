@@ -6,7 +6,7 @@ interface IProps {
   description: string,
 }
 
-export const GameSettingsHintBlock: React.FunctionComponent<IProps> = ({
+export const HintItem: React.FunctionComponent<IProps> = ({
   description,
 }) => {
   const [isVisivle, setIsVisible] = useState<boolean>(false);
@@ -21,16 +21,16 @@ export const GameSettingsHintBlock: React.FunctionComponent<IProps> = ({
 
   return (
     <div
-      className={styles['game-settings-hint__icon']}
+      className={styles.hint__icon}
       onMouseEnter={onHintIconHover}
       onMouseLeave={onHintIconLeave}
     >
       {
         isVisivle && (
           <div
-            className={styles['game-settings-hint__block']}
+            className={styles.hint__block}
           >
-            <p className={styles['game-settings-hint__text']}>{description}</p>
+            <p className={styles.hint__text}>{description}</p>
           </div>
         )
       }

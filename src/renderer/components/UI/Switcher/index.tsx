@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 
 import { IUIElementProps } from '$types/gameSettings';
-import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
+import { HintItem } from '$components/HintItem';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {
   isChecked: boolean,
@@ -32,7 +32,7 @@ export const Switcher: React.FunctionComponent<IProps> = ({
         {label}
       </span>
       {
-        description && <GameSettingsHintBlock description={description} />
+        description && <HintItem description={description} />
       }
     </p>
     <div className={classNames('switcher__block')}>

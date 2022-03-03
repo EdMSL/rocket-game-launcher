@@ -28,7 +28,7 @@ import {
 import { Checkbox } from '$components/UI/Checkbox';
 import { Select } from '$components/UI/Select';
 import { Range } from '$components/UI/Range';
-import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
+import { HintItem } from '$components/HintItem';
 import { getNumberOfDecimalPlaces, getValueFromRange } from '$utils/strings';
 import { Switcher } from '$components/UI/Switcher';
 import { IMainRootState } from '$types/main';
@@ -196,7 +196,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                         <span>{parameter.label}</span>
                         {
                           parameter.description
-                          && <GameSettingsHintBlock description={parameter.description} />
+                          && <HintItem description={parameter.description} />
                         }
                       </div>
                       <div className={styles['game-settings-content__subblock']}>

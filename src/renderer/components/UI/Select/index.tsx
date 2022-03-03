@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
+import { HintItem } from '$components/HintItem';
 import { IUIElementProps } from '$types/gameSettings';
 
 export interface ISelectOption {
@@ -54,7 +54,7 @@ export const Select: (React.FunctionComponent<IProps>) = ({
           >
             <span className="select__label-text">{label}</span>
             {
-              description && <GameSettingsHintBlock description={description} />
+              description && <HintItem description={description} />
             }
           </label>
         )

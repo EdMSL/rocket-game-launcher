@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
+import { HintItem } from '$components/HintItem';
 import { IUIElementProps } from '$types/gameSettings';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {
@@ -44,7 +44,7 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
     >
       <span>{label}</span>
       {
-        description && <GameSettingsHintBlock description={description} />
+        description && <HintItem description={description} />
       }
     </label>
   </div>
