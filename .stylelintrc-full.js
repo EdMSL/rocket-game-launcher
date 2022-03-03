@@ -24,6 +24,7 @@ module.exports = {
     "block-no-empty": [true, {
       "message": "No empty rule blocks.",
     }],
+    "color-function-notation": "legacy",
     "comment-empty-line-before": "never",
     "declaration-empty-line-before": ["never", {
       "ignore": ["after-comment", "after-declaration"],
@@ -46,6 +47,7 @@ module.exports = {
     "rule-empty-line-before": ["always", {
       "ignore": ["first-nested"],
     }],
+    "selector-class-pattern": /^([a-z][a-z0-9]*)([_-]{1,2}[a-z0-9]+)*$/,
     "selector-max-compound-selectors": 2,
     "selector-max-universal": 1,
     "selector-pseudo-class-no-unknown": [true, {
