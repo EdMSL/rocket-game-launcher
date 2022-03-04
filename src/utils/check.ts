@@ -44,39 +44,14 @@ export interface IGameSettingsConfigCheckResult {
 export const getIsPathWithVariableCorrect = (
   value: string,
   action: string,
-  isThrowError = true,
-): string|boolean => {
+): boolean => {
   if (action === LauncherButtonAction.OPEN) {
-    if (!path.extname(value)) {
-      if (isThrowError) {
-        return value;
-      }
-
-      return true;
-    }
-
-    if (isThrowError) {
-      throw new Error(`path to folder is not correct. Path: ${value}`);
-    } else {
-      return false;
-    }
+    return !path.extname(value);
   } else if (action === LauncherButtonAction.RUN) {
-    if (path.extname(value) && /\.[a-zA-Z0-9]{2,}/.test(path.extname(value))) {
-      return value;
-    }
-
-    if (isThrowError) {
-      throw new Error(`path to file is not correct. Path: ${value}`);
-    } else {
-      return false;
-    }
+    return !!path.extname(value) && Boolean(/\.[a-zA-Z0-9]{2,}/.test(path.extname(value)));
   }
 
-  if (isThrowError) {
-    throw new Error(`path value is not correct. Path: ${value}`);
-  } else {
-    return false;
-  }
+  return false;
 };
 
 const getIsPathWithVariableCorrectForCustomBtn = (
@@ -87,7 +62,17 @@ const getIsPathWithVariableCorrectForCustomBtn = (
     throw new Error(`path variable is not correct or not available for this path. Path: ${value}`);
   }
 
-  return getIsPathWithVariableCorrect(value, helpers.state.ancestors[0].action) as string;
+  if (!getIsPathWithVariableCorrect(value, helpers.state.ancestors[0].action)) {
+    if (helpers.state.ancestors[0].action === LauncherButtonAction.OPEN) {
+      throw new Error(`path to folder is not correct. Path: ${value}`);
+    } else if (helpers.state.ancestors[0].action === LauncherButtonAction.RUN) {
+      throw new Error(`path to file is not correct. Path: ${value}`);
+    } else {
+      throw new Error(`path value is not correct. Path: ${value}`);
+    }
+  }
+
+  return value;
 };
 
 const configFileDataSchema = Joi.object({
