@@ -150,7 +150,7 @@ export const replaceRootDirByPathVariable = (
   pathStr: string,
   availablePathVariables: string[],
   pathVariables: IPathVariables,
-): string|undefined => {
+): string => {
   const newPathStr = pathStr;
 
   const availablePathVariablesOrder = pathVariablesCheckOrderArr.filter((current) => availablePathVariables.includes(current));
@@ -167,10 +167,13 @@ export const replaceRootDirByPathVariable = (
   });
 
   if (pathVariableName && variableIndex >= 0) {
-    return newPathStr.replace(pathVariables[availablePathVariablesOrder[variableIndex]], pathVariableName).trim();
+    return newPathStr.replace(
+      pathVariables[availablePathVariablesOrder[variableIndex]],
+      pathVariableName,
+    ).trim();
   }
 
-  return undefined;
+  return '';
 };
 
 /**

@@ -15,6 +15,7 @@ import { generateSelectOptions } from '$utils/data';
 import { Button } from '$components/UI/Button';
 import { IPathVariables } from '$constants/paths';
 import { ArgumentsBlock } from '$components/ArgumentsBlock';
+import { getIsPathWithVariableCorrect } from '$utils/check';
 
 interface IProps {
   item: ILauncherCustomButton,
@@ -42,7 +43,11 @@ export const CustomBtnItem: React.FC<IProps> = ({
       ...item,
       action: target.checked ? LauncherButtonAction.RUN : LauncherButtonAction.OPEN,
     },
-    fieldName);
+    fieldName,
+    getIsPathWithVariableCorrect(
+      item.path,
+      item.action,
+    ));
   }, [item, fieldName, onChangeBtnData]);
 
   const OnTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,7 +90,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         id={`item_checkbox-${item.id}`}
         label="Кнопка запуска приложения?"
         isChecked={item.action === LauncherButtonAction.RUN}
-        description="Определяет действие по нажатию кнопки: запуск приложения\файла иил открываетие папки. Влияет на доступный выбор в селекторе пути ниже"//eslint-disable-line max-len
+        description="Определяет действие по нажатию кнопки: запуск приложения\файла или открытие папки. Влияет на доступный выбор в селекторе пути ниже"//eslint-disable-line max-len
         onChange={onCheckboxChange}
       />
       <PathSelector

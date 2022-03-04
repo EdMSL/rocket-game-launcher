@@ -64,7 +64,12 @@ export const PathSelector: React.FC<IProps> = ({
     if (currentPathVariable !== pathVariable) {
       setCurrentPathValue(pathVariable);
     }
-  }, [currentPathValue, currentPathVariable, pathValue, pathVariable]);
+
+    setIsValidationError(!getIsPathWithVariableCorrect(
+      value as string,
+      isSelectFile ? LauncherButtonAction.RUN : LauncherButtonAction.OPEN,
+    ));
+  }, [currentPathValue, currentPathVariable, pathValue, pathVariable, isSelectFile, value]);
 
   const getPathFromPathSelector = useCallback(async (
   ): Promise<string> => {
@@ -87,25 +92,21 @@ export const PathSelector: React.FC<IProps> = ({
     currentPathVariable,
     currentPathValue]);
 
-  const ontPatchTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
+  const onPatchTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     const isCorrectPath = getIsPathWithVariableCorrect(
       target.value,
       isSelectFile ? LauncherButtonAction.RUN : LauncherButtonAction.OPEN,
-      false,
     );
 
-    if (!isCorrectPath) {
-      setIsValidationError(true);
-    } else {
-      setIsValidationError(false);
-    }
+    setIsValidationError(!isCorrectPath);
 
     setCurrentPathValue(target.value);
-    onChange(`${currentPathVariable}\\${target.value}`, !isCorrectPath as boolean, id, parent);
+    onChange(`${currentPathVariable}\\${target.value}`, !isCorrectPath, id, parent);
   }, [currentPathVariable, id, parent, isSelectFile, onChange]);
 
   const onSelectPatchBtnClick = useCallback(async () => {
     let pathStr: string|undefined = await getPathFromPathSelector();
+    let isCorrectPath;
 
     if (pathStr) {
       try {
@@ -116,18 +117,25 @@ export const PathSelector: React.FC<IProps> = ({
 
         setCurrentPathVariable(variablePath);
         setCurrentPathValue(valuePath);
+
+        isCorrectPath = getIsPathWithVariableCorrect(
+          pathStr,
+          isSelectFile ? LauncherButtonAction.RUN : LauncherButtonAction.OPEN,
+        );
+
+        setIsValidationError(!isCorrectPath);
       } catch (error) {
         pathStr = undefined;
       }
     }
 
-    onChange(pathStr, isValidationError, id, parent);
+    onChange(pathStr, !isCorrectPath, id, parent);
   }, [id,
     parent,
     pathVariables,
     isGameDocuments,
     availablePathVariables,
-    isValidationError,
+    isSelectFile,
     onChange,
     getPathFromPathSelector]);
 
@@ -184,7 +192,7 @@ export const PathSelector: React.FC<IProps> = ({
           data-parent={parent}
           data-multiparameters={multiparameters}
           disabled={isDisabled}
-          onChange={ontPatchTextFieldChange}
+          onChange={onPatchTextFieldChange}
         />
         <Button
           className="path-selector__input-btn"
