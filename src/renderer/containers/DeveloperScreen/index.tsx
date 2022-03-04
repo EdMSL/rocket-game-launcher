@@ -172,7 +172,7 @@ export const DeveloperScreen: React.FC = () => {
         path: `${PathVariableName.GAME_DIR}\\`,
         action: LauncherButtonAction.OPEN,
         id: getRandomId('custom-btn'),
-        label: 'Запуск',
+        label: 'Открыть папку',
         args: [],
       }];
 

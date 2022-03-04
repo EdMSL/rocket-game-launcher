@@ -53,7 +53,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
     value: string|undefined,
     isValidationError: boolean,
   ) => {
-    if (value !== undefined) {
+    if (value) {
       onChangeBtnData({ ...item, path: value }, fieldName, isValidationError);
     }
   }, [item, fieldName, onChangeBtnData]);

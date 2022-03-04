@@ -33,20 +33,18 @@ export const ArgumentsBlock: React.FC<IProps> = ({
     isValidationError: boolean,
     id: string,
   ) => {
-    if (value !== undefined) {
-      if (value !== '') {
-        changeArguments(
-          args.map((currentArg, index) => {
-            if (index === Number(id.split('-')[2])) {
-              return value;
-            }
+    if (value) {
+      changeArguments(
+        args.map((currentArg, index) => {
+          if (index === Number(id.split('-')[2])) {
+            return value;
+          }
 
-            return currentArg;
-          }),
-          parent,
-          isValidationError,
-        );
-      }
+          return currentArg;
+        }),
+        parent,
+        isValidationError,
+      );
     }
   }, [args, parent, changeArguments]);
 
