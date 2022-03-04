@@ -19,7 +19,7 @@ interface IProps extends IUIElementParams {
   pathVariables: IPathVariables,
   extensions?: string[],
   isSelectDisabled?: boolean,
-  isSelectFile?: boolean,
+  selectorType?: string,
   isGameDocuments?: boolean,
   onChange: (
     value: string|undefined,
@@ -46,7 +46,7 @@ export const PathSelector: React.FC<IProps> = ({
   multiparameters = '',
   isDisabled = false,
   isSelectDisabled = options.length <= 1,
-  isSelectFile = false,
+  selectorType = LauncherButtonAction.OPEN,
   isGameDocuments = true,
   onChange,
 }) => {
@@ -67,19 +67,19 @@ export const PathSelector: React.FC<IProps> = ({
 
     setIsValidationError(!getIsPathWithVariableCorrect(
       value as string,
-      isSelectFile ? LauncherButtonAction.RUN : LauncherButtonAction.OPEN,
+      selectorType,
     ));
-  }, [currentPathValue, currentPathVariable, pathValue, pathVariable, isSelectFile, value]);
+  }, [currentPathValue, currentPathVariable, pathValue, pathVariable, selectorType, value]);
 
   const getPathFromPathSelector = useCallback(async (
   ): Promise<string> => {
     const pathStr = await ipcRenderer.invoke(
       AppChannel.GET_PATH_BY_PATH_SELECTOR,
       pathVariables,
+      selectorType,
       currentPathValue
         ? `${pathVariables[currentPathVariable]}\\${currentPathValue}`
         : pathVariables[currentPathVariable],
-      isSelectFile,
       extensions,
       isGameDocuments,
     );
@@ -87,7 +87,7 @@ export const PathSelector: React.FC<IProps> = ({
     return pathStr;
   }, [pathVariables,
     extensions,
-    isSelectFile,
+    selectorType,
     isGameDocuments,
     currentPathVariable,
     currentPathValue]);
@@ -95,14 +95,14 @@ export const PathSelector: React.FC<IProps> = ({
   const onPatchTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     const isCorrectPath = getIsPathWithVariableCorrect(
       target.value,
-      isSelectFile ? LauncherButtonAction.RUN : LauncherButtonAction.OPEN,
+      selectorType,
     );
 
     setIsValidationError(!isCorrectPath);
 
     setCurrentPathValue(target.value);
     onChange(`${currentPathVariable}\\${target.value}`, !isCorrectPath, id, parent);
-  }, [currentPathVariable, id, parent, isSelectFile, onChange]);
+  }, [currentPathVariable, id, parent, selectorType, onChange]);
 
   const onSelectPatchBtnClick = useCallback(async () => {
     let pathStr: string|undefined = await getPathFromPathSelector();
@@ -120,7 +120,7 @@ export const PathSelector: React.FC<IProps> = ({
 
         isCorrectPath = getIsPathWithVariableCorrect(
           pathStr,
-          isSelectFile ? LauncherButtonAction.RUN : LauncherButtonAction.OPEN,
+          selectorType,
         );
 
         setIsValidationError(!isCorrectPath);
@@ -135,7 +135,7 @@ export const PathSelector: React.FC<IProps> = ({
     pathVariables,
     isGameDocuments,
     availablePathVariables,
-    isSelectFile,
+    selectorType,
     onChange,
     getPathFromPathSelector]);
 

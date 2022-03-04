@@ -11,7 +11,7 @@ import {
   writeToLogFileSync,
 } from '$utils/log';
 import {
-  checkIsPathIsNotOutsideValidFolder, getPathWithoutRootDir, parseJSON,
+  checkIsPathIsNotOutsideValidFolder, parseJSON,
 } from '$utils/strings';
 import {
   ReadWriteError,
@@ -22,14 +22,12 @@ import {
   ErrorMessage,
 } from '$utils/errors';
 import {
-  Encoding, GameSettingsFileView,
+  Encoding, GameSettingsFileView, LauncherButtonAction,
 } from '$constants/misc';
 import {
   IPathVariables,
   USER_THEMES_DIR,
 } from '$constants/paths';
-// import { IMainRootState } from '$types/config';
-import { IMainRootState } from '$types/main';
 
 export const xmlAttributePrefix = '@_';
 
@@ -612,16 +610,16 @@ export const getUserThemesFolders = (): string[] => {
 export const getPathFromFileInput = async (
   dialog: Electron.Dialog,
   currentWindow: Electron.BrowserWindow,
+  selectorType: string,
   pathVariables: IPathVariables,
   startPath = '',
-  isPathToFile = false,
   extensions = ['*'],
   isGameDocuments = false,
 ): Promise<string|undefined> => {
   try {
     const pathObj = await dialog.showOpenDialog(currentWindow, {
       defaultPath: startPath,
-      properties: [isPathToFile ? 'openFile' : 'openDirectory'],
+      properties: [selectorType === LauncherButtonAction.RUN ? 'openFile' : 'openDirectory'],
       filters: [{ name: 'File', extensions }],
     });
 

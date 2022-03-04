@@ -2,7 +2,9 @@ import React, { useCallback } from 'react';
 import classNames from 'classnames';
 
 import styles from './styles.module.scss';
-import { PathRegExp, PathVariableName } from '$constants/misc';
+import {
+  LauncherButtonAction, PathRegExp, PathVariableName,
+} from '$constants/misc';
 import { PathSelector } from '$components/UI/PathSelector';
 import { IPathVariables } from '$constants/paths';
 import { generateSelectOptions } from '$utils/data';
@@ -111,7 +113,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
                     value={currentArg}
                     options={generateSelectOptions([PathVariableName.GAME_DIR])}
                     pathVariables={pathVariables}
-                    isSelectFile
+                    selectorType={LauncherButtonAction.RUN}
                     onChange={onPathSelectorChange}
                   />
                   )

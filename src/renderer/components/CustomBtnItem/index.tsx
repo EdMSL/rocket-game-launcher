@@ -100,8 +100,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         value={item.path}
         options={generateSelectOptions([PathVariableName.GAME_DIR])}
         pathVariables={pathVariables}
-        isSelectFile={item.action === LauncherButtonAction.RUN}
-        extensions={FileExtension.EXECUTABLE}
+        selectorType={item.action}
         description="Путь до файла для запуска или папки для открытия в проводнике"//eslint-disable-line max-len
         onChange={onPathSelectorChange}
       />

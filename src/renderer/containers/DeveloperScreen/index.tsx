@@ -420,7 +420,7 @@ export const DeveloperScreen: React.FC = () => {
                 options={generateSelectOptions([PathVariableName.GAME_DIR])}
                 pathVariables={pathVariables}
                 extensions={FileExtension.EXECUTABLE}
-                isSelectFile
+                selectorType={LauncherButtonAction.RUN}
                 description="Путь до исполняемого файла игры, .exe или .lnk"//eslint-disable-line max-len
                 onChange={onPathSelectorChange}
               />
@@ -529,7 +529,7 @@ export const DeveloperScreen: React.FC = () => {
                 value={currentConfig.modOrganizer.pathToINI}
                 options={generateSelectOptions([PathVariableName.MO_DIR])}
                 pathVariables={pathVariables}
-                isSelectFile
+                selectorType={LauncherButtonAction.RUN}
                 extensions={FileExtension.INI}
                 isDisabled={!currentConfig.modOrganizer.isUsed}
                 description="Задает путь до конфигурационного файла Mod Organizer (ModOrganizer.ini)"//eslint-disable-line max-len
