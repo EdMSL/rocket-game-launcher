@@ -265,42 +265,42 @@ $checkbox-size: 20px;
 }
 
 .switcher__container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+  position: relative;
 
-.switcher__label {
-  @include reset-indents;
-  margin-right: 10px;
+  display: flex;
+  align-items: center;
 }
 
 .switcher__label-text {
   color: inherit;
 }
 
-.switcher__block {
+.switcher__label {
   display: flex;
   align-items: center;
-}
 
-.switcher__toggler {
-  position: relative;
-
-  display: block;
-  width: 36px;
-  height: 20px;
-
-  border: 1px solid var(--text-main);
-  border-radius: 14px;
-
-  cursor: pointer;
+  user-select: none;
 
   &::before {
     content: "";
     position: absolute;
-    top: 1px;
-    left: 1px;
+    top: calc(50% - #{$checkbox-size} / 2);
+    right: 0;
+
+    width: 36px;
+    height: 20px;
+
+    border: 1px solid var(--text-main);
+    border-radius: 14px;
+
+    cursor: pointer;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: calc(50% - #{$checkbox-size} / 2 + 2px);
+    right: calc(0% + 16px + 1px);
 
     display: block;
     width: 16px;
@@ -309,14 +309,16 @@ $checkbox-size: 20px;
     background-color: var(--text-main);
     border-radius: 50%;
 
-    transition: left 0.3s linear;
+    cursor: pointer;
+
+    transition: right 0.3s linear;
   }
 
-  .switcher__input:checked + &::before {
-    left: calc(100% - 16px - 1px);
+  .switcher__input:checked + &::after {
+    right: 3px;
   }
 
-  .switcher__input:focus + & {
+  .switcher__input:focus + &::before {
     @include focus;
   }
 }

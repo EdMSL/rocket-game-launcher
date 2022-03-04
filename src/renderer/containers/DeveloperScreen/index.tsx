@@ -49,6 +49,7 @@ import {
   validateNumberInputs,
 } from '$utils/check';
 import { Header } from '$components/Header';
+import { getRandomId } from '$utils/strings';
 
 export const DeveloperScreen: React.FC = () => {
   const pathVariables = useAppSelector((state) => state.main.pathVariables);
@@ -70,8 +71,7 @@ export const DeveloperScreen: React.FC = () => {
 
   const changeCurrentConfig = useCallback((fieldName, value, parent?) => {
     let newConfig: ILauncherConfig;
-    //FIXME Приходит много лишней информации при изменении в pathSelector
-    // console.log(value);
+
     if (parent) {
       newConfig = {
         ...currentConfig,
@@ -162,11 +162,7 @@ export const DeveloperScreen: React.FC = () => {
 
   const onCustomBtnDeleteClick = useCallback((id: string) => {
     changeCurrentConfig('customButtons', currentConfig.customButtons
-      .filter((currentBtn) => currentBtn.id !== id)
-      .map((currentBtn, index) => ({
-        ...currentBtn,
-        id: `customBtn${index}`,
-      })));
+      .filter((currentBtn) => currentBtn.id !== id));
   }, [currentConfig, changeCurrentConfig]);
 
   const onAddCustomBtnBtnClick = useCallback(() => {
@@ -175,7 +171,7 @@ export const DeveloperScreen: React.FC = () => {
       {
         path: `${PathVariableName.GAME_DIR}\\`,
         action: LauncherButtonAction.OPEN,
-        id: `customBtn${currentConfig.customButtons.length}`,
+        id: getRandomId('custom-btn'),
         label: 'Запуск',
         args: [],
       }];
@@ -368,6 +364,7 @@ export const DeveloperScreen: React.FC = () => {
               {
                 appWindowFields.map((field) => (
                   <NumberField
+                    key={field.id}
                     className={styles['developer-screen__item']}
                     id={field.id}
                     value={currentConfig[field.id]}

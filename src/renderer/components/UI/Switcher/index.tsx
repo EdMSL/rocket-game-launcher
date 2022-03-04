@@ -27,30 +27,27 @@ export const Switcher: React.FunctionComponent<IProps> = ({
     className,
   )}
   >
-    <p className={classNames('switcher__label')}>
+    <input
+      className={classNames('visually-hidden', 'switcher__input')}
+      type="checkbox"
+      id={id}
+      name={name}
+      data-parent={parent}
+      data-multiparameters={multiparameters}
+      checked={isChecked}
+      disabled={isDisabled}
+      onChange={onChange}
+    />
+    <label
+      htmlFor={id}
+      className={classNames('switcher__label')}
+    >
       <span className={classNames('switcher__label-text')}>
         {label}
       </span>
       {
         description && <HintItem description={description} />
       }
-    </p>
-    <div className={classNames('switcher__block')}>
-      <input
-        className={classNames('visually-hidden', 'switcher__input')}
-        type="checkbox"
-        id={id}
-        name={name}
-        data-parent={parent}
-        data-multiparameters={multiparameters}
-        checked={isChecked}
-        disabled={isDisabled}
-        onChange={onChange}
-      />
-      <label
-        htmlFor={id}
-        className={classNames('switcher__toggler')}
-      />
-    </div>
+    </label>
   </div>
 );

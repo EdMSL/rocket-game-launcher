@@ -92,12 +92,12 @@ export const ArgumentsBlock: React.FC<IProps> = ({
       className,
     )}
     >
-      <p className={styles['developer-screen__agrs-title']}>
+      <div className={styles['developer-screen__agrs-title']}>
         <span>Аргументы запуска</span>
         {
           description && <HintItem description={description} />
         }
-      </p>
+      </div>
       <div className={styles['developer-screen__agrs-block']}>
         {
         args.map((currentArg, index) => (
