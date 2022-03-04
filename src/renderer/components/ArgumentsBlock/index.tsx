@@ -16,7 +16,7 @@ interface IProps {
   parent: string,
   pathVariables: IPathVariables,
   description?: string,
-  changeArguments: (newArgs: string[], parent: string) => void,
+  changeArguments: (newArgs: string[], parent: string, isValidationError?: boolean) => void,
   onPathError: () => void,
 }
 
@@ -27,9 +27,12 @@ export const ArgumentsBlock: React.FC<IProps> = ({
   pathVariables,
   description,
   changeArguments,
-  onPathError,
 }) => {
-  const onPathSelectorChange = useCallback((value: string|undefined, isError: boolean, id: string) => {
+  const onPathSelectorChange = useCallback((
+    value: string|undefined,
+    isValidationError: boolean,
+    id: string,
+  ) => {
     if (value !== undefined) {
       if (value !== '') {
         changeArguments(
@@ -41,12 +44,11 @@ export const ArgumentsBlock: React.FC<IProps> = ({
             return currentArg;
           }),
           parent,
+          isValidationError,
         );
       }
-    } else {
-      onPathError();
     }
-  }, [args, parent, changeArguments, onPathError]);
+  }, [args, parent, changeArguments]);
 
   const onArgumentTextFieldChange = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
@@ -77,7 +79,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
   }: React.MouseEvent<HTMLButtonElement>) => {
     const newArgs = [...args,
       currentTarget.id === `${parent}-add_arg_path`
-        ? `${PathVariableName.GAME_DIR}\\`
+        ? `${PathVariableName.GAME_DIR}\\example.exe`
         : '',
     ];
 

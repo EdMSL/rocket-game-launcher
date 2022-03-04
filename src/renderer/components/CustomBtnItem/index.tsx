@@ -21,7 +21,11 @@ interface IProps {
   fieldName: string,
   pathVariables: IPathVariables,
   onDeleteBtnClick: (id: string) => void,
-  onChangeBtnData: (newBtnData: ILauncherCustomButton, fieldName: string) => void,
+  onChangeBtnData: (
+    newBtnData: ILauncherCustomButton,
+    fieldName: string,
+    isValidationError?: boolean,
+  ) => void,
   onPathError: () => void,
 }
 
@@ -45,27 +49,31 @@ export const CustomBtnItem: React.FC<IProps> = ({
     onChangeBtnData({ ...item, label: target.value }, fieldName);
   }, [item, fieldName, onChangeBtnData]);
 
-  const onPathSelectorChange = useCallback((value) => {
+  const onPathSelectorChange = useCallback((
+    value: string|undefined,
+    isValidationError: boolean,
+  ) => {
     if (value !== undefined) {
-      if (value !== '') {
-        onChangeBtnData({ ...item, path: value }, fieldName);
-      }
-    } else {
-      onPathError();
+      onChangeBtnData({ ...item, path: value }, fieldName, isValidationError);
     }
-  }, [item, fieldName, onChangeBtnData, onPathError]);
+  }, [item, fieldName, onChangeBtnData]);
 
   const onDeleteCustomBtnBtnClick = useCallback(() => {
     onDeleteBtnClick(item.id);
   }, [onDeleteBtnClick, item.id]);
 
-  const onChangeArguments = useCallback((newArgs: string[]) => {
-    onChangeBtnData({ ...item, args: newArgs }, fieldName);
+  const onChangeArguments = useCallback((
+    newArgs: string[],
+    parent: string,
+    isValidationError: boolean|undefined,
+  ) => {
+    onChangeBtnData({ ...item, args: newArgs }, fieldName, isValidationError);
   }, [item, fieldName, onChangeBtnData]);
 
   return (
     <li className={styles['developer-screen__custom-btn-item']}>
       <TextField
+        className="developer-screen__item"
         id={`item_label-${item.id}`}
         value={item.label}
         label="Заголовок кнопки"
@@ -73,6 +81,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         onChange={OnTextFieldChange}
       />
       <Checkbox
+        className="developer-screen__item"
         id={`item_checkbox-${item.id}`}
         label="Кнопка запуска приложения?"
         isChecked={item.action === LauncherButtonAction.RUN}
@@ -80,6 +89,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         onChange={onCheckboxChange}
       />
       <PathSelector
+        className="developer-screen__item"
         id={`item_path-${item.id}`}
         label="Путь до файла\папки"
         value={item.path}
@@ -93,7 +103,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
       <ArgumentsBlock
         args={item.args!}
         parent={fieldName}
-        className={styles['developer-screen__item']}
+        className="developer-screen__item"
         pathVariables={pathVariables}
         description="Дополнительные агрументы запуска"//eslint-disable-line max-len
         changeArguments={onChangeArguments}

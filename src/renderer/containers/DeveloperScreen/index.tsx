@@ -97,7 +97,7 @@ export const DeveloperScreen: React.FC = () => {
 
   const onPathSelectorChange = useCallback((
     value: string|undefined,
-    isError: boolean,
+    isValidationError: boolean,
     id: string,
     parent: string,
   ) => {
@@ -120,11 +120,18 @@ export const DeveloperScreen: React.FC = () => {
     } else {
       dispatch(addMessages([CreateUserMessage.error('Выбран некорректный путь до папки. Подробности в файле лога.')])); //eslint-disable-line max-len
     }
-    console.log(isError);
-    if (isError) {
-      setValidationErrors(getUniqueValidationErrors(validationErrors, [{ id, reason: 'incorrect path' }]));
+
+    if (isValidationError) {
+      setValidationErrors(getUniqueValidationErrors(
+        validationErrors,
+        [{ id, reason: 'incorrect path' }],
+      ));
     } else {
-      setValidationErrors(getUniqueValidationErrors(validationErrors, [{ id, reason: 'incorrect path' }]));
+      setValidationErrors(getUniqueValidationErrors(
+        validationErrors,
+        [{ id, reason: 'incorrect path' }],
+        true,
+      ));
     }
   }, [dispatch, currentConfig, validationErrors, changeCurrentConfig]);
 
@@ -176,7 +183,11 @@ export const DeveloperScreen: React.FC = () => {
     changeCurrentConfig('customButtons', newButtons);
   }, [currentConfig, changeCurrentConfig]);
 
-  const onCustomBtnChange = useCallback((newBtnData: ILauncherCustomButton, fieldName: string) => {
+  const onCustomBtnChange = useCallback((
+    newBtnData: ILauncherCustomButton,
+    fieldName: string,
+    isValidationError: boolean|undefined,
+  ) => {
     const newButtons = currentConfig.customButtons.map((currentBtn) => {
       if (currentBtn.id === newBtnData.id) {
         return newBtnData;
@@ -185,8 +196,21 @@ export const DeveloperScreen: React.FC = () => {
       return currentBtn;
     });
 
+    if (isValidationError) {
+      setValidationErrors(getUniqueValidationErrors(
+        validationErrors,
+        [{ id: 'customButtons', reason: 'incorrect path' }],
+      ));
+    } else {
+      setValidationErrors(getUniqueValidationErrors(
+        validationErrors,
+        [{ id: 'customButtons', reason: 'incorrect path' }],
+        true,
+      ));
+    }
+
     changeCurrentConfig(fieldName, newButtons);
-  }, [currentConfig, changeCurrentConfig]);
+  }, [currentConfig, validationErrors, changeCurrentConfig]);
 
   const changeArguments = useCallback((
     newArgs: string[],

@@ -637,7 +637,10 @@ export const getPathFromFileInput = async (
 
     return pathObj.filePaths[0];
   } catch (error: any) {
-    writeToLogFile(`Can't get path from file input. Reason: ${error.message}`);
+    writeToLogFile(
+      `Can't get path from file input. Reason: ${error.message}`,
+      LogMessageType.ERROR,
+    );
 
     return undefined;
   }

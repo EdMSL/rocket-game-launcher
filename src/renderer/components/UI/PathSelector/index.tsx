@@ -12,7 +12,7 @@ import { getVariableAndValueFromPath } from '$utils/data';
 import { IPathVariables } from '$constants/paths';
 import { checkIsPathIsNotOutsideValidFolder, replaceRootDirByPathVariable } from '$utils/strings';
 import { AppChannel, LauncherButtonAction } from '$constants/misc';
-import { checkPathWithVariable } from '$utils/check';
+import { getIsPathWithVariableCorrect } from '$utils/check';
 
 interface IProps extends IUIElementParams {
   options: ISelectOption[],
@@ -21,7 +21,12 @@ interface IProps extends IUIElementParams {
   isSelectDisabled?: boolean,
   isSelectFile?: boolean,
   isGameDocuments?: boolean,
-  onChange: (value: string|undefined, isError: boolean, id: string, parent: string) => void,
+  onChange: (
+    value: string|undefined,
+    isValidationError: boolean,
+    id: string,
+    parent: string
+  ) => void,
   onHover?: (id: string) => void,
   onLeave?: () => void,
 }
@@ -50,7 +55,7 @@ export const PathSelector: React.FC<IProps> = ({
 
   const [currentPathVariable, setCurrentPathVariable] = useState<string>(pathVariable);
   const [currentPathValue, setCurrentPathValue] = useState<string>(pathValue);
-  const [isError, setIsError] = useState<boolean>(false);
+  const [isValidationError, setIsValidationError] = useState<boolean>(false);
 
   useEffect(() => {
     if (currentPathValue !== pathValue) {
@@ -83,21 +88,21 @@ export const PathSelector: React.FC<IProps> = ({
     currentPathValue]);
 
   const ontPatchTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    const a = checkPathWithVariable(
+    const isCorrectPath = getIsPathWithVariableCorrect(
       target.value,
       isSelectFile ? LauncherButtonAction.RUN : LauncherButtonAction.OPEN,
       false,
     );
 
-    if (!a) {
-      setIsError(true);
+    if (!isCorrectPath) {
+      setIsValidationError(true);
     } else {
-      setIsError(false);
+      setIsValidationError(false);
     }
 
     setCurrentPathValue(target.value);
-    onChange(`${currentPathVariable}\\${target.value}`, isError, id, parent);
-  }, [currentPathVariable, id, parent, isSelectFile, isError, onChange]);
+    onChange(`${currentPathVariable}\\${target.value}`, !isCorrectPath as boolean, id, parent);
+  }, [currentPathVariable, id, parent, isSelectFile, onChange]);
 
   const onSelectPatchBtnClick = useCallback(async () => {
     let pathStr: string|undefined = await getPathFromPathSelector();
@@ -107,22 +112,22 @@ export const PathSelector: React.FC<IProps> = ({
         checkIsPathIsNotOutsideValidFolder(pathStr, pathVariables, isGameDocuments);
 
         pathStr = replaceRootDirByPathVariable(pathStr, availablePathVariables, pathVariables);
-        const [varr, stri] = getVariableAndValueFromPath(pathStr!);
+        const [variablePath, valuePath] = getVariableAndValueFromPath(pathStr!);
 
-        setCurrentPathVariable(varr);
-        setCurrentPathValue(stri);
+        setCurrentPathVariable(variablePath);
+        setCurrentPathValue(valuePath);
       } catch (error) {
         pathStr = undefined;
       }
     }
 
-    onChange(pathStr, isError, id, parent);
+    onChange(pathStr, isValidationError, id, parent);
   }, [id,
     parent,
     pathVariables,
     isGameDocuments,
     availablePathVariables,
-    isError,
+    isValidationError,
     onChange,
     getPathFromPathSelector]);
 
@@ -130,8 +135,8 @@ export const PathSelector: React.FC<IProps> = ({
     { target }: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     setCurrentPathVariable(target.value);
-    onChange(`${target.value}\\${currentPathValue}`, isError, id, parent);
-  }, [currentPathValue, id, parent, isError, onChange]);
+    onChange(`${target.value}\\${currentPathValue}`, isValidationError, id, parent);
+  }, [currentPathValue, id, parent, isValidationError, onChange]);
 
   return (
     <div className={classNames(
@@ -168,7 +173,10 @@ export const PathSelector: React.FC<IProps> = ({
         }
         </select>
         <input
-          className={classNames('path-selector__input', isError && 'path-selector__input--error')}
+          className={classNames(
+            'path-selector__input',
+            isValidationError && 'path-selector__input--error',
+          )}
           id={id}
           name={name}
           type="text"
