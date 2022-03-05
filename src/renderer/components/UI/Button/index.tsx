@@ -5,11 +5,12 @@ interface IButtonProps {
   children: string | ReactElement | [string | ReactElement, string | ReactElement],
   className?: string,
   id?: string,
+  name?: string,
   isSubmit?: boolean,
   isDisabled?: boolean,
   tabIndex?: number,
   btnPath?: string,
-  btnArgs?: string[],
+  btnArgs?: string,
   btnLabel?: string,
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void,
 }
@@ -17,6 +18,7 @@ export const Button: React.FunctionComponent<IButtonProps> = memo(({
   children,
   className = '',
   id,
+  name,
   isSubmit,
   isDisabled,
   tabIndex = 0,
@@ -41,6 +43,7 @@ export const Button: React.FunctionComponent<IButtonProps> = memo(({
       className={classNames('button', className)}
       disabled={isDisabled}
       id={id}
+      name={name}
       tabIndex={tabIndex}
       data-path={btnPath}
       data-args={btnArgs}

@@ -105,14 +105,20 @@ const configFileDataSchema = Joi.object({
   playButton: Joi.object({
     path: Joi.string().optional().allow('').default(defaultLauncherConfig.playButton.path)
       .pattern(PathRegExp.GAME_DIR_REGEXP, 'correct path'),
-    args: Joi.array().items(Joi.string()).optional().default(defaultLauncherConfig.playButton.args),
+    args: Joi.array().items(Joi.object({
+      id: Joi.string().optional().default(() => getRandomId('play-btn-arg')),
+      data: Joi.string().required(),
+    })).optional().default(defaultLauncherConfig.playButton.args),
     label: Joi.string().optional().allow('').default(defaultLauncherConfig.playButton.label),
   }).required(),
   customButtons: Joi.array()
     .items(Joi.object({
       id: Joi.string().optional().default(() => getRandomId('custom-btn')),
       path: Joi.string().required().custom(getIsPathWithVariableCorrectForCustomBtn),
-      args: Joi.array().items(Joi.string()).optional().default([]),
+      args: Joi.array().items(Joi.object({
+        id: Joi.string().optional().default(() => getRandomId('custom-btn-arg')),
+        data: Joi.string().required(),
+      })).optional().default([]),
       label: Joi.string().optional().default('Запуск'),
       action: Joi.string().required().valid(...Object.values(LauncherButtonAction)),
     })).optional().default([]),

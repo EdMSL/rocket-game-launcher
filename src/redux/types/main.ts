@@ -26,10 +26,15 @@ export const MAIN_TYPES = {
   DELETE_MESSAGES: 'DELETE_MESSAGES',
 };
 
+export interface IButtonArg {
+  id: string,
+  data: string,
+}
+
 export interface ILauncherAppButton {
   path: string,
   label: string,
-  args: string[],
+  args: IButtonArg[],
 }
 
 export interface ILauncherCustomButton extends ILauncherAppButton {

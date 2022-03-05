@@ -33,6 +33,7 @@ import { MinWindowSize } from '$constants/defaultParameters';
 import { Button } from '$components/UI/Button';
 import { CustomBtnItem } from '$components/CustomBtnItem';
 import {
+  IButtonArg,
   ILauncherConfig,
   ILauncherCustomButton,
   IMainRootState,
@@ -209,7 +210,7 @@ export const DeveloperScreen: React.FC = () => {
   }, [currentConfig, validationErrors, changeCurrentConfig]);
 
   const changeArguments = useCallback((
-    newArgs: string[],
+    newArgs: IButtonArg[],
     parent: string,
   ) => {
     changeCurrentConfig('args', newArgs, parent);

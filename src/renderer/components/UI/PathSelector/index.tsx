@@ -27,8 +27,6 @@ interface IProps extends IUIElementParams {
     id: string,
     parent: string
   ) => void,
-  onHover?: (id: string) => void,
-  onLeave?: () => void,
 }
 
 export const PathSelector: React.FC<IProps> = ({

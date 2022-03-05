@@ -5,7 +5,7 @@ import styles from './styles.module.scss';
 import { Checkbox } from '$components/UI/Checkbox';
 import { PathSelector } from '$components/UI/PathSelector';
 import { TextField } from '$components/UI/TextField';
-import { ILauncherCustomButton } from '$types/main';
+import { IButtonArg, ILauncherCustomButton } from '$types/main';
 import {
   PathVariableName,
   LauncherButtonAction,
@@ -67,7 +67,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
   }, [onDeleteBtnClick, item.id]);
 
   const onChangeArguments = useCallback((
-    newArgs: string[],
+    newArgs: IButtonArg[],
     parent: string,
     isValidationError: boolean|undefined,
   ) => {

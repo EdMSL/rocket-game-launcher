@@ -110,11 +110,15 @@ function* saveLauncherConfigSaga(
       path: btn.path,
       action: btn.action,
       label: btn.label,
-      args: btn.args,
+      args: btn.args.map((arg) => ({ data: arg.data })),
     }));
 
     const configForSave = {
       ...newConfig,
+      playButton: {
+        ...newConfig.playButton,
+        args: newConfig.playButton.args.map((arg) => ({ data: arg.data })),
+      },
       customButtons: customBtnsForSave,
     };
 

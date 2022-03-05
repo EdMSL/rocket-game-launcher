@@ -11,14 +11,16 @@ import { generateSelectOptions } from '$utils/data';
 import { Button } from '$components/UI/Button';
 import { TextField } from '$components/UI/TextField';
 import { HintItem } from '$components/HintItem';
+import { IButtonArg } from '$types/main';
+import { getRandomId } from '$utils/strings';
 
 interface IProps {
   className?: string,
-  args: string[],
+  args: IButtonArg[],
   parent: string,
   pathVariables: IPathVariables,
   description?: string,
-  changeArguments: (newArgs: string[], parent: string, isValidationError?: boolean) => void,
+  changeArguments: (newArgs: IButtonArg[], parent: string, isValidationError?: boolean) => void,
   onPathError: () => void,
 }
 
@@ -37,9 +39,12 @@ export const ArgumentsBlock: React.FC<IProps> = ({
   ) => {
     if (value) {
       changeArguments(
-        args.map((currentArg, index) => {
-          if (index === Number(id.split('-')[2])) {
-            return value;
+        args.map((currentArg) => {
+          if (currentArg.id === id) {
+            return {
+              id,
+              data: value,
+            };
           }
 
           return currentArg;
@@ -54,9 +59,12 @@ export const ArgumentsBlock: React.FC<IProps> = ({
     { target }: React.ChangeEvent<HTMLInputElement>,
   ) => {
     changeArguments(
-      args.map((currentArg, index) => {
-        if (index === Number(target.id.split('-')[2])) {
-          return target.value;
+      args.map((currentArg) => {
+        if (currentArg.id === target.id) {
+          return {
+            id: target.id,
+            data: target.value,
+          };
         }
 
         return currentArg;
@@ -69,7 +77,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
     currentTarget,
   }: React.MouseEvent<HTMLButtonElement>) => {
     changeArguments(
-      args.filter((currentArg, index) => index !== Number(currentTarget.id.split('-')[2])),
+      args.filter((currentArg) => currentArg.id !== currentTarget.id.split('_')[1]),
       parent,
     );
   }, [args, parent, changeArguments]);
@@ -77,10 +85,14 @@ export const ArgumentsBlock: React.FC<IProps> = ({
   const OnAddArgumentBtnClick = useCallback(({
     currentTarget,
   }: React.MouseEvent<HTMLButtonElement>) => {
-    const newArgs = [...args,
-      currentTarget.id === `${parent}-add_arg_path`
-        ? `${PathVariableName.GAME_DIR}\\example.exe`
-        : '',
+    const newArgs = [
+      ...args,
+      {
+        id: getRandomId(`${parent}-arg`),
+        data: currentTarget.name === 'add-arg-path'
+          ? `${PathVariableName.GAME_DIR}\\example.exe`
+          : '',
+      },
     ];
 
     changeArguments(newArgs, parent);
@@ -106,11 +118,11 @@ export const ArgumentsBlock: React.FC<IProps> = ({
             key={`${parent}-${index}`} //eslint-disable-line react/no-array-index-key
           >
             {
-              PathRegExp.PATH_VARIABLE_REGEXP.test(currentArg)
+              PathRegExp.PATH_VARIABLE_REGEXP.test(currentArg.data)
                 ? (
                   <PathSelector
-                    id={`${parent}-arg-${index}`}
-                    value={currentArg}
+                    id={currentArg.id}
+                    value={currentArg.data}
                     options={generateSelectOptions([PathVariableName.GAME_DIR])}
                     pathVariables={pathVariables}
                     selectorType={LauncherButtonAction.RUN}
@@ -119,14 +131,14 @@ export const ArgumentsBlock: React.FC<IProps> = ({
                   )
                 : (
                   <TextField
-                    id={`${parent}-arg-${index}`}
-                    value={currentArg}
+                    id={currentArg.id}
+                    value={currentArg.data}
                     onChange={onArgumentTextFieldChange}
                   />
                   )
             }
             <Button
-              id={`${parent}-arg_delete-${index}`}
+              id={`delete_${currentArg.id}`}
               className={styles['developer-screen__args-delete-btn']}
               onClick={onDeleteArgBtnClick}
             >
@@ -137,7 +149,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
         }
         <div className={styles['developer-screen__agrs-btns']}>
           <Button
-            id={`${parent}-add_arg_path`}
+            name="add-arg-path"
             className={classNames('main-btn', styles['developer-screen__agrs-btn'])}
             onClick={OnAddArgumentBtnClick}
           >
@@ -156,7 +168,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
             </div>
           </Button>
           <Button
-            id={`${parent}-add_arg_str`}
+            name="add-arg-string"
             className={classNames('main-btn', styles['developer-screen__agrs-btn'])}
             onClick={OnAddArgumentBtnClick}
           >

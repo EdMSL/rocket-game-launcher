@@ -20,11 +20,12 @@ import { Modal } from '$components/UI/Modal';
 import { LauncherSettings } from '$components/LauncherSettings';
 import { getPathToFile } from '$utils/strings';
 import { Loader } from '$components/UI/Loader';
+import { IButtonArg } from '$types/main';
 
 export const MainScreen: React.FC = () => {
   /* eslint-disable max-len */
   const playButton = useAppSelector((state) => state.main.config.playButton);
-  const appButtons = useAppSelector((state) => state.main.config.customButtons);
+  const customButtons = useAppSelector((state) => state.main.config.customButtons);
   const isGameRunning = useAppSelector((state) => state.main.isGameRunning);
   const pathVariables = useAppSelector((state) => state.main.pathVariables);
   const isDevWindowOpen = useAppSelector((state) => state.main.isDevWindowOpen);
@@ -76,13 +77,15 @@ export const MainScreen: React.FC = () => {
     dispatch(setIsGameRunning(true));
     runApplication(
       getPathToFile(playButton.path, pathVariables),
-      playButton.args,
+      playButton.args.map((arg) => arg.data),
       'Game',
       changeGameState,
     );
   }, [dispatch, playButton, pathVariables, changeGameState]);
 
-  const onRunApplicationBtnClick = useCallback(({ currentTarget }) => {
+  const onRunApplicationBtnClick = useCallback((
+    { currentTarget }: React.MouseEvent<HTMLButtonElement>,
+  ) => {
     runApplication(
       currentTarget.dataset.path!,
       currentTarget.dataset.args!.split(','),
@@ -109,6 +112,10 @@ export const MainScreen: React.FC = () => {
     setIsDevWinwodOpening(true);
   }, [dispatch]);
 
+  const getBtnArgs = useCallback((
+    btnArg: IButtonArg[],
+  ) => btnArg.map((arg) => arg.data).join(), []);
+
   return (
     <React.Fragment>
       <main className={classNames('main', styles['main-screen__main'])}>
@@ -121,12 +128,13 @@ export const MainScreen: React.FC = () => {
             {playButton.label}
           </Button>
           {
-            appButtons.map((button) => (
+            customButtons.map((button) => (
               <Button
                 key={button.id}
+                id={button.id}
                 className={classNames('main-btn', 'control-panel__btn')}
                 btnPath={getPathToFile(button.path, pathVariables)}
-                btnArgs={button.args}
+                btnArgs={getBtnArgs(button.args)}
                 btnLabel={button.label}
                 onClick={button.action === LauncherButtonAction.RUN
                   ? onRunApplicationBtnClick
