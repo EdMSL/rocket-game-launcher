@@ -22,7 +22,7 @@ interface IProps extends IUIElementParams {
   selectorType?: string,
   isGameDocuments?: boolean,
   onChange: (
-    value: string|undefined,
+    value: string,
     isValidationError: boolean,
     id: string,
     parent: string
@@ -102,7 +102,7 @@ export const PathSelector: React.FC<IProps> = ({
   }, [currentPathVariable, id, parent, selectorType, onChange]);
 
   const onSelectPatchBtnClick = useCallback(async () => {
-    let pathStr: string = await getPathFromPathSelector();
+    let pathStr = await getPathFromPathSelector();
     let isCorrectPath;
 
     if (pathStr) {
@@ -122,7 +122,7 @@ export const PathSelector: React.FC<IProps> = ({
 
         setIsValidationError(!isCorrectPath);
       } catch (error) {
-        pathStr = undefined;
+        pathStr = '';
       }
     }
 

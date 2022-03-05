@@ -9,7 +9,6 @@ import { ILauncherCustomButton } from '$types/main';
 import {
   PathVariableName,
   LauncherButtonAction,
-  FileExtension,
 } from '$constants/misc';
 import { generateSelectOptions } from '$utils/data';
 import { Button } from '$components/UI/Button';
@@ -55,7 +54,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
   }, [item, fieldName, onChangeBtnData]);
 
   const onPathSelectorChange = useCallback((
-    value: string|undefined,
+    value: string,
     isValidationError: boolean,
   ) => {
     if (value) {

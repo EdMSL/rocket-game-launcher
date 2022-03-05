@@ -176,6 +176,8 @@ export const replaceRootDirByPathVariable = (
   return '';
 };
 
+const createRegexp = (pathForRegEpx: string): RegExp => new RegExp(pathForRegEpx.replaceAll('\\', '\\\\'));
+
 /**
  * Заменить корневой путь на переменную пути.
  * @param currPath Изменяемый путь.
@@ -193,15 +195,21 @@ export const replacePathVariableByRootDir = (
   return newStr.replace(pathVariable, rootDirPathStr).trim();
 };
 
+/**
+ * Получить путь до файла без учета корневой папки-переменной пути.
+ * @param pathToFile Путь до файла.
+ * @param pathVariables Переменные путей.
+ * @returns Строка пути без переменной пути.
+*/
 export const getPathWithoutRootDir = (
   pathToFile: string,
   pathVariables: IPathVariables,
 ): string => {
-  if (new RegExp(GAME_DIR.replaceAll('\\', '\\\\')).test(pathToFile)) {
+  if (createRegexp(GAME_DIR).test(pathToFile)) {
     return pathToFile.replace(GAME_DIR, '').substr(1);
   } else if (
     pathVariables[PathVariableName.DOCUMENTS]
-    && new RegExp(pathVariables[PathVariableName.DOCUMENTS].replaceAll('\\', '\\\\')).test(pathToFile)
+    && createRegexp(pathVariables[PathVariableName.DOCUMENTS]).test(pathToFile)
   ) {
     return pathToFile.replace(pathVariables[PathVariableName.DOCUMENTS], '').substr(1);
   }
@@ -209,15 +217,24 @@ export const getPathWithoutRootDir = (
   throw new CustomError(`Recieved incorrect path: ${pathToFile}`);
 };
 
+/**
+ * Получить путь до файла без учета корневой папки-переменной пути.
+ * @param pathForCheck Путь до файла.
+ * @param pathVariables Переменные путей.
+ * @param isGameDocuments Проверять путь до папки документов пользователя или
+ * папки файлов игры в папке документов.
+ * @returns Входит ли путь в состав допустимых.
+*/
 export const checkIsPathIsNotOutsideValidFolder = (
   pathForCheck: string,
   pathVariables: IPathVariables,
   isGameDocuments = true,
 ): void => {
   if (
-    !new RegExp(GAME_DIR.replaceAll('\\', '\\\\')).test(pathForCheck)
-    && !new RegExp(pathVariables[isGameDocuments ? PathVariableName.DOCS_GAME : PathVariableName.DOCUMENTS]
-      .replaceAll('\\', '\\\\'))
+    !createRegexp(GAME_DIR).test(pathForCheck)
+    && !createRegexp(pathVariables[isGameDocuments
+      ? PathVariableName.DOCS_GAME
+      : PathVariableName.DOCUMENTS])
       .test(pathForCheck)
   ) {
     throw new CustomError(`The path is outside of a valid folder. Path: ${pathForCheck}`);

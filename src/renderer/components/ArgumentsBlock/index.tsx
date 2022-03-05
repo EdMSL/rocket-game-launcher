@@ -31,7 +31,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
   changeArguments,
 }) => {
   const onPathSelectorChange = useCallback((
-    value: string|undefined,
+    value: string,
     isValidationError: boolean,
     id: string,
   ) => {
