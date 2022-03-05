@@ -10,9 +10,7 @@ import {
   writeToLogFile,
   writeToLogFileSync,
 } from '$utils/log';
-import {
-  checkIsPathIsNotOutsideValidFolder, parseJSON,
-} from '$utils/strings';
+import { parseJSON } from '$utils/strings';
 import {
   ReadWriteError,
   getReadWriteError,
@@ -24,10 +22,7 @@ import {
 import {
   Encoding, GameSettingsFileView, LauncherButtonAction,
 } from '$constants/misc';
-import {
-  IPathVariables,
-  USER_THEMES_DIR,
-} from '$constants/paths';
+import { USER_THEMES_DIR } from '$constants/paths';
 
 export const xmlAttributePrefix = '@_';
 
@@ -602,20 +597,19 @@ export const getUserThemesFolders = (): string[] => {
 /**
  * Вызывает диалоговое окно для выбора пути и возвращает путь к файлу,
  * отсекая директорию до папки игры.
- * @param pathVariables Переменные пути из `state`.
- * @param isPathToFile Выбирается путь до файла или папки?
  * @param dialog Компонент `dialog` из Electron.
  * @param currentWindow Текущее окно, из которого вызывается команда выбора пути.
+ * @param selectorType Тип селектора: выбира пути до файла или папки?
+ * @param startPath Начальный путь, с которым открывается окно выбора пути.
+ * @param extensions Доступные расширения файлов для выбора в селекторе файла.
 */
 export const getPathFromFileInput = async (
   dialog: Electron.Dialog,
   currentWindow: Electron.BrowserWindow,
   selectorType: string,
-  pathVariables: IPathVariables,
   startPath = '',
   extensions = ['*'],
-  isGameDocuments = false,
-): Promise<string|undefined> => {
+): Promise<string> => {
   try {
     const pathObj = await dialog.showOpenDialog(currentWindow, {
       defaultPath: startPath,
@@ -627,19 +621,8 @@ export const getPathFromFileInput = async (
       return '';
     }
 
-    checkIsPathIsNotOutsideValidFolder(
-      pathObj.filePaths[0],
-      pathVariables,
-      isGameDocuments,
-    );
-
     return pathObj.filePaths[0];
   } catch (error: any) {
-    writeToLogFile(
-      `Can't get path from file input. Reason: ${error.message}`,
-      LogMessageType.ERROR,
-    );
-
-    return undefined;
+    return '';
   }
 };

@@ -75,20 +75,17 @@ export const PathSelector: React.FC<IProps> = ({
   ): Promise<string> => {
     const pathStr = await ipcRenderer.invoke(
       AppChannel.GET_PATH_BY_PATH_SELECTOR,
-      pathVariables,
       selectorType,
       currentPathValue
         ? `${pathVariables[currentPathVariable]}\\${currentPathValue}`
         : pathVariables[currentPathVariable],
       extensions,
-      isGameDocuments,
     );
 
     return pathStr;
   }, [pathVariables,
     extensions,
     selectorType,
-    isGameDocuments,
     currentPathVariable,
     currentPathValue]);
 
@@ -105,7 +102,7 @@ export const PathSelector: React.FC<IProps> = ({
   }, [currentPathVariable, id, parent, selectorType, onChange]);
 
   const onSelectPatchBtnClick = useCallback(async () => {
-    let pathStr: string|undefined = await getPathFromPathSelector();
+    let pathStr: string = await getPathFromPathSelector();
     let isCorrectPath;
 
     if (pathStr) {

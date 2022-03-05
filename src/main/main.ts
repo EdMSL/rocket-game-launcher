@@ -86,19 +86,15 @@ ipcMain.handle(
   AppChannel.GET_PATH_BY_PATH_SELECTOR,
   (
     event,
-    pathVariables: IPathVariables,
     selectorType: string,
     startPath: string,
     extensions?: string[],
-    isGameDocuments?: boolean,
   ) => getPathFromFileInput(
     dialog,
     BrowserWindow.getFocusedWindow()!,
     selectorType,
-    pathVariables,
     startPath,
     extensions,
-    isGameDocuments,
   ),
 );
 
