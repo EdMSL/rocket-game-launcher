@@ -118,9 +118,18 @@ export const addMainWindowListeners = (
       const currentSize = mainWindow.getSize();
 
       if (currentSize[0] < windowSettings.minWidth || currentSize[1] < windowSettings.minHeight) {
-        mainWindow.setSize(windowSettings.minWidth, windowSettings.minHeight);
-      } else if (currentSize[0] > windowSettings.maxWidth || currentSize[1] > windowSettings.maxHeight) {
-        mainWindow.setSize(windowSettings.maxWidth, windowSettings.maxHeight);
+        mainWindow.setSize(
+          currentSize[0] < windowSettings.minWidth ? windowSettings.minWidth : currentSize[0],
+          currentSize[1] < windowSettings.minHeight ? windowSettings.minHeight : currentSize[1],
+        );
+      } else if ((
+        windowSettings.maxWidth > 0 && currentSize[0] > windowSettings.maxWidth)
+        || (windowSettings.maxHeight > 0 && currentSize[1] > windowSettings.maxHeight)
+      ) {
+        mainWindow.setSize(
+          currentSize[0] > windowSettings.maxHeight ? windowSettings.maxWidth : currentSize[0],
+          currentSize[1] > windowSettings.maxHeight ? windowSettings.maxHeight : currentSize[1],
+        );
       }
     } else {
       mainWindow.setMinimumSize(MinWindowSize.WIDTH, MinWindowSize.HEIGHT);
