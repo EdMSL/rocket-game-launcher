@@ -70,7 +70,7 @@ export const DeveloperScreen: React.FC = () => {
     }
   }, [dispatch, launcherConfig, currentConfig, isDevWindowOpen]);
 
-  const changeCurrentConfig = useCallback((fieldName, value, parent?) => {
+  const changeCurrentConfig = useCallback((fieldName: string, value, parent?: string|undefined) => {
     let newConfig: ILauncherConfig;
 
     if (parent) {
@@ -100,7 +100,7 @@ export const DeveloperScreen: React.FC = () => {
     value: string|undefined,
     isValidationError: boolean,
     id: string,
-    parent: string,
+    parent: string|undefined,
   ) => {
     let pathStr = value;
 
@@ -277,12 +277,19 @@ export const DeveloperScreen: React.FC = () => {
     return 0;
   }, []);
 
-  const getNumberFieldIsDisabled = useCallback((id: string): boolean => !currentConfig.isResizable && (
+  const getNumberFieldIsDisabled = useCallback((
+    id: string,
+  ): boolean => !currentConfig.isResizable && (
     id === 'minWidth'
     || id === 'minHeight'
     || id === 'maxWidth'
     || id === 'maxHeight'
   ), [currentConfig]);
+
+  const getIsValidationError = useCallback(
+    (id: string): boolean => !!validationErrors.find((currError) => currError.id === id),
+    [validationErrors],
+  );
 
   /* eslint-disable react/jsx-props-no-spreading */
   return (
@@ -372,7 +379,7 @@ export const DeveloperScreen: React.FC = () => {
                     label={field.label}
                     min={getNumberFieldMinValue(field.id)}
                     isDisabled={getNumberFieldIsDisabled(field.id)}
-                    isValidationError={!!validationErrors.find((currError) => currError.id === field.id)}
+                    isValidationError={getIsValidationError(field.id)}
                     description={field.description}
                     onChange={onNumberInputChange}
                   />

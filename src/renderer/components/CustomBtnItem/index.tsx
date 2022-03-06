@@ -79,6 +79,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
       <TextField
         className="developer-screen__item"
         id={`item_label-${item.id}`}
+        name="custom-btn-label"
         value={item.label}
         label="Заголовок кнопки"
         description="Текст, который будет отображаться на данной кнопке запуска"//eslint-disable-line max-len

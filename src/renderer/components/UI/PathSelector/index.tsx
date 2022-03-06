@@ -25,23 +25,23 @@ interface IProps extends IUIElementParams {
     value: string,
     isValidationError: boolean,
     id: string,
-    parent: string
+    parent: string|undefined
   ) => void,
 }
 
 export const PathSelector: React.FC<IProps> = ({
   id,
   label,
-  name = id,
+  name,
   value,
   options,
   pathVariables,
   extensions,
   className = '',
-  parentClassname = '',
-  description = '',
-  parent = '',
-  multiparameters = '',
+  parentClassname,
+  description,
+  parent,
+  multiparameters,
   isDisabled = false,
   isSelectDisabled = options.length <= 1,
   selectorType = LauncherButtonAction.OPEN,

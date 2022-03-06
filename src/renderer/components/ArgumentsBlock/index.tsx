@@ -122,6 +122,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
                 ? (
                   <PathSelector
                     id={currentArg.id}
+                    name="btn-arg-input"
                     value={currentArg.data}
                     options={generateSelectOptions([PathVariableName.GAME_DIR])}
                     pathVariables={pathVariables}
@@ -132,6 +133,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
                 : (
                   <TextField
                     id={currentArg.id}
+                    name="btn-arg-input"
                     value={currentArg.data}
                     onChange={onArgumentTextFieldChange}
                   />
