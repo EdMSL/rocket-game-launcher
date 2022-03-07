@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { IUIElementProps } from '$types/gameSettings';
+import { IUIElementProps } from '$types/common';
 import { HintItem } from '$components/HintItem';
 import { TEXT_INPUT_MAX_LENGTH } from '$constants/defaultParameters';
 
@@ -21,7 +21,7 @@ export const TextField: React.FunctionComponent<IProps> = ({
   parent,
   multiparameters,
   isDisabled = false,
-  isValidationError,
+  validationErrors,
   onChange,
 }) => (
   <div className={classNames(
@@ -40,7 +40,10 @@ export const TextField: React.FunctionComponent<IProps> = ({
       }
     </label>
     <input
-      className={classNames('text-field__input', isValidationError && 'text-field__input--error')}
+      className={classNames(
+        'text-field__input',
+        validationErrors && validationErrors.length > 0 && 'text-field__input--error',
+      )}
       type="text"
       id={id}
       name={name}

@@ -38,7 +38,7 @@ export const parseJSON = <T>(jsonString: string): T => {
 */
 export const getRandomId = (
   word: string,
-): string => `${word}-f${((Math.random() * HEXADECIMAL_FACTOR)).toString(HEXADECIMAL)}-${new Date().getMilliseconds()}`; //eslint-disable-line max-len
+): string => `${word}_f${((Math.random() * HEXADECIMAL_FACTOR)).toString(HEXADECIMAL)}-${new Date().getMilliseconds()}`; //eslint-disable-line max-len
 
 export const getParameterRegExp = (
   parameterName: string,

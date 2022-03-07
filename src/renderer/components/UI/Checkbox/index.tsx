@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 
 import { HintItem } from '$components/HintItem';
-import { IUIElementProps } from '$types/gameSettings';
+import { IUIElementProps } from '$types/common';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {
   isChecked: boolean,

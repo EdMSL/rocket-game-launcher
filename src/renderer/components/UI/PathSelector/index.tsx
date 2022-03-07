@@ -4,7 +4,7 @@ import React, {
 import classNames from 'classnames';
 import { ipcRenderer } from 'electron';
 
-import { IUIElementParams } from '$types/gameSettings';
+import { IUIElementParams } from '$types/common';
 import { HintItem } from '$components/HintItem';
 import { Button } from '../Button';
 import { ISelectOption } from '../Select';
@@ -12,7 +12,7 @@ import { getVariableAndValueFromPath } from '$utils/data';
 import { IPathVariables } from '$constants/paths';
 import { checkIsPathIsNotOutsideValidFolder, replaceRootDirByPathVariable } from '$utils/strings';
 import { AppChannel, LauncherButtonAction } from '$constants/misc';
-import { getIsPathWithVariableCorrect } from '$utils/check';
+import { getIsPathWithVariableCorrect, IValidationData } from '$utils/check';
 
 interface IProps extends IUIElementParams {
   options: ISelectOption[],
@@ -23,9 +23,9 @@ interface IProps extends IUIElementParams {
   isGameDocuments?: boolean,
   onChange: (
     value: string,
-    isValidationError: boolean,
     id: string,
-    parent: string|undefined
+    validationData: IValidationData,
+    parent?: string
   ) => void,
 }
 
@@ -42,6 +42,7 @@ export const PathSelector: React.FC<IProps> = ({
   description,
   parent,
   multiparameters,
+  validationErrors,
   isDisabled = false,
   isSelectDisabled = options.length <= 1,
   selectorType = LauncherButtonAction.OPEN,
@@ -53,7 +54,6 @@ export const PathSelector: React.FC<IProps> = ({
 
   const [currentPathVariable, setCurrentPathVariable] = useState<string>(pathVariable);
   const [currentPathValue, setCurrentPathValue] = useState<string>(pathValue);
-  const [isValidationError, setIsValidationError] = useState<boolean>(false);
 
   useEffect(() => {
     if (currentPathValue !== pathValue) {
@@ -62,11 +62,6 @@ export const PathSelector: React.FC<IProps> = ({
     if (currentPathVariable !== pathVariable) {
       setCurrentPathValue(pathVariable);
     }
-
-    setIsValidationError(!getIsPathWithVariableCorrect(
-      value as string,
-      selectorType,
-    ));
   }, [currentPathValue, currentPathVariable, pathValue, pathVariable, selectorType, value]);
 
   const getPathFromPathSelector = useCallback(async (
@@ -91,24 +86,29 @@ export const PathSelector: React.FC<IProps> = ({
     const isCorrectPath = getIsPathWithVariableCorrect(
       target.value,
       selectorType,
+      extensions,
     );
 
-    setIsValidationError(!isCorrectPath);
-
     setCurrentPathValue(target.value);
-    onChange(`${currentPathVariable}\\${target.value}`, !isCorrectPath, id, parent);
-  }, [currentPathVariable, id, parent, selectorType, onChange]);
+
+    onChange(
+      `${currentPathVariable}\\${target.value}`,
+      id,
+      { errors: { [id]: ['incorrect path'] }, isForAdd: !isCorrectPath },
+      parent,
+    );
+  }, [currentPathVariable, selectorType, id, parent, extensions, onChange]);
 
   const onSelectPatchBtnClick = useCallback(async () => {
     let pathStr = await getPathFromPathSelector();
     let isCorrectPath;
 
-    if (pathStr) {
+    if (pathStr !== '') {
       try {
         checkIsPathIsNotOutsideValidFolder(pathStr, pathVariables, isGameDocuments);
 
         pathStr = replaceRootDirByPathVariable(pathStr, availablePathVariables, pathVariables);
-        const [variablePath, valuePath] = getVariableAndValueFromPath(pathStr!);
+        const [variablePath, valuePath] = getVariableAndValueFromPath(pathStr);
 
         setCurrentPathVariable(variablePath);
         setCurrentPathValue(valuePath);
@@ -116,21 +116,34 @@ export const PathSelector: React.FC<IProps> = ({
         isCorrectPath = getIsPathWithVariableCorrect(
           pathStr,
           selectorType,
+          extensions,
         );
 
-        setIsValidationError(!isCorrectPath);
+        onChange(
+          `${variablePath}\\${valuePath}`,
+          id,
+          { errors: { [id]: ['not available path', 'incorrect path'] }, isForAdd: !isCorrectPath },
+          parent,
+        );
       } catch (error) {
-        pathStr = '';
+        setCurrentPathVariable(availablePathVariables[0]);
+        setCurrentPathValue(pathStr);
+
+        onChange(
+          `${availablePathVariables[0]}\\${pathStr}`,
+          id,
+          { errors: { [id]: ['not available path'] }, isForAdd: true },
+          parent,
+        );
       }
     }
-
-    onChange(pathStr, !isCorrectPath, id, parent);
   }, [id,
     parent,
     pathVariables,
     isGameDocuments,
     availablePathVariables,
     selectorType,
+    extensions,
     onChange,
     getPathFromPathSelector]);
 
@@ -138,8 +151,8 @@ export const PathSelector: React.FC<IProps> = ({
     { target }: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     setCurrentPathVariable(target.value);
-    onChange(`${target.value}\\${currentPathValue}`, isValidationError, id, parent);
-  }, [currentPathValue, id, parent, isValidationError, onChange]);
+    onChange(`${target.value}\\${currentPathValue}`, id, { errors: {}, isForAdd: false }, parent);
+  }, [currentPathValue, id, parent, onChange]);
 
   return (
     <div className={classNames(
@@ -178,7 +191,7 @@ export const PathSelector: React.FC<IProps> = ({
         <input
           className={classNames(
             'path-selector__input',
-            isValidationError && 'path-selector__input--error',
+            validationErrors && validationErrors.length > 0 && 'path-selector__input--error',
           )}
           id={id}
           name={name}
@@ -186,7 +199,7 @@ export const PathSelector: React.FC<IProps> = ({
           value={currentPathValue}
           data-parent={parent}
           data-multiparameters={multiparameters}
-          disabled={isDisabled}
+          disabled={isDisabled || validationErrors?.includes('not available path')}
           onChange={onPatchTextFieldChange}
         />
         <Button

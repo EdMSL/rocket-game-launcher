@@ -46,11 +46,12 @@ import { ArgumentsBlock } from '$components/ArgumentsBlock';
 import {
   checkObjectForEqual,
   getIsWindowSettingEqual,
-  IValidationError,
+  IValidationData,
   validateNumberInputs,
 } from '$utils/check';
 import { Header } from '$components/Header';
 import { getRandomId } from '$utils/strings';
+import { IValidationErrors } from '$types/common';
 
 export const DeveloperScreen: React.FC = () => {
   const pathVariables = useAppSelector((state) => state.main.pathVariables);
@@ -62,7 +63,7 @@ export const DeveloperScreen: React.FC = () => {
 
   const [currentConfig, setCurrentConfig] = useState<IMainRootState['config']>(launcherConfig);
   const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
-  const [validationErrors, setValidationErrors] = useState<IValidationError[]>([]);
+  const [validationErrors, setValidationErrors] = useState<IValidationErrors>({});
 
   useEffect(() => {
     if (launcherConfig.isFirstLaunch) {
@@ -97,54 +98,37 @@ export const DeveloperScreen: React.FC = () => {
   }, [dispatch]);
 
   const onPathSelectorChange = useCallback((
-    value: string|undefined,
-    isValidationError: boolean,
+    value: string,
     id: string,
+    validationData: IValidationData,
     parent: string|undefined,
   ) => {
     let pathStr = value;
 
-    if (pathStr !== undefined) {
-      if (pathStr === '') {
-        if (parent) {
-          pathStr = currentConfig[parent][id];
-        } else {
-          pathStr = currentConfig[id];
-        }
+    if (pathStr === '') {
+      if (parent) {
+        pathStr = currentConfig[parent][id];
+      } else {
+        pathStr = currentConfig[id];
       }
-
-      changeCurrentConfig(
-        id,
-        pathStr,
-        parent,
-      );
-    } else {
-      dispatch(addMessages([CreateUserMessage.error('Выбран некорректный путь до папки. Подробности в файле лога.')])); //eslint-disable-line max-len
     }
 
-    if (isValidationError) {
-      setValidationErrors(getUniqueValidationErrors(
-        validationErrors,
-        [{ id, reason: 'incorrect path' }],
-      ));
-    } else {
-      setValidationErrors(getUniqueValidationErrors(
-        validationErrors,
-        [{ id, reason: 'incorrect path' }],
-        true,
-      ));
-    }
-  }, [dispatch, currentConfig, validationErrors, changeCurrentConfig]);
+    changeCurrentConfig(
+      id,
+      pathStr,
+      parent,
+    );
+
+    setValidationErrors(getUniqueValidationErrors(
+      validationErrors,
+      validationData.errors,
+      validationData.isForAdd,
+    ));
+  }, [currentConfig, validationErrors, changeCurrentConfig]);
 
   const onNumberInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    const [errors, clearErrors] = validateNumberInputs(target, currentConfig);
-
-    if (errors.length !== 0 || clearErrors.length !== 0) {
-      const newValidationErrors = getUniqueValidationErrors(validationErrors, errors);
-      const completeErrors = getUniqueValidationErrors(newValidationErrors, clearErrors, true);
-
-      setValidationErrors(completeErrors);
-    }
+    const errors = validateNumberInputs(target, currentConfig, validationErrors);
+    setValidationErrors(errors);
 
     changeCurrentConfig(target.id, Math.round(+target.value), target.dataset.parent);
   }, [currentConfig, changeCurrentConfig, validationErrors]);
@@ -182,8 +166,7 @@ export const DeveloperScreen: React.FC = () => {
 
   const onCustomBtnChange = useCallback((
     newBtnData: ILauncherCustomButton,
-    fieldName: string,
-    isValidationError: boolean|undefined,
+    validationData: IValidationData,
   ) => {
     const newButtons = currentConfig.customButtons.map((currentBtn) => {
       if (currentBtn.id === newBtnData.id) {
@@ -193,28 +176,28 @@ export const DeveloperScreen: React.FC = () => {
       return currentBtn;
     });
 
-    if (isValidationError) {
-      setValidationErrors(getUniqueValidationErrors(
-        validationErrors,
-        [{ id: 'customButtons', reason: 'incorrect path' }],
-      ));
-    } else {
-      setValidationErrors(getUniqueValidationErrors(
-        validationErrors,
-        [{ id: 'customButtons', reason: 'incorrect path' }],
-        true,
-      ));
-    }
+    setValidationErrors(getUniqueValidationErrors(
+      validationErrors,
+      validationData.errors,
+      validationData.isForAdd,
+    ));
 
-    changeCurrentConfig(fieldName, newButtons);
+    changeCurrentConfig('customButtons', newButtons);
   }, [currentConfig, validationErrors, changeCurrentConfig]);
 
   const changeArguments = useCallback((
     newArgs: IButtonArg[],
     parent: string,
+    validationData: IValidationData,
   ) => {
+    setValidationErrors(getUniqueValidationErrors(
+      validationErrors,
+      validationData.errors,
+      validationData.isForAdd,
+    ));
+
     changeCurrentConfig('args', newArgs, parent);
-  }, [changeCurrentConfig]);
+  }, [validationErrors, changeCurrentConfig]);
 
   const onSaveBtnClick = useCallback((
     { currentTarget }: React.MouseEvent<HTMLButtonElement>,
@@ -249,7 +232,7 @@ export const DeveloperScreen: React.FC = () => {
 
   const resetConfigChanges = useCallback((event) => {
     setIsConfigChanged(false);
-    setValidationErrors([]);
+    setValidationErrors({});
 
     if (currentConfig.isFirstLaunch) {
       event.preventDefault();
@@ -286,11 +269,6 @@ export const DeveloperScreen: React.FC = () => {
     || id === 'maxHeight'
   ), [currentConfig]);
 
-  const getIsValidationError = useCallback(
-    (id: string): boolean => !!validationErrors.find((currError) => currError.id === id),
-    [validationErrors],
-  );
-
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <React.Fragment>
@@ -307,7 +285,7 @@ export const DeveloperScreen: React.FC = () => {
                 'main-btn',
                 'control-panel__btn',
               )}
-              isDisabled={!isConfigChanged || validationErrors.length > 0}
+              isDisabled={!isConfigChanged || Object.keys(validationErrors).length > 0}
             >
               ОК
             </Button>
@@ -326,7 +304,7 @@ export const DeveloperScreen: React.FC = () => {
                 'main-btn',
                 'control-panel__btn',
               )}
-              isDisabled={!isConfigChanged || validationErrors.length > 0}
+              isDisabled={!isConfigChanged || Object.keys(validationErrors).length > 0}
             >
               Сохранить
             </Button>
@@ -379,7 +357,7 @@ export const DeveloperScreen: React.FC = () => {
                     label={field.label}
                     min={getNumberFieldMinValue(field.id)}
                     isDisabled={getNumberFieldIsDisabled(field.id)}
-                    isValidationError={getIsValidationError(field.id)}
+                    validationErrors={validationErrors[field.id]}
                     description={field.description}
                     onChange={onNumberInputChange}
                   />
@@ -407,6 +385,7 @@ export const DeveloperScreen: React.FC = () => {
                 pathVariables={pathVariables}
                 isGameDocuments={false}
                 description="Путь до папки игры в [User]/Documents. Укажите этот путь, если нужно управлять данными из файлов в этой папке через экран игровых настроек"//eslint-disable-line max-len
+                validationErrors={validationErrors.documentsPath}
                 onChange={onPathSelectorChange}
               />
               <p className={styles['developer-screen__text']}>Настройки запуска игры</p>
@@ -417,6 +396,7 @@ export const DeveloperScreen: React.FC = () => {
                 value={currentConfig.playButton.label}
                 label="Заголовок кнопки запуска"
                 description="Текст, который будет отображаться на основной кнопке запуска игры"//eslint-disable-line max-len
+                validationErrors={validationErrors.label}
                 onChange={OnTextFieldChange}
               />
               <PathSelector
@@ -430,6 +410,7 @@ export const DeveloperScreen: React.FC = () => {
                 extensions={FileExtension.EXECUTABLE}
                 selectorType={LauncherButtonAction.RUN}
                 description="Путь до исполняемого файла игры, .exe или .lnk"//eslint-disable-line max-len
+                validationErrors={validationErrors.path}
                 onChange={onPathSelectorChange}
               />
               <ArgumentsBlock
@@ -437,7 +418,8 @@ export const DeveloperScreen: React.FC = () => {
                 args={currentConfig.playButton.args!}
                 parent="playButton"
                 pathVariables={pathVariables}
-                description="Дополнительные агрументы запуска приложения"//eslint-disable-line max-len
+                description="Дополнительные агрументы запуска приложения"
+                validationErrors={validationErrors}
                 changeArguments={changeArguments}
                 onPathError={sendIncorrectPathErrorMessage}
               />
@@ -451,8 +433,8 @@ export const DeveloperScreen: React.FC = () => {
                       <CustomBtnItem
                         key={item.id}
                         item={item}
-                        fieldName="customButtons"
                         pathVariables={pathVariables}
+                        validationErrors={validationErrors}
                         onDeleteBtnClick={onCustomBtnDeleteClick}
                         onChangeBtnData={onCustomBtnChange}
                         onPathError={sendIncorrectPathErrorMessage}
@@ -490,7 +472,7 @@ export const DeveloperScreen: React.FC = () => {
                 ]}
                 value={currentConfig.modOrganizer.version.toString()}
                 isDisabled={!currentConfig.modOrganizer.isUsed}
-                description="Задает версию использемого Mod Organizer"//eslint-disable-line max-len
+                description="Задает версию использемого Mod Organizer"
                 onChange={onSelectChange}
               />
               <PathSelector
@@ -502,7 +484,8 @@ export const DeveloperScreen: React.FC = () => {
                 options={generateSelectOptions([PathVariableName.GAME_DIR])}
                 pathVariables={pathVariables}
                 isDisabled={!currentConfig.modOrganizer.isUsed}
-                description="Задает путь до основной папки Mod Organizer."//eslint-disable-line max-len
+                description="Задает путь до основной папки Mod Organizer."
+                validationErrors={validationErrors.pathToMOFolder}
                 onChange={onPathSelectorChange}
               />
               <PathSelector
@@ -515,6 +498,7 @@ export const DeveloperScreen: React.FC = () => {
                 pathVariables={pathVariables}
                 isDisabled={!currentConfig.modOrganizer.isUsed}
                 description="Задает путь до папки модов Mod Organizer. Если вы не меняли этот путь в МО, оставьте значение без изменений"//eslint-disable-line max-len
+                validationErrors={validationErrors.pathToMods}
                 onChange={onPathSelectorChange}
               />
               <PathSelector
@@ -527,6 +511,7 @@ export const DeveloperScreen: React.FC = () => {
                 pathVariables={pathVariables}
                 isDisabled={!currentConfig.modOrganizer.isUsed}
                 description="Задает путь до папки профилей Mod Organizer. Если вы не меняли этот путь в МО, оставьте значение без изменений"//eslint-disable-line max-len
+                validationErrors={validationErrors.pathToProfiles}
                 onChange={onPathSelectorChange}
               />
               <PathSelector
@@ -541,6 +526,7 @@ export const DeveloperScreen: React.FC = () => {
                 extensions={FileExtension.INI}
                 isDisabled={!currentConfig.modOrganizer.isUsed}
                 description="Задает путь до конфигурационного файла Mod Organizer (ModOrganizer.ini)"//eslint-disable-line max-len
+                validationErrors={validationErrors.pathToINI}
                 onChange={onPathSelectorChange}
               />
             </div>

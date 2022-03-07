@@ -42,7 +42,6 @@ import {
   IPathVariables,
 } from '$constants/paths';
 import {
-  ILauncherAppButton,
   ILauncherConfig,
   ILauncherCustomButton,
   IModOrganizerParams,
@@ -50,7 +49,7 @@ import {
 } from '$types/main';
 import { defaultModOrganizerParams } from '$constants/defaultParameters';
 import { getReadWriteError } from './errors';
-import { IValidationError } from './check';
+import { IValidationErrors } from '$types/common';
 
 const ONE_GB = 1073741824;
 const SYMBOLS_TO_TYPE = 8;
@@ -670,24 +669,48 @@ export const getVariableAndValueFromPath = (pathStr: string): [string, string] =
  * Получить ошибки валидации полей размеров экрана.
  * @param currentErrors Текущие ошибки валидации.
  * @param newErrorsOrForClear Ошибки валидации для добавления или для очистки.
- * @param isForClear Очищать ошибки из списока или добавлять новые ошибки в список.
- * @returns Массив из строк переменной и остатка пути.
+ * @param isForAdd Очищать ошибки из списка или добавлять новые ошибки в список.
+ * @returns Объект с ошибками валидации.
 */
 export const getUniqueValidationErrors = (
-  currentErrors: IValidationError[],
-  newErrorsOrForClear: IValidationError[],
-  isForClear = false,
-): IValidationError[] => {
-  const errs = (isForClear ? currentErrors : newErrorsOrForClear)
-    .filter((currentError) => {
-      const a = !((isForClear ? newErrorsOrForClear : currentErrors))
-        .find((curr) => currentError.id === curr.id && currentError.reason === curr.reason);
-      return a;
-    });
+  currentErrors: IValidationErrors,
+  newErrorsOrForClear: IValidationErrors,
+  isForAdd,
+): IValidationErrors => {
+  const newErrors = Object.keys(newErrorsOrForClear).reduce<IValidationErrors>((acc, id) => {
+    if (isForAdd) {
+      return {
+        ...currentErrors,
+        ...acc,
+        [id]: Array.from(new Set([...currentErrors[id] ? currentErrors[id] : [], ...newErrorsOrForClear[id]])),
+      };
+    }
 
-  if (isForClear) {
-    return errs;
-  }
+    if (currentErrors[id]) {
+      return {
+        ...currentErrors,
+        ...acc,
+        [id]: [...currentErrors[id].filter((currError) => !newErrorsOrForClear[id].includes(currError))],
+      };
+    }
 
-  return [...currentErrors, ...errs];
+    return {
+      ...currentErrors,
+      ...acc,
+      [id]: [],
+    };
+  }, {});
+
+  return Object.keys(newErrors).reduce((acc, id) => {
+    if (newErrors[id].length > 0) {
+      return {
+        ...acc,
+        [id]: newErrors[id],
+      };
+    }
+
+    return {
+      ...acc,
+    };
+  }, {});
 };

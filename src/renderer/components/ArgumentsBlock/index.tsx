@@ -13,6 +13,8 @@ import { TextField } from '$components/UI/TextField';
 import { HintItem } from '$components/HintItem';
 import { IButtonArg } from '$types/main';
 import { getRandomId } from '$utils/strings';
+import { IValidationData } from '$utils/check';
+import { IValidationErrors } from '$types/common';
 
 interface IProps {
   className?: string,
@@ -20,7 +22,8 @@ interface IProps {
   parent: string,
   pathVariables: IPathVariables,
   description?: string,
-  changeArguments: (newArgs: IButtonArg[], parent: string, isValidationError?: boolean) => void,
+  validationErrors: IValidationErrors,
+  changeArguments: (newArgs: IButtonArg[], parent: string, validationData: IValidationData) => void,
   onPathError: () => void,
 }
 
@@ -30,12 +33,13 @@ export const ArgumentsBlock: React.FC<IProps> = ({
   parent,
   pathVariables,
   description,
+  validationErrors,
   changeArguments,
 }) => {
   const onPathSelectorChange = useCallback((
     value: string,
-    isValidationError: boolean,
     id: string,
+    validationData: IValidationData,
   ) => {
     if (value) {
       changeArguments(
@@ -50,7 +54,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
           return currentArg;
         }),
         parent,
-        isValidationError,
+        validationData,
       );
     }
   }, [args, parent, changeArguments]);
@@ -70,6 +74,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
         return currentArg;
       }),
       parent,
+      { errors: {}, isForAdd: false },
     );
   }, [args, parent, changeArguments]);
 
@@ -77,8 +82,9 @@ export const ArgumentsBlock: React.FC<IProps> = ({
     currentTarget,
   }: React.MouseEvent<HTMLButtonElement>) => {
     changeArguments(
-      args.filter((currentArg) => currentArg.id !== currentTarget.id.split('_')[1]),
+      args.filter((currentArg) => currentArg.id !== currentTarget.id.split(':')[1]),
       parent,
+      { errors: {}, isForAdd: false },
     );
   }, [args, parent, changeArguments]);
 
@@ -95,7 +101,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
       },
     ];
 
-    changeArguments(newArgs, parent);
+    changeArguments(newArgs, parent, { errors: {}, isForAdd: false });
   }, [args, parent, changeArguments]);
 
   return (
@@ -112,10 +118,10 @@ export const ArgumentsBlock: React.FC<IProps> = ({
       </div>
       <div className={styles['developer-screen__agrs-block']}>
         {
-        args.map((currentArg, index) => (
+        args.map((currentArg) => (
           <div
             className={styles['developer-screen__agrs-item']}
-            key={`${parent}-${index}`} //eslint-disable-line react/no-array-index-key
+            key={currentArg.id}
           >
             {
               PathRegExp.PATH_VARIABLE_REGEXP.test(currentArg.data)
@@ -127,6 +133,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
                     options={generateSelectOptions([PathVariableName.GAME_DIR])}
                     pathVariables={pathVariables}
                     selectorType={LauncherButtonAction.RUN}
+                    validationErrors={validationErrors[currentArg.id]}
                     onChange={onPathSelectorChange}
                   />
                   )
@@ -140,7 +147,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
                   )
             }
             <Button
-              id={`delete_${currentArg.id}`}
+              id={`delete:${currentArg.id}`}
               className={styles['developer-screen__args-delete-btn']}
               onClick={onDeleteArgBtnClick}
             >

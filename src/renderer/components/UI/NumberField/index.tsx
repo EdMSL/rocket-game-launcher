@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import classNames from 'classnames';
 
-import { IUIElementProps } from '$types/gameSettings';
+import { IUIElementProps } from '$types/common';
 import { HintItem } from '$components/HintItem';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {
@@ -20,7 +20,7 @@ export const NumberField: React.FunctionComponent<IProps> = ({
   parent,
   multiparameters,
   isDisabled = false,
-  isValidationError,
+  validationErrors,
   onChange,
 }) => {
   const onInputBlur = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +48,7 @@ export const NumberField: React.FunctionComponent<IProps> = ({
       <input
         className={classNames(
           'number-field__input',
-          isValidationError && 'number-field__input--error',
+          validationErrors && validationErrors.length > 0 && 'number-field__input--error',
         )}
         type="number"
         min={min}

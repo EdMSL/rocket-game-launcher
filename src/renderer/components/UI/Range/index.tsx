@@ -5,7 +5,7 @@ import classNames from 'classnames';
 
 import { HintItem } from '$components/HintItem';
 import { RangeButtonName } from '$constants/misc';
-import { IUIElementProps } from '$types/gameSettings';
+import { IUIElementProps } from '$types/common';
 import { getNumberOfDecimalPlaces } from '$utils/strings';
 import { useDebouncedFunction } from '$utils/hooks';
 

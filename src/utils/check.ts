@@ -25,15 +25,17 @@ import {
 import { CustomError, ErrorName } from './errors';
 import { getRandomId } from './strings';
 import { ILauncherConfig, IWindowSettings } from '$types/main';
+import { getUniqueValidationErrors } from './data';
+import { IValidationErrors } from '$types/common';
 
 interface IGameSettingsFileError {
   parent: string,
   error: string,
 }
 
-export interface IValidationError {
-  id: string,
-  reason: string,
+export interface IValidationData {
+  errors: IValidationErrors,
+  isForAdd: boolean,
 }
 
 export interface IGameSettingsConfigCheckResult {
@@ -44,11 +46,16 @@ export interface IGameSettingsConfigCheckResult {
 export const getIsPathWithVariableCorrect = (
   value: string,
   action: string,
+  extensions: string[] = [],
 ): boolean => {
   if (action === LauncherButtonAction.OPEN) {
     return !path.extname(value);
-  } else if (action === LauncherButtonAction.RUN) {
-    return !!path.extname(value) && Boolean(/\.[a-zA-Z0-9]{2,}/.test(path.extname(value)));
+  } else if (action === LauncherButtonAction.RUN && !!path.extname(value)) {
+    if (extensions.length > 0) {
+      return extensions.includes(path.extname(value).substr(1));
+    }
+
+    return Boolean(/\.[a-zA-Z0-9]{2,}/.test(path.extname(value)));
   }
 
   return false;
@@ -77,16 +84,18 @@ const getIsPathWithVariableCorrectForCustomBtn = (
 
 const configFileDataSchema = Joi.object({
   isResizable: Joi.bool().optional().default(defaultLauncherConfig.isResizable),
+  width: Joi.number().integer().min(MinWindowSize.WIDTH)
+    .optional()
+    .default(defaultLauncherConfig.width),
+  height: Joi.number().integer().min(MinWindowSize.HEIGHT)
+    .optional()
+    .default(defaultLauncherConfig.height),
   minWidth: Joi.number().integer().min(MinWindowSize.WIDTH).optional()
     .default(defaultLauncherConfig.minWidth),
   minHeight: Joi.number().integer().min(MinWindowSize.HEIGHT).optional()
     .default(defaultLauncherConfig.minHeight),
   maxWidth: Joi.number().integer().optional().default(defaultLauncherConfig.maxWidth),
   maxHeight: Joi.number().integer().optional().default(defaultLauncherConfig.maxHeight),
-  width: Joi.number().integer().min(MinWindowSize.WIDTH).optional()
-    .default(defaultLauncherConfig.width),
-  height: Joi.number().integer().min(MinWindowSize.HEIGHT).optional()
-    .default(defaultLauncherConfig.height),
   modOrganizer: Joi.object({
     isUsed: Joi.bool().optional().default(false),
     version: Joi.number().valid(1, 2).when(Joi.ref('isUsed'), { is: true, then: Joi.required() }),
@@ -560,23 +569,23 @@ export const getIsWindowSettingEqual = (
   Валидация значений полей `number` в `developer screen`.
   @param target Поле `target` объекта `event`.
   @param currentConfig Текущие значения конфигурации лаунчера.
+  @param currentErrors Текущие ошибки валидации.
   @returns Массив из двух массивов: ошибки для добавления и ошибки для удаления.
 */
 export const validateNumberInputs = (
   target: EventTarget & HTMLInputElement,
   currentConfig: ILauncherConfig,
-): IValidationError[][] => {
-  const errors: IValidationError[] = [];
-  const clearErrors: IValidationError[] = [];
-
-  if (+target.value < +target.min) {
-    errors.push({ id: target.id, reason: 'less min value' });
-  } else {
-    clearErrors.push({ id: target.id, reason: 'less min value' });
-  }
+  currentErrors: IValidationErrors,
+): IValidationErrors => {
+  let errors: IValidationErrors = { ...currentErrors };
+  errors = getUniqueValidationErrors(
+    errors,
+    { [target.id]: ['less min value'] },
+    +target.value < +target.min,
+  );
 
   if (currentConfig.isResizable) {
-    const namesAmdValues = target.id.toLowerCase().includes('width')
+    const namesAndValues = target.id.toLowerCase().includes('width')
       ? {
           default: currentConfig.width,
           min: currentConfig.minWidth,
@@ -595,37 +604,59 @@ export const validateNumberInputs = (
         };
 
     if (target.id === 'width' || target.id === 'height') {
-      (+target.value < namesAmdValues.min ? errors : clearErrors).push(
-        { id: target.id, reason: `less config ${namesAmdValues.minName}` },
-        { id: namesAmdValues.minName, reason: `more config ${target.id}` },
+      errors = getUniqueValidationErrors(
+        errors,
+        {
+          [target.id]: [`less config ${namesAndValues.minName}`],
+          [namesAndValues.minName]: [`more config ${target.id}`],
+        },
+        +target.value < namesAndValues.min,
       );
 
-      (+target.value > namesAmdValues.max && namesAmdValues.max > 0 ? errors : clearErrors).push(
-        { id: target.id, reason: `more config ${namesAmdValues.maxName}` },
-        { id: namesAmdValues.maxName, reason: `less config ${target.id}` },
+      errors = getUniqueValidationErrors(
+        errors,
+        {
+          [target.id]: [`more config ${namesAndValues.maxName}`],
+          [namesAndValues.maxName]: [`less config ${target.id}`],
+        },
+        +target.value > namesAndValues.max && namesAndValues.max > 0,
       );
     } else if (target.id === 'minWidth' || target.id === 'minHeight') {
-      (+target.value > namesAmdValues.default ? errors : clearErrors).push(
-        { id: target.id, reason: `more config ${namesAmdValues.defaultName}` },
-        { id: namesAmdValues.defaultName, reason: `less config ${target.id}` },
+      errors = getUniqueValidationErrors(
+        errors,
+        {
+          [target.id]: [`more config ${namesAndValues.defaultName}`],
+          [namesAndValues.defaultName]: [`less config ${target.id}`],
+        },
+        +target.value > namesAndValues.default,
       );
 
-      (+target.value > namesAmdValues.max && namesAmdValues.max > 0 ? errors : clearErrors).push(
-        { id: target.id, reason: `more config ${namesAmdValues.maxName}` },
-        { id: namesAmdValues.maxName, reason: `less config ${target.id}` },
+      errors = getUniqueValidationErrors(
+        errors,
+        {
+          [target.id]: [`more config ${namesAndValues.maxName}`],
+          [namesAndValues.maxName]: [`less config ${target.id}`],
+        },
+        +target.value > namesAndValues.max && namesAndValues.max > 0,
       );
     } else if (target.id === 'maxWidth' || target.id === 'maxHeight') {
-      (+target.value < namesAmdValues.default && +target.value > 0 ? errors : clearErrors).push(
-        { id: target.id, reason: `less config ${namesAmdValues.defaultName}` },
-        { id: namesAmdValues.defaultName, reason: `more config ${target.id}` },
+      errors = getUniqueValidationErrors(
+        errors,
+        {
+          [target.id]: [`less config ${namesAndValues.defaultName}`],
+          [namesAndValues.defaultName]: [`more config ${target.id}`],
+        },
+        +target.value < namesAndValues.default && +target.value > 0,
       );
-
-      (+target.value < namesAmdValues.min && +target.value > 0 ? errors : clearErrors).push(
-        { id: target.id, reason: `less config ${namesAmdValues.minName}` },
-        { id: namesAmdValues.minName, reason: `more config ${target.id}` },
+      errors = getUniqueValidationErrors(
+        errors,
+        {
+          [target.id]: [`less config ${namesAndValues.minName}`],
+          [namesAndValues.minName]: [`more config ${target.id}`],
+        },
+        +target.value < namesAndValues.min && +target.value > 0,
       );
     }
   }
-
-  return [errors, clearErrors];
+  return errors;
 };

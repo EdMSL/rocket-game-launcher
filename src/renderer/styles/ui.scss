@@ -440,7 +440,8 @@ $checkbox-size: 20px;
     background-color: var(--disabled-color);
   }
 
-  &--error {
+  &--error,
+  &--error:disabled {
     background-color: var(--error-color);
   }
 }

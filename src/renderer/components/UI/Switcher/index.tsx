@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { IUIElementProps } from '$types/gameSettings';
+import { IUIElementProps } from '$types/common';
 import { HintItem } from '$components/HintItem';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {

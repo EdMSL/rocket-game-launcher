@@ -87,23 +87,3 @@ export type IGameSettingsRootState = Readonly<{
   moProfiles: string[],
   gameSettingsOptions: IGameSettingsOptions,
 }>;
-
-export interface IUIElementParams {
-  id: string,
-  className?: string,
-  parentClassname?: string,
-  label?: string,
-  name?: string,
-  value?: string|number,
-  multiparameters?: string,
-  isDisabled?: boolean,
-  parent?: string,
-  description?: string,
-  maxLength?: number,
-  isValidationError?: boolean,
-}
-
-export interface IUIElementProps<E> extends IUIElementParams{
-  onChange: (event: React.ChangeEvent<E>) => void,
-}
-
