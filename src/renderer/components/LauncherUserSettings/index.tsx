@@ -15,7 +15,7 @@ interface IProps {
   userThemes: IMainRootState['userThemes'],
 }
 
-export const LauncherSettings: React.FC<IProps> = ({
+export const LauncherUserSettings: React.FC<IProps> = ({
   isAutoclose,
   userTheme,
   userThemes,

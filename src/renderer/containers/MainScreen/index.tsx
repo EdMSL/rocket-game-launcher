@@ -17,7 +17,7 @@ import { useAppSelector } from '$store/store';
 import { CreateUserMessage } from '$utils/message';
 import { LauncherButtonAction, AppChannel } from '$constants/misc';
 import { Modal } from '$components/UI/Modal';
-import { LauncherSettings } from '$components/LauncherSettings';
+import { LauncherUserSettings } from '$components/LauncherUserSettings';
 import { getPathToFile } from '$utils/strings';
 import { Loader } from '$components/UI/Loader';
 import { IButtonArg } from '$types/main';
@@ -186,9 +186,10 @@ export const MainScreen: React.FC = () => {
           isModalOpen && (
           <Modal
             modalParentClassname="launcher-settings"
+            title="Пользовательские настройки"
             onCloseBtnClick={closeModal}
           >
-            <LauncherSettings
+            <LauncherUserSettings
               isAutoclose={isAutoclose}
               userTheme={userTheme}
               userThemes={userThemes}
