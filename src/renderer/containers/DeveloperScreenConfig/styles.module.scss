@@ -1,0 +1,88 @@
+.developer-screen__btn {
+  align-self: center;
+  width: 200px;
+}
+
+.developer-screen__block {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  padding-bottom: 20px;
+
+  border-bottom: 1px solid var(--text-main);
+
+  &:last-child {
+    margin-bottom: 0;
+
+    border-bottom-width: 0;
+  }
+}
+
+.developer-screen__block-title {
+  @include reset-indents;
+  margin-bottom: 10px;
+
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.developer-screen__text {
+  @include reset-indents;
+  margin-bottom: 10px;
+
+  text-align: center;
+}
+
+.developer-screen__item {
+  margin-bottom: 10px;
+  padding-right: 10px;
+  padding-left: 10px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &:nth-last-of-type(-n+2) .hint__block {
+    top: auto;
+    bottom: 0;
+  }
+}
+
+.developer-screen__custom-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-right: 10px;
+
+  & .text-field__container {
+    flex-grow: 1;
+    margin-right: 10px;
+  }
+
+  & .text-field__input {
+    width: 100%;
+  }
+
+  & .path-selector__container {
+    flex-grow: 8;
+  }
+
+  & .path-selector__input-block {
+    max-width: 100%;
+  }
+}
+
+.developer-screen__custom-btns {
+  display: flex;
+  flex-direction: column;
+}
+
+.developer-screen__item.select__container {
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.developer-screen__custom-btns-container {
+  @include reset-list;
+}

@@ -61,6 +61,10 @@ $icon-size: 24px;
     background-color: var(--header-btn-color);
   }
 
+  &:disabled {
+    background-color: var(--header-btn-disabled-color);
+  }
+
   &--info {
     background-image:
       url(
@@ -116,6 +120,10 @@ $icon-size: 24px;
 
     &:hover {
       background-color: var(--header-btn-close-color);
+    }
+
+    &:disabled:hover {
+      background-color: var(--header-btn-disabled-color);
     }
   }
   /* stylelint-enable string-no-newline, max-line-length */

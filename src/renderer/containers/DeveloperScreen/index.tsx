@@ -1,541 +1,75 @@
 import { ipcRenderer } from 'electron';
 import React, {
   useCallback,
-  useState,
-  ReactElement,
-  useEffect,
 } from 'react';
-import { useDispatch } from 'react-redux';
 import classNames from 'classnames';
-import Scrollbars from 'react-custom-scrollbars-2';
+import {
+  NavLink, Redirect, Route, Switch,
+} from 'react-router-dom';
 
 import styles from './styles.module.scss';
 import { useAppSelector } from '$store/store';
-import { NumberField } from '$components/UI/NumberField';
-import { TextField } from '$components/UI/TextField';
-import { Switcher } from '$components/UI/Switcher';
-import { Select } from '$components/UI/Select';
-import { PathSelector } from '$components/UI/PathSelector';
 import {
-  saveLauncherConfig,
-  addMessages,
-  setIsFirstLaunch,
-} from '$actions/main';
-import { CreateUserMessage } from '$utils/message';
-import {
-  appWindowFields,
-  FileExtension,
-  LauncherButtonAction,
-  PathVariableName,
   AppChannel,
 } from '$constants/misc';
-import { MinWindowSize } from '$constants/defaultParameters';
-import { Button } from '$components/UI/Button';
-import { CustomBtnItem } from '$components/CustomBtnItem';
-import {
-  IButtonArg,
-  ILauncherConfig,
-  ILauncherCustomButton,
-  IMainRootState,
-} from '$types/main';
 import { Loader } from '$components/UI/Loader';
-import {
-  generateSelectOptions, getUniqueValidationErrors,
-} from '$utils/data';
-import { ArgumentsBlock } from '$components/ArgumentsBlock';
-import {
-  checkObjectForEqual,
-  getIsWindowSettingEqual,
-  IValidationData,
-  validateNumberInputs,
-} from '$utils/check';
 import { Header } from '$components/Header';
-import { getRandomId } from '$utils/strings';
-import { IValidationErrors } from '$types/common';
+import { DeveloperScreenConfig } from '$containers/DeveloperScreenConfig';
+import { Routes } from '$constants/routes';
+import { DeveloperScreenGameSettings } from '$containers/DeveloperScreenGameSettings';
 
 export const DeveloperScreen: React.FC = () => {
-  const pathVariables = useAppSelector((state) => state.main.pathVariables);
-  const launcherConfig = useAppSelector((state) => state.main.config);
   const isGameSettingsSaving = useAppSelector((state) => state.main.isGameSettingsSaving);
-  const isDevWindowOpen = useAppSelector((state) => state.main.isDevWindowOpen);
+  const isFirstLaunch = useAppSelector((state) => state.main.config.isFirstLaunch);
 
-  const dispatch = useDispatch();
-
-  const [currentConfig, setCurrentConfig] = useState<IMainRootState['config']>(launcherConfig);
-  const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
-  const [validationErrors, setValidationErrors] = useState<IValidationErrors>({});
-
-  useEffect(() => {
-    if (launcherConfig.isFirstLaunch) {
-      dispatch(setIsFirstLaunch(false));
-    }
-  }, [dispatch, launcherConfig, currentConfig, isDevWindowOpen]);
-
-  const changeCurrentConfig = useCallback((fieldName: string, value, parent?: string|undefined) => {
-    let newConfig: ILauncherConfig;
-
-    if (parent) {
-      newConfig = {
-        ...currentConfig,
-        [parent]: {
-          ...currentConfig[parent],
-          [fieldName]: value,
-        },
-      };
-    } else {
-      newConfig = {
-        ...currentConfig,
-        [fieldName]: value,
-      };
-    }
-
-    setCurrentConfig(newConfig);
-    setIsConfigChanged(!checkObjectForEqual(launcherConfig, newConfig));
-  }, [launcherConfig, currentConfig]);
-
-  const sendIncorrectPathErrorMessage = useCallback(() => {
-    dispatch(addMessages([CreateUserMessage.error('Выбран некорректный путь до папки. Подробности в файле лога.')])); //eslint-disable-line max-len
-  }, [dispatch]);
-
-  const onPathSelectorChange = useCallback((
-    value: string,
-    id: string,
-    validationData: IValidationData,
-    parent: string|undefined,
-  ) => {
-    let pathStr = value;
-
-    if (pathStr === '') {
-      if (parent) {
-        pathStr = currentConfig[parent][id];
-      } else {
-        pathStr = currentConfig[id];
-      }
-    }
-
-    changeCurrentConfig(
-      id,
-      pathStr,
-      parent,
-    );
-
-    setValidationErrors(getUniqueValidationErrors(
-      validationErrors,
-      validationData.errors,
-      validationData.isForAdd,
-    ));
-  }, [currentConfig, validationErrors, changeCurrentConfig]);
-
-  const onNumberInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    const errors = validateNumberInputs(target, currentConfig, validationErrors);
-    setValidationErrors(errors);
-
-    changeCurrentConfig(target.id, Math.round(+target.value), target.dataset.parent);
-  }, [currentConfig, changeCurrentConfig, validationErrors]);
-
-  const OnTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    changeCurrentConfig(target.id, target.value, target.dataset.parent);
-  }, [changeCurrentConfig]);
-
-  const onSwitcherChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    changeCurrentConfig(target.id, target.checked, target.dataset.parent);
-  }, [changeCurrentConfig]);
-
-  const onSelectChange = useCallback(({ target }: React.ChangeEvent<HTMLSelectElement>) => {
-    changeCurrentConfig(target.id, target.value, target.dataset.parent);
-  }, [changeCurrentConfig]);
-
-  const onCustomBtnDeleteClick = useCallback((id: string) => {
-    changeCurrentConfig('customButtons', currentConfig.customButtons
-      .filter((currentBtn) => currentBtn.id !== id));
-  }, [currentConfig, changeCurrentConfig]);
-
-  const onAddCustomBtnBtnClick = useCallback(() => {
-    const newButtons = [
-      ...currentConfig.customButtons,
-      {
-        path: `${PathVariableName.GAME_DIR}\\`,
-        action: LauncherButtonAction.OPEN,
-        id: getRandomId('custom-btn'),
-        label: 'Открыть папку',
-        args: [],
-      }];
-
-    changeCurrentConfig('customButtons', newButtons);
-  }, [currentConfig, changeCurrentConfig]);
-
-  const onCustomBtnChange = useCallback((
-    newBtnData: ILauncherCustomButton,
-    validationData: IValidationData,
-  ) => {
-    const newButtons = currentConfig.customButtons.map((currentBtn) => {
-      if (currentBtn.id === newBtnData.id) {
-        return newBtnData;
-      }
-
-      return currentBtn;
-    });
-
-    setValidationErrors(getUniqueValidationErrors(
-      validationErrors,
-      validationData.errors,
-      validationData.isForAdd,
-    ));
-
-    changeCurrentConfig('customButtons', newButtons);
-  }, [currentConfig, validationErrors, changeCurrentConfig]);
-
-  const changeArguments = useCallback((
-    newArgs: IButtonArg[],
-    parent: string,
-    validationData: IValidationData,
-  ) => {
-    setValidationErrors(getUniqueValidationErrors(
-      validationErrors,
-      validationData.errors,
-      validationData.isForAdd,
-    ));
-
-    changeCurrentConfig('args', newArgs, parent);
-  }, [validationErrors, changeCurrentConfig]);
-
-  const onSaveBtnClick = useCallback((
-    { currentTarget }: React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    const newConfig = { ...currentConfig, isFirstLaunch: false };
-
-    if (!getIsWindowSettingEqual(launcherConfig, currentConfig)) {
-      ipcRenderer.send(AppChannel.CHANGE_WINDOW_SETTINGS, {
-        isResizable: currentConfig.isResizable,
-        width: currentConfig.width,
-        height: currentConfig.height,
-        minWidth: currentConfig.minWidth,
-        maxWidth: currentConfig.maxWidth,
-        minHeight: currentConfig.minHeight,
-        maxHeight: currentConfig.maxHeight,
-      });
-    }
-
-    dispatch(saveLauncherConfig(
-      newConfig,
-      currentTarget.id === 'ok_btn',
-    ));
-
-    if (currentConfig.isFirstLaunch) {
-      setCurrentConfig(newConfig);
-    }
-
-    setIsConfigChanged(false);
-  }, [dispatch,
-    currentConfig,
-    launcherConfig]);
-
-  const resetConfigChanges = useCallback((event) => {
-    setIsConfigChanged(false);
-    setValidationErrors({});
-
-    if (currentConfig.isFirstLaunch) {
-      event.preventDefault();
-    } else {
-      setCurrentConfig(launcherConfig);
-    }
-  }, [launcherConfig, currentConfig.isFirstLaunch, setValidationErrors]);
-
-  const onResetBtnClick = useCallback((event) => {
-    resetConfigChanges(event);
-  }, [resetConfigChanges]);
-
-  const onCancelBtnClick = useCallback((event) => {
-    resetConfigChanges(event);
-    ipcRenderer.send(AppChannel.CLOSE_DEV_WINDOW);
-  }, [resetConfigChanges]);
-
-  const getNumberFieldMinValue = useCallback((id: string): number => {
-    if (id === 'width' || id === 'minWidth') {
-      return MinWindowSize.WIDTH;
-    } else if (id === 'height' || id === 'minHeight') {
-      return MinWindowSize.HEIGHT;
-    }
-
-    return 0;
+  const onCloseWindowBtnClick = useCallback(() => {
+    ipcRenderer.send(AppChannel.CLOSE_DEV_WINDOW, true);
   }, []);
-
-  const getNumberFieldIsDisabled = useCallback((
-    id: string,
-  ): boolean => !currentConfig.isResizable && (
-    id === 'minWidth'
-    || id === 'minHeight'
-    || id === 'maxWidth'
-    || id === 'maxHeight'
-  ), [currentConfig]);
 
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <React.Fragment>
-      <Header onClose={onCancelBtnClick} />
+      <Header
+        onClose={onCloseWindowBtnClick}
+        isCloseBtnDisabled={isFirstLaunch}
+      />
       <main className={classNames('main', styles['developer-screen__main'])}>
-        <form
-          className={styles['develover-screen__form']}
-        >
-          <div className={styles['develover-screen__controller']}>
-            <Button
-              id="ok_btn"
-              onClick={onSaveBtnClick}
-              className={classNames(
-                'main-btn',
-                'control-panel__btn',
-              )}
-              isDisabled={!isConfigChanged || Object.keys(validationErrors).length > 0}
-            >
-              ОК
-            </Button>
-            <Button
-              onClick={onCancelBtnClick}
-              className={classNames(
-                'main-btn',
-                'control-panel__btn',
-              )}
-            >
-              Отмена
-            </Button>
-            <Button
-              onClick={onSaveBtnClick}
-              className={classNames(
-                'main-btn',
-                'control-panel__btn',
-              )}
-              isDisabled={!isConfigChanged || Object.keys(validationErrors).length > 0}
-            >
-              Сохранить
-            </Button>
-            <Button
-              onClick={onResetBtnClick}
-              className={classNames(
-                'main-btn',
-                'control-panel__btn',
-              )}
-              isDisabled={!isConfigChanged}
-            >
-              Сбросить
-            </Button>
-          </div>
-          <Scrollbars
-            autoHeight
-            autoHide
-            autoHeightMax="100%"
-            hideTracksWhenNotNeeded
-            renderTrackVertical={(props): ReactElement => (
-              <div
-                {...props}
-                className="scrollbar__track"
-              />
-            )}
-            renderThumbVertical={(props): ReactElement => (
-              <div
-                {...props}
-                className="scrollbar__thumb"
-              />
-            )}
+        <nav>
+          <NavLink
+            className={classNames('button', 'main-btn', 'control-panel__btn')}
+            activeClassName="control-panel__btn--active"
+            to={Routes.DEVELOPER_SCREEN_CONFIG}
           >
-            <div className={styles['developer-screen__block']}>
-              <p className={styles['developer-screen__block-title']}>Настройки резмеров окна</p>
-              <Switcher
-                className={styles['developer-screen__item']}
-                id="isResizable"
-                label="Изменяемый размер окна?"
-                isChecked={currentConfig.isResizable}
-                onChange={onSwitcherChange}
-                description="Определяет, может ли пользователь изменять размеры окна программы"
-              />
-              {
-                appWindowFields.map((field) => (
-                  <NumberField
-                    key={field.id}
-                    className={styles['developer-screen__item']}
-                    id={field.id}
-                    value={currentConfig[field.id]}
-                    label={field.label}
-                    min={getNumberFieldMinValue(field.id)}
-                    isDisabled={getNumberFieldIsDisabled(field.id)}
-                    validationErrors={validationErrors[field.id]}
-                    description={field.description}
-                    onChange={onNumberInputChange}
-                  />
-                ))
-              }
-            </div>
-            <div className={styles['developer-screen__block']}>
-              <p className={styles['developer-screen__block-title']}>
-                Настройки путей и запуска программ
-              </p>
-              <TextField
-                className={styles['developer-screen__item']}
-                id="gameName"
-                value={currentConfig.gameName}
-                label="Заголовок окна программы"
-                description="Название игры или любой текст, который будет отображаться в заголовке окна программы"//eslint-disable-line max-len
-                onChange={OnTextFieldChange}
-              />
-              <PathSelector
-                className={styles['developer-screen__item']}
-                id="documentsPath"
-                label="Папка файлов игры в Documents"
-                value={currentConfig.documentsPath}
-                options={generateSelectOptions([PathVariableName.DOCUMENTS])}
-                pathVariables={pathVariables}
-                isGameDocuments={false}
-                description="Путь до папки игры в [User]/Documents. Укажите этот путь, если нужно управлять данными из файлов в этой папке через экран игровых настроек"//eslint-disable-line max-len
-                validationErrors={validationErrors.documentsPath}
-                onChange={onPathSelectorChange}
-              />
-              <p className={styles['developer-screen__text']}>Настройки запуска игры</p>
-              <TextField
-                className={styles['developer-screen__item']}
-                id="label"
-                parent="playButton"
-                value={currentConfig.playButton.label}
-                label="Заголовок кнопки запуска"
-                description="Текст, который будет отображаться на основной кнопке запуска игры"//eslint-disable-line max-len
-                validationErrors={validationErrors.label}
-                onChange={OnTextFieldChange}
-              />
-              <PathSelector
-                className={styles['developer-screen__item']}
-                id="path"
-                parent="playButton"
-                label="Исполняемый файл игры"
-                value={currentConfig.playButton.path}
-                options={generateSelectOptions([PathVariableName.GAME_DIR])}
-                pathVariables={pathVariables}
-                extensions={FileExtension.EXECUTABLE}
-                selectorType={LauncherButtonAction.RUN}
-                description="Путь до исполняемого файла игры, .exe или .lnk"//eslint-disable-line max-len
-                validationErrors={validationErrors.path}
-                onChange={onPathSelectorChange}
-              />
-              <ArgumentsBlock
-                className={styles['developer-screen__item']}
-                args={currentConfig.playButton.args!}
-                parent="playButton"
-                pathVariables={pathVariables}
-                description="Дополнительные агрументы запуска приложения"
-                validationErrors={validationErrors}
-                changeArguments={changeArguments}
-                onPathError={sendIncorrectPathErrorMessage}
-              />
-              <div className={styles['developer-screen__custom-btns']}>
-                <p className={styles['developer-screen__text']}>
-                  Кнопки запуска дополнительных программ
-                </p>
-                <ul className={styles['developer-screen__custom-btns-container']}>
-                  {
-                    currentConfig.customButtons.map((item) => (
-                      <CustomBtnItem
-                        key={item.id}
-                        item={item}
-                        pathVariables={pathVariables}
-                        validationErrors={validationErrors}
-                        onDeleteBtnClick={onCustomBtnDeleteClick}
-                        onChangeBtnData={onCustomBtnChange}
-                        onPathError={sendIncorrectPathErrorMessage}
-                      />
-                    ))
-                  }
-                </ul>
-                <Button
-                  className={classNames('main-btn', 'developer-screen__btn')}
-                  onClick={onAddCustomBtnBtnClick}
-                >
-                  Добавить кнопку
-                </Button>
-              </div>
-            </div>
-            <div className={styles['developer-screen__block']}>
-              <p className={styles['developer-screen__block-title']}>Настройки Mod Organizer</p>
-              <Switcher
-                className={styles['developer-screen__item']}
-                id="isUsed"
-                parent="modOrganizer"
-                label="Используется ли MO?"
-                isChecked={currentConfig.modOrganizer.isUsed}
-                description="Определяет, используется ли в игре\сборке Mod Organizer"//eslint-disable-line max-len
-                onChange={onSwitcherChange}
-              />
-              <Select
-                className={styles['developer-screen__item']}
-                id="version"
-                parent="modOrganizer"
-                label="Версия MO"
-                optionsArr={[
-                  { label: 'Mod Organizer', value: '1' },
-                  { label: 'Mod Organizer 2', value: '2' },
-                ]}
-                value={currentConfig.modOrganizer.version.toString()}
-                isDisabled={!currentConfig.modOrganizer.isUsed}
-                description="Задает версию использемого Mod Organizer"
-                onChange={onSelectChange}
-              />
-              <PathSelector
-                className={styles['developer-screen__item']}
-                id="pathToMOFolder"
-                label="Путь до папки MO"
-                parent="modOrganizer"
-                value={currentConfig.modOrganizer.pathToMOFolder}
-                options={generateSelectOptions([PathVariableName.GAME_DIR])}
-                pathVariables={pathVariables}
-                isDisabled={!currentConfig.modOrganizer.isUsed}
-                description="Задает путь до основной папки Mod Organizer."
-                validationErrors={validationErrors.pathToMOFolder}
-                onChange={onPathSelectorChange}
-              />
-              <PathSelector
-                className={styles['developer-screen__item']}
-                id="pathToMods"
-                label="Путь до папки модов MO"
-                parent="modOrganizer"
-                value={currentConfig.modOrganizer.pathToMods}
-                options={generateSelectOptions([PathVariableName.MO_DIR])}
-                pathVariables={pathVariables}
-                isDisabled={!currentConfig.modOrganizer.isUsed}
-                description="Задает путь до папки модов Mod Organizer. Если вы не меняли этот путь в МО, оставьте значение без изменений"//eslint-disable-line max-len
-                validationErrors={validationErrors.pathToMods}
-                onChange={onPathSelectorChange}
-              />
-              <PathSelector
-                className={styles['developer-screen__item']}
-                id="pathToProfiles"
-                label="Путь до папки профилей MO"
-                parent="modOrganizer"
-                value={currentConfig.modOrganizer.pathToProfiles}
-                options={generateSelectOptions([PathVariableName.MO_DIR])}
-                pathVariables={pathVariables}
-                isDisabled={!currentConfig.modOrganizer.isUsed}
-                description="Задает путь до папки профилей Mod Organizer. Если вы не меняли этот путь в МО, оставьте значение без изменений"//eslint-disable-line max-len
-                validationErrors={validationErrors.pathToProfiles}
-                onChange={onPathSelectorChange}
-              />
-              <PathSelector
-                className={styles['developer-screen__item']}
-                id="pathToINI"
-                label="Путь до конфигурационного файла MO"
-                parent="modOrganizer"
-                value={currentConfig.modOrganizer.pathToINI}
-                options={generateSelectOptions([PathVariableName.MO_DIR])}
-                pathVariables={pathVariables}
-                selectorType={LauncherButtonAction.RUN}
-                extensions={FileExtension.INI}
-                isDisabled={!currentConfig.modOrganizer.isUsed}
-                description="Задает путь до конфигурационного файла Mod Organizer (ModOrganizer.ini)"//eslint-disable-line max-len
-                validationErrors={validationErrors.pathToINI}
-                onChange={onPathSelectorChange}
-              />
-            </div>
-          </Scrollbars>
-        </form>
+            <span className="control-panel__btn-text">
+              Конфигурация
+            </span>
+          </NavLink>
+          <NavLink
+            className={classNames('button', 'main-btn', 'control-panel__btn')}
+            activeClassName="control-panel__btn--active"
+            to={Routes.DEVELOPER_SCREEN_GAME_SETTINGS}
+          >
+            <span className="control-panel__btn-text">
+              Игровые настройки
+            </span>
+          </NavLink>
+        </nav>
+        <Switch>
+          <Route
+            exact
+            path={Routes.DEVELOPER_SCREEN_CONFIG}
+            component={DeveloperScreenConfig}
+          />
+          <Route
+            exact
+            path={Routes.DEVELOPER_SCREEN_GAME_SETTINGS}
+            component={DeveloperScreenGameSettings}
+          />
+          <Redirect to={Routes.DEVELOPER_SCREEN_CONFIG} />
+        </Switch>
         {
-        isGameSettingsSaving
-        && <Loader />
-      }
+          isGameSettingsSaving && <Loader />
+        }
       </main>
     </React.Fragment>
   );

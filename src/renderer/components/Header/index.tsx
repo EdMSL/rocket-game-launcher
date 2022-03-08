@@ -13,11 +13,13 @@ const launcherIcon = require('$images/icon.png');
 
 // передача функции openAppInfo в компонент означает, что окно с этим компонентом является главным
 interface IProps {
+  isCloseBtnDisabled?: boolean,
   onClose: (event) => void,
   openAppInfo?: () => void,
 }
 
 export const Header: React.FunctionComponent<IProps> = ({
+  isCloseBtnDisabled = false,
   onClose,
   openAppInfo = null,
 }) => {
@@ -111,6 +113,7 @@ export const Header: React.FunctionComponent<IProps> = ({
           <Button
             className={classNames(styles.header__btn, styles['header__btn--close'])}
             onClick={onCloseWindowBtnClick}
+            isDisabled={isCloseBtnDisabled}
           >
             <span className={styles['header__btn-text']}>Close</span>
           </Button>

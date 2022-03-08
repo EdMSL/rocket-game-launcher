@@ -106,7 +106,8 @@ export const addDevWindowListeners = (
     devWindow.webContents.send(AppChannel.MAX_UNMAX_WINDOW, devWindow.isMaximized());
   });
 
-  ipcMain.on(AppChannel.CLOSE_DEV_WINDOW, () => {
+  ipcMain.on(AppChannel.CLOSE_DEV_WINDOW, (event, isByCloseWindowBtnClick = false) => {
+    devWindow.webContents.send(AppChannel.DEV_WINDOW_CLOSED, isByCloseWindowBtnClick);
     mainWindow.webContents.send(AppChannel.DEV_WINDOW_CLOSED);
     devWindow.hide();
   });

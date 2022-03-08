@@ -81,8 +81,7 @@ export const App = (): JSX.Element => {
         />
       </Switch>
       {
-        !pathname.includes(Routes.DEVELOPER_SCREEN)
-          && <Messages />
+        !pathname.includes(Routes.DEVELOPER_SCREEN) && <Messages />
       }
       {
         isOpenAppInfo && (
