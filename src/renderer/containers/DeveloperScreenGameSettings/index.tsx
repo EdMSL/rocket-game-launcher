@@ -7,10 +7,17 @@ import styles from './styles.module.scss';
 import { DeveloperScreenController } from '$components/DeveloperScreenController';
 import { IValidationErrors } from '$types/common';
 import { useAppSelector } from '$store/store';
+import { IGameSettingsRootState } from '$types/gameSettings';
 
 export const DeveloperScreenGameSettings: React.FC = () => {
+  const settingsFiles = useAppSelector((state) => state.gameSettings.gameSettingsFiles);
+  const settingsGroups = useAppSelector((state) => state.gameSettings.gameSettingsGroups);
+  const baseFilesEncoding = useAppSelector((state) => state.gameSettings.baseFilesEncoding);
   const isFirstLaunch = useAppSelector((state) => state.main.config.isFirstLaunch);
-  // const [currentConfig, setCurrentConfig] = useState<IMainRootState['config']>(launcherConfig);
+
+  const [currentSettingsFiles, setCurrentSettingsFiles] = useState<IGameSettingsRootState['gameSettingsFiles']>(settingsFiles);//eslint-disable-line max-len
+  const [currentSettingsGroups, setCurrentSettingsGroups] = useState<IGameSettingsRootState['gameSettingsGroups']>(settingsGroups);//eslint-disable-line max-len
+  const [currentBaseFilesEncoding, setCurrentBaseFilesEncoding] = useState<IGameSettingsRootState['baseFilesEncoding']>(baseFilesEncoding);//eslint-disable-line max-len
   const [validationErrors, setValidationErrors] = useState<IValidationErrors>({});
   const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
 
@@ -49,7 +56,9 @@ export const DeveloperScreenGameSettings: React.FC = () => {
           />
         )}
       >
-        <div className={styles['developer-screen_game-settings']}>Data here</div>
+        <div className={styles['developer-screen_game-settings']}>
+          <div className="developer-screen__block">Data here</div>
+        </div>
       </Scrollbars>
     </form>
   );

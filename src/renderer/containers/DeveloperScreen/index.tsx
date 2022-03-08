@@ -34,7 +34,7 @@ export const DeveloperScreen: React.FC = () => {
         isCloseBtnDisabled={isFirstLaunch}
       />
       <main className={classNames('main', styles['developer-screen__main'])}>
-        <nav>
+        <nav className={styles['developer-screen__navigation']}>
           <NavLink
             className={classNames('button', 'main-btn', 'control-panel__btn')}
             activeClassName="control-panel__btn--active"

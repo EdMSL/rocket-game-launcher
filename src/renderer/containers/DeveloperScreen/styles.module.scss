@@ -1,3 +1,11 @@
+.developer-screen__navigation {
+  display: flex;
+
+  & .control-panel__btn {
+    flex-grow: 1;
+  }
+}
+
 .develover-screen__form {
   flex-grow: 1;
   display: flex;
@@ -6,4 +14,19 @@
   height: 100%;
   padding: 0 10px 10px;
   overflow: hidden;
+}
+
+.developer-screen__block {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  padding-bottom: 20px;
+
+  border-bottom: 1px solid var(--text-main);
+
+  &:last-child {
+    margin-bottom: 0;
+
+    border-bottom-width: 0;
+  }
 }

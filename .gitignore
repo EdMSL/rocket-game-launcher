@@ -10,6 +10,7 @@ Thumbs.db
 
 # Файлы редактора
 .idea
+.vscode
 
 # Вспомогательные файлы
 node_modules/

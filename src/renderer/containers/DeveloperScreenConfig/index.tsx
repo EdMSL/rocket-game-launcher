@@ -295,7 +295,7 @@ export const DeveloperScreenConfig: React.FC = () => {
           />
         )}
       >
-        <div className={styles['developer-screen__block']}>
+        <div className="developer-screen__block">
           <p className={styles['developer-screen__block-title']}>Настройки резмеров окна</p>
           <Switcher
             className={styles['developer-screen__item']}
@@ -322,7 +322,7 @@ export const DeveloperScreenConfig: React.FC = () => {
           ))
         }
         </div>
-        <div className={styles['developer-screen__block']}>
+        <div className="developer-screen__block">
           <p className={styles['developer-screen__block-title']}>
             Настройки путей и запуска программ
           </p>
@@ -408,7 +408,7 @@ export const DeveloperScreenConfig: React.FC = () => {
             </Button>
           </div>
         </div>
-        <div className={styles['developer-screen__block']}>
+        <div className="developer-screen__block">
           <p className={styles['developer-screen__block-title']}>Настройки Mod Organizer</p>
           <Switcher
             className={styles['developer-screen__item']}
