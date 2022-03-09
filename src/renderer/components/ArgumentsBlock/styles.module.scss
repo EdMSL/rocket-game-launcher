@@ -47,11 +47,13 @@
 }
 
 .developer-screen__args-delete-btn {
-  width: 20px;
-  height: 20px;
-  margin-left: 14px;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
 
   vertical-align: sub;
+
+  background-color: var(--btn-color);
   /* stylelint-disable string-no-newline, max-line-length */
   background-image:
     url(
@@ -64,6 +66,10 @@
   background-repeat: no-repeat;
   background-position: center;
   /* stylelint-enable string-no-newline, max-line-length */
+
+  &:hover {
+    background-color: var(--hover-color);
+  }
 
   &:focus {
     @include focus;

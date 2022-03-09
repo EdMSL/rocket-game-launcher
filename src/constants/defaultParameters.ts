@@ -44,8 +44,8 @@ export const defaultLauncherWindowSettings: IWindowSettings = {
 };
 
 export const defaultDevWindowResolution = {
-  width: 1024,
-  height: 768,
+  width: 1100,
+  height: 700,
   minWidth: 800,
   minHeight: 600,
   maxWidth: 0,
