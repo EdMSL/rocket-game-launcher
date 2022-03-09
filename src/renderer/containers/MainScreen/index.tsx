@@ -11,7 +11,7 @@ import { Routes } from '$constants/routes';
 import { runApplication, openFolder } from '$utils/process';
 import { Button } from '$components/UI/Button';
 import {
-  setIsGameRunning, addMessages, setIsDevWindowOpen,
+  setIsGameRunning, addMessages, setIsDevWindowOpen, setIsDevWindowOpening,
 } from '$actions/main';
 import { useAppSelector } from '$store/store';
 import { CreateUserMessage } from '$utils/message';
@@ -28,6 +28,7 @@ export const MainScreen: React.FC = () => {
   const customButtons = useAppSelector((state) => state.main.config.customButtons);
   const isGameRunning = useAppSelector((state) => state.main.isGameRunning);
   const pathVariables = useAppSelector((state) => state.main.pathVariables);
+  const isDevWindowOpening = useAppSelector((state) => state.main.isDevWindowOpening);
   const isDevWindowOpen = useAppSelector((state) => state.main.isDevWindowOpen);
   const userThemes = useAppSelector((state) => state.main.userThemes);
   const userTheme = useAppSelector((state) => state.userSettings.theme);
@@ -39,7 +40,6 @@ export const MainScreen: React.FC = () => {
   const dispatch = useDispatch();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isDevWindowOpening, setIsDevWinwodOpening] = useState<boolean>(false);
 
   useEffect(() => {
     ipcRenderer.on(AppChannel.DEV_WINDOW_CLOSED, () => {
@@ -47,7 +47,8 @@ export const MainScreen: React.FC = () => {
     });
 
     ipcRenderer.on(AppChannel.DEV_WINDOW_OPENED, () => {
-      setIsDevWinwodOpening(false);
+      dispatch(setIsDevWindowOpening(false));
+      dispatch(setIsDevWindowOpen(true));
     });
 
     return (): void => { ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED); };
@@ -108,8 +109,7 @@ export const MainScreen: React.FC = () => {
 
   const onDeveloperScreenBtnClick = useCallback(() => {
     ipcRenderer.send(AppChannel.OPEN_DEV_WINDOW);
-    dispatch(setIsDevWindowOpen(true));
-    setIsDevWinwodOpening(true);
+    dispatch(setIsDevWindowOpening(true));
   }, [dispatch]);
 
   const getBtnArgs = useCallback((

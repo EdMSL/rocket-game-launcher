@@ -179,6 +179,7 @@ export const createStorage = (): Store<IAppState> => {
           ...configurationData.playButton,
         },
       },
+      isDevWindowOpening: configurationData.isFirstLaunch,
       launcherVersion: app.getVersion(),
       pathVariables,
       userThemes,

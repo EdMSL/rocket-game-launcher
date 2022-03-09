@@ -75,6 +75,13 @@ export const setIsGameSettingsAvailable = (
   payload: isGameSettingsAvailable,
 });
 
+export const setIsDevWindowOpening = (
+  isDevWindowOpening: IMainRootState['isDevWindowOpening'],
+) => ({
+  type: MAIN_TYPES.SET_IS_DEV_WINDOW_OPENING,
+  payload: isDevWindowOpening,
+});
+
 export const setIsDevWindowOpen = (
   isDevWindowOpen: IMainRootState['isDevWindowOpen'],
 ) => ({

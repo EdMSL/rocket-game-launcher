@@ -471,6 +471,9 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
 
     if (isFirstLaunch) {
       yield take(MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED);
+
+      // Здесь должен быть action на setDevWindowOpening, перенесен в storage основного процесса
+      // чтобы убрать эффект мигания окна
       ipcRenderer.send(AppChannel.OPEN_DEV_WINDOW);
     }
   }
