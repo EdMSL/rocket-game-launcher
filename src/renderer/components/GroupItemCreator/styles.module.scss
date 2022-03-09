@@ -1,0 +1,93 @@
+.group-item-creator__container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.group-item-creator__labels-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.group-item-creator__label {
+  margin-right: 10px;
+}
+
+.group-item-creator__input-block {
+  position: relative;
+
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  max-width: 50%;
+}
+
+.group-item-creator__input {
+  width: 100%;
+  padding: 12px 44px 12px 4px;
+
+  font-size: var(--text-size-input);
+
+  border: none;
+
+  &:first-child {
+    margin-bottom: 4px;
+  }
+
+  &:focus {
+    @include focus;
+  }
+
+  &:disabled {
+    background-color: var(--disabled-color);
+  }
+
+  &--error,
+  &--error:disabled {
+    background-color: var(--error-color);
+  }
+}
+
+.group-item-creator__input-btn {
+  position: absolute;
+  right: 0;
+
+  width: 40px;
+  height: 100%;
+
+  font-size: 0;
+
+  vertical-align: sub;
+
+  background-color: var(--btn-color);
+  /* stylelint-disable string-no-newline, max-line-length */
+  background-image:
+    url(
+      'data:image/svg+xml,\
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgb(230, 230, 230)">\
+        <path d="M0 0h24v24H0z" fill="none"/>\
+        <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>\
+      </svg>'
+    );
+
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 24px 24px;
+  /* stylelint-enable string-no-newline, max-line-length */
+
+  &:focus {
+    @include focus;
+  }
+
+  &:hover {
+    background-color: var(--hover-color);
+  }
+
+  &:disabled {
+    background-color: var(--disabled-color);
+  }
+
+  &:disabled:hover {
+    background-color: var(--disabled-color);
+  }
+}

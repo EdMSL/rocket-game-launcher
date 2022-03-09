@@ -154,7 +154,7 @@ export const checkConfigFileData = (configObj: ILauncherConfig): ILauncherConfig
 const settingsMainSchema = Joi.object<IGameSettingsConfig>({
   gameSettingsGroups: Joi.array()
     .items(Joi.object({
-      name: Joi.string().required(),
+      name: Joi.string().required().alphanum(),
       label: Joi.string().optional().default(Joi.ref('name')),
     })).optional().default([])
     .unique((a, b) => a.name === b.name),

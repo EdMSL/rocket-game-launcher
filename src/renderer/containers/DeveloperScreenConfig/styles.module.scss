@@ -3,36 +3,6 @@
   width: 200px;
 }
 
-.developer-screen__block-title {
-  @include reset-indents;
-  margin-bottom: 10px;
-
-  font-size: 16px;
-  font-weight: 700;
-  text-align: center;
-}
-
-.developer-screen__text {
-  @include reset-indents;
-  margin-bottom: 10px;
-
-  text-align: center;
-}
-
-.developer-screen__item {
-  margin-right: 10px;
-  margin-bottom: 10px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  &:nth-last-of-type(-n+2) .hint__block {
-    top: auto;
-    bottom: 0;
-  }
-}
-
 .developer-screen__custom-item {
   display: flex;
   justify-content: space-between;

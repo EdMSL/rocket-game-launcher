@@ -38,7 +38,7 @@ import {
   IMainRootState,
 } from '$types/main';
 import {
-  generateSelectOptions, getUniqueValidationErrors,
+  generateSelectOptions, getNewConfig, getUniqueValidationErrors,
 } from '$utils/data';
 import { ArgumentsBlock } from '$components/ArgumentsBlock';
 import {
@@ -118,22 +118,7 @@ export const DeveloperScreenConfig: React.FC = () => {
   }, [resetConfigChanges]);
 
   const changeCurrentConfig = useCallback((fieldName: string, value, parent?: string|undefined) => {
-    let newConfig: ILauncherConfig;
-
-    if (parent) {
-      newConfig = {
-        ...currentConfig,
-        [parent]: {
-          ...currentConfig[parent],
-          [fieldName]: value,
-        },
-      };
-    } else {
-      newConfig = {
-        ...currentConfig,
-        [fieldName]: value,
-      };
-    }
+    const newConfig = getNewConfig(currentConfig, value, fieldName, parent);
 
     setCurrentConfig(newConfig);
     setIsConfigChanged(!checkObjectForEqual(launcherConfig, newConfig));
@@ -296,9 +281,9 @@ export const DeveloperScreenConfig: React.FC = () => {
         )}
       >
         <div className="developer-screen__block">
-          <p className={styles['developer-screen__block-title']}>Настройки резмеров окна</p>
+          <p className="developer-screen__block-title">Настройки резмеров окна</p>
           <Switcher
-            className={styles['developer-screen__item']}
+            className="developer-screen__item"
             id="isResizable"
             label="Изменяемый размер окна?"
             isChecked={currentConfig.isResizable}
@@ -306,28 +291,28 @@ export const DeveloperScreenConfig: React.FC = () => {
             description="Определяет, может ли пользователь изменять размеры окна программы"
           />
           {
-          appWindowFields.map((field) => (
-            <NumberField
-              key={field.id}
-              className={styles['developer-screen__item']}
-              id={field.id}
-              value={currentConfig[field.id]}
-              label={field.label}
-              min={getNumberFieldMinValue(field.id)}
-              isDisabled={getNumberFieldIsDisabled(field.id)}
-              validationErrors={validationErrors[field.id]}
-              description={field.description}
-              onChange={onNumberInputChange}
-            />
-          ))
-        }
+            appWindowFields.map((field) => (
+              <NumberField
+                key={field.id}
+                className="developer-screen__item"
+                id={field.id}
+                value={currentConfig[field.id]}
+                label={field.label}
+                min={getNumberFieldMinValue(field.id)}
+                isDisabled={getNumberFieldIsDisabled(field.id)}
+                validationErrors={validationErrors[field.id]}
+                description={field.description}
+                onChange={onNumberInputChange}
+              />
+            ))
+          }
         </div>
         <div className="developer-screen__block">
-          <p className={styles['developer-screen__block-title']}>
+          <p className="developer-screen__block-title">
             Настройки путей и запуска программ
           </p>
           <TextField
-            className={styles['developer-screen__item']}
+            className="developer-screen__item"
             id="gameName"
             value={currentConfig.gameName}
             label="Заголовок окна программы"
@@ -335,7 +320,7 @@ export const DeveloperScreenConfig: React.FC = () => {
             onChange={OnTextFieldChange}
           />
           <PathSelector
-            className={styles['developer-screen__item']}
+            className="developer-screen__item"
             id="documentsPath"
             label="Папка файлов игры в Documents"
             value={currentConfig.documentsPath}
@@ -346,9 +331,9 @@ export const DeveloperScreenConfig: React.FC = () => {
             validationErrors={validationErrors.documentsPath}
             onChange={onPathSelectorChange}
           />
-          <p className={styles['developer-screen__text']}>Настройки запуска игры</p>
+          <p className="developer-screen__text">Настройки запуска игры</p>
           <TextField
-            className={styles['developer-screen__item']}
+            className="developer-screen__item"
             id="label"
             parent="playButton"
             value={currentConfig.playButton.label}
@@ -358,7 +343,7 @@ export const DeveloperScreenConfig: React.FC = () => {
             onChange={OnTextFieldChange}
           />
           <PathSelector
-            className={styles['developer-screen__item']}
+            className="developer-screen__item"
             id="path"
             parent="playButton"
             label="Исполняемый файл игры"
@@ -372,7 +357,7 @@ export const DeveloperScreenConfig: React.FC = () => {
             onChange={onPathSelectorChange}
           />
           <ArgumentsBlock
-            className={styles['developer-screen__item']}
+            className="developer-screen__item"
             args={currentConfig.playButton.args!}
             parent="playButton"
             pathVariables={pathVariables}
@@ -382,7 +367,7 @@ export const DeveloperScreenConfig: React.FC = () => {
             onPathError={sendIncorrectPathErrorMessage}
           />
           <div className={styles['developer-screen__custom-btns']}>
-            <p className={styles['developer-screen__text']}>
+            <p className="developer-screen__text">
               Кнопки запуска дополнительных программ
             </p>
             <ul className={styles['developer-screen__custom-btns-container']}>
@@ -409,9 +394,9 @@ export const DeveloperScreenConfig: React.FC = () => {
           </div>
         </div>
         <div className="developer-screen__block">
-          <p className={styles['developer-screen__block-title']}>Настройки Mod Organizer</p>
+          <p className="developer-screen__block-title">Настройки Mod Organizer</p>
           <Switcher
-            className={styles['developer-screen__item']}
+            className="developer-screen__item"
             id="isUsed"
             parent="modOrganizer"
             label="Используется ли MO?"
@@ -420,7 +405,7 @@ export const DeveloperScreenConfig: React.FC = () => {
             onChange={onSwitcherChange}
           />
           <Select
-            className={styles['developer-screen__item']}
+            className="developer-screen__item"
             id="version"
             parent="modOrganizer"
             label="Версия MO"
@@ -434,7 +419,7 @@ export const DeveloperScreenConfig: React.FC = () => {
             onChange={onSelectChange}
           />
           <PathSelector
-            className={styles['developer-screen__item']}
+            className="developer-screen__item"
             id="pathToMOFolder"
             label="Путь до папки MO"
             parent="modOrganizer"
@@ -447,7 +432,7 @@ export const DeveloperScreenConfig: React.FC = () => {
             onChange={onPathSelectorChange}
           />
           <PathSelector
-            className={styles['developer-screen__item']}
+            className="developer-screen__item"
             id="pathToMods"
             label="Путь до папки модов MO"
             parent="modOrganizer"
@@ -460,7 +445,7 @@ export const DeveloperScreenConfig: React.FC = () => {
             onChange={onPathSelectorChange}
           />
           <PathSelector
-            className={styles['developer-screen__item']}
+            className="developer-screen__item"
             id="pathToProfiles"
             label="Путь до папки профилей MO"
             parent="modOrganizer"
@@ -473,7 +458,7 @@ export const DeveloperScreenConfig: React.FC = () => {
             onChange={onPathSelectorChange}
           />
           <PathSelector
-            className={styles['developer-screen__item']}
+            className="developer-screen__item"
             id="pathToINI"
             label="Путь до конфигурационного файла MO"
             parent="modOrganizer"

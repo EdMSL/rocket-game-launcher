@@ -514,6 +514,35 @@ export const getUserThemes = (themesFolders: string[]): { [key: string]: string,
 };
 
 /**
+ * Получить новый объект конфигурации с изменным значением заданного поля.
+ * @param currentConfig Конфиг, на основе которого создаем новый.
+ * @param value Новое значение поля объекта.
+ * @param fieldName Имя изменяемого поля объекта.
+ * @param parent Имя родительского поля объекта, в котором располагается `fieldName`.
+ * @returns Новый объект конфигурации.
+*/
+export const getNewConfig = <U, T>(
+  currentConfig: U,
+  value: T,
+  fieldName: string,
+  parent?: string,
+): U => {
+  if (parent) {
+    return {
+      ...currentConfig,
+      [parent]: {
+        ...currentConfig[parent],
+        [fieldName]: value,
+      },
+    };
+  }
+  return {
+    ...currentConfig,
+    [fieldName]: value,
+  };
+};
+
+/**
  * Получить параметры Mod Organizer c учетом данных из config.json.
  * @param data Данные из секции modOrganizer файла config.json.
  * @returns Объект с данными Mod Organizer.
