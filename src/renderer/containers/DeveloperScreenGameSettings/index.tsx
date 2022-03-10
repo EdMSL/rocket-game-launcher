@@ -15,6 +15,7 @@ import { GroupItemCreator } from '$components/GroupItemCreator';
 import { checkObjectForEqual } from '$utils/check';
 import { saveGameSettingsConfig } from '$actions/main';
 import { AppChannel } from '$constants/misc';
+import { TextField } from '$components/UI/TextField';
 
 export const DeveloperScreenGameSettings: React.FC = () => {
   const gameSettingsFiles = useAppSelector((state) => state.gameSettings.gameSettingsFiles);
@@ -92,6 +93,12 @@ export const DeveloperScreenGameSettings: React.FC = () => {
     setValidationErrors(errors);
   }, []);
 
+  const onTextFieldChange = useCallback((
+    { target }: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    changeCurrentConfig(target.value, target.id);
+  }, [changeCurrentConfig]);
+
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <form
@@ -143,6 +150,17 @@ export const DeveloperScreenGameSettings: React.FC = () => {
               </div>
             ))
           }
+        </div>
+        <div className="developer-screen__block">
+          <p className="developer-screen__block-title">Кодировка файлов настроек</p>
+          <TextField
+            className="developer-screen__item"
+            id="baseFilesEncoding"
+            label="Кодировка"
+            value={currentSettingsConfig.baseFilesEncoding}
+            description="Кодировка, которая будет по умолчанию применяться при чтении данных из файлов игровых настроек." //eslint-disable-line max-len
+            onChange={onTextFieldChange}
+          />
         </div>
       </Scrollbars>
     </form>
