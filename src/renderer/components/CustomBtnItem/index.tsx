@@ -10,7 +10,7 @@ import {
   PathVariableName,
   LauncherButtonAction,
 } from '$constants/misc';
-import { generateSelectOptions } from '$utils/data';
+import { generateSelectOptions, getUniqueValidationErrors } from '$utils/data';
 import { Button } from '$components/UI/Button';
 import { IPathVariables } from '$constants/paths';
 import { ArgumentsBlock } from '$components/ArgumentsBlock';
@@ -25,11 +25,8 @@ interface IProps {
   pathVariables: IPathVariables,
   validationErrors: IValidationErrors,
   onDeleteBtnClick: (id: string) => void,
-  onChangeBtnData: (
-    newBtnData: ILauncherCustomButton,
-    validationData: IValidationData,
-  ) => void,
-  onPathError: () => void,
+  onChangeBtnData: (newBtnData: ILauncherCustomButton) => void,
+  onValidationError: (errors: IValidationErrors) => void,
 }
 
 export const CustomBtnItem: React.FC<IProps> = ({
@@ -38,7 +35,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
   pathVariables,
   onChangeBtnData,
   onDeleteBtnClick,
-  onPathError,
+  onValidationError,
 }) => {
   const onCheckboxChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     const newSelectorType = target.checked ? LauncherButtonAction.RUN : LauncherButtonAction.OPEN;
@@ -47,12 +44,17 @@ export const CustomBtnItem: React.FC<IProps> = ({
     onChangeBtnData({
       ...item,
       action: newSelectorType,
-    },
-    { errors: { [`item-path_${item.id}`]: ['incorrect path'] }, isForAdd: !isPathCorrect });
-  }, [item, onChangeBtnData]);
+    });
+
+    onValidationError(getUniqueValidationErrors(
+      validationErrors,
+      { [`item-path_${item.id}`]: ['incorrect path'] },
+      !isPathCorrect,
+    ));
+  }, [item, validationErrors, onValidationError, onChangeBtnData]);
 
   const OnTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    onChangeBtnData({ ...item, label: target.value }, { errors: {}, isForAdd: false });
+    onChangeBtnData({ ...item, label: target.value });
   }, [item, onChangeBtnData]);
 
   const onPathSelectorChange = useCallback((
@@ -61,9 +63,15 @@ export const CustomBtnItem: React.FC<IProps> = ({
     validationData: IValidationData,
   ) => {
     if (value) {
-      onChangeBtnData({ ...item, path: value }, validationData);
+      onChangeBtnData({ ...item, path: value });
+
+      onValidationError(getUniqueValidationErrors(
+        validationErrors,
+        validationData.errors,
+        validationData.isForAdd,
+      ));
     }
-  }, [item, onChangeBtnData]);
+  }, [item, validationErrors, onValidationError, onChangeBtnData]);
 
   const onDeleteCustomBtnBtnClick = useCallback(() => {
     onDeleteBtnClick(item.id);
@@ -71,10 +79,8 @@ export const CustomBtnItem: React.FC<IProps> = ({
 
   const onChangeArguments = useCallback((
     newArgs: IButtonArg[],
-    parent: string,
-    validationData: IValidationData,
   ) => {
-    onChangeBtnData({ ...item, args: newArgs }, validationData);
+    onChangeBtnData({ ...item, args: newArgs });
   }, [item, onChangeBtnData]);
 
   return (
@@ -116,7 +122,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         description="Дополнительные агрументы запуска"
         validationErrors={validationErrors}
         changeArguments={onChangeArguments}
-        onPathError={onPathError}
+        onValidationError={onValidationError}
       />
       <Button
         className={classNames('button', 'main-btn')}

@@ -102,6 +102,10 @@ export const DeveloperScreenConfig: React.FC = () => {
     return (): void => { ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED); };
   }, [launcherConfig.isFirstLaunch, saveConfigChanges, resetConfigChanges]);
 
+  const setNewValidationErrors = useCallback((errors: IValidationErrors) => {
+    setValidationErrors(errors);
+  }, []);
+
   const onSaveBtnClick = useCallback((
     { currentTarget }: React.MouseEvent<HTMLButtonElement>,
   ) => {
@@ -123,10 +127,6 @@ export const DeveloperScreenConfig: React.FC = () => {
     setCurrentConfig(newConfig);
     setIsConfigChanged(!checkObjectForEqual(launcherConfig, newConfig));
   }, [launcherConfig, currentConfig, setIsConfigChanged]);
-
-  const sendIncorrectPathErrorMessage = useCallback(() => {
-    dispatch(addMessages([CreateUserMessage.error('Выбран некорректный путь до папки. Подробности в файле лога.')])); //eslint-disable-line max-len
-  }, [dispatch]);
 
   const onPathSelectorChange = useCallback((
     value: string,
@@ -197,7 +197,6 @@ export const DeveloperScreenConfig: React.FC = () => {
 
   const onCustomBtnChange = useCallback((
     newBtnData: ILauncherCustomButton,
-    validationData: IValidationData,
   ) => {
     const newButtons = currentConfig.customButtons.map((currentBtn) => {
       if (currentBtn.id === newBtnData.id) {
@@ -207,28 +206,15 @@ export const DeveloperScreenConfig: React.FC = () => {
       return currentBtn;
     });
 
-    setValidationErrors(getUniqueValidationErrors(
-      validationErrors,
-      validationData.errors,
-      validationData.isForAdd,
-    ));
-
     changeCurrentConfig('customButtons', newButtons);
-  }, [currentConfig, validationErrors, changeCurrentConfig]);
+  }, [currentConfig, changeCurrentConfig]);
 
   const changeArguments = useCallback((
     newArgs: IButtonArg[],
     parent: string,
-    validationData: IValidationData,
   ) => {
-    setValidationErrors(getUniqueValidationErrors(
-      validationErrors,
-      validationData.errors,
-      validationData.isForAdd,
-    ));
-
     changeCurrentConfig('args', newArgs, parent);
-  }, [validationErrors, changeCurrentConfig]);
+  }, [changeCurrentConfig]);
 
   const getNumberFieldMinValue = useCallback((id: string): number => {
     if (id === 'width' || id === 'minWidth') {
@@ -364,7 +350,7 @@ export const DeveloperScreenConfig: React.FC = () => {
             description="Дополнительные агрументы запуска приложения"
             validationErrors={validationErrors}
             changeArguments={changeArguments}
-            onPathError={sendIncorrectPathErrorMessage}
+            onValidationError={setNewValidationErrors}
           />
           <div className={styles['developer-screen__custom-btns']}>
             <p className="developer-screen__text">
@@ -380,7 +366,7 @@ export const DeveloperScreenConfig: React.FC = () => {
                   validationErrors={validationErrors}
                   onDeleteBtnClick={onCustomBtnDeleteClick}
                   onChangeBtnData={onCustomBtnChange}
-                  onPathError={sendIncorrectPathErrorMessage}
+                  onValidationError={setNewValidationErrors}
                 />
               ))
                   }

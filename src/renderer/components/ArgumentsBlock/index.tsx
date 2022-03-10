@@ -7,7 +7,7 @@ import {
 } from '$constants/misc';
 import { PathSelector } from '$components/UI/PathSelector';
 import { IPathVariables } from '$constants/paths';
-import { generateSelectOptions } from '$utils/data';
+import { generateSelectOptions, getUniqueValidationErrors } from '$utils/data';
 import { Button } from '$components/UI/Button';
 import { TextField } from '$components/UI/TextField';
 import { HintItem } from '$components/HintItem';
@@ -23,8 +23,8 @@ interface IProps {
   pathVariables: IPathVariables,
   description?: string,
   validationErrors: IValidationErrors,
-  changeArguments: (newArgs: IButtonArg[], parent: string, validationData: IValidationData) => void,
-  onPathError: () => void,
+  changeArguments: (newArgs: IButtonArg[], parent: string) => void,
+  onValidationError: (errors: IValidationErrors) => void,
 }
 
 export const ArgumentsBlock: React.FC<IProps> = ({
@@ -35,6 +35,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
   description,
   validationErrors,
   changeArguments,
+  onValidationError,
 }) => {
   const onPathSelectorChange = useCallback((
     value: string,
@@ -54,10 +55,15 @@ export const ArgumentsBlock: React.FC<IProps> = ({
           return currentArg;
         }),
         parent,
-        validationData,
       );
+
+      onValidationError(getUniqueValidationErrors(
+        validationErrors,
+        validationData.errors,
+        validationData.isForAdd,
+      ));
     }
-  }, [args, parent, changeArguments]);
+  }, [args, parent, validationErrors, changeArguments, onValidationError]);
 
   const onArgumentTextFieldChange = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
@@ -74,7 +80,6 @@ export const ArgumentsBlock: React.FC<IProps> = ({
         return currentArg;
       }),
       parent,
-      { errors: {}, isForAdd: false },
     );
   }, [args, parent, changeArguments]);
 
@@ -84,7 +89,6 @@ export const ArgumentsBlock: React.FC<IProps> = ({
     changeArguments(
       args.filter((currentArg) => currentArg.id !== currentTarget.id.split(':')[1]),
       parent,
-      { errors: {}, isForAdd: false },
     );
   }, [args, parent, changeArguments]);
 
@@ -101,7 +105,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
       },
     ];
 
-    changeArguments(newArgs, parent, { errors: {}, isForAdd: false });
+    changeArguments(newArgs, parent);
   }, [args, parent, changeArguments]);
 
   return (
