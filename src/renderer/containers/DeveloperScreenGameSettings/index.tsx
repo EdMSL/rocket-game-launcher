@@ -1,7 +1,9 @@
 import React, {
-  ReactElement, useCallback, useMemo, useState,
+  ReactElement, useCallback, useEffect, useMemo, useState,
 } from 'react';
 import Scrollbars from 'react-custom-scrollbars-2';
+import { useDispatch } from 'react-redux';
+import { ipcRenderer } from 'electron';
 
 import styles from './styles.module.scss';
 import { DeveloperScreenController } from '$components/DeveloperScreenController';
@@ -11,12 +13,16 @@ import { IGameSettingsConfig, IGameSettingsGroup } from '$types/gameSettings';
 import { getNewConfig } from '$utils/data';
 import { GroupItemCreator } from '$components/GroupItemCreator';
 import { checkObjectForEqual } from '$utils/check';
+import { saveGameSettingsConfig } from '$actions/main';
+import { AppChannel } from '$constants/misc';
 
 export const DeveloperScreenGameSettings: React.FC = () => {
   const gameSettingsFiles = useAppSelector((state) => state.gameSettings.gameSettingsFiles);
   const gameSettingsGroups = useAppSelector((state) => state.gameSettings.gameSettingsGroups);
   const baseFilesEncoding = useAppSelector((state) => state.gameSettings.baseFilesEncoding);
   const isFirstLaunch = useAppSelector((state) => state.main.config.isFirstLaunch);
+
+  const dispatch = useDispatch();
 
   const settingsConfig: IGameSettingsConfig = useMemo(() => ({
     gameSettingsGroups,
@@ -28,6 +34,33 @@ export const DeveloperScreenGameSettings: React.FC = () => {
   const [validationErrors, setValidationErrors] = useState<IValidationErrors>({});
   const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
 
+  const saveSettingsChanges = useCallback((
+    isGoToMainScreen: boolean,
+  ) => {
+    dispatch(saveGameSettingsConfig(
+      currentSettingsConfig,
+      isGoToMainScreen,
+    ));
+
+    setIsConfigChanged(false);
+  }, [dispatch, currentSettingsConfig]);
+
+  const resetConfigChanges = useCallback(() => {
+    setIsConfigChanged(false);
+    setValidationErrors({});
+    setCurrentSettingsConfig(settingsConfig);
+  }, [settingsConfig]);
+
+  useEffect(() => {
+    ipcRenderer.on(AppChannel.DEV_WINDOW_CLOSED, (event, isByCloseWindowBtnClick: boolean) => {
+      if (isByCloseWindowBtnClick) {
+        resetConfigChanges();
+      }
+    });
+
+    return (): void => { ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED); };
+  }, [resetConfigChanges]);
+
   const changeCurrentConfig = useCallback((value, fieldName: string, parent?: string) => {
     const newConfig = getNewConfig(currentSettingsConfig, value, fieldName, parent);
 
@@ -35,22 +68,27 @@ export const DeveloperScreenGameSettings: React.FC = () => {
     setIsConfigChanged(!checkObjectForEqual(settingsConfig, newConfig));
   }, [settingsConfig, currentSettingsConfig]);
 
-  const onSaveBtnClick = useCallback(() => {}, []);
-  const onCancelBtnClick = useCallback(() => {}, []);
+  const onSaveBtnClick = useCallback(() => {
+    saveSettingsChanges(false);
+  }, [saveSettingsChanges]);
+
+  const onCancelBtnClick = useCallback(() => {
+    resetConfigChanges();
+    ipcRenderer.send(AppChannel.CLOSE_DEV_WINDOW);
+  }, [resetConfigChanges]);
+
   const onResetBtnClick = useCallback(() => {
-    setIsConfigChanged(false);
-    setValidationErrors({});
-    setCurrentSettingsConfig(settingsConfig);
-  }, [settingsConfig]);
+    resetConfigChanges();
+  }, [resetConfigChanges]);
 
   const createNewGroup = useCallback((group: IGameSettingsGroup) => {
     changeCurrentConfig(
-      [...currentSettingsConfig.gameSettingsGroups!, group],
+      [...currentSettingsConfig.gameSettingsGroups, group],
       'gameSettingsGroups',
     );
   }, [currentSettingsConfig, changeCurrentConfig]);
 
-  const onValidationError = useCallback((errors: IValidationErrors) => {
+  const setNewValidationErrors = useCallback((errors: IValidationErrors) => {
     setValidationErrors(errors);
   }, []);
 
@@ -93,12 +131,13 @@ export const DeveloperScreenGameSettings: React.FC = () => {
               className="developer-screen__item"
               validationErrors={validationErrors}
               onApplyNewName={createNewGroup}
-              onValidationError={onValidationError}
+              onValidationError={setNewValidationErrors}
             />
           </div>
           {
-            currentSettingsConfig.gameSettingsGroups!.map((item) => (
-              <div>
+            currentSettingsConfig.gameSettingsGroups.map((item) => (
+              <div key={item.id}>
+                <p>{item.id}</p>
                 <p>{item.name}</p>
                 <p>{item.label}</p>
               </div>

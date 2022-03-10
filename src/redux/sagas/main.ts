@@ -31,11 +31,12 @@ import {
   setIsGameSettingsSaving,
   setPathVariables,
   setIsLauncherConfigChanged,
+  saveGameSettingsConfig,
 } from '$actions/main';
 import {
   generateGameSettingsOptionsSaga,
   initGameSettingsSaga,
-  getInitialGameSettingsConfigSaga,
+  getGameSettingsConfigSaga,
 } from '$sagas/gameSettings';
 import {
   GAME_SETTINGS_FILE_PATH, CONFIG_FILE_PATH,
@@ -57,7 +58,7 @@ import {
 } from '$utils/backup';
 import { getPathToFile } from '$utils/strings';
 import { IUnwrap } from '$types/common';
-import { setGameSettingsOptions } from '$actions/gameSettings';
+import { setGameSettingsConfig, setGameSettingsOptions } from '$actions/gameSettings';
 import { getGameSettingsOptionsWithDefaultValues, updatePathVariables } from '$utils/data';
 import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
 import { writeJSONFile } from '$utils/files';
@@ -69,13 +70,13 @@ const getState = (state: IAppState): IAppState => state;
  * Инициализация лаунчера при запуске.
 */
 function* initLauncherSaga(): SagaIterator {
-  yield put(setIsLauncherInitialised(false));
+  // yield put(setIsLauncherInitialised(false));
 
   try {
     if (fs.existsSync(GAME_SETTINGS_FILE_PATH)) {
-      yield call(getInitialGameSettingsConfigSaga);
+      // yield call(getGameSettingsConfigSaga);
     } else {
-      writeToLogFile('Game settings file settings.json not found.');
+      // writeToLogFile('Game settings file settings.json not found.');
     }
   } catch (error: any) {
     let errorMessage = '';
@@ -102,6 +103,7 @@ function* initLauncherSaga(): SagaIterator {
 function* saveLauncherConfigSaga(
   { payload: { newConfig, isGoToMainScreen } }: ReturnType<typeof saveLauncherConfig>,
 ): SagaIterator {
+  // Ставим здесь именно сохранение игровых настроек только из-за показа лоадера
   yield put(setIsGameSettingsSaving(true));
 
   try {
@@ -159,14 +161,66 @@ function* saveLauncherConfigSaga(
   }
 }
 
+function* saveGameSettingsConfigSaga(
+  { payload: { newConfig, isGoToMainScreen } }: ReturnType<typeof saveGameSettingsConfig>,
+): SagaIterator {
+  yield put(setIsGameSettingsSaving(true));
+
+  try {
+    // Здесь мы оставляем только нужные поля, отсекая id, который используется в компоненте.
+    const gameSettingsGroupsForSave = newConfig.gameSettingsGroups.map((group) => ({
+      name: group.name,
+      label: group.label,
+    }));
+
+    const configForSave = {
+      ...newConfig,
+      gameSettingsGroups: gameSettingsGroupsForSave,
+    };
+
+    yield call(writeJSONFile, GAME_SETTINGS_FILE_PATH, configForSave);
+    yield put(setGameSettingsConfig(newConfig));
+    yield put(setIsLauncherConfigChanged(true));
+
+    if (Object.keys(newConfig.gameSettingsFiles).length > 0) {
+      setIsGameSettingsAvailable(true);
+    }
+
+    if (isGoToMainScreen) {
+      ipcRenderer.send(AppChannel.CLOSE_DEV_WINDOW);
+    }
+  } catch (error: any) {
+    let errorMessage = '';
+
+    if (error instanceof SagaError) {
+      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
+    } else if (error instanceof CustomError) {
+      errorMessage = `${error.message}`;
+    } else if (error instanceof ReadWriteError) {
+      errorMessage = `${error.message}. Path '${error.path}'.`;
+    } else {
+      errorMessage = `Unknown error. Message: ${error.message}`;
+    }
+
+    writeToLogFileSync(
+      `Failed to save game settings file. Reason: ${errorMessage}`,
+      LogMessageType.ERROR,
+    );
+
+    yield put(addMessages([CreateUserMessage.error('Произошла ошибка при сохранении файла игровых настроек. Подробности в файле лога.')])); //eslint-disable-line max-len
+  } finally {
+    yield put(setIsGameSettingsSaving(false));
+  }
+}
+
 function* updateGameSettingsOptionsSaga(): SagaIterator {
   yield put(setIsGameSettingsLoaded(false));
 
   try {
     yield put(setIsGameSettingsAvailable(false));
 
-    const newConfigData: SagaReturnType<typeof getInitialGameSettingsConfigSaga> = yield call(
-      getInitialGameSettingsConfigSaga,
+    const newConfigData: SagaReturnType<typeof getGameSettingsConfigSaga> = yield call(
+      getGameSettingsConfigSaga,
       true,
     );
 
@@ -466,7 +520,7 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
       config: { isFirstLaunch },
     },
   }: ReturnType<typeof getState> = yield select(getState);
-  if (!isLauncherInitialised && location.pathname === `${Routes.MAIN_SCREEN}`) {
+  if (!isLauncherInitialised && (location.pathname === Routes.MAIN_SCREEN)) {
     yield call(initLauncherSaga);
 
     if (isFirstLaunch) {
@@ -499,6 +553,7 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
 export default function* mainSaga(): SagaIterator {
   yield takeLatest(LOCATION_CHANGE, locationChangeSaga);
   yield takeLatest(MAIN_TYPES.SAVE_LAUNCHER_CONFIG, saveLauncherConfigSaga);
+  yield takeLatest(MAIN_TYPES.SAVE_GAME_SETTINGS_CONFIG, saveGameSettingsConfigSaga);
   yield takeLatest(MAIN_TYPES.CREATE_GAME_SETTINGS_FILES_BACKUP, createGameSettingsBackupSaga);
   yield takeLatest(MAIN_TYPES.GET_GAME_SETTINGS_FILES_BACKUP, getGameSettingsFilesBackupSaga);
   yield takeLatest(MAIN_TYPES.DELETE_GAME_SETTINGS_FILES_BACKUP, deleteGameSettingsFilesBackupSaga);

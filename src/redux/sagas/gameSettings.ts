@@ -101,7 +101,7 @@ const getState = (state: IAppState): IAppState => state;
  * @param isFromUpdateAction Выполнениe для обновления опций?
  * @returns Объект с данными из settings.json.
 */
-export function* getInitialGameSettingsConfigSaga(
+export function* getGameSettingsConfigSaga(
   isFromUpdateAction = false,
 ): SagaIterator<IGameSettingsConfig> {
   try {

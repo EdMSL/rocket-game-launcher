@@ -2,12 +2,13 @@ import { createReducer } from 'reduxsauce';
 
 import { GAME_SETTINGS_HANDLERS } from '$handlers/gameSettings';
 import { IGameSettingsRootState } from '$types/gameSettings';
+import { defaultGameSettingsConfig } from '$constants/defaultParameters';
 
 // Если добавляем поле в settings.json, то добаляем его здесь в стейт и constants/misc
-const INITIAL_STATE: IGameSettingsRootState = {
-  gameSettingsGroups: [],
-  baseFilesEncoding: '',
-  gameSettingsFiles: {},
+export const INITIAL_STATE: IGameSettingsRootState = {
+  gameSettingsGroups: defaultGameSettingsConfig.gameSettingsGroups,
+  baseFilesEncoding: defaultGameSettingsConfig.baseFilesEncoding,
+  gameSettingsFiles: defaultGameSettingsConfig.gameSettingsFiles,
   moProfile: '',
   moProfiles: [],
   gameSettingsOptions: {},

@@ -1,3 +1,4 @@
+import { IGameSettingsConfig } from '$types/gameSettings';
 import {
   MAIN_TYPES, IMainRootState, IGameSettingsBackup,
 } from '$types/main';
@@ -37,6 +38,14 @@ export const saveLauncherConfig = (
   isGoToMainScreen = false,
 ) => ({
   type: MAIN_TYPES.SAVE_LAUNCHER_CONFIG,
+  payload: { newConfig, isGoToMainScreen },
+});
+
+export const saveGameSettingsConfig = (
+  newConfig: IGameSettingsConfig,
+  isGoToMainScreen = false,
+) => ({
+  type: MAIN_TYPES.SAVE_GAME_SETTINGS_CONFIG,
   payload: { newConfig, isGoToMainScreen },
 });
 

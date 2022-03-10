@@ -271,9 +271,10 @@ export const readFileData = (
 /**
  * Синхронно получить данные из JSON файла.
  * @param pathToFile Путь к файлу.
+ * @param isWriteToLog Делать ли запись об ошибке в файле лога.
  * @returns Объект с данными из файла.
 */
-export const readJSONFileSync = <T>(pathToFile: string): T => {
+export const readJSONFileSync = <T>(pathToFile: string, isWriteToLog = true): T => {
   try {
     if (
       pathToFile !== null
@@ -291,10 +292,12 @@ export const readJSONFileSync = <T>(pathToFile: string): T => {
 
     return parseJSON<T>(JSONstring);
   } catch (error: any) {
-    writeToLogFileSync(
-      `Message: ${error.message}. Path: '${pathToFile}'.`,
-      LogMessageType.ERROR,
-    );
+    if (isWriteToLog) {
+      writeToLogFileSync(
+        `Message: ${error.message}. Path: '${pathToFile}'.`,
+        LogMessageType.ERROR,
+      );
+    }
 
     throw error;
   }

@@ -16,7 +16,9 @@ describe('#Check', () => {
 
       assert.hasAllKeys(result, ['baseFilesEncoding', 'gameSettingsGroups', 'gameSettingsFiles']);
 
+      // @ts-ignore
       delete result.gameSettingsGroups;
+      // @ts-ignore
       delete result.baseFilesEncoding;
 
       result = checkGameSettingsConfigMainFields(result);
@@ -26,6 +28,7 @@ describe('#Check', () => {
     it('Should return object with default values', () => {
       const obj = readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`);
 
+      // @ts-ignore
       delete obj.baseFilesEncoding;
       obj.gameSettingsGroups![0].name = 'new';
       // @ts-ignore
@@ -40,6 +43,7 @@ describe('#Check', () => {
     it('Should return no errors', () => {
       const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
 
+      // @ts-ignore
       delete obj.baseFilesEncoding;
       assert.containsAllKeys(checkGameSettingsConfigMainFields(obj), ['baseFilesEncoding']);
 
@@ -48,6 +52,7 @@ describe('#Check', () => {
       // @ts-ignore
       assert.equal(checkGameSettingsConfigMainFields(obj).gameSettingsGroups[0].label, 'Graphic');
 
+      // @ts-ignore
       delete obj.gameSettingsGroups;
       // @ts-ignore
       assert.equal(checkGameSettingsConfigMainFields(obj).gameSettingsGroups.length, 0);

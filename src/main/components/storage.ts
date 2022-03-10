@@ -2,10 +2,12 @@ import Storage from 'electron-store';
 import { Store } from 'redux';
 import path from 'path';
 import { app } from 'electron';
+import fs from 'fs';
 
 import { configureStore, IAppState } from '$store/store';
 import { IUserSettingsRootState } from '$types/userSettings';
 import {
+  defaultGameSettingsConfig,
   defaultLauncherConfig,
 } from '$constants/defaultParameters';
 import {
@@ -21,6 +23,7 @@ import {
 import {
   CONFIG_FILE_PATH,
   GAME_DIR,
+  GAME_SETTINGS_FILE_PATH,
   IPathVariables,
 } from '$constants/paths';
 import {
@@ -29,7 +32,7 @@ import {
   ReadWriteError,
   showMessageBox,
 } from '$utils/errors';
-import { checkConfigFileData } from '$utils/check';
+import { checkConfigFileData, checkGameSettingsConfigMainFields } from '$utils/check';
 import { getObjectAsList } from '$utils/strings';
 import {
   createPathVariables,
@@ -38,11 +41,12 @@ import {
   getUserThemes,
 } from '$utils/data';
 import { INITIAL_STATE as mainInitialState } from '$reducers/main';
-// import { INITIAL_STATE as configInitialState } from '$reducers/main';
+import { INITIAL_STATE as gameSettingsInitialState } from '$reducers/gameSettings';
 import { INITIAL_STATE as userSettingsInitialState } from '$reducers/userSettings';
 import { ILauncherConfig, IUserMessage } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
 import { Scope } from '$constants/misc';
+import { IGameSettingsConfig } from '$types/gameSettings';
 
 interface IStorage {
   userSettings: IUserSettingsRootState,
@@ -72,7 +76,6 @@ const getConfigurationData = (): ILauncherConfig => {
         );
 
         writeJSONFile(CONFIG_FILE_PATH, defaultLauncherConfig)
-        // writeJSONFile(CONFIG_FILE_PATH, minimalLauncherConfig)
           .then(() => {
             writeToLogFile('New config file config.json successfully created.');
           })
@@ -81,7 +84,6 @@ const getConfigurationData = (): ILauncherConfig => {
           });
 
         return defaultLauncherConfig;
-        // return minimalLauncherConfig;
       }
 
       throw new Error('Found problems with config.json.');
@@ -93,6 +95,28 @@ const getConfigurationData = (): ILauncherConfig => {
 
     throw new Error('Found problems with config.json.');
   }
+};
+
+const getGameSettingsData = (messages: IUserMessage[]): [IGameSettingsConfig, boolean] => {
+  try {
+    const fileData = readJSONFileSync<IGameSettingsConfig>(GAME_SETTINGS_FILE_PATH, false);
+
+    return [checkGameSettingsConfigMainFields(fileData), true];
+  } catch (error: any) {
+    if (error instanceof ReadWriteError) {
+      if (error.cause.name === ErrorName.NOT_FOUND) {
+        writeToLogFileSync('Game settings file settings.json not found.');
+      } else {
+        writeToLogFileSync(`Unknown error. Message: ${error.message}`);
+      }
+    } else if (error instanceof CustomError) {
+      messages.push(CreateUserMessage.error('Ошибка обработки файла settings.json. Игровые настройки будут недоступны. Подробности в файле лога')); //eslint-disable-line max-len
+    } else {
+      writeToLogFileSync(`Unknown error. Message: ${error.message}`);
+    }
+  }
+
+  return [defaultGameSettingsConfig, false];
 };
 
 /**
@@ -160,6 +184,8 @@ export const createStorage = (): Store<IAppState> => {
     configurationData.customButtons = newButtons;
   }
 
+  const [gameSettingsObj, isSettingsAvailable] = getGameSettingsData(messages);
+
   // Генерация state без gameSettings.
   const newStore = {
     userSettings: {
@@ -179,11 +205,18 @@ export const createStorage = (): Store<IAppState> => {
           ...configurationData.playButton,
         },
       },
-      isDevWindowOpening: configurationData.isFirstLaunch,
+      isGameSettingsAvailable: isSettingsAvailable,
+      isDevWindowOpeninging: configurationData.isFirstLaunch,
       launcherVersion: app.getVersion(),
       pathVariables,
       userThemes,
       messages,
+    },
+    gameSettings: {
+      ...gameSettingsInitialState,
+      gameSettingsGroups: gameSettingsObj.gameSettingsGroups,
+      baseFilesEncoding: gameSettingsObj.baseFilesEncoding,
+      gameSettingsFiles: gameSettingsObj.gameSettingsFiles,
     },
   };
 

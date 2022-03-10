@@ -75,8 +75,8 @@ export interface IGameSettingsFiles {
 }
 
 export interface IGameSettingsConfig {
-  gameSettingsGroups?: IGameSettingsRootState['gameSettingsGroups'],
-  baseFilesEncoding?: IGameSettingsRootState['baseFilesEncoding'],
+  gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
+  baseFilesEncoding: IGameSettingsRootState['baseFilesEncoding'],
   gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
 }
 

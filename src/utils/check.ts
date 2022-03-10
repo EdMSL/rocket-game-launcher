@@ -164,7 +164,7 @@ const settingsMainSchema = Joi.object<IGameSettingsConfig>({
     .pattern(
       Joi.string(),
       Joi.any(),
-    ).required().min(1),
+    ).required(),
 });
 
 const gameSettingsFileSchema = Joi.object({

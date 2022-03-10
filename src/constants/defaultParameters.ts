@@ -2,29 +2,18 @@ import {
   IError,
   ISuccess,
 } from '$types/common';
+import { IGameSettingsConfig } from '$types/gameSettings';
 import {
   ILauncherConfig,
   ILauncherCustomButton,
   IModOrganizerParams,
   IWindowSettings,
 } from '$types/main';
-import { LauncherButtonAction } from './misc';
+import { Encoding, LauncherButtonAction } from './misc';
 
 export const SUCCESS_STATUS: ISuccess = 'success';
 export const ERROR_STATUS: IError = 'error';
 export const WARNING_STATUS = 'warning';
-
-interface ILauncherConfigModOrganizerParams {
-  isUsed: boolean,
-  version?: number,
-  path?: string,
-  pathToINI?: string,
-  pathToProfiles?: string,
-  pathToMods?: string,
-  profileSection?: string,
-  profileParam?: string,
-  profileParamValueRegExp?: string,
-}
 
 export const MinWindowSize = {
   HEIGHT: 300,
@@ -94,4 +83,10 @@ export const defaultLauncherConfig: ILauncherConfig = {
     label: 'Играть',
   },
   customButtons: [],
+};
+
+export const defaultGameSettingsConfig: IGameSettingsConfig = {
+  gameSettingsGroups: [],
+  gameSettingsFiles: {},
+  baseFilesEncoding: Encoding.WIN1251,
 };
