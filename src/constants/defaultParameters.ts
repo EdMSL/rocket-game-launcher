@@ -33,7 +33,9 @@ export const MinWindowSize = {
 
 export const TEXT_INPUT_MAX_LENGTH = 50;
 
-export const emptyGameSettingsGroup = { name: '', label: '' };
+export const emptyGameSettingsGroup = {
+  id: '', name: '', label: '',
+};
 
 export const defaultLauncherWindowSettings: IWindowSettings = {
   isResizable: false,

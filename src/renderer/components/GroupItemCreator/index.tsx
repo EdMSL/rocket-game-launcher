@@ -2,6 +2,7 @@ import React, {
   useCallback, useEffect, useRef, useState,
 } from 'react';
 import classNames from 'classnames';
+import { ipcRenderer } from 'electron';
 
 import styles from './styles.module.scss';
 import { HintItem } from '$components/HintItem';
@@ -10,25 +11,19 @@ import { Button } from '$components/UI/Button';
 import { IValidationErrors } from '$types/common';
 import { IGameSettingsGroup } from '$types/gameSettings';
 import { getUniqueValidationErrors } from '$utils/data';
+import { AppChannel } from '$constants/misc';
+import { getRandomId } from '$utils/strings';
 
 interface IProps {
-  // id: string,
-  // valueName: string,
-  // valueLabel: string,
   className: string,
   validationErrors: IValidationErrors,
-  // onChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
   onApplyNewName: (group: IGameSettingsGroup) => void,
   onValidationError: (data: IValidationErrors) => void,
 }
 
 export const GroupItemCreator: React.FunctionComponent<IProps> = ({
-  // id,
-  // valueName,
-  // valueLabel,
   className = '',
   validationErrors,
-  // onChange,
   onApplyNewName,
   onValidationError,
 }) => {
@@ -50,15 +45,23 @@ export const GroupItemCreator: React.FunctionComponent<IProps> = ({
     input?.addEventListener('keyup', onEnterKeyPress);
     label?.addEventListener('keyup', onEnterKeyPress);
 
+    ipcRenderer.on(AppChannel.DEV_WINDOW_CLOSED, (event, isByCloseWindowBtnClick: boolean) => {
+      if (isByCloseWindowBtnClick) {
+        setNewGroup(emptyGameSettingsGroup);
+      }
+    });
+
     return (): void => {
       input?.removeEventListener('keyup', onEnterKeyPress);
       label?.removeEventListener('keyup', onEnterKeyPress);
+      ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED);
     };
   }, [onEnterKeyPress]);
 
   const onApplyBtnClick = useCallback(() => {
     onApplyNewName({
       ...newGroup,
+      id: getRandomId('gs-group'),
       label: newGroup.label ? newGroup.label : newGroup.name,
     });
     setNewGroup(emptyGameSettingsGroup);
@@ -105,12 +108,13 @@ export const GroupItemCreator: React.FunctionComponent<IProps> = ({
           />
         </label>
       </div>
-      <div className={styles['group-item-creator__input-block']}>
-        <div>
+      <div className={styles['group-item-creator__inputs-container']}>
+        <div className={styles['group-item-creator__inputs-block']}>
           <input
             className={classNames(
               styles['group-item-creator__input'],
-              validationErrors['group-creator-name'] && validationErrors['group-creator-name'].length > 0 && styles['group-item-creator__input--error'],
+              validationErrors['group-creator-name']?.length > 0
+                && styles['group-item-creator__input--error'],
             )}
             ref={nameInput}
             type="text"

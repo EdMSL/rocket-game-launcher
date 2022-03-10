@@ -13,13 +13,17 @@
   margin-right: 10px;
 }
 
-.group-item-creator__input-block {
+.group-item-creator__inputs-container {
   position: relative;
 
   flex-grow: 1;
   display: flex;
   align-items: center;
-  max-width: 50%;
+  max-width: 30%;
+}
+
+.group-item-creator__inputs-block {
+  flex-grow: 1;
 }
 
 .group-item-creator__input {
@@ -56,8 +60,6 @@
   height: 100%;
 
   font-size: 0;
-
-  vertical-align: sub;
 
   background-color: var(--btn-color);
   /* stylelint-disable string-no-newline, max-line-length */

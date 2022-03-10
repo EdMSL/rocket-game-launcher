@@ -100,7 +100,7 @@ export const DeveloperScreenConfig: React.FC = () => {
     });
 
     return (): void => { ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED); };
-  }, [launcherConfig.isFirstLaunch, saveConfigChanges, resetConfigChanges]);
+  }, [resetConfigChanges]);
 
   const setNewValidationErrors = useCallback((errors: IValidationErrors) => {
     setValidationErrors(errors);

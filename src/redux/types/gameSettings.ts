@@ -25,6 +25,7 @@ export interface IGameSettingsOptions {
 }
 
 export interface IGameSettingsGroup {
+  id: string,
   name: string,
   label?: string,
 }
