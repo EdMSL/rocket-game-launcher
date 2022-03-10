@@ -32,11 +32,22 @@ export const GroupItemCreator: React.FunctionComponent<IProps> = ({
 
   const [newGroup, setNewGroup] = useState<IGameSettingsGroup>(emptyGameSettingsGroup);
 
+  const createGroup = useCallback(() => {
+    onApplyNewName({
+      ...newGroup,
+      id: getRandomId('gs-group'),
+      label: newGroup.label ? newGroup.label : newGroup.name,
+    });
+
+    setNewGroup(emptyGameSettingsGroup);
+    nameInput.current?.focus();
+  }, [newGroup, onApplyNewName]);
+
   const onEnterKeyPress = useCallback((event: KeyboardEvent) => {
     if (event.code === 'Enter' && newGroup.name && !validationErrors['group-creator-name']) {
-      onApplyNewName(newGroup);
+      createGroup();
     }
-  }, [newGroup, validationErrors, onApplyNewName]);
+  }, [newGroup.name, validationErrors, createGroup]);
 
   useEffect(() => {
     const input = nameInput.current;
@@ -59,14 +70,8 @@ export const GroupItemCreator: React.FunctionComponent<IProps> = ({
   }, [onEnterKeyPress]);
 
   const onApplyBtnClick = useCallback(() => {
-    onApplyNewName({
-      ...newGroup,
-      id: getRandomId('gs-group'),
-      label: newGroup.label ? newGroup.label : newGroup.name,
-    });
-    setNewGroup(emptyGameSettingsGroup);
-    nameInput.current?.focus();
-  }, [newGroup, onApplyNewName]);
+    createGroup();
+  }, [createGroup]);
 
   const onTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     if (target.id === 'group-creator-name') {
