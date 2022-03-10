@@ -16,11 +16,7 @@ import { TextField } from '$components/UI/TextField';
 import { Switcher } from '$components/UI/Switcher';
 import { Select } from '$components/UI/Select';
 import { PathSelector } from '$components/UI/PathSelector';
-import {
-  saveLauncherConfig,
-  addMessages,
-} from '$actions/main';
-import { CreateUserMessage } from '$utils/message';
+import { saveLauncherConfig } from '$actions/main';
 import {
   appWindowFields,
   FileExtension,
@@ -33,7 +29,6 @@ import { Button } from '$components/UI/Button';
 import { CustomBtnItem } from '$components/CustomBtnItem';
 import {
   IButtonArg,
-  ILauncherConfig,
   ILauncherCustomButton,
   IMainRootState,
 } from '$types/main';

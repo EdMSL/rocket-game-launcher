@@ -91,11 +91,11 @@ export const setIsDevWindowOpening = (
   payload: isDevWindowOpening,
 });
 
-export const setIsDevWindowOpen = (
-  isDevWindowOpen: IMainRootState['isDevWindowOpen'],
+export const setIsDeveloperMode = (
+  isDeveloperMode: IMainRootState['isDeveloperMode'],
 ) => ({
-  type: MAIN_TYPES.SET_IS_DEV_WINDOW_OPEN,
-  payload: isDevWindowOpen,
+  type: MAIN_TYPES.SET_IS_DEVELOPER_MODE,
+  payload: isDeveloperMode,
 });
 
 export const createGameSettingsFilesBackup = (isGetBackup = false) => ({

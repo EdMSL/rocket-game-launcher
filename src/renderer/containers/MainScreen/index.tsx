@@ -11,7 +11,7 @@ import { Routes } from '$constants/routes';
 import { runApplication, openFolder } from '$utils/process';
 import { Button } from '$components/UI/Button';
 import {
-  setIsGameRunning, addMessages, setIsDevWindowOpen, setIsDevWindowOpening,
+  setIsGameRunning, addMessages, setIsDeveloperMode, setIsDevWindowOpening,
 } from '$actions/main';
 import { useAppSelector } from '$store/store';
 import { CreateUserMessage } from '$utils/message';
@@ -29,7 +29,7 @@ export const MainScreen: React.FC = () => {
   const isGameRunning = useAppSelector((state) => state.main.isGameRunning);
   const pathVariables = useAppSelector((state) => state.main.pathVariables);
   const isDevWindowOpening = useAppSelector((state) => state.main.isDevWindowOpening);
-  const isDevWindowOpen = useAppSelector((state) => state.main.isDevWindowOpen);
+  const isDeveloperMode = useAppSelector((state) => state.main.isDeveloperMode);
   const userThemes = useAppSelector((state) => state.main.userThemes);
   const userTheme = useAppSelector((state) => state.userSettings.theme);
   const isAutoclose = useAppSelector((state) => state.userSettings.isAutoclose);
@@ -43,15 +43,18 @@ export const MainScreen: React.FC = () => {
 
   useEffect(() => {
     ipcRenderer.on(AppChannel.DEV_WINDOW_CLOSED, () => {
-      dispatch(setIsDevWindowOpen(false));
+      dispatch(setIsDeveloperMode(false));
     });
 
     ipcRenderer.on(AppChannel.DEV_WINDOW_OPENED, () => {
       dispatch(setIsDevWindowOpening(false));
-      dispatch(setIsDevWindowOpen(true));
+      dispatch(setIsDeveloperMode(true));
     });
 
-    return (): void => { ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED); };
+    return (): void => {
+      ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED);
+      ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_OPENED);
+    };
   }, [dispatch]);
 
   const changeGameState = useCallback((errorMessage: string, isRunning: boolean, close = false) => {
@@ -71,8 +74,8 @@ export const MainScreen: React.FC = () => {
   }, [dispatch]);
 
   const onDisabledNavLinkClick = useCallback((event) => {
-    if (isGameRunning || !isGameSettingsAvailable) event.preventDefault();
-  }, [isGameRunning, isGameSettingsAvailable]);
+    if (isGameRunning || (!isGameSettingsAvailable && !isDeveloperMode)) event.preventDefault();
+  }, [isGameRunning, isGameSettingsAvailable, isDeveloperMode]);
 
   const onPlayGameBtnClick = useCallback(() => {
     dispatch(setIsGameRunning(true));
@@ -153,7 +156,10 @@ export const MainScreen: React.FC = () => {
               'button',
               'main-btn',
               'control-panel__btn',
-              (isGameRunning || !isGameSettingsAvailable || !playButton.path) && 'control-panel__btn--disabled',
+              (isGameRunning
+                || !playButton.path
+                || (!isGameSettingsAvailable && !isDeveloperMode))
+                && 'control-panel__btn--disabled',
               styles['main-screen__btn'],
             )}
             onClick={onDisabledNavLinkClick}
@@ -177,7 +183,7 @@ export const MainScreen: React.FC = () => {
               styles['main-screen__bottom-btn--developer'],
             )}
             onClick={onDeveloperScreenBtnClick}
-            isDisabled={isDevWindowOpen}
+            isDisabled={isDeveloperMode}
           >
             <span className={styles['main-screen__bottom-btn-text']}>Экран разработчика</span>
           </Button>

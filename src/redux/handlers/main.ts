@@ -117,14 +117,14 @@ const setIsDevWindowOpening: IMainActionHadler<
   isDevWindowOpening,
 });
 
-const setIsDevWindowOpen: IMainActionHadler<
-  typeof MAIN_ACTIONS.setIsDevWindowOpen
+const setIsDeveloperMode: IMainActionHadler<
+  typeof MAIN_ACTIONS.setIsDeveloperMode
 > = (
   state,
-  { payload: isDevWindowOpen },
+  { payload: isDeveloperMode },
 ) => ({
   ...state,
-  isDevWindowOpen,
+  isDeveloperMode,
 });
 
 const setGameSettingsFilesBackup: IMainActionHadler<
@@ -192,7 +192,7 @@ export const MAIN_HANDLERS = {
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_SAVING]: setIsGameSettingsSaving,
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_FILES_BACKUPING]: setIsGameSettingsFilesBackuping,
   [MAIN_TYPES.SET_IS_DEV_WINDOW_OPENING]: setIsDevWindowOpening,
-  [MAIN_TYPES.SET_IS_DEV_WINDOW_OPEN]: setIsDevWindowOpen,
+  [MAIN_TYPES.SET_IS_DEVELOPER_MODE]: setIsDeveloperMode,
   [MAIN_TYPES.SET_GAME_SETTINGS_FILES_BACKUP]: setGameSettingsFilesBackup,
   [MAIN_TYPES.SET_USER_THEMES]: setUserThemes,
   [MAIN_TYPES.SET_MESSAGES]: setMessages,
