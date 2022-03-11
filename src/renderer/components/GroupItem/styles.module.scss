@@ -3,7 +3,7 @@
   align-items: center;
   margin-top: 10px;
   margin-right: 10px;
-  padding: 10px;
+  padding: 4px 8px;
 
   border: 2px solid var(--text-main);
   border-radius: 10px;
@@ -15,6 +15,7 @@
   &--editable {
     flex-grow: 1;
     margin-right: 0;
+    padding: 10px;
   }
 
   &--new {

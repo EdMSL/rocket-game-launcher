@@ -173,6 +173,7 @@ export const DeveloperScreenGameSettings: React.FC = () => {
               className={classNames(
                 'main-btn',
                 'control-panel__btn',
+                'developer-screen__btn',
               )}
               onClick={createNewGroup}
             >

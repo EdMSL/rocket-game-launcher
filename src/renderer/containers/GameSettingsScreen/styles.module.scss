@@ -65,6 +65,10 @@
   overflow-y: auto;
 }
 
+.game-settings-screen__modal {
+  z-index: 150;
+}
+
 .game-settings-screen__modal .modal__block {
   flex-grow: 1;
   min-width: 95%;
