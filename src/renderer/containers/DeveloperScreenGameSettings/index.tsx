@@ -4,6 +4,7 @@ import React, {
 import Scrollbars from 'react-custom-scrollbars-2';
 import { useDispatch } from 'react-redux';
 import { ipcRenderer } from 'electron';
+import classNames from 'classnames';
 
 import styles from './styles.module.scss';
 import { DeveloperScreenController } from '$components/DeveloperScreenController';
@@ -11,11 +12,13 @@ import { IValidationErrors } from '$types/common';
 import { useAppSelector } from '$store/store';
 import { IGameSettingsConfig, IGameSettingsGroup } from '$types/gameSettings';
 import { getNewConfig } from '$utils/data';
-import { GroupItemCreator } from '$components/GroupItemCreator';
 import { checkObjectForEqual } from '$utils/check';
 import { saveGameSettingsConfig } from '$actions/main';
 import { AppChannel } from '$constants/misc';
 import { TextField } from '$components/UI/TextField';
+import { GroupItem } from '$components/GroupItem';
+import { Button } from '$components/UI/Button';
+import { getRandomId } from '$utils/strings';
 
 export const DeveloperScreenGameSettings: React.FC = () => {
   const gameSettingsFiles = useAppSelector((state) => state.gameSettings.gameSettingsFiles);
@@ -34,6 +37,7 @@ export const DeveloperScreenGameSettings: React.FC = () => {
   const [currentSettingsConfig, setCurrentSettingsConfig] = useState<IGameSettingsConfig>(settingsConfig);
   const [validationErrors, setValidationErrors] = useState<IValidationErrors>({});
   const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
+  const [lastCreatedGroupId, setLastCreatedGroupId] = useState<string>('');
 
   const saveSettingsChanges = useCallback((
     isGoToMainScreen: boolean,
@@ -82,9 +86,41 @@ export const DeveloperScreenGameSettings: React.FC = () => {
     resetConfigChanges();
   }, [resetConfigChanges]);
 
-  const createNewGroup = useCallback((group: IGameSettingsGroup) => {
+  const createNewGroup = useCallback(() => {
+    const newId = getRandomId('gs-group');
+
     changeCurrentConfig(
-      [...currentSettingsConfig.gameSettingsGroups, group],
+      [...currentSettingsConfig.gameSettingsGroups, {
+        id: newId,
+        name: 'Name',
+        label: 'Заголовок',
+      }],
+      'gameSettingsGroups',
+    );
+
+    setLastCreatedGroupId(newId);
+  }, [currentSettingsConfig, changeCurrentConfig]);
+
+  const editGroupItem = useCallback((group: IGameSettingsGroup) => {
+    changeCurrentConfig(
+      currentSettingsConfig.gameSettingsGroups.map((currentGroup) => {
+        if (currentGroup.id === group.id) {
+          return group;
+        }
+
+        return currentGroup;
+      }),
+      'gameSettingsGroups',
+    );
+
+    if (lastCreatedGroupId === group.id) {
+      setLastCreatedGroupId('');
+    }
+  }, [currentSettingsConfig, lastCreatedGroupId, changeCurrentConfig]);
+
+  const deleteGroupItem = useCallback((id: string) => {
+    changeCurrentConfig(
+      currentSettingsConfig.gameSettingsGroups.filter((group) => group.id !== id),
       'gameSettingsGroups',
     );
   }, [currentSettingsConfig, changeCurrentConfig]);
@@ -130,26 +166,33 @@ export const DeveloperScreenGameSettings: React.FC = () => {
           />
         )}
       >
-        <div className={styles['developer-screen_game-settings']}>
+        <div className={styles['developer-screen__game-settings']}>
           <div className="developer-screen__block">
             <p className="developer-screen__block-title">Группы игровых настроек</p>
-            <p className="developer-screen__text">Создать группу</p>
-            <GroupItemCreator
-              className="developer-screen__item"
-              validationErrors={validationErrors}
-              onApplyNewName={createNewGroup}
-              onValidationError={setNewValidationErrors}
-            />
+            <Button
+              className={classNames(
+                'main-btn',
+                'control-panel__btn',
+              )}
+              onClick={createNewGroup}
+            >
+              Добавить
+            </Button>
+            <ul className={styles['developer-screen__groups-container']}>
+              {
+              currentSettingsConfig.gameSettingsGroups.map((item) => (
+                <GroupItem
+                  key={item.id}
+                  item={item}
+                  isNew={lastCreatedGroupId === item.id}
+                  groups={currentSettingsConfig.gameSettingsGroups}
+                  editItem={editGroupItem}
+                  deleteItem={deleteGroupItem}
+                />
+              ))
+            }
+            </ul>
           </div>
-          {
-            currentSettingsConfig.gameSettingsGroups.map((item) => (
-              <div key={item.id}>
-                <p>{item.id}</p>
-                <p>{item.name}</p>
-                <p>{item.label}</p>
-              </div>
-            ))
-          }
         </div>
         <div className="developer-screen__block">
           <p className="developer-screen__block-title">Кодировка файлов настроек</p>

@@ -1,3 +1,12 @@
-.developer-screen_game-settings {
+.developer-screen__game-settings {
   color: inherit;
+}
+
+.developer-screen__groups-container {
+  @include reset-indents;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-right: 10px;
+  margin-bottom: 10px;
 }
