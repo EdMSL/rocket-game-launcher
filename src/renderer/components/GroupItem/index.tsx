@@ -47,7 +47,7 @@ export const GroupItem: React.FC<IProps> = ({
       input?.removeEventListener('keyup', onEnterKeyPress);
       label?.removeEventListener('keyup', onEnterKeyPress);
     };
-  }, [onEnterKeyPress, nameInput]);
+  }, [onEnterKeyPress]);
 
   const onGroupInputChange = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
@@ -77,8 +77,9 @@ export const GroupItem: React.FC<IProps> = ({
       deleteItem(item.id);
     } else {
       setIsEditMode(false);
+      setEditableGroup(item);
     }
-  }, [isNew, item.id, deleteItem]);
+  }, [isNew, item, deleteItem]);
 
   return (
     <li className={classNames(
@@ -113,6 +114,7 @@ export const GroupItem: React.FC<IProps> = ({
               id={`input-name-${item.id}`}
               name="name"
               value={editableGroup.name}
+              autoFocus
               onChange={onGroupInputChange}
             />
             <label

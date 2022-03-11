@@ -175,6 +175,7 @@ export const DeveloperScreenGameSettings: React.FC = () => {
                 'control-panel__btn',
                 'developer-screen__btn',
               )}
+              isDisabled={!!lastCreatedGroupId}
               onClick={createNewGroup}
             >
               Добавить
