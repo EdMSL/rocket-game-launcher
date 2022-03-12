@@ -188,8 +188,10 @@ export const DeveloperScreenGameSettings: React.FC = () => {
                   item={item}
                   isNew={lastCreatedGroupId === item.id}
                   groups={currentSettingsConfig.gameSettingsGroups}
+                  validationErrors={validationErrors}
                   editItem={editGroupItem}
                   deleteItem={deleteGroupItem}
+                  onValidationError={setNewValidationErrors}
                 />
               ))
             }

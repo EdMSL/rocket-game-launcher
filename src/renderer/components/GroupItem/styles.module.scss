@@ -48,6 +48,10 @@
   &:focus {
     @include focus;
   }
+
+  &--error {
+    background-color: var(--error-color);
+  }
 }
 
 .group__btn {
@@ -67,6 +71,10 @@
 
   &:focus {
     @include focus;
+  }
+
+  &:disabled {
+    opacity: 0.3;
   }
   /* stylelint-disable string-no-newline, max-line-length */
 

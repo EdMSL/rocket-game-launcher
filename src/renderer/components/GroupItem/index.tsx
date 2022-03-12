@@ -7,21 +7,27 @@ import styles from './styles.module.scss';
 import { IGameSettingsGroup } from '$types/gameSettings';
 import { Button } from '$components/UI/Button';
 import { HintItem } from '$components/HintItem';
+import { IValidationErrors } from '$types/common';
+import { getUniqueValidationErrors } from '$utils/data';
 
 interface IProps {
   item: IGameSettingsGroup,
   groups: IGameSettingsGroup[],
   isNew: boolean,
+  validationErrors: IValidationErrors,
   editItem: (group: IGameSettingsGroup) => void,
   deleteItem: (id: string) => void,
+  onValidationError: (errors: IValidationErrors) => void,
 }
 
 export const GroupItem: React.FC<IProps> = ({
   item,
   isNew,
   groups,
+  validationErrors,
   editItem,
   deleteItem,
+  onValidationError,
 }) => {
   const nameInput = useRef<HTMLInputElement>(null);
   const labelInput = useRef<HTMLInputElement>(null);
@@ -30,11 +36,22 @@ export const GroupItem: React.FC<IProps> = ({
   const [editableGroup, setEditableGroup] = useState<IGameSettingsGroup>(item);
 
   const onEnterKeyPress = useCallback((event: KeyboardEvent) => {
-    if (isEditMode && event.code === 'Enter' && editableGroup.name) {
+    if (isEditMode && event.code === 'Enter' && editableGroup.name && !validationErrors[item.id]) {
       editItem(editableGroup);
       setIsEditMode(false);
     }
-  }, [isEditMode, editableGroup, editItem]);
+  }, [isEditMode, editableGroup, validationErrors, item.id, editItem]);
+
+  const onEscKeyPress = useCallback((event: KeyboardEvent) => {
+    if (isEditMode && event.code === 'Escape') {
+      if (isNew) {
+        deleteItem(item.id);
+      } else {
+        setIsEditMode(false);
+        setEditableGroup(item);
+      }
+    }
+  }, [isNew, item, isEditMode, deleteItem]);
 
   useEffect(() => {
     const input = nameInput.current;
@@ -42,22 +59,44 @@ export const GroupItem: React.FC<IProps> = ({
 
     input?.addEventListener('keyup', onEnterKeyPress);
     label?.addEventListener('keyup', onEnterKeyPress);
+    input?.addEventListener('keyup', onEscKeyPress);
+    label?.addEventListener('keyup', onEscKeyPress);
 
     return (): void => {
       input?.removeEventListener('keyup', onEnterKeyPress);
       label?.removeEventListener('keyup', onEnterKeyPress);
+      input?.removeEventListener('keyup', onEscKeyPress);
+      label?.removeEventListener('keyup', onEscKeyPress);
     };
-  }, [onEnterKeyPress]);
+  }, [onEnterKeyPress, onEscKeyPress]);
 
   const onGroupInputChange = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    let errors: IValidationErrors = { ...validationErrors };
     setEditableGroup({
       ...editableGroup,
-      name: target.name === 'name' ? target.value : editableGroup.name,
+      name: target.name === 'name' ? target.value.toLowerCase() : editableGroup.name,
       label: target.name === 'label' ? target.value : editableGroup.label,
     });
-  }, [editableGroup]);
+
+    if (target.name === 'name') {
+      errors = getUniqueValidationErrors(
+        errors,
+        { [item.id]: ['alphanum'] },
+        !/^[a-z0-9]*$/.test(target.value.toLowerCase()),
+      );
+
+      errors = getUniqueValidationErrors(
+        errors,
+        { [item.id]: ['already exists'] },
+        groups.map((group) => group.name).includes(target.value.toLowerCase())
+        && item.name !== target.value.toLowerCase(),
+      );
+    }
+
+    onValidationError(errors);
+  }, [item.id, item.name, editableGroup, groups, validationErrors, onValidationError]);
 
   const onEditBtnClick = useCallback(() => {
     setIsEditMode(true);
@@ -110,7 +149,10 @@ export const GroupItem: React.FC<IProps> = ({
             </label>
             <input
               ref={nameInput}
-              className={styles.group__input}
+              className={classNames(
+                styles.group__input,
+                validationErrors[item.id] && styles['group__input--error'],
+              )}
               id={`input-name-${item.id}`}
               name="name"
               value={editableGroup.name}
@@ -162,6 +204,7 @@ export const GroupItem: React.FC<IProps> = ({
           <Button
             className={classNames(styles.group__btn, styles['group__btn--confirm'])}
             onClick={onConfirmBtnClick}
+            isDisabled={!!validationErrors[item.id]}
           >
             Подтвердить
           </Button>

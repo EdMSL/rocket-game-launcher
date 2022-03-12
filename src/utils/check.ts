@@ -154,8 +154,8 @@ export const checkConfigFileData = (configObj: ILauncherConfig): ILauncherConfig
 const settingsMainSchema = Joi.object<IGameSettingsConfig>({
   gameSettingsGroups: Joi.array()
     .items(Joi.object({
-      id: Joi.string().optional().default(getRandomId('gs-group')),
-      name: Joi.string().required().alphanum(),
+      id: Joi.string().optional().default(() => getRandomId('gs-group')),
+      name: Joi.string().required().alphanum().lowercase(),
       label: Joi.string().optional().default(Joi.ref('name')),
     })).optional().default([])
     .unique((a, b) => a.name === b.name),
@@ -579,6 +579,7 @@ export const validateNumberInputs = (
   currentErrors: IValidationErrors,
 ): IValidationErrors => {
   let errors: IValidationErrors = { ...currentErrors };
+
   errors = getUniqueValidationErrors(
     errors,
     { [target.id]: ['less min value'] },
