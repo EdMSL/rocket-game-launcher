@@ -43,6 +43,8 @@ export interface IGameSettingsConfigCheckResult {
   isError: boolean,
 }
 
+const MIN_NAME_LENGTH = 10;
+
 export const getIsPathWithVariableCorrect = (
   value: string,
   action: string,
@@ -154,8 +156,7 @@ export const checkConfigFileData = (configObj: ILauncherConfig): ILauncherConfig
 const settingsMainSchema = Joi.object<IGameSettingsConfig>({
   gameSettingsGroups: Joi.array()
     .items(Joi.object({
-      id: Joi.string().optional().default(() => getRandomId('gs-group')),
-      name: Joi.string().required().alphanum().lowercase(),
+      name: Joi.string().required().alphanum().min(MIN_NAME_LENGTH),
       label: Joi.string().optional().default(Joi.ref('name')),
     })).optional().default([])
     .unique((a, b) => a.name === b.name),

@@ -40,6 +40,21 @@ export const getRandomId = (
   word: string,
 ): string => `${word}_f${((Math.random() * HEXADECIMAL_FACTOR)).toString(HEXADECIMAL)}-${new Date().getMilliseconds()}`; //eslint-disable-line max-len
 
+/**
+ * Генерирует уникальную строку, содержащую только буквы и цифры.
+ * @returns Строка с уникальным именем.
+*/
+export const getRandomName = (): string => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+
+  for (let i = 0; i < HEXADECIMAL; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+
+  return result;
+};
+
 export const getParameterRegExp = (
   parameterName: string,
 ): RegExp => new RegExp(`set\\s+${parameterName}\\s+to\\s+(.+)$`, 'i');

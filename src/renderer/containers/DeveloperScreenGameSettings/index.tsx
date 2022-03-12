@@ -10,15 +10,16 @@ import styles from './styles.module.scss';
 import { DeveloperScreenController } from '$components/DeveloperScreenController';
 import { IValidationErrors } from '$types/common';
 import { useAppSelector } from '$store/store';
-import { IGameSettingsConfig, IGameSettingsGroup } from '$types/gameSettings';
-import { getNewConfig } from '$utils/data';
+import { IGameSettingsConfig } from '$types/gameSettings';
+import { getNewConfig, getUniqueValidationErrors } from '$utils/data';
 import { checkObjectForEqual } from '$utils/check';
 import { saveGameSettingsConfig } from '$actions/main';
 import { AppChannel } from '$constants/misc';
 import { TextField } from '$components/UI/TextField';
-import { GroupItem } from '$components/GroupItem';
 import { Button } from '$components/UI/Button';
-import { getRandomId } from '$utils/strings';
+import { getRandomName } from '$utils/strings';
+import { EditableItem } from '$components/EditableItem';
+import { HintItem } from '$components/HintItem';
 
 export const DeveloperScreenGameSettings: React.FC = () => {
   const gameSettingsFiles = useAppSelector((state) => state.gameSettings.gameSettingsFiles);
@@ -37,7 +38,7 @@ export const DeveloperScreenGameSettings: React.FC = () => {
   const [currentSettingsConfig, setCurrentSettingsConfig] = useState<IGameSettingsConfig>(settingsConfig);
   const [validationErrors, setValidationErrors] = useState<IValidationErrors>({});
   const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
-  const [lastCreatedGroupId, setLastCreatedGroupId] = useState<string>('');
+  const [lastCreatedGroupName, setLastCreatedGroupName] = useState<string>('');
 
   const saveSettingsChanges = useCallback((
     isGoToMainScreen: boolean,
@@ -87,25 +88,27 @@ export const DeveloperScreenGameSettings: React.FC = () => {
   }, [resetConfigChanges]);
 
   const createNewGroup = useCallback(() => {
-    const newId = getRandomId('gs-group');
+    const newName = getRandomName();
 
     changeCurrentConfig(
       [...currentSettingsConfig.gameSettingsGroups, {
-        id: newId,
-        name: 'Name',
-        label: 'Заголовок',
+        name: newName,
+        label: '',
       }],
       'gameSettingsGroups',
     );
 
-    setLastCreatedGroupId(newId);
+    setLastCreatedGroupName(newName);
   }, [currentSettingsConfig, changeCurrentConfig]);
 
-  const editGroupItem = useCallback((group: IGameSettingsGroup) => {
+  const editGroupItem = useCallback((value: string, name: string) => {
     changeCurrentConfig(
       currentSettingsConfig.gameSettingsGroups.map((currentGroup) => {
-        if (currentGroup.id === group.id) {
-          return group;
+        if (currentGroup.name === name) {
+          return {
+            ...currentGroup,
+            label: value,
+          };
         }
 
         return currentGroup;
@@ -113,16 +116,27 @@ export const DeveloperScreenGameSettings: React.FC = () => {
       'gameSettingsGroups',
     );
 
-    if (lastCreatedGroupId === group.id) {
-      setLastCreatedGroupId('');
+    if (lastCreatedGroupName === name) {
+      setLastCreatedGroupName('');
     }
-  }, [currentSettingsConfig, lastCreatedGroupId, changeCurrentConfig]);
+  }, [currentSettingsConfig, lastCreatedGroupName, changeCurrentConfig]);
 
-  const deleteGroupItem = useCallback((id: string) => {
+  const validateGroupLabel = useCallback((value: string, name: string) => {
+    setValidationErrors(getUniqueValidationErrors(
+      validationErrors,
+      { [name]: ['already exists'] },
+      currentSettingsConfig.gameSettingsGroups.map((group) => group.label).includes(value)
+      && currentSettingsConfig.gameSettingsGroups.find((group) => group.name === name)?.label !== value,
+    ));
+  }, [currentSettingsConfig.gameSettingsGroups, validationErrors]);
+
+  const deleteGroupItem = useCallback((name: string) => {
     changeCurrentConfig(
-      currentSettingsConfig.gameSettingsGroups.filter((group) => group.id !== id),
+      currentSettingsConfig.gameSettingsGroups.filter((group) => group.name !== name),
       'gameSettingsGroups',
     );
+
+    setLastCreatedGroupName('');
   }, [currentSettingsConfig, changeCurrentConfig]);
 
   const setNewValidationErrors = useCallback((errors: IValidationErrors) => {
@@ -137,7 +151,7 @@ export const DeveloperScreenGameSettings: React.FC = () => {
 
   /* eslint-disable react/jsx-props-no-spreading */
   return (
-    <form
+    <div
       className="develover-screen__form"
     >
       <DeveloperScreenController
@@ -175,7 +189,7 @@ export const DeveloperScreenGameSettings: React.FC = () => {
                 'control-panel__btn',
                 'developer-screen__btn',
               )}
-              isDisabled={!!lastCreatedGroupId}
+              isDisabled={!!lastCreatedGroupName}
               onClick={createNewGroup}
             >
               Добавить
@@ -183,16 +197,31 @@ export const DeveloperScreenGameSettings: React.FC = () => {
             <ul className={styles['developer-screen__groups-container']}>
               {
               currentSettingsConfig.gameSettingsGroups.map((item) => (
-                <GroupItem
-                  key={item.id}
-                  item={item}
-                  isNew={lastCreatedGroupId === item.id}
-                  groups={currentSettingsConfig.gameSettingsGroups}
-                  validationErrors={validationErrors}
-                  editItem={editGroupItem}
-                  deleteItem={deleteGroupItem}
-                  onValidationError={setNewValidationErrors}
-                />
+                <li
+                  key={item.name}
+                  className={classNames(
+                    styles['developer-screen__groups-item'],
+                    lastCreatedGroupName === item.name && styles['developer-screen__groups-item--new'],
+                  )}
+                >
+                  {
+                    lastCreatedGroupName === item.name && (
+                    <p className={styles['developer-screen__group-label']}>
+                      <span>Заголовок группы</span>
+                      <HintItem description="Задать заголовок группы. Отображается как имя вкладки в экране игровых настроек." />
+                    </p>
+                    )
+                  }
+                  <EditableItem
+                    id={item.name}
+                    isError={!!validationErrors[item.name]}
+                    isNew={lastCreatedGroupName === item.name}
+                    item={item.label}
+                    onApply={editGroupItem}
+                    onDelete={deleteGroupItem}
+                    onChange={validateGroupLabel}
+                  />
+                </li>
               ))
             }
             </ul>
@@ -210,6 +239,6 @@ export const DeveloperScreenGameSettings: React.FC = () => {
           />
         </div>
       </Scrollbars>
-    </form>
+    </div>
   );
 };
