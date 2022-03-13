@@ -97,6 +97,7 @@ export const readBackupFolder = async (folderName: string): Promise<IGameSetting
       });
 
       return {
+        id: getRandomId('backup-folder'),
         name: folderName,
         files: newFiles,
       };

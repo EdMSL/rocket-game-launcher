@@ -55,6 +55,7 @@ export interface IBackupFile {
 }
 
 export interface IGameSettingsBackup {
+  id: string,
   name: string,
   files: IBackupFile[],
 }

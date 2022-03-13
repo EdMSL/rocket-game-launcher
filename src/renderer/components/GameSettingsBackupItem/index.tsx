@@ -17,8 +17,10 @@ import {
   renameGameSettingsFilesBackup,
   restoreGameSettingsFilesBackup,
 } from '$actions/main';
+import { EditableItem } from '$components/EditableItem';
 
 interface IProps {
+  id: string,
   backupName: string,
   backupFiles: IBackupFile[],
   allBackups: string[],
@@ -27,6 +29,7 @@ interface IProps {
 }
 
 export const GameSettingsBackupItem: React.FC<IProps> = ({
+  id,
   backupName,
   backupFiles,
   allBackups,
@@ -35,88 +38,50 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
 }) => {
   const dispatch = useDispatch();
 
-  const nameInput = useRef<HTMLInputElement>(null);
   const backupSummary = useRef<HTMLDetailsElement>(null);
 
   const [selectedBackupFiles, setSelectedBackupFiles] = useState<string[]>([]);
-  const [isEditBackupNameMode, setIsEditBackupNameMode] = useState<boolean>(false);
-  const [currentBackupName, setCurrentBackupName] = useState<string>('');
   const [isBackupNameError, setIsBackupNameError] = useState<boolean>(false);
-
-  const cancelBackupRename = useCallback(() => {
-    setCurrentBackupName('');
-    setIsEditBackupNameMode(false);
-    setIsBackupNameError(false);
-  }, []);
-
-  const onEscKeyPress = useCallback((event: KeyboardEvent) => {
-    if (event.code === 'Escape') {
-      cancelBackupRename();
-      backupSummary.current?.focus();
-    }
-  }, [cancelBackupRename]);
 
   // При нажатии пробела summary сворачивается\разворачивается.
   // Для этого отключаем этот функционал, когда инпут внутри него в фокусе.
   const onSpaceKeyPress = useCallback((event: KeyboardEvent) => {
-    if (event.code === 'Space' && document.activeElement === nameInput.current) {
+    if (event.code === 'Space') {
       event.preventDefault();
     }
   }, []);
 
   useEffect(() => {
-    const input = nameInput.current;
     const summary = backupSummary.current;
 
-    nameInput.current?.addEventListener('keyup', onEscKeyPress);
     backupSummary.current?.addEventListener('keyup', onSpaceKeyPress);
 
     return (): void => {
-      if (input !== null) {
-        input.removeEventListener('keyup', onEscKeyPress);
-      }
-
-      if (summary !== null) {
-        summary.removeEventListener('keyup', onSpaceKeyPress);
-      }
+      summary?.removeEventListener('keyup', onSpaceKeyPress);
     };
-  }, [onEscKeyPress, onSpaceKeyPress, isEditBackupNameMode]);
-
-  const onBackupEditBtnClick = useCallback(() => {
-    setIsEditBackupNameMode(true);
-  }, []);
-
-  const onBackupCancelBtnClick = useCallback(() => {
-    cancelBackupRename();
-  }, [cancelBackupRename]);
+  }, [onSpaceKeyPress]);
 
   const onBackupDeleteBtnClick = useCallback(() => {
     dispatch(deleteGameSettingsFilesBackup(backupName));
   }, [dispatch, backupName]);
 
-  const onBackupNameInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
+  const changeBackupName = useCallback((value: string) => {
     if (
-      allBackups.includes(target.value.trim().toLocaleLowerCase())
-      || !isValidName(target.value)
-      || (target.value.length > 0 && target.value.trim().length === 0)
+      (allBackups.includes(value.trim().toLowerCase()) && backupName.toLowerCase() !== value.trim().toLowerCase())
+      || !isValidName(value)
+      || (value.length > 0 && value.trim().length === 0)
     ) {
       setIsBackupNameError(true);
     } else {
       setIsBackupNameError(false);
     }
+  }, [allBackups, backupName]);
 
-    setCurrentBackupName(target.value);
-  }, [allBackups]);
-
-  const onFormSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!isBackupNameError && currentBackupName) {
-      dispatch(renameGameSettingsFilesBackup(backupName, currentBackupName.trim()));
-      setIsEditBackupNameMode(false);
-      setCurrentBackupName('');
+  const renameBackup = useCallback((newName: string) => {
+    if (!isBackupNameError && newName && backupName !== newName) {
+      dispatch(renameGameSettingsFilesBackup(backupName, newName.trim()));
     }
-  }, [dispatch, backupName, isBackupNameError, currentBackupName]);
+  }, [dispatch, backupName, isBackupNameError]);
 
   const onOpenOriginalFileDirectoryBtnClick = useCallback(({ currentTarget }) => {
     openFolder(getPathToParentFileFolder(currentTarget.innerText), sendErrorMessage);
@@ -132,10 +97,6 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
     setSelectedBackupFiles(newSelectedFiles);
   }, [selectedBackupFiles]);
 
-  const onBackupNameInputBlur = useCallback(() => {
-    cancelBackupRename();
-  }, [cancelBackupRename]);
-
   const onAllFilesInputChange = useCallback(({ target }) => {
     const newSelectedFiles = target.checked
       ? backupFiles.map((file) => file.id)
@@ -150,12 +111,13 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
     );
 
     dispatch(restoreGameSettingsFilesBackup({
+      id,
       name: backupName,
       files: filesForRestore,
     }));
 
     setSelectedBackupFiles([]);
-  }, [dispatch, selectedBackupFiles, backupName, backupFiles]);
+  }, [dispatch, id, selectedBackupFiles, backupName, backupFiles]);
 
   return (
     <li className={styles['game-settings-backup__item-container']}>
@@ -166,76 +128,15 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
           className={styles['game-settings-backup__title']}
           ref={backupSummary}
         >
-          {
-            isEditBackupNameMode && (
-              <React.Fragment>
-                <form
-                  className={styles['game-settings-backup__form']}
-                  onSubmit={onFormSubmit}
-                >
-                  <input
-                    className={classNames(
-                      styles['game-settings-backup__name-field'],
-                      isBackupNameError && styles['game-settings-backup__name-field--error'],
-                    )}
-                    ref={nameInput}
-                    type="text"
-                    placeholder={backupName}
-                    value={currentBackupName}
-                    autoFocus
-                    onChange={onBackupNameInputChange}
-                  />
-                  <Button
-                    className={classNames(
-                      styles['game-settings-backup__item-btn--confirm'],
-                      styles['game-settings-backup__item-btn'],
-                    )}
-                    isSubmit
-                    isDisabled={!currentBackupName || isBackupNameError}
-                  >
-                    Принять
-                  </Button>
-                  <Button
-                    className={classNames(
-                      styles['game-settings-backup__item-btn--cancel'],
-                      styles['game-settings-backup__item-btn'],
-                    )}
-                    onClick={onBackupCancelBtnClick}
-                  >
-                    Отменить
-                  </Button>
-                </form>
-              </React.Fragment>
-            )
-          }
-          {
-            !isEditBackupNameMode && (
-              <React.Fragment>
-                <span className={styles['game-settings-backup__title-text']}>
-                  {backupName}
-                </span>
-                <Button
-                  className={classNames(
-                    styles['game-settings-backup__item-btn--edit'],
-                    styles['game-settings-backup__item-btn'],
-                  )}
-                  isDisabled={isEditBackupNameMode}
-                  onClick={onBackupEditBtnClick}
-                >
-                  Редактировать
-                </Button>
-                <Button
-                  className={classNames(
-                    styles['game-settings-backup__item-btn--delete'],
-                    styles['game-settings-backup__item-btn'],
-                  )}
-                  onClick={onBackupDeleteBtnClick}
-                >
-                  Удалить
-                </Button>
-              </React.Fragment>
-            )
-          }
+          <EditableItem
+            id={backupName}
+            item={backupName}
+            isError={isBackupNameError}
+            placeholder={backupName}
+            onApply={renameBackup}
+            onDelete={onBackupDeleteBtnClick}
+            onChange={changeBackupName}
+          />
         </summary>
         <ul className={styles['game-settings-backup__item-list']}>
           <li className={styles['game-settings-backup__file']}>

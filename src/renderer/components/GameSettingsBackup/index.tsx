@@ -87,7 +87,8 @@ export const GameSettingsBackup: React.FC<IProps> = ({
               gameSettingsFilesBackup.length > 0
                 ? gameSettingsFilesBackup.map((backupFolder) => (
                   <GameSettingsBackupItem
-                    key={backupFolder.name}
+                    key={backupFolder.id}
+                    id={backupFolder.id}
                     backupName={backupFolder.name}
                     backupFiles={backupFolder.files}
                     allBackups={gameSettingsBackupsNames}
@@ -129,8 +130,8 @@ export const GameSettingsBackup: React.FC<IProps> = ({
           </Button>
         </div>
         {
-            isGameSettingsFilesBackuping && <Loader />
-          }
+          isGameSettingsFilesBackuping && <Loader />
+        }
       </React.Fragment>
     </div>
   );
