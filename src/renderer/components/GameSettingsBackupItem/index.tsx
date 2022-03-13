@@ -11,7 +11,7 @@ import {
 import { Button } from '$components/UI/Button';
 import { Checkbox } from '$components/UI/Checkbox';
 import { openFolder } from '$utils/process';
-import { getPathToParentFileFolder, isValidName } from '$utils/strings';
+import { isValidName } from '$utils/strings';
 import {
   deleteGameSettingsFilesBackup,
   renameGameSettingsFilesBackup,
@@ -84,7 +84,7 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
   }, [dispatch, backupName, isBackupNameError]);
 
   const onOpenOriginalFileDirectoryBtnClick = useCallback(({ currentTarget }) => {
-    openFolder(getPathToParentFileFolder(currentTarget.innerText), sendErrorMessage);
+    openFolder(currentTarget.innerText, sendErrorMessage, true);
   }, [sendErrorMessage]);
 
   const onBackupFileCheckboxChange = useCallback((

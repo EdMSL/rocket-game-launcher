@@ -154,56 +154,55 @@ export const runApplication = (
 };
 
 /**
- * Открыть папку в проводнике.
- * @param pathToFolder Путь к папке.
+ * Открыть папку в проводнике. Если передан путь к файлу, то выбрать этот файл.
+ * @param pathToOpen Путь к папке.
  * @param cb callback-функция, которая будет вызвана при ошибке.
+ * @param isPathToFile Задает тип открываемого пути для вывода текста ошибки.
 */
 export const openFolder = (
-  pathToFolder: string,
+  pathToOpen: string,
   cb?: (errorMessage: string) => void,
+  isPathToFile = false,
 ): void => {
-  let message: string;
+  let isFolder = true;
 
-  if (fs.existsSync(pathToFolder)) {
-    if (!fs.statSync(pathToFolder).isDirectory()) {
-      message = `Message: Can't open folder. ${ErrorMessage.PATH_TO_FILE}. Path ${pathToFolder}.`; //eslint-disable-line max-len
-      writeToLogFile(
-        message,
-        LogMessageType.ERROR,
-      );
-
-      if (cb) {
-        cb(`Не удалось открыть папку. Указан путь к файлу, не папке. Путь: ${pathToFolder}.`);
-      }
-
-      return;
+  if (fs.existsSync(pathToOpen)) {
+    if (!fs.statSync(pathToOpen).isDirectory()) {
+      isFolder = false;
     }
   } else {
-    message = `Message: Can't open folder. ${ErrorMessage.DIRECTORY_NOT_FOUND}. Path ${pathToFolder}.`; //eslint-disable-line max-len
     writeToLogFile(
-      message,
+      `Message: Can't open folder. ${isPathToFile ? ErrorMessage.FILE_NOT_FOUND : ErrorMessage.DIRECTORY_NOT_FOUND}${isPathToFile ? ' in folder.' : ''}. Path ${pathToOpen}.`, //eslint-disable-line max-len
       LogMessageType.ERROR,
     );
 
     if (cb) {
-      cb(`Не удалось открыть папку. Папка не найдена. Путь: ${pathToFolder}.`);
+      cb(`Не удалось открыть папку. ${isPathToFile ? 'Папка не существует или в ней не найден указанный файл' : 'Папка не найдена'}. Путь: ${pathToOpen}.`);//eslint-disable-line max-len
     }
 
     return;
   }
 
   try {
-    execFile('explorer.exe', [pathToFolder]);
+    if (isFolder) {
+      shell.openPath(pathToOpen);
+    } else {
+      shell.showItemInFolder(pathToOpen);
+    }
   } catch (error: any) {
     writeToLogFile(
-      `Message: Can't open folder. Unknown error. ${error.message} Path ${pathToFolder}.`, //eslint-disable-line max-len
+      `Message: Can't open folder. Unknown error. ${error.message} Path ${pathToOpen}.`, //eslint-disable-line max-len
       LogMessageType.ERROR,
     );
 
     if (cb) {
-      cb(`Не удалось открыть папку. Неизвестная ошибка. Подробности в лог файле. Путь: ${pathToFolder}.`); //eslint-disable-line max-len
+      cb(`Не удалось открыть папку. Неизвестная ошибка. Подробности в лог файле. Путь: ${pathToOpen}.`); //eslint-disable-line max-len
     }
   }
 };
 
+/**
+ * Открывает страницу в браузере.
+ * @param url Адрес сайта для перехода
+ */
 export const openSite = (url: string): void => { shell.openExternal(url); };
