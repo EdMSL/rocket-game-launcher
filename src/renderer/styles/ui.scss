@@ -356,11 +356,12 @@ $checkbox-size: 20px;
 }
 
 .text-field__label {
-  margin-right: 10px;
+  flex: 1 1 50%;
 }
 
 .text-field__input {
-  width: 50%;
+  flex: 1 1 50%;
+  box-sizing: border-box;
   padding: 12px 10px;
 
   font-size: var(--text-size-input);
@@ -387,16 +388,15 @@ $checkbox-size: 20px;
 }
 
 .path-selector__label {
-  margin-right: 10px;
+  flex: 1 1 50%;
 }
 
 .path-selector__input-block {
   position: relative;
 
-  flex-grow: 1;
+  flex: 1 1 50%;
   display: flex;
   align-items: center;
-  max-width: 50%;
 }
 
 .path-selector__select {

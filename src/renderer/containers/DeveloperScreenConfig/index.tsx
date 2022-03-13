@@ -171,7 +171,7 @@ export const DeveloperScreenConfig: React.FC = () => {
     changeCurrentConfig(target.id, target.value, target.dataset.parent);
   }, [changeCurrentConfig]);
 
-  const onCustomBtnDeleteClick = useCallback((id: string) => {
+  const onDeleteCustomBtnBtnClick = useCallback((id: string) => {
     changeCurrentConfig('customButtons', currentConfig.customButtons
       .filter((currentBtn) => currentBtn.id !== id));
   }, [currentConfig, changeCurrentConfig]);
@@ -180,9 +180,9 @@ export const DeveloperScreenConfig: React.FC = () => {
     const newButtons = [
       ...currentConfig.customButtons,
       {
+        id: getRandomId('custom-btn'),
         path: `${PathVariableName.GAME_DIR}\\`,
         action: LauncherButtonAction.OPEN,
-        id: getRandomId('custom-btn'),
         label: 'Открыть папку',
         args: [],
       }];
@@ -229,7 +229,7 @@ export const DeveloperScreenConfig: React.FC = () => {
     || id === 'maxWidth'
     || id === 'maxHeight'
   ), [currentConfig]);
-
+  ///TODO Реализовать открытие нового созданного объекта CustomButton
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <form
@@ -353,18 +353,18 @@ export const DeveloperScreenConfig: React.FC = () => {
             </p>
             <ul className={styles['developer-screen__custom-btns-container']}>
               {
-              currentConfig.customButtons.map((item) => (
-                <CustomBtnItem
-                  key={item.id}
-                  item={item}
-                  pathVariables={pathVariables}
-                  validationErrors={validationErrors}
-                  onDeleteBtnClick={onCustomBtnDeleteClick}
-                  onChangeBtnData={onCustomBtnChange}
-                  onValidationError={setNewValidationErrors}
-                />
-              ))
-                  }
+                currentConfig.customButtons.map((item) => (
+                  <CustomBtnItem
+                    key={item.id}
+                    item={item}
+                    pathVariables={pathVariables}
+                    validationErrors={validationErrors}
+                    onDeleteBtnClick={onDeleteCustomBtnBtnClick}
+                    onChangeBtnData={onCustomBtnChange}
+                    onValidationError={setNewValidationErrors}
+                  />
+                ))
+              }
             </ul>
             <Button
               className={classNames('main-btn', 'developer-screen__btn')}

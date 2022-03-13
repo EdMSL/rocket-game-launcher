@@ -84,52 +84,78 @@ export const CustomBtnItem: React.FC<IProps> = ({
   }, [item, onChangeBtnData]);
 
   return (
-    <li className={styles['developer-screen__custom-btn-item']}>
-      <TextField
-        className="developer-screen__item"
-        id={`item-label_${item.id}`}
-        name="custom-btn-label"
-        value={item.label}
-        label="Заголовок кнопки"
-        description="Текст, который будет отображаться на данной кнопке запуска"
-        onChange={OnTextFieldChange}
-      />
-      <Checkbox
-        className="developer-screen__item"
-        id={`item-checkbox_${item.id}`}
-        label="Кнопка запуска приложения?"
-        isChecked={item.action === LauncherButtonAction.RUN}
-        description="Определяет действие по нажатию кнопки: запуск приложения\файла или открытие папки. Влияет на доступный выбор в селекторе пути ниже"//eslint-disable-line max-len
-        onChange={onCheckboxChange}
-      />
-      <PathSelector
-        className="developer-screen__item"
-        id={`item-path_${item.id}`}
-        label="Путь до файла\папки"
-        value={item.path}
-        options={generateSelectOptions([PathVariableName.GAME_DIR])}
-        pathVariables={pathVariables}
-        selectorType={item.action}
-        description="Путь до файла для запуска или папки для открытия в проводнике"
-        validationErrors={validationErrors[`item-path_${item.id}`]}
-        onChange={onPathSelectorChange}
-      />
-      <ArgumentsBlock
-        args={item.args!}
-        parent="customButtons"
-        className="developer-screen__item"
-        pathVariables={pathVariables}
-        description="Дополнительные агрументы запуска"
-        validationErrors={validationErrors}
-        changeArguments={onChangeArguments}
-        onValidationError={onValidationError}
-      />
-      <Button
-        className={classNames('button', 'main-btn')}
-        onClick={onDeleteCustomBtnBtnClick}
+    <li className={styles['custom-btn__item']}>
+      <details
+        className={styles['custom-btn__block']}
       >
-        Удалить
-      </Button>
+        <summary className={classNames(
+          styles['custom-btn-title'],
+          Object.keys(validationErrors).find((error) => error.includes(item.id)) && styles['custom-btn-title--error'],
+        )}
+        >
+          <span className={styles['custom-btn-text']}>Заголовок:</span>
+          <span className={styles['custom-btn-text']}>{item.label}</span>
+          <span className={styles['custom-btn-text']}>Путь:</span>
+          <span className={styles['custom-btn-text']}>{item.path}</span>
+          <Button
+            className={classNames(
+              styles['custom-btn__title-btn'],
+            )}
+            onClick={onDeleteCustomBtnBtnClick}
+          >
+            Удалить
+          </Button>
+        </summary>
+        <TextField
+          className="developer-screen__item"
+          id={`item-label_${item.id}`}
+          name="custom-btn-label"
+          value={item.label}
+          label="Заголовок кнопки"
+          description="Текст, который будет отображаться на данной кнопке запуска"
+          onChange={OnTextFieldChange}
+        />
+        <Checkbox
+          className="developer-screen__item"
+          id={`item-checkbox_${item.id}`}
+          label="Кнопка запуска приложения?"
+          isChecked={item.action === LauncherButtonAction.RUN}
+          description="Определяет действие по нажатию кнопки: запуск приложения\файла или открытие папки. Влияет на доступный выбор в селекторе пути ниже"//eslint-disable-line max-len
+          onChange={onCheckboxChange}
+        />
+        <PathSelector
+          className="developer-screen__item"
+          id={`item-path_${item.id}`}
+          label="Путь до файла\папки"
+          value={item.path}
+          options={generateSelectOptions([PathVariableName.GAME_DIR])}
+          pathVariables={pathVariables}
+          selectorType={item.action}
+          description="Путь до файла для запуска или папки для открытия в проводнике"
+          validationErrors={validationErrors[`item-path_${item.id}`]}
+          onChange={onPathSelectorChange}
+        />
+        <ArgumentsBlock
+          args={item.args!}
+          parent="customButtons"
+          parentId={item.id}
+          className="developer-screen__item"
+          pathVariables={pathVariables}
+          description="Дополнительные агрументы запуска"
+          validationErrors={validationErrors}
+          changeArguments={onChangeArguments}
+          onValidationError={onValidationError}
+        />
+        <Button
+          className={classNames(
+            'main-btn',
+            'custom-btn__button',
+          )}
+          onClick={onDeleteCustomBtnBtnClick}
+        >
+          Удалить
+        </Button>
+      </details>
     </li>
   );
 };

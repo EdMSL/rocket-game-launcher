@@ -127,7 +127,7 @@ const configFileDataSchema = Joi.object({
       id: Joi.string().optional().default(() => getRandomId('custom-btn')),
       path: Joi.string().required().custom(getIsPathWithVariableCorrectForCustomBtn),
       args: Joi.array().items(Joi.object({
-        id: Joi.string().optional().default(() => getRandomId('custom-btn-arg')),
+        id: Joi.string().optional().default((parent, helpers) => getRandomId(`custom-btn-arg_${helpers.state.ancestors[2].id.split('_')[1]}`)),
         data: Joi.string().required(),
       })).optional().default([]),
       label: Joi.string().optional().default('Запуск'),

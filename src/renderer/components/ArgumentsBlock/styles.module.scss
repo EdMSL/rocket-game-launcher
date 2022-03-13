@@ -24,13 +24,11 @@
   }
 
   & .text-field__input {
-    flex-grow: 1;
-
     font-size: var(--text-size-input);
   }
 
   & .text-field__label {
-    margin-right: 0;
+    display: none;
   }
 
   & .path-selector__container {

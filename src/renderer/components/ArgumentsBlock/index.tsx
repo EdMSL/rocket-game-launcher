@@ -21,8 +21,9 @@ interface IProps {
   args: IButtonArg[],
   parent: string,
   pathVariables: IPathVariables,
-  description?: string,
   validationErrors: IValidationErrors,
+  description?: string,
+  parentId?: string,
   changeArguments: (newArgs: IButtonArg[], parent: string) => void,
   onValidationError: (errors: IValidationErrors) => void,
 }
@@ -34,6 +35,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
   pathVariables,
   description,
   validationErrors,
+  parentId,
   changeArguments,
   onValidationError,
 }) => {
@@ -82,7 +84,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
       parent,
     );
   }, [args, parent, changeArguments]);
-
+  ///TODO Удаление аргумента с ошибкой не удаляет ошибку из списка ошибок
   const onDeleteArgBtnClick = useCallback(({
     currentTarget,
   }: React.MouseEvent<HTMLButtonElement>) => {
@@ -98,7 +100,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
     const newArgs = [
       ...args,
       {
-        id: getRandomId(`${parent}-arg`),
+        id: getRandomId(`${parentId || parent}-arg`),
         data: currentTarget.name === 'add-arg-path'
           ? `${PathVariableName.GAME_DIR}\\example.exe`
           : '',
@@ -106,7 +108,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
     ];
 
     changeArguments(newArgs, parent);
-  }, [args, parent, changeArguments]);
+  }, [args, parent, parentId, changeArguments]);
 
   return (
     <div className={classNames(
