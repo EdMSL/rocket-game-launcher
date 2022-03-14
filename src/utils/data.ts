@@ -743,3 +743,17 @@ export const getUniqueValidationErrors = (
     };
   }, {});
 };
+
+/**
+ *Очищает при удалении компонента все ошибки валидации, связанные этим компонентом.
+ * @param validationErrors Текущие ошибки валидации.
+ * @param id id удаляемого компонента.
+ * @returns Ошибки валидации без ошибок, привязанных к текущему компоненту.
+ */
+export const clearValidationErrors = (
+  validationErrors: IValidationErrors,
+  id: string,
+): IValidationErrors => Object.keys(validationErrors).filter((error) => !error.includes(id)).reduce((acc, current) => ({
+  ...acc,
+  [current]: validationErrors[current],
+}), {});

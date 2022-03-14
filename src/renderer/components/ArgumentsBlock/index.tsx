@@ -7,7 +7,9 @@ import {
 } from '$constants/misc';
 import { PathSelector } from '$components/UI/PathSelector';
 import { IPathVariables } from '$constants/paths';
-import { generateSelectOptions, getUniqueValidationErrors } from '$utils/data';
+import {
+  clearValidationErrors, generateSelectOptions, getUniqueValidationErrors,
+} from '$utils/data';
 import { Button } from '$components/UI/Button';
 import { TextField } from '$components/UI/TextField';
 import { HintItem } from '$components/HintItem';
@@ -84,7 +86,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
       parent,
     );
   }, [args, parent, changeArguments]);
-  ///TODO Удаление аргумента с ошибкой не удаляет ошибку из списка ошибок
+
   const onDeleteArgBtnClick = useCallback(({
     currentTarget,
   }: React.MouseEvent<HTMLButtonElement>) => {
@@ -92,7 +94,9 @@ export const ArgumentsBlock: React.FC<IProps> = ({
       args.filter((currentArg) => currentArg.id !== currentTarget.id.split(':')[1]),
       parent,
     );
-  }, [args, parent, changeArguments]);
+
+    onValidationError(clearValidationErrors(validationErrors, currentTarget.id.split(':')[1]));
+  }, [args, parent, validationErrors, changeArguments, onValidationError]);
 
   const OnAddArgumentBtnClick = useCallback(({
     currentTarget,

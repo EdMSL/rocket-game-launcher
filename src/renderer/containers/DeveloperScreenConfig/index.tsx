@@ -33,6 +33,7 @@ import {
   IMainRootState,
 } from '$types/main';
 import {
+  clearValidationErrors,
   generateSelectOptions, getNewConfig, getUniqueValidationErrors,
 } from '$utils/data';
 import { ArgumentsBlock } from '$components/ArgumentsBlock';
@@ -174,7 +175,9 @@ export const DeveloperScreenConfig: React.FC = () => {
   const onDeleteCustomBtnBtnClick = useCallback((id: string) => {
     changeCurrentConfig('customButtons', currentConfig.customButtons
       .filter((currentBtn) => currentBtn.id !== id));
-  }, [currentConfig, changeCurrentConfig]);
+
+    setValidationErrors(clearValidationErrors(validationErrors, id));
+  }, [currentConfig, validationErrors, changeCurrentConfig]);
 
   const onAddCustomBtnBtnClick = useCallback(() => {
     const newButtons = [
