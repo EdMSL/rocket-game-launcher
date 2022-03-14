@@ -1,9 +1,6 @@
 import { ipcRenderer } from 'electron';
 import React, {
-  useCallback,
-  useState,
-  useEffect,
-  ReactElement,
+  useCallback, useState, useEffect, ReactElement,
 } from 'react';
 import { useDispatch } from 'react-redux';
 import classNames from 'classnames';
@@ -34,7 +31,9 @@ import {
 } from '$types/main';
 import {
   clearValidationErrors,
-  generateSelectOptions, getNewConfig, getUniqueValidationErrors,
+  generateSelectOptions,
+  getNewConfig,
+  getUniqueValidationErrors,
 } from '$utils/data';
 import { ArgumentsBlock } from '$components/ArgumentsBlock';
 import {
@@ -56,6 +55,7 @@ export const DeveloperScreenConfig: React.FC = () => {
   const [currentConfig, setCurrentConfig] = useState<IMainRootState['config']>(launcherConfig);
   const [validationErrors, setValidationErrors] = useState<IValidationErrors>({});
   const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
+  const [lastAddedBtnItemId, setLastAddedBtnItemId] = useState<string>('');
 
   const saveConfigChanges = useCallback((
     isGoToMainScreen: boolean,
@@ -176,21 +176,23 @@ export const DeveloperScreenConfig: React.FC = () => {
     changeCurrentConfig('customButtons', currentConfig.customButtons
       .filter((currentBtn) => currentBtn.id !== id));
 
+    setLastAddedBtnItemId('');
     setValidationErrors(clearValidationErrors(validationErrors, id));
   }, [currentConfig, validationErrors, changeCurrentConfig]);
 
   const onAddCustomBtnBtnClick = useCallback(() => {
-    const newButtons = [
+    const newId = getRandomId('custom-btn');
+
+    setLastAddedBtnItemId(newId);
+    changeCurrentConfig('customButtons', [
       ...currentConfig.customButtons,
       {
-        id: getRandomId('custom-btn'),
+        id: newId,
         path: `${PathVariableName.GAME_DIR}\\`,
         action: LauncherButtonAction.OPEN,
         label: 'Открыть папку',
         args: [],
-      }];
-
-    changeCurrentConfig('customButtons', newButtons);
+      }]);
   }, [currentConfig, changeCurrentConfig]);
 
   const onCustomBtnChange = useCallback((
@@ -232,12 +234,10 @@ export const DeveloperScreenConfig: React.FC = () => {
     || id === 'maxWidth'
     || id === 'maxHeight'
   ), [currentConfig]);
-  ///TODO Реализовать открытие нового созданного объекта CustomButton
+
   /* eslint-disable react/jsx-props-no-spreading */
   return (
-    <form
-      className="develover-screen__form"
-    >
+    <form className="develover-screen__form">
       <DeveloperScreenController
         isConfigChanged={isConfigChanged}
         isHaveValidationErrors={Object.keys(validationErrors).length > 0}
@@ -362,6 +362,7 @@ export const DeveloperScreenConfig: React.FC = () => {
                     item={item}
                     pathVariables={pathVariables}
                     validationErrors={validationErrors}
+                    lastItemId={lastAddedBtnItemId}
                     onDeleteBtnClick={onDeleteCustomBtnBtnClick}
                     onChangeBtnData={onCustomBtnChange}
                     onValidationError={setNewValidationErrors}

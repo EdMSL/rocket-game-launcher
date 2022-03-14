@@ -1,10 +1,29 @@
 .custom-btn__item {
-  margin-bottom: var(--indent-size);
+  margin-bottom: calc(var(--indent-size) * 2);
 }
 
 .custom-btn__block {
+  position: relative;
+
   display: flex;
   flex-direction: column;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 40%;
+
+    display: none;
+    width: 20%;
+    height: 1px;
+
+    background-color: var(--text-main);
+  }
+
+  &[open]::after {
+    display: block;
+  }
 }
 
 .custom-btn-title {

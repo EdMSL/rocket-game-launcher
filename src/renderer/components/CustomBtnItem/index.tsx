@@ -1,4 +1,6 @@
-import React, { useCallback } from 'react';
+import React, {
+  useCallback, useEffect, useRef,
+} from 'react';
 import classNames from 'classnames';
 
 import styles from './styles.module.scss';
@@ -24,6 +26,7 @@ interface IProps {
   item: ILauncherCustomButton,
   pathVariables: IPathVariables,
   validationErrors: IValidationErrors,
+  lastItemId: string,
   onDeleteBtnClick: (id: string) => void,
   onChangeBtnData: (newBtnData: ILauncherCustomButton) => void,
   onValidationError: (errors: IValidationErrors) => void,
@@ -33,10 +36,19 @@ export const CustomBtnItem: React.FC<IProps> = ({
   item,
   validationErrors,
   pathVariables,
+  lastItemId,
   onChangeBtnData,
   onDeleteBtnClick,
   onValidationError,
 }) => {
+  const detailsElementRef = useRef<HTMLDetailsElement>(null);
+
+  useEffect(() => {
+    if (item.id === lastItemId) {
+      detailsElementRef.current?.setAttribute('open', 'open');
+    }
+  }, [item.id, lastItemId]);
+
   const onCheckboxChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     const newSelectorType = target.checked ? LauncherButtonAction.RUN : LauncherButtonAction.OPEN;
     const isPathCorrect = getIsPathWithVariableCorrect(item.path, newSelectorType);
@@ -87,6 +99,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
     <li className={styles['custom-btn__item']}>
       <details
         className={styles['custom-btn__block']}
+        ref={detailsElementRef}
       >
         <summary className={classNames(
           styles['custom-btn-title'],
