@@ -97,7 +97,7 @@ const getConfigurationData = (): ILauncherConfig => {
   }
 };
 
-const getGameSettingsData = (messages: IUserMessage[]): [IGameSettingsConfig, boolean] => {
+const getGameSettingsData = (messages: IUserMessage[]): [IGameSettingsConfig, boolean|null] => {
   try {
     const fileData = readJSONFileSync<IGameSettingsConfig>(GAME_SETTINGS_FILE_PATH, false);
 
@@ -106,9 +106,11 @@ const getGameSettingsData = (messages: IUserMessage[]): [IGameSettingsConfig, bo
     if (error instanceof ReadWriteError) {
       if (error.cause.name === ErrorName.NOT_FOUND) {
         writeToLogFileSync('Game settings file settings.json not found.');
-      } else {
-        writeToLogFileSync(`Unknown error. Message: ${error.message}`);
+
+        return [defaultGameSettingsConfig, null];
       }
+
+      writeToLogFileSync(`Unknown error. Message: ${error.message}`);
     } else if (error instanceof CustomError) {
       messages.push(CreateUserMessage.error('Ошибка обработки файла settings.json. Игровые настройки будут недоступны. Подробности в файле лога.')); //eslint-disable-line max-len
       writeToLogFileSync(`An error occured during settinsgs.json file processing. Message: ${error.message}`, LogMessageType.ERROR); //eslint-disable-line max-len
@@ -206,7 +208,8 @@ export const createStorage = (): Store<IAppState> => {
           ...configurationData.playButton,
         },
       },
-      isGameSettingsAvailable: isSettingsAvailable,
+      isGameSettingsAvailable: isSettingsAvailable !== null && isSettingsAvailable,
+      isGameSettingsFileExists: isSettingsAvailable !== null,
       isDevWindowOpeninging: configurationData.isFirstLaunch,
       launcherVersion: app.getVersion(),
       pathVariables,
@@ -243,10 +246,10 @@ export const createStorage = (): Store<IAppState> => {
   });
 
   writeToLogFileSync(`Working directory: ${GAME_DIR}`);
-  writeToLogFileSync(`Paths variables: \n${getObjectAsList(pathVariables)}`);
+  writeToLogFileSync(`Paths variables: \n  ${getObjectAsList(pathVariables)}`);
 
   if (configurationFileData.modOrganizer) {
-    writeToLogFileSync(`MO information: \n${getObjectAsList(configurationFileData.modOrganizer!)}`);
+    writeToLogFileSync(`MO information: \n  ${getObjectAsList(configurationFileData.modOrganizer!)}`); //eslint-disable-line max-len
   }
 
   return appStore;

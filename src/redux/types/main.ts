@@ -101,6 +101,7 @@ export type IMainRootState = Readonly<{
   isGameRunning: boolean,
   isGameSettingsLoaded: boolean,
   isGameSettingsAvailable: boolean,
+  isGameSettingsFileExists: boolean,
   isGameSettingsSaving: boolean,
   isGameSettingsFilesBackuping: boolean,
   isDeveloperMode: boolean,

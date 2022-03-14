@@ -324,7 +324,7 @@ export const getPathToFile = (
 */
 export const getObjectAsList = (obj: { [key: string]: any, }): string => Object.keys(obj)
   .map((key) => `${key}: ${obj[key]}`)
-  .join('\n');
+  .join('\n  ');
 
 /**
  * Получить путь до родительской папки файла.
