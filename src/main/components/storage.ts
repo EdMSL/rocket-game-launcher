@@ -110,9 +110,10 @@ const getGameSettingsData = (messages: IUserMessage[]): [IGameSettingsConfig, bo
         writeToLogFileSync(`Unknown error. Message: ${error.message}`);
       }
     } else if (error instanceof CustomError) {
-      messages.push(CreateUserMessage.error('Ошибка обработки файла settings.json. Игровые настройки будут недоступны. Подробности в файле лога')); //eslint-disable-line max-len
+      messages.push(CreateUserMessage.error('Ошибка обработки файла settings.json. Игровые настройки будут недоступны. Подробности в файле лога.')); //eslint-disable-line max-len
+      writeToLogFileSync(`An error occured during settinsgs.json file processing. Message: ${error.message}`, LogMessageType.ERROR); //eslint-disable-line max-len
     } else {
-      writeToLogFileSync(`Unknown error. Message: ${error.message}`);
+      writeToLogFileSync(`Unknown error. Message: ${error.message}`, LogMessageType.ERROR);
     }
   }
 
