@@ -46,6 +46,7 @@ export interface ILauncherCustomButton extends ILauncherAppButton {
 
 export interface IUserMessage extends IMessage {
   id: string,
+  window: string,
 }
 
 export interface IBackupFile {

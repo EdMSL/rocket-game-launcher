@@ -5,6 +5,7 @@ import {
   Switch,
   Route,
   useLocation,
+  Redirect,
 } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 
@@ -79,10 +80,12 @@ export const App = (): JSX.Element => {
           path={Routes.DEVELOPER_SCREEN}
           component={DeveloperScreen}
         />
+        <Redirect
+          from="/"
+          to={Routes.MAIN_SCREEN}
+        />
       </Switch>
-      {
-        !pathname.includes(Routes.DEVELOPER_SCREEN) && <Messages />
-      }
+      <Messages />
       {
         isOpenAppInfo && (
           <Modal

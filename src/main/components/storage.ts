@@ -47,6 +47,7 @@ import { ILauncherConfig, IUserMessage } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
 import { Scope } from '$constants/misc';
 import { IGameSettingsConfig } from '$types/gameSettings';
+import { RoutesWindowName } from '$constants/routes';
 
 interface IStorage {
   userSettings: IUserSettingsRootState,
@@ -106,13 +107,17 @@ const getGameSettingsData = (messages: IUserMessage[]): [IGameSettingsConfig, bo
     if (error instanceof ReadWriteError) {
       if (error.cause.name === ErrorName.NOT_FOUND) {
         writeToLogFileSync('Game settings file settings.json not found.');
+        messages.push(CreateUserMessage.warning('Не найден файл settings.json. Загружены игровые настройки по умолчанию.', RoutesWindowName.DEV)); //eslint-disable-line max-len
 
         return [defaultGameSettingsConfig, null];
       }
 
       writeToLogFileSync(`Unknown error. Message: ${error.message}`);
     } else if (error instanceof CustomError) {
-      messages.push(CreateUserMessage.error('Ошибка обработки файла settings.json. Игровые настройки будут недоступны. Подробности в файле лога.')); //eslint-disable-line max-len
+      messages.push(
+        CreateUserMessage.error('Ошибка обработки файла settings.json. Игровые настройки будут недоступны. Подробности в файле лога.'), //eslint-disable-line max-len
+        CreateUserMessage.error('Ошибка обработки файла settings.json. Загружены игровые настройки по умолчанию.', RoutesWindowName.DEV), //eslint-disable-line max-len
+      );
       writeToLogFileSync(`An error occured during settinsgs.json file processing. Message: ${error.message}`, LogMessageType.ERROR); //eslint-disable-line max-len
     } else {
       writeToLogFileSync(`Unknown error. Message: ${error.message}`, LogMessageType.ERROR);

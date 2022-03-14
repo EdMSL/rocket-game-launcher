@@ -1,3 +1,4 @@
+import { RoutesWindowName } from '$constants/routes';
 import { IUserMessage } from '$types/main';
 import { getRandomId } from '$utils/strings';
 
@@ -12,17 +13,18 @@ export interface IMessage {
  * Создает сообщение для вывода на главный экран приложения.
  * @param type Тип сообщения.
  * @param text Текст сообщения.
- * @param word Слово для генерации id. По умолчанию параметр `type`.
+ * @param window Окно, где будет выводиться сообщение.
  * @returns Объект сообщения.
 */
 const createMessage = (
   type: IMessageType,
   text: string,
-  word: IMessageType|string = type,
+  window = RoutesWindowName.MAIN,
 ): IUserMessage => ({
-  id: getRandomId(word),
+  id: getRandomId(type),
   type,
   text,
+  window,
 });
 
 export const CreateUserMessage = {
@@ -31,23 +33,23 @@ export const CreateUserMessage = {
    * @param text Текст сообщения.
    * @returns Объект сообщения.
   */
-  error: (text: string): IUserMessage => createMessage('error', text),
+  error: (text: string, window?: string): IUserMessage => createMessage('error', text, window),
   /**
    * Создать информационное сообщение пользователю с предупреждением.
    * @param text Текст сообщения.
    * @returns Объект сообщения.
   */
-  warning: (text: string): IUserMessage => createMessage('warning', text),
+  warning: (text: string, window?: string): IUserMessage => createMessage('warning', text, window),
   /**
    * Создать информационное сообщение пользователю.
    * @param text Текст сообщения.
    * @returns Объект сообщения.
   */
-  info: (text: string): IUserMessage => createMessage('info', text),
+  info: (text: string, window?: string): IUserMessage => createMessage('info', text, window),
   /**
    * Создать информационное сообщение пользователю об успехе.
    * @param text Текст сообщения.
    * @returns Объект сообщения.
   */
-  success: (text: string): IUserMessage => createMessage('success', text),
+  success: (text: string, window?: string): IUserMessage => createMessage('success', text, window),
 };

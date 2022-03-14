@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 
 import styles from './styles.module.scss';
 import { useAppSelector } from '$store/store';
@@ -12,17 +13,23 @@ export const Messages: React.FC = () => {
 
   const dispatch = useDispatch();
 
+  const { pathname } = useLocation<{ [key: string]: string, }>();
+
+  const filteredMessages = messages.filter((message) => pathname.includes(message.window));
+
   const onDeleteAllMessagesBtnClick = useCallback(() => {
-    dispatch(setMessages([]));
-  }, [dispatch]);
+    const clearedMessages = messages.filter((message) => !pathname.includes(message.window));
+
+    dispatch(setMessages(clearedMessages));
+  }, [dispatch, pathname, messages]);
 
   return (
     <div className={styles.messages}>
       {
-        messages.length > 0 && (
+        filteredMessages.length > 0 && (
           <React.Fragment>
             {
-              messages.length > 1 && (
+              filteredMessages.length > 1 && (
                 <Button
                   className={styles.messages__btn}
                   onClick={onDeleteAllMessagesBtnClick}
@@ -32,7 +39,7 @@ export const Messages: React.FC = () => {
               )
             }
             <ul className={styles.messages__list}>
-              {messages.map((currentMessage) => (
+              {filteredMessages.map((currentMessage) => (
                 <Message
                   key={currentMessage.id}
                   message={currentMessage}
