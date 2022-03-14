@@ -134,7 +134,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
             key={currentArg.id}
           >
             {
-              PathRegExp.PATH_VARIABLE_REGEXP.test(currentArg.data)
+              PathRegExp.PATH_VARIABLE.test(currentArg.data)
                 ? (
                   <PathSelector
                     id={currentArg.id}

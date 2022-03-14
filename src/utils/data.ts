@@ -487,7 +487,7 @@ export const changeSectionalIniParameter = (
 export const getApplicationArgs = (args: string[]): string[] => args.map((arg) => {
   let newArg = arg;
 
-  if (PathRegExp.GAME_DIR_REGEXP.test(arg)) {
+  if (PathRegExp.GAME_DIR.test(arg)) {
     newArg = getPathToFile(arg, DefaultPathVariable, '');
   }
 
@@ -688,7 +688,7 @@ export const getCustomButtons = (
  * @returns Массив из строк переменной и остатка пути.
 */
 export const getVariableAndValueFromPath = (pathStr: string): [string, string] => {
-  const pathVariable = pathStr.match(PathRegExp.PATH_VARIABLE_REGEXP)![0];
+  const pathVariable = pathStr.match(PathRegExp.PATH_VARIABLE)![0];
   const pathValue = clearPathVaribaleFromPathString(pathStr);
 
   return [pathVariable, pathValue];

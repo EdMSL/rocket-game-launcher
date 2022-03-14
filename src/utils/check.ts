@@ -57,7 +57,7 @@ export const getIsPathWithVariableCorrect = (
       return extensions.includes(path.extname(value).substr(1));
     }
 
-    return Boolean(/\.[a-zA-Z0-9]{2,}/.test(path.extname(value)));
+    return Boolean(PathRegExp.PATH_EXTNAME.test(path.extname(value)));
   }
 
   return false;
@@ -101,21 +101,21 @@ const configFileDataSchema = Joi.object({
   modOrganizer: Joi.object({
     isUsed: Joi.bool().optional().default(false),
     version: Joi.number().valid(1, 2).when(Joi.ref('isUsed'), { is: true, then: Joi.required() }),
-    pathToMOFolder: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToMOFolder).pattern(PathRegExp.GAME_DIR_REGEXP, 'correct path'),
-    pathToINI: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToINI).pattern(PathRegExp.MO_DIR_REGEXP, 'correct path'),
-    pathToProfiles: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToProfiles).pattern(PathRegExp.MO_DIR_REGEXP, 'correct path'),
-    pathToMods: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToMods).pattern(PathRegExp.MO_DIR_REGEXP, 'correct path'),
+    pathToMOFolder: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToMOFolder).pattern(PathRegExp.GAME_DIR, 'correct path'),
+    pathToINI: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToINI).pattern(PathRegExp.MO_DIR, 'correct path'),
+    pathToProfiles: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToProfiles).pattern(PathRegExp.MO_DIR, 'correct path'),
+    pathToMods: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToMods).pattern(PathRegExp.MO_DIR, 'correct path'),
     profileSection: Joi.string().optional(),
     profileParam: Joi.string().optional(),
     profileParamValueRegExp: Joi.string().optional().allow(''),
   }).optional().default(defaultLauncherConfig.modOrganizer),
   documentsPath: Joi.string().optional().allow('').default(defaultLauncherConfig.documentsPath)
-    .pattern(PathRegExp.DOCUMENTS_REGEXP, 'correct path'),
+    .pattern(PathRegExp.DOCUMENTS, 'correct path'),
   isFirstLaunch: Joi.bool().optional().default(defaultLauncherConfig.isFirstLaunch),
   gameName: Joi.string().optional().allow('').default(defaultLauncherConfig.gameName),
   playButton: Joi.object({
     path: Joi.string().optional().allow('').default(defaultLauncherConfig.playButton.path)
-      .pattern(PathRegExp.GAME_DIR_REGEXP, 'correct path'),
+      .pattern(PathRegExp.GAME_DIR, 'correct path'),
     args: Joi.array().items(Joi.object({
       id: Joi.string().optional().default(() => getRandomId('play-btn-arg')),
       data: Joi.string().required(),

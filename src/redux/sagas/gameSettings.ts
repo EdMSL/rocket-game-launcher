@@ -599,7 +599,7 @@ function* changeMOProfileSaga(
 
     const MOProfileGameSettingsOnly = Object.keys(gameSettingsFiles)
       .reduce<IGameSettingsFiles>((acc, curr) => {
-        if (new RegExp(PathRegExp.MO_PROFILE_REGEXP).test(gameSettingsFiles[curr].path)) {
+        if (new RegExp(PathRegExp.MO_PROFILE).test(gameSettingsFiles[curr].path)) {
           return {
             ...acc,
             [curr]: {
