@@ -24,21 +24,27 @@ import { IValidationErrors } from '$types/common';
 
 interface IProps {
   item: ILauncherCustomButton,
+  position: number,
+  quantity: number,
   pathVariables: IPathVariables,
   validationErrors: IValidationErrors,
   lastItemId: string,
   onDeleteBtnClick: (id: string) => void,
   onChangeBtnData: (newBtnData: ILauncherCustomButton) => void,
+  onChangeBtnOrder: (position: number, isUpInOrder: boolean) => void,
   onValidationError: (errors: IValidationErrors) => void,
 }
 
 export const CustomBtnItem: React.FC<IProps> = ({
   item,
+  position,
+  quantity,
   validationErrors,
   pathVariables,
   lastItemId,
   onChangeBtnData,
   onDeleteBtnClick,
+  onChangeBtnOrder,
   onValidationError,
 }) => {
   const detailsElementRef = useRef<HTMLDetailsElement>(null);
@@ -85,15 +91,21 @@ export const CustomBtnItem: React.FC<IProps> = ({
     }
   }, [item, validationErrors, onValidationError, onChangeBtnData]);
 
-  const onDeleteCustomBtnBtnClick = useCallback(() => {
-    onDeleteBtnClick(item.id);
-  }, [onDeleteBtnClick, item.id]);
-
   const onChangeArguments = useCallback((
     newArgs: IButtonArg[],
   ) => {
     onChangeBtnData({ ...item, args: newArgs });
   }, [item, onChangeBtnData]);
+
+  const onDeleteCustomBtnBtnClick = useCallback(() => {
+    onDeleteBtnClick(item.id);
+  }, [onDeleteBtnClick, item.id]);
+
+  const onChangeButtonsOrderBtnClick = useCallback((
+    { currentTarget }: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    onChangeBtnOrder(position, currentTarget.name === 'up');
+  }, [position, onChangeBtnOrder]);
 
   return (
     <li className={styles['custom-btn__item']}>
@@ -103,7 +115,8 @@ export const CustomBtnItem: React.FC<IProps> = ({
       >
         <summary className={classNames(
           styles['custom-btn-title'],
-          Object.keys(validationErrors).find((error) => error.includes(item.id)) && styles['custom-btn-title--error'],
+          Object.keys(validationErrors).find((error) => error.includes(item.id))
+            && styles['custom-btn-title--error'],
         )}
         >
           <span className={styles['custom-btn-text']}>Заголовок:</span>
@@ -113,6 +126,29 @@ export const CustomBtnItem: React.FC<IProps> = ({
           <Button
             className={classNames(
               styles['custom-btn__title-btn'],
+              styles['custom-btn__title-btn--up'],
+            )}
+            name="up"
+            isDisabled={quantity === 1 || position === 0}
+            onClick={onChangeButtonsOrderBtnClick}
+          >
+            Вверх
+          </Button>
+          <Button
+            className={classNames(
+              styles['custom-btn__title-btn'],
+              styles['custom-btn__title-btn--down'],
+            )}
+            name="down"
+            isDisabled={quantity === 1 || position === quantity - 1}
+            onClick={onChangeButtonsOrderBtnClick}
+          >
+            Вниз
+          </Button>
+          <Button
+            className={classNames(
+              styles['custom-btn__title-btn'],
+              styles['custom-btn__title-btn--delete'],
             )}
             onClick={onDeleteCustomBtnBtnClick}
           >

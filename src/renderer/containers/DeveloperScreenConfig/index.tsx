@@ -209,6 +209,24 @@ export const DeveloperScreenConfig: React.FC = () => {
     changeCurrentConfig('customButtons', newButtons);
   }, [currentConfig, changeCurrentConfig]);
 
+  const onCustomBtnChangeOrder = useCallback((position: number, isUpInOrder: boolean) => {
+    const newButtons = [...currentConfig.customButtons];
+
+    if (isUpInOrder) {
+      [
+        newButtons[position - 1],
+        newButtons[position],
+      ] = [newButtons[position], newButtons[position - 1]];
+    } else {
+      [
+        newButtons[position],
+        newButtons[position + 1],
+      ] = [newButtons[position + 1], newButtons[position]];
+    }
+
+    changeCurrentConfig('customButtons', newButtons);
+  }, [currentConfig.customButtons, changeCurrentConfig]);
+
   const changeArguments = useCallback((
     newArgs: IButtonArg[],
     parent: string,
@@ -356,15 +374,18 @@ export const DeveloperScreenConfig: React.FC = () => {
             </p>
             <ul className={styles['developer-screen__custom-btns-container']}>
               {
-                currentConfig.customButtons.map((item) => (
+                currentConfig.customButtons.map((item, index) => (
                   <CustomBtnItem
                     key={item.id}
                     item={item}
+                    position={index}
+                    quantity={currentConfig.customButtons.length}
                     pathVariables={pathVariables}
                     validationErrors={validationErrors}
                     lastItemId={lastAddedBtnItemId}
                     onDeleteBtnClick={onDeleteCustomBtnBtnClick}
                     onChangeBtnData={onCustomBtnChange}
+                    onChangeBtnOrder={onCustomBtnChangeOrder}
                     onValidationError={setNewValidationErrors}
                   />
                 ))
