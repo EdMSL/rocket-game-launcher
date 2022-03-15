@@ -87,7 +87,7 @@ ipcMain.handle(
   (
     event,
     selectorType: string,
-    startPath: string,
+    startPath?: string,
     extensions?: string[],
   ) => getPathFromFileInput(
     dialog,

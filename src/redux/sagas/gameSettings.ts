@@ -27,6 +27,7 @@ import {
   addMessages,
   setIsGameSettingsAvailable,
   setIsGameSettingsLoaded,
+  setIsGameSettingsLoading,
   setIsGameSettingsSaving,
   setIsLauncherConfigChanged,
 } from '$actions/main';
@@ -441,10 +442,10 @@ export function* initGameSettingsSaga(
   settingsFiles?: IGameSettingsConfig['gameSettingsFiles'],
 ): SagaIterator {
   try {
-    yield put(setIsGameSettingsLoaded(false));
+    yield put(setIsGameSettingsLoading(true));
     writeToLogFileSync('Game settings initialization started.');
 
-    let gameSettingsFiles;
+    let gameSettingsFiles: IGameSettingsFiles;
 
     const {
       gameSettings: {
@@ -543,13 +544,14 @@ export function* initGameSettingsSaga(
 
     yield put(setGameSettingsOptions({}));
     yield put(setGameSettingsFiles({}));
+    yield put(setIsGameSettingsLoaded(true));
 
     if (isFromUpdateAction) {
       throw new SagaError('Init game settings', errorMessage);
     }
   } finally {
     yield take(GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_FILES);
-    yield put(setIsGameSettingsLoaded(true));
+    yield put(setIsGameSettingsLoading(false));
   }
 }
 

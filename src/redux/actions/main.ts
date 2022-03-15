@@ -63,6 +63,13 @@ export const setIsLauncherInitialised = (
   payload: isLauncherInitialised,
 });
 
+export const setIsGameSettingsLoading = (
+  isGameSettingsLoading: IMainRootState['isGameSettingsLoading'],
+) => ({
+  type: MAIN_TYPES.SET_IS_GAME_SETTINGS_LOADING,
+  payload: isGameSettingsLoading,
+});
+
 export const setIsGameSettingsLoaded = (
   isGameSettingsLoaded: IMainRootState['isGameSettingsLoaded'],
 ) => ({

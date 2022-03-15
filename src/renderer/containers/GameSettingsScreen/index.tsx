@@ -35,6 +35,7 @@ import { GameSettingsBackup } from '$components/GameSettingsBackup';
 */
 export const GameSettingsScreen: React.FC = () => {
   /* eslint-disable max-len */
+  const isGameSettingsLoading = useAppSelector((state) => state.main.isGameSettingsLoading);
   const isGameSettingsLoaded = useAppSelector((state) => state.main.isGameSettingsLoaded);
   const isGameSettingsFilesBackuping = useAppSelector((state) => state.main.isGameSettingsFilesBackuping);
   const gameSettingsFilesBackup = useAppSelector((state) => state.main.gameSettingsFilesBackup);
@@ -212,7 +213,7 @@ export const GameSettingsScreen: React.FC = () => {
           )
         }
         {
-          !isGameSettingsLoaded && <Loader />
+          isGameSettingsLoading && <Loader />
         }
       </div>
     </main>

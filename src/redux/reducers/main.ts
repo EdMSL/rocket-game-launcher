@@ -27,6 +27,7 @@ export const INITIAL_STATE: IMainRootState = {
   isLauncherConfigChanged: false,
   isDevWindowOpening: false,
   isGameRunning: false,
+  isGameSettingsLoading: false,
   isGameSettingsLoaded: false,
   isGameSettingsAvailable: false,
   isGameSettingsFileExists: true,
