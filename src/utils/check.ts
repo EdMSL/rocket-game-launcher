@@ -169,6 +169,8 @@ const settingsMainSchema = Joi.object<IGameSettingsConfig>({
 });
 
 const gameSettingsFileSchema = Joi.object({
+  id: Joi.string().optional().default(() => getRandomId('game-settings-file')),
+  name: Joi.string().required().alphanum().min(MIN_NAME_LENGTH),
   encoding: Joi.string().optional().default(Joi.ref('$encoding')),
   path: Joi.string().required(),
   view: Joi.string().required().valid(...Object.values(GameSettingsFileView)),

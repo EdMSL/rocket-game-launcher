@@ -21,6 +21,7 @@ import {
   getLineIniParameterValue,
   getParameterRegExp,
   getPathToFile,
+  getRandomId,
   replacePathVariableByRootDir,
 } from './strings';
 import {
@@ -47,7 +48,7 @@ import {
   IModOrganizerParams,
   IUserMessage,
 } from '$types/main';
-import { defaultModOrganizerParams } from '$constants/defaultParameters';
+import { defaultGameSettingsConfig, defaultModOrganizerParams } from '$constants/defaultParameters';
 import { getReadWriteError } from './errors';
 import { IValidationErrors } from '$types/common';
 
@@ -757,3 +758,23 @@ export const clearValidationErrors = (
   ...acc,
   [current]: validationErrors[current],
 }), {});
+
+/**
+ * Сгенерировать новый объект файла игровых настроек.
+ * @param name Имя файла.
+ * @param path путь к файлу.
+ * @param encoding Кодировка файла.
+ * @returns Объект файла из `state`.
+ */
+export const getDefaultGameSettingsFile = (
+  name: string,
+  path: string,
+  encoding = defaultGameSettingsConfig.baseFilesEncoding,
+): IGameSettingsFile => ({
+  id: getRandomId('game-settings-file'),
+  name: name.trim().replaceAll(/\s/g, ''),
+  path,
+  view: GameSettingsFileView.SECTIONAL,
+  encoding,
+  optionsList: [],
+});

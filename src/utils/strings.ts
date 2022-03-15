@@ -37,8 +37,8 @@ export const parseJSON = <T>(jsonString: string): T => {
  * @returns Строка с уникальным содержимым.
 */
 export const getRandomId = (
-  word: string,
-): string => `${word}_f${((Math.random() * HEXADECIMAL_FACTOR)).toString(HEXADECIMAL)}-${new Date().getMilliseconds()}`; //eslint-disable-line max-len
+  word?: string,
+): string => `${word ? `${word}_` : ''}${((Math.random() * HEXADECIMAL_FACTOR)).toString(HEXADECIMAL)}-${new Date().getMilliseconds()}`; //eslint-disable-line max-len
 
 /**
  * Генерирует уникальную строку, содержащую только буквы и цифры.
@@ -172,7 +172,7 @@ export const replaceRootDirByPathVariable = (
   let variableIndex = -1;
 
   const pathVariableName = availablePathVariablesOrder.find((curr, index) => {
-    if (pathStr.includes(pathVariables[curr])) {
+    if (pathVariables[curr] && pathStr.includes(pathVariables[curr])) {
       variableIndex = index;
 
       return true;
@@ -332,6 +332,16 @@ export const getObjectAsList = (obj: { [key: string]: any, }): string => Object.
  * @returns Строка абсолютного пути до папки.
 */
 export const getPathToParentFileFolder = (pathToFile: string): string => path.dirname(pathToFile);
+
+/**
+ * Получить имя файла из строки пути до него.
+ * @param pathToFile Путь до файла.
+ * @returns Имя файла.
+*/
+export const getFileNameFromPathToFile = (
+  pathToFile: string,
+  isWithExtension = false,
+): string => path.basename(pathToFile, isWithExtension ? '' : path.extname(pathToFile));
 
 /**
  * Проверка имени папки на корректность.
