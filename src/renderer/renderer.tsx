@@ -1,7 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
-import { HashRouter } from 'react-router-dom';
 import { ConnectedRouter } from 'connected-react-router';
 import unhandled from 'electron-unhandled';
 
@@ -31,9 +30,7 @@ if (!module.hot) {
 render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
-      <HashRouter>
-        <App />
-      </HashRouter>
+      <App />
     </ConnectedRouter>
   </Provider>,
   document.getElementById('root'),
