@@ -53,3 +53,7 @@
   @include reset-indents;
   margin-right: var(--indent-size);
 }
+
+.developer-screen__files-container {
+  @include reset-list;
+}

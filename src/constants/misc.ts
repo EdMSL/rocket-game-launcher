@@ -51,6 +51,14 @@ export const PathVariableName = {
   MO_PROFILE: '%MO_PROFILE%',
 };
 
+export const gameSettingsFileAvailableVariables = [
+  PathVariableName.GAME_DIR,
+  PathVariableName.DOCS_GAME,
+  PathVariableName.MO_PROFILE,
+  PathVariableName.MO_MODS,
+  PathVariableName.MO_DIR,
+];
+
 export const pathVariablesCheckOrderArr = [
   PathVariableName.MO_PROFILE,
   PathVariableName.MO_MODS,

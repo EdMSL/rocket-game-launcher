@@ -11,21 +11,35 @@ import { DeveloperScreenController } from '$components/DeveloperScreenController
 import { IValidationErrors } from '$types/common';
 import { useAppSelector } from '$store/store';
 import { IGameSettingsConfig } from '$types/gameSettings';
-import { getNewConfig, getUniqueValidationErrors } from '$utils/data';
+import {
+  getDefaultGameSettingsFile, getNewConfig, getUniqueValidationErrors,
+} from '$utils/data';
 import { checkObjectForEqual } from '$utils/check';
-import { saveGameSettingsConfig } from '$actions/main';
-import { AppChannel } from '$constants/misc';
+import { addMessages, saveGameSettingsConfig } from '$actions/main';
+import {
+  AppChannel, gameSettingsFileAvailableVariables, LauncherButtonAction,
+} from '$constants/misc';
 import { TextField } from '$components/UI/TextField';
 import { Button } from '$components/UI/Button';
-import { getRandomName } from '$utils/strings';
+import {
+  checkIsPathIsNotOutsideValidFolder,
+  getFileNameFromPathToFile,
+  getRandomName,
+  replaceRootDirByPathVariable,
+} from '$utils/strings';
 import { EditableItem } from '$components/EditableItem';
 import { HintItem } from '$components/HintItem';
+import { GameSettingsFileItem } from '$components/GameSettingsFileItem';
+import { GAME_DIR } from '$constants/paths';
+import { CreateUserMessage } from '$utils/message';
+import { RoutesWindowName } from '$constants/routes';
 
 export const DeveloperScreenGameSettings: React.FC = () => {
   const gameSettingsFiles = useAppSelector((state) => state.gameSettings.gameSettingsFiles);
   const gameSettingsGroups = useAppSelector((state) => state.gameSettings.gameSettingsGroups);
   const baseFilesEncoding = useAppSelector((state) => state.gameSettings.baseFilesEncoding);
   const isFirstLaunch = useAppSelector((state) => state.main.config.isFirstLaunch);
+  const pathVariables = useAppSelector((state) => state.main.pathVariables);
 
   const dispatch = useDispatch();
 
@@ -39,6 +53,13 @@ export const DeveloperScreenGameSettings: React.FC = () => {
   const [validationErrors, setValidationErrors] = useState<IValidationErrors>({});
   const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
   const [lastCreatedGroupName, setLastCreatedGroupName] = useState<string>('');
+
+  const getPathFromPathSelector = useCallback(async (
+  ): Promise<string> => ipcRenderer.invoke(
+    AppChannel.GET_PATH_BY_PATH_SELECTOR,
+    LauncherButtonAction.RUN,
+    GAME_DIR,
+  ), []);
 
   const saveSettingsChanges = useCallback((
     isGoToMainScreen: boolean,
@@ -149,6 +170,44 @@ export const DeveloperScreenGameSettings: React.FC = () => {
     changeCurrentConfig(target.value, target.id);
   }, [changeCurrentConfig]);
 
+  const onAddGameSettingsFile = useCallback(async () => {
+    const pathStr = await getPathFromPathSelector();
+
+    if (pathStr !== '') {
+      try {
+        checkIsPathIsNotOutsideValidFolder(pathStr, pathVariables);
+
+        const pathWithVariable = replaceRootDirByPathVariable(
+          pathStr,
+          gameSettingsFileAvailableVariables,
+          pathVariables,
+        );
+
+        changeCurrentConfig({
+          ...currentSettingsConfig.gameSettingsFiles,
+          [getRandomName()]: getDefaultGameSettingsFile(
+            getFileNameFromPathToFile(pathStr),
+            pathWithVariable,
+          ),
+        },
+        'gameSettingsFiles');
+      } catch (error: any) {
+        dispatch(addMessages([CreateUserMessage.error(
+          'Выбранный файл находится в недопустимой папке.',
+          RoutesWindowName.DEV,
+        )]));
+      }
+    }
+  }, [pathVariables,
+    currentSettingsConfig.gameSettingsFiles,
+    dispatch,
+    changeCurrentConfig,
+    getPathFromPathSelector]);
+
+  const currentGameSettingsFiles = Object
+    .keys(currentSettingsConfig.gameSettingsFiles)
+    .map((file) => currentSettingsConfig.gameSettingsFiles[file]);
+
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <div
@@ -196,34 +255,42 @@ export const DeveloperScreenGameSettings: React.FC = () => {
             </Button>
             <ul className={styles['developer-screen__groups-container']}>
               {
-              currentSettingsConfig.gameSettingsGroups.map((item) => (
-                <li
-                  key={item.name}
-                  className={classNames(
-                    styles['developer-screen__groups-item'],
-                    lastCreatedGroupName === item.name && styles['developer-screen__groups-item--new'],
-                  )}
-                >
-                  {
-                    lastCreatedGroupName === item.name && (
-                    <p className={styles['developer-screen__group-label']}>
-                      <span>Заголовок группы</span>
-                      <HintItem description="Задать заголовок группы. Отображается как имя вкладки в экране игровых настроек." />
-                    </p>
-                    )
-                  }
-                  <EditableItem
-                    id={item.name}
-                    isError={!!validationErrors[item.name]}
-                    isNew={lastCreatedGroupName === item.name}
-                    item={item.label}
-                    onApply={editGroupItem}
-                    onDelete={deleteGroupItem}
-                    onChange={validateGroupLabel}
-                  />
-                </li>
-              ))
-            }
+                currentSettingsConfig.gameSettingsGroups.length > 0
+                  && currentSettingsConfig.gameSettingsGroups.map((item) => (
+                    <li
+                      key={item.name}
+                      className={classNames(
+                        styles['developer-screen__groups-item'],
+                        lastCreatedGroupName === item.name && styles['developer-screen__groups-item--new'],
+                      )}
+                    >
+                      {
+                      lastCreatedGroupName === item.name && (
+                      <p className={styles['developer-screen__group-label']}>
+                        <span>Заголовок группы</span>
+                        <HintItem description="Задать заголовок группы. Отображается как имя вкладки в экране игровых настроек." />
+                      </p>
+                      )
+                    }
+                      <EditableItem
+                        id={item.name}
+                        isError={!!validationErrors[item.name]}
+                        isNew={lastCreatedGroupName === item.name}
+                        item={item.label}
+                        onApply={editGroupItem}
+                        onDelete={deleteGroupItem}
+                        onChange={validateGroupLabel}
+                      />
+                    </li>
+                  ))
+              }
+              {
+                currentSettingsConfig.gameSettingsGroups.length === 0 && (
+                  <li className={styles['developer-screen__groups-item']}>
+                    Нет групп игровых настроек
+                  </li>
+                )
+              }
             </ul>
           </div>
         </div>
@@ -237,6 +304,36 @@ export const DeveloperScreenGameSettings: React.FC = () => {
             description="Кодировка, которая будет по умолчанию применяться при чтении данных из файлов игровых настроек." //eslint-disable-line max-len
             onChange={onTextFieldChange}
           />
+        </div>
+        <div className="developer-screen__block">
+          <p className="developer-screen__block-title">Игровые параметры</p>
+          <Button
+            className={classNames(
+              'main-btn',
+              'control-panel__btn',
+              'developer-screen__btn',
+            )}
+            onClick={onAddGameSettingsFile}
+          >
+            Добавить файл
+          </Button>
+          <ul className={styles['developer-screen__files-container']}>
+            {
+              currentGameSettingsFiles.length > 0 && currentGameSettingsFiles.map((file) => (
+                <GameSettingsFileItem
+                  key={file.id}
+                  file={file}
+                />
+              ))
+            }
+            {
+              currentGameSettingsFiles.length === 0 && (
+              <li className={styles['developer-screen__files-container']}>
+                Нет игровых параметров
+              </li>
+              )
+            }
+          </ul>
         </div>
       </Scrollbars>
     </div>
