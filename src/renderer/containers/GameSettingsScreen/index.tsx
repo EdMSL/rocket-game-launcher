@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import {
-  Switch, Route, NavLink,
+  Switch, Route, NavLink, Link,
 } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import classNames from 'classnames';
@@ -134,15 +134,14 @@ export const GameSettingsScreen: React.FC = () => {
             </NavLink>
           ))
             }
-        <NavLink
-          exact
+        <Link
           to={Routes.MAIN_SCREEN}
           className={classNames('button', 'main-btn', 'control-panel__btn')}
         >
           <span className={classNames('control-panel__btn-text')}>
             Назад
           </span>
-        </NavLink>
+        </Link>
       </div>
       <div className={styles['game-settings-screen__content']}>
         {
