@@ -30,7 +30,7 @@ import { IValidationErrors } from '$types/common';
 
 interface IGameSettingsFileError {
   parent: string,
-  error: string,
+  error: Joi.ValidationError,
 }
 
 export interface IValidationData {
@@ -40,7 +40,7 @@ export interface IValidationData {
 
 export interface IGameSettingsConfigCheckResult {
   files: IGameSettingsConfig['gameSettingsFiles'],
-  isError: boolean,
+  errors: IGameSettingsFileError[],
 }
 
 const MIN_NAME_LENGTH = 10;
@@ -170,8 +170,8 @@ const settingsMainSchema = Joi.object<IGameSettingsConfig>({
 
 const gameSettingsFileSchema = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('game-settings-file')),
-  name: Joi.string().required().alphanum().min(MIN_NAME_LENGTH),
-  encoding: Joi.string().optional().default(Joi.ref('$encoding')),
+  name: Joi.string().required().alphanum(),
+  encoding: Joi.string().optional().allow(''),
   path: Joi.string().required(),
   view: Joi.string().required().valid(...Object.values(GameSettingsFileView)),
   optionsList: Joi.array().items(Joi.object().pattern(
@@ -179,6 +179,8 @@ const gameSettingsFileSchema = Joi.object({
     Joi.any(),
   )),
 });
+
+const gameSettingsFileOptionTypeSchema = Joi.string().required().valid(...Object.values(GameSettingsOptionType)).label('optionType');
 
 // id для опций не указываются в settings.json, вместо этого они генерируются автоматически.
 const defaultOptionTypeSchema = Joi.object({
@@ -413,14 +415,23 @@ export const checkGameSettingsConfigMainFields = (
 const checkGameSettingsFileOptionsList = (
   optionsList: IGameSettingsParameter[],
   validationOptions: Joi.ValidationOptions,
-): { options: IGameSettingsParameter[], errors: string[], } => {
-  const errors: string[] = [];
+  fileName: string,
+): { options: IGameSettingsParameter[], errors: IGameSettingsFileError[], } => {
+  const errors: IGameSettingsFileError[] = [];
 
-  const options = optionsList.reduce<IGameSettingsParameter[]>((totalOptions, currentOption) => {
+  const options = optionsList.reduce<IGameSettingsParameter[]>((totalOptions, currentOption, index) => {
     let validationResult: Joi.ValidationResult;
 
-    if (!Object.values(GameSettingsOptionType).includes(currentOption.optionType)) {
-      errors.push(`"optionType" must be one of [${Object.values(GameSettingsOptionType).join(', ')}]`);
+    validationResult = gameSettingsFileOptionTypeSchema.validate(
+      currentOption.optionType,
+      validationOptions,
+    );
+
+    if (validationResult.error) {
+      errors.push({
+        parent: `"${fileName}" "optionsList[${index}]"`,
+        error: validationResult.error,
+      });
 
       return [...totalOptions];
     }
@@ -441,7 +452,10 @@ const checkGameSettingsFileOptionsList = (
     }
 
     if (validationResult.error) {
-      errors.push(validationResult.error.message);
+      errors.push({
+        parent: `"${fileName}" "optionsList[${index}]"`,
+        error: validationResult.error,
+      });
 
       return [...totalOptions];
     }
@@ -473,9 +487,10 @@ export const checkGameSettingsFiles = (
   const newGameSettingsFilesObj = Object
     .keys(gameSettingsFiles)
     .reduce<IGameSettingsFiles>((filesObj, fileName) => {
-      const validationOptions = {
+      const validationOptions: Joi.ValidationOptions = {
         abortEarly: false,
         stripUnknown: true,
+
         context: {
           encoding: baseFilesEncoding,
           isGameSettingsGroupsExists: gameSettingsGroups.length > 0,
@@ -490,7 +505,7 @@ export const checkGameSettingsFiles = (
       );
 
       if (validationResult.error) {
-        validationErrors.push({ parent: fileName, error: validationResult.error.message });
+        validationErrors.push({ parent: `"${fileName}"`, error: validationResult.error });
 
         return {
           ...filesObj,
@@ -503,10 +518,11 @@ export const checkGameSettingsFiles = (
       } = checkGameSettingsFileOptionsList(
         gameSettingsFiles[fileName].optionsList,
         validationOptions,
+        fileName,
       );
 
       if (errors.length > 0) {
-        validationErrors.push({ parent: fileName, error: errors.join() });
+        validationErrors.push(...errors);
       }
 
       if (options.length > 0) {
@@ -527,14 +543,14 @@ export const checkGameSettingsFiles = (
   if (validationErrors.length > 0) {
     validationErrors.forEach((currentError) => {
       if (currentError.error) {
-        writeToLogFile(`${currentError.parent}: ${currentError.error}`, LogMessageType.ERROR);
+        writeToLogFile(`${currentError.error.name}. ${currentError.parent} ${currentError.error.message}`, LogMessageType.ERROR);//eslint-disable-line
       }
     });
   }
 
   return {
     files: newGameSettingsFilesObj,
-    isError: validationErrors.length > 0,
+    errors: validationErrors,
   };
 };
 
