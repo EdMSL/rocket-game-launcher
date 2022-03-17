@@ -149,6 +149,40 @@ export const getOptionName = (
   return parameter.name!;
 };
 
+/**
+ * Глубокое клонирование объекта.
+ * @param obj Объект для клонирования.
+ * @param deleteKey Ключ объекта, который нужно удалить при клонировании.
+ * @returns Клон переданного объекта.
+ */
+export const deepClone = (obj, deleteKey = '') => {
+  const clone = { ...obj };
+
+  Object.keys(clone).forEach(
+    (key) => {
+      if (typeof obj[key] === 'object') {
+        clone[key] = deepClone(obj[key], deleteKey);
+      } else if (key === deleteKey) {
+        delete clone[deleteKey];
+      } else {
+        clone[key] = obj[key];
+      }
+    },
+  );
+
+  if (Array.isArray(obj) && obj.length) {
+    clone.length = obj.length;
+
+    return Array.from(clone);
+  }
+
+  if (Array.isArray(obj)) {
+    return Array.from(obj);
+  }
+
+  return clone;
+};
+
 export const getValueFromObjectDeepKey = <T>(lib, keys): T => {
   const key = keys.shift();
 
@@ -763,18 +797,16 @@ export const clearValidationErrors = (
  * Сгенерировать новый объект файла игровых настроек.
  * @param name Имя файла.
  * @param path путь к файлу.
- * @param encoding Кодировка файла.
  * @returns Объект файла из `state`.
  */
 export const getDefaultGameSettingsFile = (
   name: string,
   path: string,
-  encoding = defaultGameSettingsConfig.baseFilesEncoding,
 ): IGameSettingsFile => ({
   id: getRandomId('game-settings-file'),
   name: name.trim().replaceAll(/\s/g, ''),
   path,
   view: GameSettingsFileView.SECTIONAL,
-  encoding,
+  encoding: '',
   optionsList: [],
 });
