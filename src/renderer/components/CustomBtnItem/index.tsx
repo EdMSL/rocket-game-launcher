@@ -108,25 +108,25 @@ export const CustomBtnItem: React.FC<IProps> = ({
   }, [position, onChangeBtnOrder]);
 
   return (
-    <li className={styles['custom-btn__item']}>
+    <li className={classNames('developer-screen__spoiler-item', styles['custom-btn__item'])}>
       <details
-        className={styles['custom-btn__block']}
+        className="developer-screen__spoiler-block"
         ref={detailsElementRef}
       >
         <summary className={classNames(
-          styles['custom-btn-title'],
+          'developer-screen__spoiler-title',
           Object.keys(validationErrors).find((error) => error.includes(item.id))
-            && styles['custom-btn-title--error'],
+            && 'developer-screen__spoiler-title--error',
         )}
         >
-          <span className={styles['custom-btn-text']}>Заголовок:</span>
-          <span className={styles['custom-btn-text']}>{item.label}</span>
-          <span className={styles['custom-btn-text']}>Путь:</span>
-          <span className={styles['custom-btn-text']}>{item.path}</span>
+          <span className="developer-screen__spoiler-text">Заголовок:</span>
+          <span className="developer-screen__spoiler-text">{item.label}</span>
+          <span className="developer-screen__spoiler-text">Путь:</span>
+          <span className="developer-screen__spoiler-text">{item.path}</span>
           <Button
             className={classNames(
-              styles['custom-btn__title-btn'],
-              styles['custom-btn__title-btn--up'],
+              'developer-screen__spoiler-title-btn',
+              'developer-screen__spoiler-title-btn--up',
             )}
             name="up"
             isDisabled={quantity === 1 || position === 0}
@@ -136,8 +136,8 @@ export const CustomBtnItem: React.FC<IProps> = ({
           </Button>
           <Button
             className={classNames(
-              styles['custom-btn__title-btn'],
-              styles['custom-btn__title-btn--down'],
+              'developer-screen__spoiler-title-btn',
+              'developer-screen__spoiler-title-btn--down',
             )}
             name="down"
             isDisabled={quantity === 1 || position === quantity - 1}
@@ -147,8 +147,8 @@ export const CustomBtnItem: React.FC<IProps> = ({
           </Button>
           <Button
             className={classNames(
-              styles['custom-btn__title-btn'],
-              styles['custom-btn__title-btn--delete'],
+              'developer-screen__spoiler-title-btn',
+              'developer-screen__spoiler-title-btn--delete',
             )}
             onClick={onDeleteCustomBtnBtnClick}
           >
@@ -198,7 +198,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         <Button
           className={classNames(
             'main-btn',
-            'custom-btn__button',
+            'developer-screen__spoiler-button',
           )}
           onClick={onDeleteCustomBtnBtnClick}
         >

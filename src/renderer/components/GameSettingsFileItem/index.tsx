@@ -73,7 +73,11 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
   }, [file.id, deleteFile]);
 
   return (
-    <li className="developer-screen__spoiler-item">
+    <li className={classNames(
+      'developer-screen__spoiler-item',
+      styles['game-settings-file__item'],
+    )}
+    >
       <details className="developer-screen__spoiler-block">
         <summary
           className={classNames(
