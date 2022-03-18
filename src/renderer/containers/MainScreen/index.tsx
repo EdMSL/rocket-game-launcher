@@ -2,7 +2,7 @@ import { ipcRenderer } from 'electron';
 import React, {
   useCallback, useEffect, useState,
 } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import classNames from 'classnames';
 
@@ -21,6 +21,7 @@ import { LauncherUserSettings } from '$components/LauncherUserSettings';
 import { getPathToFile } from '$utils/strings';
 import { Loader } from '$components/UI/Loader';
 import { IButtonArg } from '$types/main';
+import { ILocationState } from '$types/common';
 
 export const MainScreen: React.FC = () => {
   /* eslint-disable max-len */
@@ -150,11 +151,13 @@ export const MainScreen: React.FC = () => {
           }
           {
             isGameSettingsFileExists && (
-            <NavLink
-              exact
-              to={gameSettingsGroups.length > 0
-                ? `${Routes.GAME_SETTINGS_SCREEN}/${gameSettingsGroups[0].name}`
-                : Routes.GAME_SETTINGS_SCREEN}
+            <Link<ILocationState>
+              to={{
+                pathname: gameSettingsGroups.length > 0
+                  ? `${Routes.GAME_SETTINGS_SCREEN}/${gameSettingsGroups[0].name}`
+                  : Routes.GAME_SETTINGS_SCREEN,
+                state: { isFromMainPage: true },
+              }}
               className={classNames(
                 'button',
                 'main-btn',
@@ -168,7 +171,7 @@ export const MainScreen: React.FC = () => {
               onClick={onDisabledNavLinkClick}
             >
               Настройки
-            </NavLink>
+            </Link>
             )
           }
           <Button

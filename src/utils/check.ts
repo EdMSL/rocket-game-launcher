@@ -184,7 +184,7 @@ const gameSettingsFileOptionTypeSchema = Joi.string().required().valid(...Object
 
 // id для опций не указываются в settings.json, вместо этого они генерируются автоматически.
 const defaultOptionTypeSchema = Joi.object({
-  id: Joi.string().optional().default(() => getRandomId('option')),
+  id: Joi.string().optional().default(() => getRandomId('game-settings-option')),
   optionType: Joi.string().required().valid(GameSettingsOptionType.DEFAULT),
   name: Joi.string().required(),
   label: Joi.string().optional().default(Joi.ref('name')),
@@ -229,7 +229,7 @@ const defaultOptionTypeSchema = Joi.object({
 });
 
 const groupOptionTypeSchema = Joi.object({
-  id: Joi.string().optional().default(() => getRandomId('option')),
+  id: Joi.string().optional().default(() => getRandomId('game-settings-option')),
   optionType: Joi.string().required().valid(GameSettingsOptionType.GROUP),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {
@@ -278,7 +278,7 @@ const groupOptionTypeSchema = Joi.object({
 });
 
 const combinedOptionTypeSchema = Joi.object({
-  id: Joi.string().optional().default(() => getRandomId('option')),
+  id: Joi.string().optional().default(() => getRandomId('game-settings-option')),
   optionType: Joi.string().required().valid(GameSettingsOptionType.COMBINED),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {
@@ -335,7 +335,7 @@ const combinedOptionTypeSchema = Joi.object({
 });
 
 const relatedOptionTypeSchema = Joi.object({
-  id: Joi.string().optional().default(() => getRandomId('option')),
+  id: Joi.string().optional().default(() => getRandomId('game-settings-option')),
   optionType: Joi.string().required().valid(GameSettingsOptionType.RELATED),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {

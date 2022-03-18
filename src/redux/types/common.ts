@@ -39,3 +39,7 @@ export interface IUIElementParams {
 export interface IUIElementProps<E> extends IUIElementParams{
   onChange: (event: React.ChangeEvent<E>) => void,
 }
+
+export interface ILocationState {
+  isFromMainPage?: boolean,
+}

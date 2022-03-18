@@ -75,6 +75,7 @@ import {
   GameSettingsOptionType,
   GameSettingsFileView,
 } from '$constants/misc';
+import { RoutesWindowName } from '$constants/routes';
 import {
   getParameterRegExp,
   getPathToFile,
@@ -433,6 +434,52 @@ export function* generateGameSettingsOptionsSaga(
 }
 
 /**
+ * Инициализация игровых настроек для режима разработчика.
+ * Только проверка полей на валидность и запись в `state`.
+ */
+export function* initGameSettingsDeveloperSaga(): SagaIterator {
+  try {
+    const {
+      gameSettings: {
+        gameSettingsFiles,
+        baseFilesEncoding,
+        gameSettingsGroups,
+      },
+    }: ReturnType<typeof getState> = yield select(getState);
+
+    const {
+      files,
+      errors, // eslint-disable-line prefer-const
+    }: IUnwrapSync<typeof checkGameSettingsFiles> = yield call(
+      checkGameSettingsFiles,
+      gameSettingsFiles,
+      baseFilesEncoding,
+      gameSettingsGroups,
+    );
+
+    if (errors.length > 0) {
+      yield put(addMessages([CreateUserMessage.warning('Обнаружены ошибки в файле settings.json. Подробности в файле лога.', RoutesWindowName.DEV)]));//eslint-disable-line max-len
+    }
+    yield put(setGameSettingsFiles(files));
+    yield put(setIsGameSettingsLoaded(true));
+  } catch (error: any) {
+    let errorMessage = '';
+
+    if (error instanceof SagaError) {
+      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
+    } else if (error instanceof CustomError) {
+      errorMessage = `${error.message}`;
+    } else if (error instanceof ReadWriteError) {
+      errorMessage = `${error.message}. Path "${error.path}".`;
+    } else {
+      errorMessage = `Unknown error. Message: ${error.message}`;
+    }
+
+    writeToLogFile(errorMessage);
+  }
+}
+
+/**
  * Инициализация игровых настроек. Осуществляется при первом переходе на экран настроек.
  * Получаем данные МО, проверяем на валидность параметры игровых настроек (`gameSettingsFiles`)
  * и переписываем их в случае невалидности некоторых полей, генерируем опции игровых настроек.
@@ -480,7 +527,7 @@ export function* initGameSettingsSaga(
 
     let {
       files: newGameSettingsFilesObj,
-      isError: isCheckFilesError, // eslint-disable-line prefer-const
+      errors: checkFilesErrors, // eslint-disable-line prefer-const
     }: IUnwrapSync<typeof checkGameSettingsFiles> = yield call(
       checkGameSettingsFiles,
       gameSettingsFiles,
@@ -507,13 +554,14 @@ export function* initGameSettingsSaga(
     } else if (
       Object.keys(newGameSettingsFilesObj).length !== Object.keys(gameSettingsFiles).length
       || Object.keys(incorrectGameSettingsFiles).length > 0
-      || isCheckFilesError
+      || checkFilesErrors.length > 0
     ) {
       yield put(addMessages([CreateUserMessage.warning('Обнаружены ошибки в файле игровых настроек settings.json. Некоторые опции будут недоступны. Подробности в файле лога.')])); //eslint-disable-line max-len
     }
 
     yield put(setGameSettingsOptions(totalGameSettingsOptions));
     yield put(setGameSettingsFiles(newGameSettingsFilesObj));
+    yield put(setIsGameSettingsLoaded(true));
 
     if (isLauncherConfigChanged) {
       yield put(setIsLauncherConfigChanged(false));
@@ -544,7 +592,7 @@ export function* initGameSettingsSaga(
 
     yield put(setGameSettingsOptions({}));
     yield put(setGameSettingsFiles({}));
-    yield put(setIsGameSettingsLoaded(true));
+    yield put(setIsGameSettingsLoaded(false));
 
     if (isFromUpdateAction) {
       throw new SagaError('Init game settings', errorMessage);
@@ -662,7 +710,7 @@ function* saveGameSettingsFilesSaga(
 
     const {
       gameSettings: {
-        moProfile, gameSettingsFiles, gameSettingsOptions,
+        moProfile, gameSettingsFiles, gameSettingsOptions, baseFilesEncoding,
       },
       main: { pathVariables },
     }: ReturnType<typeof getState> = yield select(getState);
@@ -750,7 +798,7 @@ function* saveGameSettingsFilesSaga(
           getPathToFile(changedGameSettingsFiles[fileName].path, pathVariables, moProfile),
           file[fileName],
           changedGameSettingsFiles[fileName].view,
-          changedGameSettingsFiles[fileName].encoding,
+          changedGameSettingsFiles[fileName].encoding || baseFilesEncoding,
         );
       }),
     );

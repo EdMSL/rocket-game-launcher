@@ -14,7 +14,9 @@ import fs from 'fs';
 import { ipcRenderer } from 'electron';
 
 import { IAppState } from '$store/store';
-import { GAME_SETTINGS_PATH_REGEXP, Routes } from '$constants/routes';
+import {
+  GAME_SETTINGS_PATH_REGEXP, Routes,
+} from '$constants/routes';
 import {
   addMessages,
   setGameSettingsFilesBackup,
@@ -32,11 +34,13 @@ import {
   setPathVariables,
   setIsLauncherConfigChanged,
   saveGameSettingsConfig,
+  setIsGameSettingsLoading,
 } from '$actions/main';
 import {
   generateGameSettingsOptionsSaga,
   initGameSettingsSaga,
   getGameSettingsConfigSaga,
+  initGameSettingsDeveloperSaga,
 } from '$sagas/gameSettings';
 import {
   GAME_SETTINGS_FILE_PATH, CONFIG_FILE_PATH,
@@ -57,9 +61,11 @@ import {
   restoreBackupFiles,
 } from '$utils/backup';
 import { getPathToFile } from '$utils/strings';
-import { IUnwrap } from '$types/common';
+import { ILocationState, IUnwrap } from '$types/common';
 import { setGameSettingsConfig, setGameSettingsOptions } from '$actions/gameSettings';
-import { getGameSettingsOptionsWithDefaultValues, updatePathVariables } from '$utils/data';
+import {
+  deepClone, getGameSettingsOptionsWithDefaultValues, updatePathVariables,
+} from '$utils/data';
 import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
 import { writeJSONFile } from '$utils/files';
 import { AppChannel } from '$constants/misc';
@@ -107,24 +113,7 @@ function* saveLauncherConfigSaga(
   yield put(setIsGameSettingsSaving(true));
 
   try {
-    // Здесь мы оставляем только нужные поля, отсекая id, который используется в компоненте.
-    const customBtnsForSave = newConfig.customButtons.map((btn) => ({
-      path: btn.path,
-      action: btn.action,
-      label: btn.label,
-      args: btn.args.map((arg) => ({ data: arg.data })),
-    }));
-
-    const configForSave = {
-      ...newConfig,
-      playButton: {
-        ...newConfig.playButton,
-        args: newConfig.playButton.args.map((arg) => ({ data: arg.data })),
-      },
-      customButtons: customBtnsForSave,
-    };
-
-    yield call(writeJSONFile, CONFIG_FILE_PATH, configForSave);
+    yield call(writeJSONFile, CONFIG_FILE_PATH, deepClone(newConfig, 'id'));
     yield put(setLauncherConfig(newConfig));
     yield put(setIsLauncherConfigChanged(true));
 
@@ -167,18 +156,7 @@ function* saveGameSettingsConfigSaga(
   yield put(setIsGameSettingsSaving(true));
 
   try {
-    // Здесь мы оставляем только нужные поля, отсекая id, который используется в компоненте.
-    const gameSettingsGroupsForSave = newConfig.gameSettingsGroups.map((group) => ({
-      name: group.name,
-      label: group.label,
-    }));
-
-    const configForSave = {
-      ...newConfig,
-      gameSettingsGroups: gameSettingsGroupsForSave,
-    };
-
-    yield call(writeJSONFile, GAME_SETTINGS_FILE_PATH, configForSave);
+    yield call(writeJSONFile, GAME_SETTINGS_FILE_PATH, deepClone(newConfig, 'id'));
     yield put(setGameSettingsConfig(newConfig));
     yield put(setIsLauncherConfigChanged(true));
 
@@ -214,6 +192,7 @@ function* saveGameSettingsConfigSaga(
 }
 
 function* updateGameSettingsOptionsSaga(): SagaIterator {
+  yield put(setIsGameSettingsLoading(true));
   yield put(setIsGameSettingsLoaded(false));
 
   try {
@@ -237,6 +216,7 @@ function* updateGameSettingsOptionsSaga(): SagaIterator {
         [CreateUserMessage.error('Не найден файл settings.json, обновление прервано. Игровые настройки будут недоступны.')], // eslint-disable-line max-len
       ));
       yield put(push(`${Routes.MAIN_SCREEN}`));
+      yield put(setIsGameSettingsLoaded(true));
     } else {
       let errorMessage = '';
 
@@ -260,7 +240,7 @@ function* updateGameSettingsOptionsSaga(): SagaIterator {
       ));
     }
   } finally {
-    yield put(setIsGameSettingsLoaded(true));
+    yield put(setIsGameSettingsLoading(false));
   }
 }
 
@@ -511,9 +491,12 @@ function* restoreGameSettingsFilesBackupSaga({
   }
 }
 
-function* locationChangeSaga({ payload: { location } }: LocationChangeAction): SagaIterator {
+function* locationChangeSaga(
+  { payload: { location } }: LocationChangeAction<ILocationState>,
+): SagaIterator {
   const {
     main: {
+      isDeveloperMode,
       isLauncherInitialised,
       isGameSettingsLoaded,
       isLauncherConfigChanged,
@@ -534,7 +517,10 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
 
   if (GAME_SETTINGS_PATH_REGEXP.test(location.pathname)) {
     if (isLauncherInitialised) {
-      if (!isGameSettingsLoaded || isLauncherConfigChanged) {
+      if (
+        (!isDeveloperMode && !isGameSettingsLoaded && location.state?.isFromMainPage)
+        || isLauncherConfigChanged
+      ) {
         yield call(initGameSettingsSaga, false);
       } else {
         const {
@@ -546,6 +532,10 @@ function* locationChangeSaga({ payload: { location } }: LocationChangeAction): S
     } else if (!isLauncherInitialised) {
       yield put(push(`${Routes.MAIN_SCREEN}`));
     }
+  }
+
+  if (location.pathname === Routes.DEVELOPER_SCREEN && !isGameSettingsLoaded) {
+    yield call(initGameSettingsDeveloperSaga);
   }
 }
 
