@@ -21,6 +21,7 @@ interface IProps extends IUIElementParams {
   isSelectDisabled?: boolean,
   selectorType?: string,
   isGameDocuments?: boolean,
+  value: string,
   onChange: (
     value: string,
     id: string,
@@ -60,7 +61,7 @@ export const PathSelector: React.FC<IProps> = ({
       setCurrentPathValue(pathValue);
     }
     if (currentPathVariable !== pathVariable) {
-      setCurrentPathValue(pathVariable);
+      setCurrentPathVariable(pathVariable);
     }
   }, [currentPathValue, currentPathVariable, pathValue, pathVariable, selectorType, value]);
 
@@ -173,9 +174,10 @@ export const PathSelector: React.FC<IProps> = ({
       <div className="path-selector__input-block">
         <select
           className="path-selector__select"
-          onChange={onPathVariableSelectChange}
+          name={name}
           value={currentPathVariable}
           disabled={isSelectDisabled}
+          onChange={onPathVariableSelectChange}
         >
           {
           options.map((option) => (

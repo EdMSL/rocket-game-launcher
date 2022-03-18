@@ -169,7 +169,7 @@ const settingsMainSchema = Joi.object<IGameSettingsConfig>({
 });
 
 const gameSettingsFileSchema = Joi.object({
-  id: Joi.string().optional().default(() => getRandomId('game-settings-file')),
+  id: Joi.string().optional().default((parent, helpers) => helpers.prefs.context?.fileName),
   name: Joi.string().required().alphanum(),
   encoding: Joi.string().optional().allow(''),
   path: Joi.string().required(),
@@ -496,6 +496,7 @@ export const checkGameSettingsFiles = (
           isGameSettingsGroupsExists: gameSettingsGroups.length > 0,
           view: gameSettingsFiles[fileName].view,
           availableGameSettingsGroups,
+          fileName,
         },
       };
 

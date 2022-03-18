@@ -304,10 +304,12 @@ export const getOptionData = (
 /**
  * Генерирует опции (`options`) для UI компонента `Select`.
  * @param obj Объект или массив строк, на основе которых будет сгенерирован список опций.
+ * @param isKeyLabel Определяет, что в паре ключ-значение будет заголовком, а что значением.
  * @returns Массив с опциями.
 */
 export const generateSelectOptions = (
   obj: { [key: string]: string, } | string[],
+  isKeyLabel = false,
 ): ISelectOption[] => {
   if (Array.isArray(obj)) {
     return obj.map((key) => ({
@@ -317,8 +319,8 @@ export const generateSelectOptions = (
   }
 
   return Object.keys(obj).map((key) => ({
-    label: obj[key],
-    value: key,
+    label: isKeyLabel ? key : obj[key],
+    value: isKeyLabel ? obj[key] : key,
   }));
 };
 

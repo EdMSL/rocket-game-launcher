@@ -10,8 +10,9 @@ import styles from './styles.module.scss';
 import { DeveloperScreenController } from '$components/DeveloperScreenController';
 import { IValidationErrors } from '$types/common';
 import { useAppSelector } from '$store/store';
-import { IGameSettingsConfig } from '$types/gameSettings';
+import { IGameSettingsConfig, IGameSettingsFile } from '$types/gameSettings';
 import {
+  deepClone,
   getDefaultGameSettingsFile, getNewConfig, getUniqueValidationErrors,
 } from '$utils/data';
 import { checkObjectForEqual } from '$utils/check';
@@ -94,6 +95,22 @@ export const DeveloperScreenGameSettings: React.FC = () => {
     setCurrentSettingsConfig(newConfig);
     setIsConfigChanged(!checkObjectForEqual(settingsConfig, newConfig));
   }, [settingsConfig, currentSettingsConfig]);
+
+  const changeGameSettingsFiles = useCallback((
+    fileName: string,
+    fileData: IGameSettingsFile,
+  ) => {
+    const newConfig = {
+      ...currentSettingsConfig,
+      gameSettingsFiles: {
+        ...currentSettingsConfig.gameSettingsFiles,
+        [fileName]: fileData,
+      },
+    };
+
+    setCurrentSettingsConfig(newConfig);
+    setIsConfigChanged(!checkObjectForEqual(settingsConfig, newConfig));
+  }, [currentSettingsConfig, settingsConfig]);
 
   const onSaveBtnClick = useCallback(() => {
     saveSettingsChanges(false);
@@ -204,6 +221,13 @@ export const DeveloperScreenGameSettings: React.FC = () => {
     changeCurrentConfig,
     getPathFromPathSelector]);
 
+  const deleteGameSettingsFile = useCallback((fileName: string) => {
+    const newGameSettingsFiles = deepClone(currentSettingsConfig.gameSettingsFiles);
+    delete newGameSettingsFiles[fileName];
+
+    changeCurrentConfig(newGameSettingsFiles, 'gameSettingsFiles');
+  }, [currentSettingsConfig.gameSettingsFiles, changeCurrentConfig]);
+
   const currentGameSettingsFiles = Object
     .keys(currentSettingsConfig.gameSettingsFiles)
     .map((file) => currentSettingsConfig.gameSettingsFiles[file]);
@@ -301,28 +325,24 @@ export const DeveloperScreenGameSettings: React.FC = () => {
             id="baseFilesEncoding"
             label="Кодировка"
             value={currentSettingsConfig.baseFilesEncoding}
-            description="Кодировка, которая будет по умолчанию применяться при чтении данных из файлов игровых настроек." //eslint-disable-line max-len
+            description="Кодировка, которая будет по умолчанию применяться при чтении и записи данных файлов игровых настроек." //eslint-disable-line max-len
             onChange={onTextFieldChange}
           />
         </div>
         <div className="developer-screen__block">
           <p className="developer-screen__block-title">Игровые параметры</p>
-          <Button
-            className={classNames(
-              'main-btn',
-              'control-panel__btn',
-              'developer-screen__btn',
-            )}
-            onClick={onAddGameSettingsFile}
-          >
-            Добавить файл
-          </Button>
+          <p className="developer-screen__text">Файлы игровых параметров</p>
           <ul className={styles['developer-screen__files-container']}>
             {
               currentGameSettingsFiles.length > 0 && currentGameSettingsFiles.map((file) => (
                 <GameSettingsFileItem
                   key={file.id}
                   file={file}
+                  pathVariables={pathVariables}
+                  validationErrors={validationErrors}
+                  onFileDataChange={changeGameSettingsFiles}
+                  onValidation={setNewValidationErrors}
+                  deleteFile={deleteGameSettingsFile}
                 />
               ))
             }
@@ -334,6 +354,16 @@ export const DeveloperScreenGameSettings: React.FC = () => {
               )
             }
           </ul>
+          <Button
+            className={classNames(
+              'main-btn',
+              'control-panel__btn',
+              'developer-screen__btn',
+            )}
+            onClick={onAddGameSettingsFile}
+          >
+            Добавить файл
+          </Button>
         </div>
       </Scrollbars>
     </div>
