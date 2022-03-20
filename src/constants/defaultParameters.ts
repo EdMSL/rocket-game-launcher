@@ -86,7 +86,8 @@ export const defaultLauncherConfig: ILauncherConfig = {
 };
 
 export const defaultGameSettingsConfig: IGameSettingsConfig = {
-  gameSettingsGroups: [],
-  gameSettingsFiles: {},
   baseFilesEncoding: Encoding.WIN1251,
+  gameSettingsGroups: [],
+  gameSettingsFiles: [],
+  gameSettingsParameters: [],
 };

@@ -40,7 +40,7 @@ export const GameSettingsScreen: React.FC = () => {
   const isGameSettingsFilesBackuping = useAppSelector((state) => state.main.isGameSettingsFilesBackuping);
   const gameSettingsFilesBackup = useAppSelector((state) => state.main.gameSettingsFilesBackup);
   const isGameSettingsSaving = useAppSelector((state) => state.main.isGameSettingsSaving);
-  const gameSettingsFiles = useAppSelector((state) => state.gameSettings.gameSettingsFiles);
+  const gameSettingsParameters = useAppSelector((state) => state.gameSettings.gameSettingsParameters);
   const gameSettingsGroups = useAppSelector((state) => state.gameSettings.gameSettingsGroups);
   const gameSettingsOptions = useAppSelector((state) => state.gameSettings.gameSettingsOptions);
   const moProfile = useAppSelector((state) => state.gameSettings.moProfile);
@@ -177,7 +177,7 @@ export const GameSettingsScreen: React.FC = () => {
                     <GameSettingsContent
                       isGameSettingsLoaded={isGameSettingsLoaded}
                       gameSettingsOptions={gameSettingsOptions}
-                      gameSettingsFiles={gameSettingsFiles}
+                      gameSettingsParameters={gameSettingsParameters}
                       gameSettingsGroups={gameSettingsGroups}
                       onSettingOptionChange={onSettingOptionChange}
                     />

@@ -76,6 +76,7 @@ export const PathRegExp = {
   MO_MODS: new RegExp('^%MO_MODS%'),
   MO_PROFILE: new RegExp('^%MO_PROFILE%'),
   CUSTOM_BTNS_AVAILABLE_PATH_VARIABLES: new RegExp('^%(GAME_DIR|DOCS_GAME)%'),
+  GAME_PARAMETERS_AVAILABLE_PATH_VARIABLES: new RegExp('^%(GAME_DIR|DOCS_GAME|MO_PROFILE|MO_MODS|MO_DIR)%'),
   PATH_VARIABLE: /^%[A-Z_]+%/,
   PATH_EXTNAME: /\.[a-zA-Z0-9]{2,}$/,
   CORRECT_PATH_WITH_VARIABLE_TO_FILE: /^%[A-Z_]+%\\(?:[a-zA-Z0-9]+\\)*([a-zA-Z0-9]+\.[a-zA-Z0-9]{3})/,

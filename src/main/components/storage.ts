@@ -32,7 +32,7 @@ import {
   ReadWriteError,
   showMessageBox,
 } from '$utils/errors';
-import { checkConfigFileData, checkGameSettingsConfigMainFields } from '$utils/check';
+import { checkConfigFileData, checkGameSettingsConfigShallow } from '$utils/check';
 import { getObjectAsList } from '$utils/strings';
 import {
   createPathVariables,
@@ -102,7 +102,7 @@ const getGameSettingsData = (messages: IUserMessage[]): [IGameSettingsConfig, bo
   try {
     const fileData = readJSONFileSync<IGameSettingsConfig>(GAME_SETTINGS_FILE_PATH, false);
 
-    return [checkGameSettingsConfigMainFields(fileData), true];
+    return [checkGameSettingsConfigShallow(fileData), true];
   } catch (error: any) {
     if (error instanceof ReadWriteError) {
       if (error.cause.name === ErrorName.NOT_FOUND) {
@@ -223,9 +223,7 @@ export const createStorage = (): Store<IAppState> => {
     },
     gameSettings: {
       ...gameSettingsInitialState,
-      gameSettingsGroups: gameSettingsObj.gameSettingsGroups,
-      baseFilesEncoding: gameSettingsObj.baseFilesEncoding,
-      gameSettingsFiles: gameSettingsObj.gameSettingsFiles,
+      ...gameSettingsObj,
     },
   };
 

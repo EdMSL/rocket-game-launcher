@@ -10,7 +10,7 @@ import {
   writeToLogFile,
   writeToLogFileSync,
 } from '$utils/log';
-import { parseJSON } from '$utils/strings';
+import { getPathToFile, parseJSON } from '$utils/strings';
 import {
   ReadWriteError,
   getReadWriteError,
@@ -22,7 +22,8 @@ import {
 import {
   Encoding, GameSettingsFileView, LauncherButtonAction,
 } from '$constants/misc';
-import { USER_THEMES_DIR } from '$constants/paths';
+import { IPathVariables, USER_THEMES_DIR } from '$constants/paths';
+import { IGameSettingsFile } from '$types/gameSettings';
 
 export const xmlAttributePrefix = '@_';
 
@@ -397,31 +398,57 @@ export const readXMLFile = async (
 
 /**
  * Асинхронно получить данные из файла для последующей генерации игровых настроек.
+ * @param file Объект файла.
+ * @param pathVariables Переменные путей.
+ * @param moProfile Профиль МО.
+ * @param isWithPrefix Нужно ли добавлять префикс к именам атрибутов.
+*/
+export const readFileForGameSettingsOptions = async (
+  file: IGameSettingsFile,
+  pathVariables: IPathVariables,
+  moProfile: string,
+  defaultEncoding: string,
+  isWithPrefix: boolean,
+): Promise<{ [key: string]: IIniObj|IXmlObj, }> => {
+  let fileData: IIniObj|IXmlObj = {};
+
+  if (file.view === GameSettingsFileView.LINE || file.view === GameSettingsFileView.SECTIONAL) {
+    fileData = await readINIFile(getPathToFile(file.path, pathVariables, moProfile), file.encoding || defaultEncoding);
+  } else if (file.view === GameSettingsFileView.TAG) {
+    fileData = await readXMLFile(getPathToFile(file.path, pathVariables, moProfile), isWithPrefix, file.encoding || defaultEncoding);
+  }
+
+  return {
+    [file.name]: fileData,
+  };
+};
+/**
+ * Асинхронно получить данные из файла для последующей генерации игровых настроек.
  * @param pathToFile Путь к файлу.
  * @param fileView Структура(вид) файла. На его основе определяется метод для чтения файла.
  * @param name Имя для определения файла при генерации опций.
  * @param encoding Кодировка файла.
  * @param isWithPrefix Нужно ли добавлять префикс к именам атрибутов.
 */
-export const readFileForGameSettingsOptions = async (
-  pathToFile: string,
-  fileView: string,
-  name: string,
-  encoding: string,
-  isWithPrefix: boolean,
-): Promise<{ [key: string]: IIniObj|IXmlObj, }> => {
-  let fileData: IIniObj|IXmlObj = {};
+// export const readFileForGameSettingsOptions = async (
+//   pathToFile: string,
+//   fileView: string,
+//   name: string,
+//   encoding: string,
+//   isWithPrefix: boolean,
+// ): Promise<{ [key: string]: IIniObj|IXmlObj, }> => {
+//   let fileData: IIniObj|IXmlObj = {};
 
-  if (fileView === GameSettingsFileView.LINE || fileView === GameSettingsFileView.SECTIONAL) {
-    fileData = await readINIFile(pathToFile, encoding);
-  } else if (fileView === GameSettingsFileView.TAG) {
-    fileData = await readXMLFile(pathToFile, isWithPrefix, encoding);
-  }
+//   if (fileView === GameSettingsFileView.LINE || fileView === GameSettingsFileView.SECTIONAL) {
+//     fileData = await readINIFile(pathToFile, encoding);
+//   } else if (fileView === GameSettingsFileView.TAG) {
+//     fileData = await readXMLFile(pathToFile, isWithPrefix, encoding);
+//   }
 
-  return {
-    [name]: fileData,
-  };
-};
+//   return {
+//     [name]: fileData,
+//   };
+// };
 
 /**
  * Синхронно записать файл.

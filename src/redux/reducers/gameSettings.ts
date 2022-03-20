@@ -9,6 +9,7 @@ export const INITIAL_STATE: IGameSettingsRootState = {
   gameSettingsGroups: defaultGameSettingsConfig.gameSettingsGroups,
   baseFilesEncoding: defaultGameSettingsConfig.baseFilesEncoding,
   gameSettingsFiles: defaultGameSettingsConfig.gameSettingsFiles,
+  gameSettingsParameters: defaultGameSettingsConfig.gameSettingsParameters,
   moProfile: '',
   moProfiles: [],
   gameSettingsOptions: {},

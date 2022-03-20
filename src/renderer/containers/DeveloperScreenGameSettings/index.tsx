@@ -16,7 +16,9 @@ import {
   getDefaultGameSettingsFile, getNewConfig, getUniqueValidationErrors,
 } from '$utils/data';
 import { checkObjectForEqual } from '$utils/check';
-import { addMessages, saveGameSettingsConfig } from '$actions/main';
+import {
+  addMessages, saveGameSettingsConfig, updateConfig,
+} from '$actions/main';
 import {
   AppChannel, gameSettingsFileAvailableVariables, LauncherButtonAction,
 } from '$constants/misc';
@@ -36,9 +38,10 @@ import { CreateUserMessage } from '$utils/message';
 import { RoutesWindowName } from '$constants/routes';
 
 export const DeveloperScreenGameSettings: React.FC = () => {
-  const gameSettingsFiles = useAppSelector((state) => state.gameSettings.gameSettingsFiles);
-  const gameSettingsGroups = useAppSelector((state) => state.gameSettings.gameSettingsGroups);
   const baseFilesEncoding = useAppSelector((state) => state.gameSettings.baseFilesEncoding);
+  const gameSettingsGroups = useAppSelector((state) => state.gameSettings.gameSettingsGroups);
+  const gameSettingsFiles = useAppSelector((state) => state.gameSettings.gameSettingsFiles);
+  const gameSettingsParameters = useAppSelector((state) => state.gameSettings.gameSettingsParameters);
   const isFirstLaunch = useAppSelector((state) => state.main.config.isFirstLaunch);
   const pathVariables = useAppSelector((state) => state.main.pathVariables);
 
@@ -48,7 +51,8 @@ export const DeveloperScreenGameSettings: React.FC = () => {
     gameSettingsGroups,
     baseFilesEncoding,
     gameSettingsFiles,
-  }), [gameSettingsGroups, baseFilesEncoding, gameSettingsFiles]);
+    gameSettingsParameters,
+  }), [gameSettingsGroups, baseFilesEncoding, gameSettingsFiles, gameSettingsParameters]);
 
   const [currentSettingsConfig, setCurrentSettingsConfig] = useState<IGameSettingsConfig>(settingsConfig);
   const [validationErrors, setValidationErrors] = useState<IValidationErrors>({});
@@ -124,6 +128,10 @@ export const DeveloperScreenGameSettings: React.FC = () => {
   const onResetBtnClick = useCallback(() => {
     resetConfigChanges();
   }, [resetConfigChanges]);
+
+  const onUpdateBtnClick = useCallback(() => {
+    dispatch(updateConfig('gameSettings'));
+  }, [dispatch]);
 
   const createNewGroup = useCallback(() => {
     const newName = getRandomName();
@@ -241,9 +249,11 @@ export const DeveloperScreenGameSettings: React.FC = () => {
         isConfigChanged={isConfigChanged}
         isHaveValidationErrors={Object.keys(validationErrors).length > 0}
         isFirstLaunch={isFirstLaunch}
+        config="gameSettings"
         onSaveBtnClick={onSaveBtnClick}
         onCancelBtnClick={onCancelBtnClick}
         onResetBtnClick={onResetBtnClick}
+        onUpdateBtnClick={onUpdateBtnClick}
       />
       <Scrollbars
         autoHeight

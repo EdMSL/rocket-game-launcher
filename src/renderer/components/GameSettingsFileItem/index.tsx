@@ -35,7 +35,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
   const onTextFieldChange = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    onFileDataChange(file.id, {
+    onFileDataChange(file.name, {
       ...file,
       [target.name]: target.value,
     });
@@ -44,7 +44,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
   const onSelectChange = useCallback((
     { target }: React.ChangeEvent<HTMLSelectElement>,
   ) => {
-    onFileDataChange(file.id, {
+    onFileDataChange(file.name, {
       ...file,
       [target.name]: target.value,
     });
@@ -56,7 +56,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
     validationData: IValidationData,
     fileName?: string|undefined,
   ) => {
-    onFileDataChange(file.id, {
+    onFileDataChange(file.name, {
       ...file,
       [fileName!]: value,
     });
@@ -69,8 +69,8 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
   }, [file, validationErrors, onFileDataChange, onValidation]);
 
   const onDeleteFileBtnClick = useCallback(() => {
-    deleteFile(file.id);
-  }, [file.id, deleteFile]);
+    deleteFile(file.name);
+  }, [file.name, deleteFile]);
 
   return (
     <li className={classNames(
@@ -82,7 +82,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         <summary
           className={classNames(
             'developer-screen__spoiler-title',
-            Object.keys(validationErrors).find((error) => error.includes(file.id))
+            Object.keys(validationErrors).find((error) => error.includes(file.name))
             && 'developer-screen__spoiler-title--error',
           )}
         >
@@ -104,10 +104,10 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         </summary>
         <PathSelector
           className="developer-screen__item"
-          id={`file-path_${file.id}`}
+          id={`file-path_${file.name}`}
           parent="path"
           pathVariables={pathVariables}
-          validationErrors={validationErrors[`file-path_${file.id}`]}
+          validationErrors={validationErrors[`file-path_${file.name}`]}
           value={file.path}
           label="Путь до файла настроек"
           description="Состоит из переменной пути и самого пути к файлу. При выборе пути через диалоговое окно, переменная определяется автоматически." //eslint-disable-line
@@ -117,7 +117,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         />
         <Select
           className="developer-screen__item"
-          id={`game-settings-file-view_${file.id}`}
+          id={`game-settings-file-view_${file.name}`}
           name="view"
           label="Тип структуры файла"
           description='Определяет, какая структура содержимого у файла. Неправильно выбранная структура приведет к ошибке обработки.' //eslint-disable-line
@@ -127,7 +127,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         />
         <TextField
           className="developer-screen__item"
-          id={`game-settings-file-name_${file.id}`}
+          id={`game-settings-file-name_${file.name}`}
           name="name"
           value={file.name}
           description="Имя файла для идентификации"
@@ -136,7 +136,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         />
         <TextField
           className="developer-screen__item"
-          id={`game-settings-file-encoding_${file.id}`}
+          id={`game-settings-file-encoding_${file.name}`}
           name="encoding"
           value={file.encoding}
           description="Кодировка файла, которая будет применяться при чтении и сохранении файла. Если не указано, берется значение по умолчанию." //eslint-disable-line max-len

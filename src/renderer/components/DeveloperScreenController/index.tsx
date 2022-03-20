@@ -8,9 +8,11 @@ interface IProps {
   isFirstLaunch: boolean,
   isConfigChanged: boolean,
   isHaveValidationErrors: boolean,
+  config: string,
   onSaveBtnClick: (event: React.MouseEvent<HTMLButtonElement>) => void,
   onCancelBtnClick: (event: React.MouseEvent<HTMLButtonElement>) => void,
   onResetBtnClick: (event: React.MouseEvent<HTMLButtonElement>) => void,
+  onUpdateBtnClick: (event: React.MouseEvent<HTMLButtonElement>) => void,
 }
 
 export const DeveloperScreenController: React.FC<IProps> = ({
@@ -20,6 +22,7 @@ export const DeveloperScreenController: React.FC<IProps> = ({
   onSaveBtnClick,
   onCancelBtnClick,
   onResetBtnClick,
+  onUpdateBtnClick,
 }) => (
   <div className={styles['develover-screen__controller']}>
     <Button
@@ -63,6 +66,15 @@ export const DeveloperScreenController: React.FC<IProps> = ({
       onClick={onResetBtnClick}
     >
       Сбросить
+    </Button>
+    <Button
+      className={classNames(
+        'main-btn',
+        'control-panel__btn',
+      )}
+      onClick={onUpdateBtnClick}
+    >
+      Обновить
     </Button>
   </div>
 );

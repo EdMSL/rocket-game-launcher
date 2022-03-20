@@ -4,6 +4,7 @@ export const GAME_SETTINGS_TYPES = {
   UPDATE_GAME_SETTINGS_OPTIONS: 'UPDATE_GAME_SETTINGS_OPTIONS',
   SET_GAME_SETTINGS_CONFIG: 'SET_GAME_SETTINGS_CONFIG',
   SET_GAME_SETTINGS_FILES: 'SET_GAME_SETTINGS_FILES',
+  SET_GAME_SETTINGS_PARAMETERS: 'SET_GAME_SETTINGS_PARAMETERS',
   SAVE_GAME_SETTINGS_FILES: 'SAVE_GAME_SETTINGS_FILES',
   SET_MO_PROFILE: 'SET_MO_PROFILE',
   CHANGE_MO_PROFILE: 'CHANGE_MO_PROFILE',
@@ -46,6 +47,7 @@ export interface IGameSettingsItemParameter {
 export interface IGameSettingsParameter {
   id: string,
   optionType: string,
+  file: string,
   name?: string,
   controllerType?: string,
   iniGroup?: string,
@@ -63,28 +65,29 @@ export interface IGameSettingsParameter {
 }
 
 export interface IGameSettingsFile {
-  id: string,
   name: string,
+  label: string,
   path: string,
   view: string,
-  optionsList: IGameSettingsParameter[],
   encoding: string,
 }
 
-export interface IGameSettingsFiles {
-  [key: string]: IGameSettingsFile,
-}
+// export interface IGameSettingsFiles {
+//   [key: string]: IGameSettingsFile,
+// }
 
 export interface IGameSettingsConfig {
   gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
   baseFilesEncoding: IGameSettingsRootState['baseFilesEncoding'],
   gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
+  gameSettingsParameters: IGameSettingsRootState['gameSettingsParameters'],
 }
 
 export type IGameSettingsRootState = Readonly<{
   gameSettingsGroups: IGameSettingsGroup[],
   baseFilesEncoding: string,
-  gameSettingsFiles: IGameSettingsFiles,
+  gameSettingsFiles: IGameSettingsFile[],
+  gameSettingsParameters: IGameSettingsParameter[],
   moProfile: string,
   moProfiles: string[],
   gameSettingsOptions: IGameSettingsOptions,

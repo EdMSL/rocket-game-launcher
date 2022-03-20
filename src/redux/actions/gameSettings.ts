@@ -40,6 +40,13 @@ export const setGameSettingsFiles = (
   payload: gameSetingsFiles,
 });
 
+export const setGameSettingsParameters = (
+  gameSettingsParameters: IGameSettingsConfig['gameSettingsParameters'],
+) => ({
+  type: GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_PARAMETERS,
+  payload: gameSettingsParameters,
+});
+
 export const saveGameSettingsFiles = (
   changedGameSettingsOptions: IGameSettingsOptions,
 ) => ({

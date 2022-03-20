@@ -35,8 +35,9 @@ import { IMainRootState } from '$types/main';
 
 interface IProps {
   isGameSettingsLoaded: IMainRootState['isGameSettingsLoaded'],
-  gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
   gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
+  // gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
+  gameSettingsParameters: IGameSettingsRootState['gameSettingsParameters'],
   gameSettingsOptions: IGameSettingsRootState['gameSettingsOptions'],
   onSettingOptionChange: (
     parent: string,
@@ -46,17 +47,19 @@ interface IProps {
 
 /**
  * Компонент для отображения игровых опций в виде контроллеров.
- * @param gameSettingsFiles Объект с параметрами из `state`, на основе которых сгенерированы
- * опции игровых настроек.
  * @param gameSettingsGroups Массив доступных групп игровых настроек из `state`.
+ * @param gameSettingsFiles Массив файлов с игровыми параметрами из `state`,
+ * на основе которых сгенерированы опции игровых настроек.
+ * @param gameSettingsParameters Массив игровых параметров из `state`.
  * @param gameSettingsOptions Объект с обработанными опциями из `state`, готовыми для вывода.
  * @param onSettingOptionChange callback функция, вызываемая при изменении значения опции
  * через контроллер.
 */
 export const GameSettingsContent: React.FunctionComponent<IProps> = ({
   isGameSettingsLoaded,
-  gameSettingsFiles,
   gameSettingsGroups,
+  // gameSettingsFiles,
+  gameSettingsParameters,
   gameSettingsOptions,
   onSettingOptionChange,
 }) => {
@@ -174,33 +177,38 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
     >
       {
         //Так как опция из gameSettingsFile может
-        // иметь разное кол-во параметров из файлов,
+        // иметь разное кол-во параметров из файла,
         // то вывод опций делаем на основе параметров (gameSettingsFiles[fileName].optionsList),
         // а не опций (gameSettingsOptions), иначе получаем дубли контроллеров.
         (isGameSettingsLoaded && Object.keys(gameSettingsOptions).length > 0)
-        && Object.keys(gameSettingsFiles)
-          .map(
-            (fileName) => getParametersForOptionsGenerate(
-              gameSettingsFiles[fileName],
-              gameSettingsGroups,
-              locationSettingGroup,
-            ).map(
-              (parameter) => {
-                if (parameter.optionType === GameSettingsOptionType.RELATED) {
-                  return (
-                    <div
-                      key={parameter.id}
-                      className={styles['game-settings-content__item']}
-                    >
-                      <div className={styles['game-settings-content__label']}>
-                        <span>{parameter.label}</span>
-                        {
+        /* && Object.keys(gameSettingsFiles) */
+        // .map(
+        //   (fileName) => getParametersForOptionsGenerate(
+        //     gameSettingsParameters,
+        //     gameSettingsGroups,
+        //     locationSettingGroup,
+        //   )
+        && getParametersForOptionsGenerate(
+          gameSettingsParameters,
+          gameSettingsGroups,
+          locationSettingGroup,
+        ).map(
+          (parameter) => {
+            if (parameter.optionType === GameSettingsOptionType.RELATED) {
+              return (
+                <div
+                  key={parameter.id}
+                  className={styles['game-settings-content__item']}
+                >
+                  <div className={styles['game-settings-content__label']}>
+                    <span>{parameter.label}</span>
+                    {
                           parameter.description
                           && <HintItem description={parameter.description} />
                         }
-                      </div>
-                      <div className={styles['game-settings-content__subblock']}>
-                        {
+                  </div>
+                  <div className={styles['game-settings-content__subblock']}>
+                    {
                           parameter.items!.map((item) => {
                             if (item.controllerType === GameSettingParameterControllerType.SELECT) {
                               return (
@@ -212,10 +220,10 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                                   )}
                                   id={item.id}
                                   name={getOptionName(item)}
-                                  parent={fileName}
+                                  parent={parameter.file}
                                   description={parameter.description}
-                                  value={(gameSettingsOptions[fileName] && getValue(item, fileName)) || 'None'}
-                                  isDisabled={!gameSettingsOptions[fileName]}
+                                  value={(gameSettingsOptions[parameter.file] && getValue(item, parameter.file)) || 'None'}
+                                  isDisabled={!gameSettingsOptions[parameter.file]}
                                   optionsArr={generateSelectOptions(item.options!)}
                                   onChange={onOptionInputChange}
                                 />
@@ -225,208 +233,207 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                             return undefined;
                           })
                         }
-                      </div>
-                    </div>
-                  );
-                }
+                  </div>
+                </div>
+              );
+            }
 
-                if (parameter.optionType === GameSettingsOptionType.GROUP) {
-                  if (parameter.controllerType === GameSettingParameterControllerType.SELECT) {
-                    return (
-                      <Select
-                        key={parameter.id}
-                        className={classNames(
-                          styles['game-settings-content__item'],
-                          styles['game-settings-content__select'],
-                        )}
-                        id={parameter.id}
-                        name={getOptionName(parameter.items![0])}
-                        parent={fileName}
-                        multiparameters={parameter.items!.map((param) => getOptionName(param)).join()}
-                        label={parameter.label}
-                        description={parameter.description}
-                        value={(gameSettingsOptions[fileName] && getValue(parameter.items![0], fileName)) || 'None'}
-                        isDisabled={!gameSettingsOptions[fileName]}
-                        optionsArr={generateSelectOptions(parameter.options!)}
-                        onChange={onOptionInputChange}
-                      />
-                    );
-                  }
+            if (parameter.optionType === GameSettingsOptionType.GROUP) {
+              if (parameter.controllerType === GameSettingParameterControllerType.SELECT) {
+                return (
+                  <Select
+                    key={parameter.id}
+                    className={classNames(
+                      styles['game-settings-content__item'],
+                      styles['game-settings-content__select'],
+                    )}
+                    id={parameter.id}
+                    name={getOptionName(parameter.items![0])}
+                    parent={parameter.file}
+                    multiparameters={parameter.items!.map((param) => getOptionName(param)).join()}
+                    label={parameter.label}
+                    description={parameter.description}
+                    value={(gameSettingsOptions[parameter.file] && getValue(parameter.items![0], parameter.file)) || 'None'}
+                    isDisabled={!gameSettingsOptions[parameter.file]}
+                    optionsArr={generateSelectOptions(parameter.options!)}
+                    onChange={onOptionInputChange}
+                  />
+                );
+              }
 
-                  if (parameter.controllerType === GameSettingParameterControllerType.CHECKBOX) {
-                    return (
-                      <Checkbox
-                        key={parameter.id}
-                        className={styles['game-settings-content__item']}
-                        id={parameter.id}
-                        name={getOptionName(parameter.items![0])}
-                        parent={fileName}
-                        multiparameters={parameter.items!.map((param) => getOptionName(param)).join()}
-                        label={parameter.label!}
-                        description={parameter.description}
-                        isChecked={Boolean(gameSettingsOptions[fileName] && +getValue(parameter.items![0], fileName))}
-                        isDisabled={!gameSettingsOptions[fileName]}
-                        onChange={onOptionInputChange}
-                      />
-                    );
-                  }
+              if (parameter.controllerType === GameSettingParameterControllerType.CHECKBOX) {
+                return (
+                  <Checkbox
+                    key={parameter.id}
+                    className={styles['game-settings-content__item']}
+                    id={parameter.id}
+                    name={getOptionName(parameter.items![0])}
+                    parent={parameter.file}
+                    multiparameters={parameter.items!.map((param) => getOptionName(param)).join()}
+                    label={parameter.label!}
+                    description={parameter.description}
+                    isChecked={Boolean(gameSettingsOptions[parameter.file] && +getValue(parameter.items![0], parameter.file))}
+                    isDisabled={!gameSettingsOptions[parameter.file]}
+                    onChange={onOptionInputChange}
+                  />
+                );
+              }
 
-                  if (parameter.controllerType === GameSettingParameterControllerType.SWITCHER) {
-                    return (
-                      <Switcher
-                        key={parameter.id}
-                        className={styles['game-settings-content__item']}
-                        parentClassname="game-settings-content"
-                        id={parameter.id}
-                        name={getOptionName(parameter.items![0])}
-                        parent={fileName}
-                        multiparameters={parameter.items!.map((param) => getOptionName(param)).join()}
-                        label={parameter.label!}
-                        description={parameter.description}
-                        isChecked={Boolean(gameSettingsOptions[fileName] && +getValue(parameter.items![0], fileName))}
-                        isDisabled={!gameSettingsOptions[fileName]}
-                        onChange={onOptionInputChange}
-                      />
-                    );
-                  }
+              if (parameter.controllerType === GameSettingParameterControllerType.SWITCHER) {
+                return (
+                  <Switcher
+                    key={parameter.id}
+                    className={styles['game-settings-content__item']}
+                    parentClassname="game-settings-content"
+                    id={parameter.id}
+                    name={getOptionName(parameter.items![0])}
+                    parent={parameter.file}
+                    multiparameters={parameter.items!.map((param) => getOptionName(param)).join()}
+                    label={parameter.label!}
+                    description={parameter.description}
+                    isChecked={Boolean(gameSettingsOptions[parameter.file] && +getValue(parameter.items![0], parameter.file))}
+                    isDisabled={!gameSettingsOptions[parameter.file]}
+                    onChange={onOptionInputChange}
+                  />
+                );
+              }
 
-                  if (parameter.controllerType === GameSettingParameterControllerType.RANGE) {
-                    return (
-                      <Range
-                        key={parameter.id}
-                        className={styles['game-settings-content__item']}
-                        parentClassname="game-settings-content"
-                        id={parameter.id}
-                        name={getOptionName(parameter.items![0])}
-                        parent={fileName}
-                        multiparameters={parameter.items!.map((param) => getOptionName(param)).join()}
-                        label={parameter.label!}
-                        description={parameter.description}
-                        defaultValue={(gameSettingsOptions[fileName] && getValue(parameter.items![0], fileName)) || '0'}
-                        min={parameter.min!}
-                        max={parameter.max!}
-                        step={parameter.step!}
-                        isDisabled={!gameSettingsOptions[fileName]}
-                        onChange={onOptionInputChange}
-                        onChangeBtnClick={onOptionRangeButtonClick}
-                      />
-                    );
-                  }
-                }
+              if (parameter.controllerType === GameSettingParameterControllerType.RANGE) {
+                return (
+                  <Range
+                    key={parameter.id}
+                    className={styles['game-settings-content__item']}
+                    parentClassname="game-settings-content"
+                    id={parameter.id}
+                    name={getOptionName(parameter.items![0])}
+                    parent={parameter.file}
+                    multiparameters={parameter.items!.map((param) => getOptionName(param)).join()}
+                    label={parameter.label!}
+                    description={parameter.description}
+                    defaultValue={(gameSettingsOptions[parameter.file] && getValue(parameter.items![0], parameter.file)) || '0'}
+                    min={parameter.min!}
+                    max={parameter.max!}
+                    step={parameter.step!}
+                    isDisabled={!gameSettingsOptions[parameter.file]}
+                    onChange={onOptionInputChange}
+                    onChangeBtnClick={onOptionRangeButtonClick}
+                  />
+                );
+              }
+            }
 
-                if (parameter.optionType === GameSettingsOptionType.COMBINED) {
-                  if (parameter.controllerType === GameSettingParameterControllerType.SELECT) {
-                    return (
-                      <Select
-                        key={parameter.id}
-                        className={classNames(
-                          styles['game-settings-content__item'],
-                          styles['game-settings-content__select'],
-                        )}
-                        id={parameter.id}
-                        name={getOptionName(parameter)}
-                        parent={fileName}
-                        multiparameters={parameter.items!.map((param) => getOptionName(param)).join()}
-                        isCombined
-                        separator={parameter.separator}
-                        label={parameter.label}
-                        description={parameter.description}
-                        value={(gameSettingsOptions[fileName] && getValue(parameter, fileName)) || 'None'}
-                        isDisabled={!gameSettingsOptions[fileName]}
-                        optionsArr={generateSelectOptions(parameter.options!)}
-                        onChange={onOptionInputChange}
-                      />
-                    );
-                  }
-                }
+            if (parameter.optionType === GameSettingsOptionType.COMBINED) {
+              if (parameter.controllerType === GameSettingParameterControllerType.SELECT) {
+                return (
+                  <Select
+                    key={parameter.id}
+                    className={classNames(
+                      styles['game-settings-content__item'],
+                      styles['game-settings-content__select'],
+                    )}
+                    id={parameter.id}
+                    name={getOptionName(parameter)}
+                    parent={parameter.file}
+                    multiparameters={parameter.items!.map((param) => getOptionName(param)).join()}
+                    isCombined
+                    separator={parameter.separator}
+                    label={parameter.label}
+                    description={parameter.description}
+                    value={(gameSettingsOptions[parameter.file] && getValue(parameter, parameter.file)) || 'None'}
+                    isDisabled={!gameSettingsOptions[parameter.file]}
+                    optionsArr={generateSelectOptions(parameter.options!)}
+                    onChange={onOptionInputChange}
+                  />
+                );
+              }
+            }
 
-                if (parameter.optionType === GameSettingsOptionType.DEFAULT) {
-                  if (parameter.controllerType === GameSettingParameterControllerType.RANGE) {
-                    return (
-                      <Range
-                        key={parameter.id}
-                        className={styles['game-settings-content__item']}
-                        parentClassname="game-settings-content"
-                        id={parameter.id}
-                        name={getOptionName(parameter)}
-                        parent={fileName}
-                        defaultValue={(gameSettingsOptions[fileName] && getValue(parameter, fileName)) || '0'}
-                        min={parameter.min!}
-                        max={parameter.max!}
-                        step={parameter.step!}
-                        isDisabled={!gameSettingsOptions[fileName]}
-                        label={parameter.label!}
-                        description={parameter.description}
-                        onChange={onOptionInputChange}
-                        onChangeBtnClick={onOptionRangeButtonClick}
-                      />
-                    );
-                  }
+            if (parameter.optionType === GameSettingsOptionType.DEFAULT) {
+              if (parameter.controllerType === GameSettingParameterControllerType.RANGE) {
+                return (
+                  <Range
+                    key={parameter.id}
+                    className={styles['game-settings-content__item']}
+                    parentClassname="game-settings-content"
+                    id={parameter.id}
+                    name={getOptionName(parameter)}
+                    parent={parameter.file}
+                    defaultValue={(gameSettingsOptions[parameter.file] && getValue(parameter, parameter.file)) || '0'}
+                    min={parameter.min!}
+                    max={parameter.max!}
+                    step={parameter.step!}
+                    isDisabled={!gameSettingsOptions[parameter.file]}
+                    label={parameter.label!}
+                    description={parameter.description}
+                    onChange={onOptionInputChange}
+                    onChangeBtnClick={onOptionRangeButtonClick}
+                  />
+                );
+              }
 
-                  if (parameter.controllerType === GameSettingParameterControllerType.CHECKBOX) {
-                    return (
-                      <Checkbox
-                        key={parameter.id}
-                        className={styles['game-settings-content__item']}
-                        parentClassname="game-settings-content"
-                        id={parameter.id}
-                        name={getOptionName(parameter)}
-                        parent={fileName}
-                        label={parameter.label!}
-                        description={parameter.description}
-                        isChecked={(gameSettingsOptions[fileName] && Boolean(+getValue(parameter, fileName))) || false}
-                        isDisabled={!gameSettingsOptions[fileName]}
-                        onChange={onOptionInputChange}
-                      />
-                    );
-                  }
+              if (parameter.controllerType === GameSettingParameterControllerType.CHECKBOX) {
+                return (
+                  <Checkbox
+                    key={parameter.id}
+                    className={styles['game-settings-content__item']}
+                    parentClassname="game-settings-content"
+                    id={parameter.id}
+                    name={getOptionName(parameter)}
+                    parent={parameter.file}
+                    label={parameter.label!}
+                    description={parameter.description}
+                    isChecked={(gameSettingsOptions[parameter.file] && Boolean(+getValue(parameter, parameter.file))) || false}
+                    isDisabled={!gameSettingsOptions[parameter.file]}
+                    onChange={onOptionInputChange}
+                  />
+                );
+              }
 
-                  if (parameter.controllerType === GameSettingParameterControllerType.SWITCHER) {
-                    return (
-                      <Switcher
-                        key={parameter.id}
-                        className={styles['game-settings-content__item']}
-                        parentClassname="game-settings-content"
-                        id={parameter.id}
-                        name={getOptionName(parameter)}
-                        parent={fileName}
-                        label={parameter.label!}
-                        description={parameter.description}
-                        isChecked={(gameSettingsOptions[fileName] && Boolean(+getValue(parameter, fileName))) || false}
-                        isDisabled={!gameSettingsOptions[fileName]}
-                        onChange={onOptionInputChange}
-                      />
-                    );
-                  }
+              if (parameter.controllerType === GameSettingParameterControllerType.SWITCHER) {
+                return (
+                  <Switcher
+                    key={parameter.id}
+                    className={styles['game-settings-content__item']}
+                    parentClassname="game-settings-content"
+                    id={parameter.id}
+                    name={getOptionName(parameter)}
+                    parent={parameter.file}
+                    label={parameter.label!}
+                    description={parameter.description}
+                    isChecked={(gameSettingsOptions[parameter.file] && Boolean(+getValue(parameter, parameter.file))) || false}
+                    isDisabled={!gameSettingsOptions[parameter.file]}
+                    onChange={onOptionInputChange}
+                  />
+                );
+              }
 
-                  if (parameter.controllerType === GameSettingParameterControllerType.SELECT) {
-                    return (
-                      <Select
-                        key={parameter.id}
-                        className={classNames(
-                          styles['game-settings-content__item'],
-                          styles['game-settings-content__select'],
-                        )}
-                        id={parameter.id}
-                        name={getOptionName(parameter)}
-                        parent={fileName}
-                        label={parameter.label}
-                        description={parameter.description}
-                        value={(gameSettingsOptions[fileName] && getValue(parameter, fileName)) || 'None'}
-                        isDisabled={!gameSettingsOptions[fileName]}
-                        optionsArr={generateSelectOptions(parameter.options!)}
-                        onChange={onOptionInputChange}
-                      />
-                    );
-                  }
-                }
+              if (parameter.controllerType === GameSettingParameterControllerType.SELECT) {
+                return (
+                  <Select
+                    key={parameter.id}
+                    className={classNames(
+                      styles['game-settings-content__item'],
+                      styles['game-settings-content__select'],
+                    )}
+                    id={parameter.id}
+                    name={getOptionName(parameter)}
+                    parent={parameter.file}
+                    label={parameter.label}
+                    description={parameter.description}
+                    value={(gameSettingsOptions[parameter.file] && getValue(parameter, parameter.file)) || 'None'}
+                    isDisabled={!gameSettingsOptions[parameter.file]}
+                    optionsArr={generateSelectOptions(parameter.options!)}
+                    onChange={onOptionInputChange}
+                  />
+                );
+              }
+            }
 
-                return undefined;
-              },
-            ),
-          )
-
-      }
+            return undefined;
+          },
+        )
+          // ),
+    }
     </Scrollbars>
   );
 };

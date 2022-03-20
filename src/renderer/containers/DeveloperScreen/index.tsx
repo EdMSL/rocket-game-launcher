@@ -20,6 +20,7 @@ import { DeveloperScreenGameSettings } from '$containers/DeveloperScreenGameSett
 
 export const DeveloperScreen: React.FC = () => {
   const isGameSettingsSaving = useAppSelector((state) => state.main.isGameSettingsSaving);
+  const isGameSettingsLoading = useAppSelector((state) => state.main.isGameSettingsLoading);
   const isFirstLaunch = useAppSelector((state) => state.main.config.isFirstLaunch);
 
   const onCloseWindowBtnClick = useCallback(() => {
@@ -68,7 +69,7 @@ export const DeveloperScreen: React.FC = () => {
           <Redirect to={Routes.DEVELOPER_SCREEN_CONFIG} />
         </Switch>
         {
-          isGameSettingsSaving && <Loader />
+          (isGameSettingsSaving || isGameSettingsLoading) && <Loader />
         }
       </main>
     </React.Fragment>

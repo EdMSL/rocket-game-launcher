@@ -35,6 +35,7 @@ import {
   setIsLauncherConfigChanged,
   saveGameSettingsConfig,
   setIsGameSettingsLoading,
+  updateConfig,
 } from '$actions/main';
 import {
   generateGameSettingsOptionsSaga,
@@ -454,15 +455,15 @@ function* restoreGameSettingsFilesBackupSaga({
     const {
       gameSettings: {
         gameSettingsFiles,
+        gameSettingsParameters,
         moProfile,
       },
     }: ReturnType<typeof getState> = yield select(getState);
 
-    const {
-      totalGameSettingsOptions,
-    }: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
+    const totalGameSettingsOptions: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
       generateGameSettingsOptionsSaga,
       gameSettingsFiles,
+      gameSettingsParameters,
       moProfile,
     );
 
@@ -488,6 +489,12 @@ function* restoreGameSettingsFilesBackupSaga({
     yield put(addMessages([CreateUserMessage.error('Произошла критическая ошибка в процессе восстановления файлов из бэкапа. Файлы не были восстановлены. Подробности в файле лога.')])); //eslint-disable-line max-len
   } finally {
     yield put(setIsGameSettingsFilesBackuping(false));
+  }
+}
+
+function* updateConfigSaga({ payload: config }: ReturnType<typeof updateConfig>): SagaIterator {
+  if (config === 'gameSettings') {
+    yield call(initGameSettingsDeveloperSaga, true);
   }
 }
 
@@ -550,4 +557,5 @@ export default function* mainSaga(): SagaIterator {
   yield takeLatest(MAIN_TYPES.RENAME_GAME_SETTINGS_FILES_BACKUP, renameGameSettingsFilesBackupSaga);
   yield takeLatest(MAIN_TYPES.RESTORE_GAME_SETTINGS_FILES_BACKUP, restoreGameSettingsFilesBackupSaga);
   yield takeLatest(GAME_SETTINGS_TYPES.UPDATE_GAME_SETTINGS_OPTIONS, updateGameSettingsOptionsSaga);
+  yield takeLatest(MAIN_TYPES.UPDATE_CONFIG, updateConfigSaga);
 }

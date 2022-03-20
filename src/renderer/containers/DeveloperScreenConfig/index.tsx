@@ -13,7 +13,7 @@ import { TextField } from '$components/UI/TextField';
 import { Switcher } from '$components/UI/Switcher';
 import { Select } from '$components/UI/Select';
 import { PathSelector } from '$components/UI/PathSelector';
-import { saveLauncherConfig } from '$actions/main';
+import { saveLauncherConfig, updateConfig } from '$actions/main';
 import {
   appWindowFields,
   FileExtension,
@@ -116,6 +116,10 @@ export const DeveloperScreenConfig: React.FC = () => {
     resetConfigChanges();
     ipcRenderer.send(AppChannel.CLOSE_DEV_WINDOW);
   }, [resetConfigChanges]);
+
+  const onUpdateBtnClick = useCallback(() => {
+    dispatch(updateConfig('launcher'));
+  }, [dispatch]);
 
   const changeCurrentConfig = useCallback((fieldName: string, value, parent?: string|undefined) => {
     const newConfig = getNewConfig(currentConfig, value, fieldName, parent);
@@ -260,9 +264,11 @@ export const DeveloperScreenConfig: React.FC = () => {
         isConfigChanged={isConfigChanged}
         isHaveValidationErrors={Object.keys(validationErrors).length > 0}
         isFirstLaunch={launcherConfig.isFirstLaunch}
+        config="launcher"
         onSaveBtnClick={onSaveBtnClick}
         onCancelBtnClick={onCancelBtnClick}
         onResetBtnClick={onResetBtnClick}
+        onUpdateBtnClick={onUpdateBtnClick}
       />
       <Scrollbars
         autoHeight

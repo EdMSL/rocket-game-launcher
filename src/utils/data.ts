@@ -22,17 +22,17 @@ import {
   getParameterRegExp,
   getPathToFile,
   getRandomId,
+  getRandomName,
   replacePathVariableByRootDir,
 } from './strings';
 import {
   IGameSettingsItemParameter,
   IGameSettingsParameter,
   IGameSettingsRootState,
-  IGameSettingsFile,
   IGameSettingsOptions,
   IGameSettingsOptionsItem,
   IGameSettingsOptionContent,
-  IGameSettingsFiles,
+  IGameSettingsFile,
 } from '$types/gameSettings';
 import { ISelectOption } from '$components/UI/Select';
 import { IIncorrectGameSettingsFiles } from '$sagas/gameSettings';
@@ -330,35 +330,35 @@ export const generateSelectOptions = (
  * @param incorrectGameSettingsFiles Объект с массивами некорректных параметров файлов.
  * @returns Объект `gameSettingsFiles`, содержащий только корректные значения.
 */
-export const filterIncorrectGameSettingsFiles = (
-  gameSettingsFiles: IGameSettingsFiles,
-  incorrectGameSettingsFiles: IIncorrectGameSettingsFiles,
-): IGameSettingsFiles => Object.keys(gameSettingsFiles)
-  .reduce<IGameSettingsFiles>((newGameSettingsFiles, gameSettingsFileName) => {
-    const currentFile = gameSettingsFiles[gameSettingsFileName];
-    const currentFileIncorrectIndexes = incorrectGameSettingsFiles[gameSettingsFileName];
+// export const filterIncorrectGameSettingsFiles = (
+//   gameSettingsFiles: IGameSettingsFiles,
+//   incorrectGameSettingsFiles: IIncorrectGameSettingsFiles,
+// ): IGameSettingsFiles => Object.keys(gameSettingsFiles)
+//   .reduce<IGameSettingsFiles>((newGameSettingsFiles, gameSettingsFileName) => {
+//     const currentFile = gameSettingsFiles[gameSettingsFileName];
+//     const currentFileIncorrectIndexes = incorrectGameSettingsFiles[gameSettingsFileName];
 
-    if (Object.keys(incorrectGameSettingsFiles).includes(gameSettingsFileName)) {
-      if (currentFile.optionsList.length === currentFileIncorrectIndexes.length) {
-        return { ...newGameSettingsFiles };
-      }
+//     if (Object.keys(incorrectGameSettingsFiles).includes(gameSettingsFileName)) {
+//       if (currentFile.optionsList.length === currentFileIncorrectIndexes.length) {
+//         return { ...newGameSettingsFiles };
+//       }
 
-      return {
-        ...newGameSettingsFiles,
-        [gameSettingsFileName]: {
-          ...currentFile,
-          optionsList: [
-            ...currentFile.optionsList
-              .filter((parameter, index) => !currentFileIncorrectIndexes.includes(index)),
-          ],
-        },
-      };
-    }
-    return {
-      ...newGameSettingsFiles,
-      [gameSettingsFileName]: { ...currentFile },
-    };
-  }, {});
+//       return {
+//         ...newGameSettingsFiles,
+//         [gameSettingsFileName]: {
+//           ...currentFile,
+//           optionsList: [
+//             ...currentFile.optionsList
+//               .filter((parameter, index) => !currentFileIncorrectIndexes.includes(index)),
+//           ],
+//         },
+//       };
+//     }
+//     return {
+//       ...newGameSettingsFiles,
+//       [gameSettingsFileName]: { ...currentFile },
+//     };
+//   }, {});
 
 /**
  * Получает список параметров для вывода в виде опций. Если есть `gameSettingsGroups`,
@@ -369,17 +369,17 @@ export const filterIncorrectGameSettingsFiles = (
  * @returns Массив с параметрами для генерации игровый опций.
 */
 export const getParametersForOptionsGenerate = (
-  gameSettingsFile: IGameSettingsFile,
+  gameSettingsParameters: IGameSettingsRootState['gameSettingsParameters'],
   gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
   currentGameSettingGroup: string,
 ): IGameSettingsParameter[] => {
   if (gameSettingsGroups.length > 0 && currentGameSettingGroup) {
-    return gameSettingsFile.optionsList.filter(
+    return gameSettingsParameters.filter(
       (currentParameter) => currentParameter.settingGroup === currentGameSettingGroup,
     );
   }
 
-  return gameSettingsFile.optionsList;
+  return gameSettingsParameters;
 };
 
 /**
@@ -797,18 +797,17 @@ export const clearValidationErrors = (
 
 /**
  * Сгенерировать новый объект файла игровых настроек.
- * @param name Имя файла.
- * @param path путь к файлу.
+ * @param label Загловок файла.
+ * @param path Путь к файлу.
  * @returns Объект файла из `state`.
  */
 export const getDefaultGameSettingsFile = (
-  name: string,
+  label: string,
   path: string,
 ): IGameSettingsFile => ({
-  id: getRandomId('game-settings-file'),
-  name: name.trim().replaceAll(/\s/g, ''),
+  name: getRandomName(),
+  label: label.trim().replaceAll(/\s/g, ''),
   path,
   view: GameSettingsFileView.SECTIONAL,
   encoding: '',
-  optionsList: [],
 });

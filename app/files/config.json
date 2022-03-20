@@ -1,35 +1,55 @@
 {
-  "isResizable": false,
+  "isResizable": true,
+  "width": 801,
+  "height": 800,
   "minWidth": 400,
   "minHeight": 400,
-  "width": 1200,
-  "height": 800,
-  "maxWidth": 0,
-  "maxHeight": 14,
+  "maxWidth": 900,
+  "maxHeight": 0,
   "modOrganizer": {
     "isUsed": true,
     "version": 2,
-    "pathToMOFolder": "%GAME_DIR%\\loot",
+    "pathToMOFolder": "%GAME_DIR%\\Mod Organizer",
     "pathToINI": "%MO_DIR%\\ModOrganizer.ini",
     "pathToProfiles": "%MO_DIR%\\profiles",
-    "pathToMods": "%MO_DIR%\\logs",
+    "pathToMods": "%MO_DIR%\\mods",
     "profileSection": "General",
     "profileParam": "selected_profile",
     "profileParamValueRegExp": ""
   },
   "documentsPath": "%DOCUMENTS%\\My Games\\Oblivion_GBR-bac\\__MO_Saves",
   "isFirstLaunch": false,
-  "gameName": "Oblivion Association",
+  "gameName": "OA Launcher",
   "playButton": {
-    "path": "%GAME_DIR%\\Oblivion.exe",
-    "args": [],
+    "path": "%GAME_DIR%\\Mod Organizer\\ModOrganizer.exe",
+    "args": [
+      {
+        "data": "moshortcut://:Oblivion"
+      }
+    ],
     "label": "Играть"
   },
   "customButtons": [
     {
       "path": "%GAME_DIR%\\Data",
       "action": "open",
-      "label": "Запуск",
+      "label": "Data",
+      "args": []
+    },
+    {
+      "path": "%GAME_DIR%\\Mod Organizer\\ModOrganizer.exe",
+      "action": "run",
+      "label": "TES CS",
+      "args": [
+        {
+          "data": "moshortcut://:Construction Set"
+        }
+      ]
+    },
+    {
+      "path": "%GAME_DIR%\\Mod Organizer",
+      "action": "open",
+      "label": "Открыть папку Mod Organizer",
       "args": []
     }
   ]

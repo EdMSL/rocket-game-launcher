@@ -150,6 +150,11 @@ export const setGameSettingsFilesBackup = (
   payload: gameSettingsFilesBackup,
 });
 
+export const updateConfig = (config: string) => ({
+  type: MAIN_TYPES.UPDATE_CONFIG,
+  payload: config,
+});
+
 export const setUserThemes = (
   userThemes: IMainRootState['userThemes'],
 ) => ({
