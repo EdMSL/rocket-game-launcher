@@ -28,6 +28,12 @@ export const App = (): JSX.Element => {
   const [isOpenAppInfo, setIsOpenAppInfo] = useState<boolean>(false);
 
   useEffect(() => {
+    document.addEventListener('auxclick', (e) => {
+      if (e.button === 1) {
+        e.preventDefault();
+      }
+    });
+
     document
       .getElementById('theme')?.setAttribute(
         'href',
