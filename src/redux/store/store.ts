@@ -1,5 +1,5 @@
 import {
-  createStore, applyMiddleware, compose, Store, Middleware,
+  createStore, applyMiddleware, compose, Store, Middleware, StoreEnhancer,
 } from 'redux';
 import {
   TypedUseSelectorHook, useSelector,
@@ -8,13 +8,7 @@ import {
   createHashHistory, History,
 } from 'history';
 import { routerMiddleware } from 'connected-react-router';
-import {
-  forwardToMain,
-  forwardToRenderer,
-  triggerAlias,
-  replayActionMain,
-  replayActionRenderer,
-} from 'electron-redux';
+import { composeWithStateSync } from 'electron-redux';
 import createSagaMiddleware from 'redux-saga';
 
 import { getRootReducer } from '$reducers/root';
@@ -30,28 +24,19 @@ export const configureStore = (
   scope: string,
 ): { store: Store<IAppState>, history: any, } => {
   const sagaMiddleware = createSagaMiddleware();
-  let history: History<unknown>|undefined;
-
   let middleware: Middleware[] = [];
+  let history: History|undefined;
 
   if (scope === Scope.RENDERER) {
     history = createHashHistory();
 
     middleware = [
-      forwardToMain,
       routerMiddleware(history),
       sagaMiddleware,
     ];
-  } else {
-    middleware = [
-      triggerAlias,
-      forwardToRenderer,
-    ];
   }
 
-  const enhanced = [
-    applyMiddleware(...middleware),
-  ];
+  const enhanced = applyMiddleware(...middleware);
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const composeEnhancers = typeof window === 'object'
@@ -61,15 +46,12 @@ export const configureStore = (
   /* eslint-enable @typescript-eslint/no-explicit-any */
 
   const rootReducer = getRootReducer(scope, history);
+  const enhancer: StoreEnhancer = composeWithStateSync(enhanced, composeEnhancers());
 
-  const store = createStore(rootReducer, initialState, composeEnhancers(...enhanced));
+  const store = createStore(rootReducer, initialState, enhancer);
 
-  if (scope === Scope.MAIN) {
-    replayActionMain(store);
-  } else {
+  if (scope === Scope.RENDERER) {
     SagaManager.startSagas(sagaMiddleware);
-
-    replayActionRenderer(store);
   }
 
   return { store, history };
