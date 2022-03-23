@@ -12,8 +12,7 @@ import { IValidationErrors } from '$types/common';
 import { useAppSelector } from '$store/store';
 import { IGameSettingsConfig, IGameSettingsFile } from '$types/gameSettings';
 import {
-  deepClone,
-  getDefaultGameSettingsFile, getNewConfig, getUniqueValidationErrors,
+  deepClone, getDefaultGameSettingsFile, getNewConfig, getUniqueValidationErrors,
 } from '$utils/data';
 import { checkObjectForEqual } from '$utils/check';
 import {
@@ -42,6 +41,7 @@ export const DeveloperScreenGameSettings: React.FC = () => {
   const gameSettingsGroups = useAppSelector((state) => state.gameSettings.gameSettingsGroups);
   const gameSettingsFiles = useAppSelector((state) => state.gameSettings.gameSettingsFiles);
   const gameSettingsParameters = useAppSelector((state) => state.gameSettings.gameSettingsParameters);
+  const isGameSettingsLoaded = useAppSelector((state) => state.main.isGameSettingsLoaded);
   const isFirstLaunch = useAppSelector((state) => state.main.config.isFirstLaunch);
   const pathVariables = useAppSelector((state) => state.main.pathVariables);
 
@@ -58,6 +58,7 @@ export const DeveloperScreenGameSettings: React.FC = () => {
   const [validationErrors, setValidationErrors] = useState<IValidationErrors>({});
   const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
   const [lastCreatedGroupName, setLastCreatedGroupName] = useState<string>('');
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
   const getPathFromPathSelector = useCallback(async (
   ): Promise<string> => ipcRenderer.invoke(
@@ -90,8 +91,13 @@ export const DeveloperScreenGameSettings: React.FC = () => {
       }
     });
 
+    if (isUpdating) {
+      resetConfigChanges();
+      setIsUpdating(false);
+    }
+
     return (): void => { ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED); };
-  }, [resetConfigChanges]);
+  }, [isUpdating, resetConfigChanges]);
 
   const changeCurrentConfig = useCallback((value, fieldName: string, parent?: string) => {
     const newConfig = getNewConfig(currentSettingsConfig, value, fieldName, parent);
@@ -131,6 +137,7 @@ export const DeveloperScreenGameSettings: React.FC = () => {
 
   const onUpdateBtnClick = useCallback(() => {
     dispatch(updateConfig('gameSettings'));
+    setIsUpdating(true);
   }, [dispatch]);
 
   const createNewGroup = useCallback(() => {
@@ -236,7 +243,7 @@ export const DeveloperScreenGameSettings: React.FC = () => {
     changeCurrentConfig(newGameSettingsFiles, 'gameSettingsFiles');
   }, [currentSettingsConfig.gameSettingsFiles, changeCurrentConfig]);
 
-  const currentGameSettingsFiles = Object
+  const currentGameSettingsFiles: IGameSettingsFile[] = Object
     .keys(currentSettingsConfig.gameSettingsFiles)
     .map((file) => currentSettingsConfig.gameSettingsFiles[file]);
 
@@ -273,108 +280,114 @@ export const DeveloperScreenGameSettings: React.FC = () => {
           />
         )}
       >
-        <div className={styles['developer-screen__game-settings']}>
-          <div className="developer-screen__block">
-            <p className="developer-screen__block-title">Группы игровых настроек</p>
-            <Button
-              className={classNames(
-                'main-btn',
-                'control-panel__btn',
-                'developer-screen__btn',
-              )}
-              isDisabled={!!lastCreatedGroupName}
-              onClick={createNewGroup}
-            >
-              Добавить
-            </Button>
-            <ul className={styles['developer-screen__groups-container']}>
-              {
-                currentSettingsConfig.gameSettingsGroups.length > 0
-                  && currentSettingsConfig.gameSettingsGroups.map((item) => (
-                    <li
-                      key={item.name}
-                      className={classNames(
-                        styles['developer-screen__groups-item'],
-                        lastCreatedGroupName === item.name && styles['developer-screen__groups-item--new'],
-                      )}
-                    >
-                      {
-                      lastCreatedGroupName === item.name && (
-                      <p className={styles['developer-screen__group-label']}>
-                        <span>Заголовок группы</span>
-                        <HintItem description="Задать заголовок группы. Отображается как имя вкладки в экране игровых настроек." />
-                      </p>
-                      )
-                    }
-                      <EditableItem
-                        id={item.name}
-                        isError={!!validationErrors[item.name]}
-                        isNew={lastCreatedGroupName === item.name}
-                        item={item.label}
-                        onApply={editGroupItem}
-                        onDelete={deleteGroupItem}
-                        onChange={validateGroupLabel}
-                      />
+        {
+          isGameSettingsLoaded && (
+          <React.Fragment>
+            <div className={styles['developer-screen__game-settings']}>
+              <div className="developer-screen__block">
+                <p className="developer-screen__block-title">Группы игровых настроек</p>
+                <Button
+                  className={classNames(
+                    'main-btn',
+                    'control-panel__btn',
+                    'developer-screen__btn',
+                  )}
+                  isDisabled={!!lastCreatedGroupName}
+                  onClick={createNewGroup}
+                >
+                  Добавить
+                </Button>
+                <ul className={styles['developer-screen__groups-container']}>
+                  {
+                  currentSettingsConfig.gameSettingsGroups.length > 0
+                    && currentSettingsConfig.gameSettingsGroups.map((item) => (
+                      <li
+                        key={item.name}
+                        className={classNames(
+                          styles['developer-screen__groups-item'],
+                          lastCreatedGroupName === item.name && styles['developer-screen__groups-item--new'],
+                        )}
+                      >
+                        {
+                        lastCreatedGroupName === item.name && (
+                        <p className={styles['developer-screen__group-label']}>
+                          <span>Заголовок группы</span>
+                          <HintItem description="Задать заголовок группы. Отображается как имя вкладки в экране игровых настроек." />
+                        </p>
+                        )
+                      }
+                        <EditableItem
+                          id={item.name}
+                          isError={!!validationErrors[item.name]}
+                          isNew={lastCreatedGroupName === item.name}
+                          item={item.label}
+                          onApply={editGroupItem}
+                          onDelete={deleteGroupItem}
+                          onChange={validateGroupLabel}
+                        />
+                      </li>
+                    ))
+                }
+                  {
+                  currentSettingsConfig.gameSettingsGroups.length === 0 && (
+                    <li className={styles['developer-screen__groups-item']}>
+                      Нет групп игровых настроек
                     </li>
-                  ))
+                  )
+                }
+                </ul>
+              </div>
+            </div>
+            <div className="developer-screen__block">
+              <p className="developer-screen__block-title">Кодировка файлов настроек</p>
+              <TextField
+                className="developer-screen__item"
+                id="baseFilesEncoding"
+                label="Кодировка"
+                value={currentSettingsConfig.baseFilesEncoding}
+                description="Кодировка, которая будет по умолчанию применяться при чтении и записи данных файлов игровых настроек." //eslint-disable-line max-len
+                onChange={onTextFieldChange}
+              />
+            </div>
+            <div className="developer-screen__block">
+              <p className="developer-screen__block-title">Игровые параметры</p>
+              <p className="developer-screen__text">Файлы игровых параметров</p>
+              <ul className={styles['developer-screen__files-container']}>
+                {
+                currentGameSettingsFiles.length > 0 && currentGameSettingsFiles.map((file) => (
+                  <GameSettingsFileItem
+                    key={file.name}
+                    file={file}
+                    pathVariables={pathVariables}
+                    validationErrors={validationErrors}
+                    onFileDataChange={changeGameSettingsFiles}
+                    onValidation={setNewValidationErrors}
+                    deleteFile={deleteGameSettingsFile}
+                  />
+                ))
               }
-              {
-                currentSettingsConfig.gameSettingsGroups.length === 0 && (
-                  <li className={styles['developer-screen__groups-item']}>
-                    Нет групп игровых настроек
-                  </li>
+                {
+                currentGameSettingsFiles.length === 0 && (
+                <li className={styles['developer-screen__files-container']}>
+                  Нет игровых параметров
+                </li>
                 )
               }
-            </ul>
-          </div>
-        </div>
-        <div className="developer-screen__block">
-          <p className="developer-screen__block-title">Кодировка файлов настроек</p>
-          <TextField
-            className="developer-screen__item"
-            id="baseFilesEncoding"
-            label="Кодировка"
-            value={currentSettingsConfig.baseFilesEncoding}
-            description="Кодировка, которая будет по умолчанию применяться при чтении и записи данных файлов игровых настроек." //eslint-disable-line max-len
-            onChange={onTextFieldChange}
-          />
-        </div>
-        <div className="developer-screen__block">
-          <p className="developer-screen__block-title">Игровые параметры</p>
-          <p className="developer-screen__text">Файлы игровых параметров</p>
-          <ul className={styles['developer-screen__files-container']}>
-            {
-              currentGameSettingsFiles.length > 0 && currentGameSettingsFiles.map((file) => (
-                <GameSettingsFileItem
-                  key={file.id}
-                  file={file}
-                  pathVariables={pathVariables}
-                  validationErrors={validationErrors}
-                  onFileDataChange={changeGameSettingsFiles}
-                  onValidation={setNewValidationErrors}
-                  deleteFile={deleteGameSettingsFile}
-                />
-              ))
-            }
-            {
-              currentGameSettingsFiles.length === 0 && (
-              <li className={styles['developer-screen__files-container']}>
-                Нет игровых параметров
-              </li>
-              )
-            }
-          </ul>
-          <Button
-            className={classNames(
-              'main-btn',
-              'control-panel__btn',
-              'developer-screen__btn',
-            )}
-            onClick={onAddGameSettingsFile}
-          >
-            Добавить файл
-          </Button>
-        </div>
+              </ul>
+              <Button
+                className={classNames(
+                  'main-btn',
+                  'control-panel__btn',
+                  'developer-screen__btn',
+                )}
+                onClick={onAddGameSettingsFile}
+              >
+                Добавить файл
+              </Button>
+            </div>
+          </React.Fragment>
+          )
+        }
       </Scrollbars>
     </div>
   );

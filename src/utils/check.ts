@@ -41,6 +41,18 @@ export interface ICheckResult<T> {
 
 const MIN_NAME_LENGTH = 10;
 
+const writeErrorsToLog = (error: Joi.ValidationError|Joi.ValidationError[]): void => {
+  if (Array.isArray(error)) {
+    error.forEach((currentError) => {
+      writeErrorsToLog(currentError);
+    });
+  } else {
+    error.details.forEach((errorItem) => {
+      writeToLogFileSync(errorItem.message, LogMessageType.ERROR);
+    });
+  }
+};
+
 export const getIsPathWithVariableCorrect = (
   value: string,
   action: string,
@@ -197,14 +209,14 @@ const gameSettingsFileOptionTypeSchema = Joi.string().required().valid(...Object
 // id для опций не указываются в settings.json, вместо этого они генерируются автоматически.
 const defaultOptionTypeSchema = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('game-settings-parameter')),
-  file: Joi.string().valid(Joi.in('$gameSettingsFiles', { render: true }))
+  file: Joi.string().valid(Joi.in('$gameSettingsFiles'))
     .messages({ 'any.only': '"file" must be one of {$gameSettingsFiles}' }),
   optionType: Joi.string().required().valid(GameSettingsOptionType.DEFAULT),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
-  ).valid(Joi.in('$gameSettingsGroups', { render: true }))
+  ).valid(Joi.in('$gameSettingsGroups'))
     .messages({ 'any.only': '"settingGroup" must be one of {$gameSettingsGroups}' }),
   label: Joi.string().optional().default(Joi.ref('name')),
   description: Joi.string().optional().default('').allow(''),
@@ -244,14 +256,14 @@ const defaultOptionTypeSchema = Joi.object({
 
 const groupOptionTypeSchema = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('game-settings-parameter')),
-  file: Joi.string().valid(Joi.in('$gameSettingsFiles', { render: true }))
+  file: Joi.string().valid(Joi.in('$gameSettingsFiles'))
     .messages({ 'any.only': '"file" must be one of {$gameSettingsFiles}' }),
   optionType: Joi.string().required().valid(GameSettingsOptionType.GROUP),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
-  ).valid(Joi.in('$gameSettingsGroups', { render: true }))
+  ).valid(Joi.in('$gameSettingsGroups'))
     .messages({ 'any.only': '"settingGroup" must be one of {$gameSettingsGroups}' }),
   label: Joi.string().required(),
   description: Joi.string().optional().default('').allow(''),
@@ -295,14 +307,14 @@ const groupOptionTypeSchema = Joi.object({
 
 const combinedOptionTypeSchema = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('game-settings-parameter')),
-  file: Joi.string().valid(Joi.in('$gameSettingsFiles', { render: true }))
+  file: Joi.string().valid(Joi.in('$gameSettingsFiles'))
     .messages({ 'any.only': '"file" must be one of {$gameSettingsFiles}' }),
   optionType: Joi.string().required().valid(GameSettingsOptionType.COMBINED),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
-  ).valid(Joi.in('$gameSettingsGroups', { render: true }))
+  ).valid(Joi.in('$gameSettingsGroups'))
     .messages({ 'any.only': '"settingGroup" must be one of {$gameSettingsGroups}' }),
   label: Joi.string().required(),
   description: Joi.string().optional().default('').allow(''),
@@ -354,14 +366,14 @@ const combinedOptionTypeSchema = Joi.object({
 
 const relatedOptionTypeSchema = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('game-settings-parameter')),
-  file: Joi.string().valid(Joi.in('$gameSettingsFiles', { render: true }))
+  file: Joi.string().valid(Joi.in('$gameSettingsFiles'))
     .messages({ 'any.only': '"file" must be one of {$gameSettingsFiles}' }),
   optionType: Joi.string().required().valid(GameSettingsOptionType.RELATED),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
-  ).valid(Joi.in('$gameSettingsGroups', { render: true }))
+  ).valid(Joi.in('$gameSettingsGroups'))
     .messages({ 'any.only': '"settingGroup" must be one of {$gameSettingsGroups}' }),
   description: Joi.string().optional().default('').allow(''),
   label: Joi.string().required(),
@@ -512,11 +524,10 @@ export const checkGameSettingsParameters = (
   const validationOptions: Joi.ValidationOptions = {
     abortEarly: false,
     stripUnknown: true,
+    messages: {
 
+    },
     context: {
-      // encoding: baseFilesEncoding,
-      // isGameSettingsGroupsExists: gameSettingsGroups.length > 0,
-      // view: gameSettingsFiles[fileName].view,
       isGameSettingsGroupsExists: gameSettingsGroups.length > 0,
       gameSettingsGroups: gameSettingsGroups.map((group) => group.name),
       gameSettingsFiles: gameSettingsFiles.map((file) => file.name),
@@ -525,7 +536,13 @@ export const checkGameSettingsParameters = (
   };
 
   const resultParameters = parameters.reduce<IGameSettingsParameter[]>((currentParams, currentParam) => {
+    const fileForParameter = gameSettingsFiles.find((file) => file.name === currentParam.file);
+
     let validationResult: Joi.ValidationResult;
+
+    if (fileForParameter) {
+        validationOptions.context!.view = fileForParameter.view;
+    }
 
     validationResult = gameSettingsFileOptionTypeSchema.validate(
       currentParam.optionType,
@@ -534,10 +551,6 @@ export const checkGameSettingsParameters = (
 
     if (validationResult.error) {
       errors.push(validationResult.error);
-      // errors.push({
-      //   parent: `"parameters[${index}]"`,
-      //   error: validationResult.error,
-      // });
 
       return [...currentParams];
     }
@@ -559,10 +572,6 @@ export const checkGameSettingsParameters = (
 
     if (validationResult.error) {
       errors.push(validationResult.error);
-      // errors.push({
-      //   parent: `"parameters[${index}]"`,
-      //   error: validationResult.error,
-      // });
 
       return [...currentParams];
     }
@@ -577,10 +586,11 @@ export const checkGameSettingsParameters = (
 };
 
 /**
- * Проверка файла игровых настроек на соответствие требованиям.
- * Проверка на наличие необходимых и опциональных полей, а так же фильтрация некорректных.
+ * Поверхностная проверка файла игровых настроек на соответствие требованиям.
+ * Проверяются только данные на первом уровне объекта.
  * На выходе получаем сообщение о результате проверки и итоговый конфиг.
- * Поля используемых файлов для настроек проверяются отдельно.
+ * @param configObj Объект для проверки.
+ * @returns Объект конфигурации игровых настроек.
 */
 export const checkGameSettingsConfigShallow = (
   configObj: IGameSettingsConfig,
@@ -599,6 +609,12 @@ export const checkGameSettingsConfigShallow = (
   return validateResult.value;
 };
 
+/**
+ * Полная проверка файла игровых настроек на соответствие требованиям.
+ * На выходе получаем сообщение о результате проверки и итоговый конфиг.
+ * @param configObj Объект для проверки.
+ * @returns Объект с данными об игровых настройках и ошибками.
+*/
 export const checkGameSettingsConfigFull = (
   configObj: IGameSettingsConfig,
 ): ICheckResult<IGameSettingsConfig> => {
@@ -609,29 +625,51 @@ export const checkGameSettingsConfigFull = (
     abortEarly: false,
     stripUnknown: true,
   });
-  console.log('error: ', validationResult.error?.details);
-  console.log('validationResult.value: ', validationResult.value);
+
+  let config = validationResult.value!;
+
   if (validationResult.error) {
+    let newGroups = config.gameSettingsGroups;
+    let newFiles = config.gameSettingsFiles;
+
     validationErrors.push(validationResult.error);
+
+    validationResult.error.details.forEach((errorItem) => {
+      if (errorItem.path[0] === 'gameSettingsGroups') {
+        newGroups = newGroups.filter((group) => group[errorItem.path[2]] !== errorItem.context?.value);
+      } else if (errorItem.path[0] === 'gameSettingsFiles') {
+        newFiles = newFiles.filter((file) => file[errorItem.path[2]] !== errorItem.context?.value);
+      }
+    });
+
+    config = {
+      ...config,
+      gameSettingsGroups: newGroups,
+      gameSettingsFiles: newFiles,
+    };
   }
 
   const { data: parameters, errors: paramErrors } = checkGameSettingsParameters(
-    validationResult.value!.gameSettingsParameters,
-    validationResult.value!.gameSettingsGroups,
-    validationResult.value!.gameSettingsFiles,
+    config.gameSettingsParameters,
+    config.gameSettingsGroups,
+    config.gameSettingsFiles,
   );
 
   if (paramErrors.length > 0) {
     validationErrors.push(...paramErrors);
   }
 
-  const newConfigObj = {
-    ...validationResult.value!,
+  if (validationErrors.length > 0) {
+    writeErrorsToLog(validationErrors);
+  }
+
+  config = {
+    ...config,
     gameSettingsParameters: parameters,
   };
 
   return {
-    data: newConfigObj,
+    data: config,
     errors: validationErrors,
   };
 };

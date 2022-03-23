@@ -42,4 +42,5 @@ export interface IUIElementProps<E> extends IUIElementParams{
 
 export interface ILocationState {
   isFromMainPage?: boolean,
+  isGameSettingsOptionsChanged?: boolean,
 }

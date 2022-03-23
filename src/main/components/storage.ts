@@ -98,35 +98,6 @@ const getConfigurationData = (): ILauncherConfig => {
   }
 };
 
-const getGameSettingsData = (messages: IUserMessage[]): [IGameSettingsConfig, boolean|null] => {
-  try {
-    const fileData = readJSONFileSync<IGameSettingsConfig>(GAME_SETTINGS_FILE_PATH, false);
-
-    return [checkGameSettingsConfigShallow(fileData), true];
-  } catch (error: any) {
-    if (error instanceof ReadWriteError) {
-      if (error.cause.name === ErrorName.NOT_FOUND) {
-        writeToLogFileSync('Game settings file settings.json not found.');
-        messages.push(CreateUserMessage.warning('Не найден файл settings.json. Загружены игровые настройки по умолчанию.', RoutesWindowName.DEV)); //eslint-disable-line max-len
-
-        return [defaultGameSettingsConfig, null];
-      }
-
-      writeToLogFileSync(`Unknown error. Message: ${error.message}`);
-    } else if (error instanceof CustomError) {
-      messages.push(
-        CreateUserMessage.error('Ошибка обработки файла settings.json. Игровые настройки будут недоступны. Подробности в файле лога.'), //eslint-disable-line max-len
-        CreateUserMessage.error('Ошибка обработки файла settings.json. Загружены игровые настройки по умолчанию.', RoutesWindowName.DEV), //eslint-disable-line max-len
-      );
-      writeToLogFileSync(`An error occured during settinsgs.json file processing. Message: ${error.message}`, LogMessageType.ERROR); //eslint-disable-line max-len
-    } else {
-      writeToLogFileSync(`Unknown error. Message: ${error.message}`, LogMessageType.ERROR);
-    }
-  }
-
-  return [defaultGameSettingsConfig, false];
-};
-
 /**
   * Функция для создания файла настроек пользователя и хранилища Redux.
 */
@@ -192,7 +163,11 @@ export const createStorage = (): Store<IAppState> => {
     configurationData.customButtons = newButtons;
   }
 
-  const [gameSettingsObj, isSettingsAvailable] = getGameSettingsData(messages);
+  let isGameSettingsFileExists = true;
+
+  if (!fs.existsSync(GAME_SETTINGS_FILE_PATH)) {
+    isGameSettingsFileExists = false;
+  }
 
   // Генерация state без gameSettings.
   const newStore = {
@@ -213,17 +188,12 @@ export const createStorage = (): Store<IAppState> => {
           ...configurationData.playButton,
         },
       },
-      isGameSettingsAvailable: isSettingsAvailable !== null && isSettingsAvailable,
-      isGameSettingsFileExists: isSettingsAvailable !== null,
+      isGameSettingsFileExists,
       isDevWindowOpeninging: configurationData.isFirstLaunch,
       launcherVersion: app.getVersion(),
       pathVariables,
       userThemes,
       messages,
-    },
-    gameSettings: {
-      ...gameSettingsInitialState,
-      ...gameSettingsObj,
     },
   };
 

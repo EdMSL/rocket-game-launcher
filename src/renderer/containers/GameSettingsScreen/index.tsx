@@ -28,6 +28,7 @@ import { GameSettingsFormControls } from '$components/GameSettingsFormControls';
 import { createGameSettingsFilesBackup, getGameSettingsFilesBackup } from '$actions/main';
 import { Modal } from '$components/UI/Modal';
 import { GameSettingsBackup } from '$components/GameSettingsBackup';
+import { ILocationState } from '$types/common';
 
 /**
  * Контейнер, в котором располагаются блок (`GameSettingsContent`) с контроллерами для изменения
@@ -122,11 +123,14 @@ export const GameSettingsScreen: React.FC = () => {
       <div className={classNames('control-panel', styles['game-settings-screen__navigation'])}>
         {
           gameSettingsGroups.map((group) => (
-            <NavLink
+            <NavLink<ILocationState>
               key={group.name}
               className={classNames('button', 'main-btn', 'control-panel__btn')}
               activeClassName="control-panel__btn--active"
-              to={`${Routes.GAME_SETTINGS_SCREEN}/${group.name}`}
+              to={{
+                pathname: `${Routes.GAME_SETTINGS_SCREEN}/${group.name}`,
+                state: { isGameSettingsOptionsChanged: isGameOptionsChanged },
+              }}
             >
               <span className={classNames('control-panel__btn-text')}>
                 {group.label}
@@ -145,11 +149,11 @@ export const GameSettingsScreen: React.FC = () => {
       </div>
       <div className={styles['game-settings-screen__content']}>
         {
-        isModOrganizerUsed
-        && moProfile
-        && moProfiles.length > 0
-        && (Object.keys(gameSettingsOptions).length > 0 || isGameSettingsLoaded)
-        && (
+          isModOrganizerUsed
+          && moProfile
+          && moProfiles.length > 0
+          && (Object.keys(gameSettingsOptions).length > 0 || isGameSettingsLoaded)
+          && (
           <div className={styles['game-settings-screen__profiles']}>
             <Select
               className={styles['game-settings-screen__select']}
@@ -160,7 +164,7 @@ export const GameSettingsScreen: React.FC = () => {
               onChange={onMOProfilesSelectChange}
             />
           </div>
-        )
+          )
         }
         <form
           className={styles['game-settings-screen__form']}

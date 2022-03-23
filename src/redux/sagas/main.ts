@@ -201,17 +201,16 @@ function* updateGameSettingsOptionsSaga(): SagaIterator {
 
     const newConfigData: SagaReturnType<typeof getGameSettingsConfigSaga> = yield call(
       getGameSettingsConfigSaga,
-      true,
     );
 
-    yield call(initGameSettingsSaga, true, newConfigData.gameSettingsFiles);
+    yield call(initGameSettingsSaga, true, newConfigData.data.gameSettingsFiles);
   } catch (error: any) {
     if (
       error instanceof SagaError
       && error.reason instanceof ReadWriteError
       && error.reason.cause.name === ErrorName.NOT_FOUND
     ) {
-      writeToLogFile('Game settings file settings.json not found.');
+      writeToLogFile('Game settings file settings.json not found.', LogMessageType.ERROR);
 
       yield put(addMessages(
         [CreateUserMessage.error('Не найден файл settings.json, обновление прервано. Игровые настройки будут недоступны.')], // eslint-disable-line max-len
@@ -503,13 +502,12 @@ function* locationChangeSaga(
 ): SagaIterator {
   const {
     main: {
-      isDeveloperMode,
       isLauncherInitialised,
       isGameSettingsLoaded,
-      isLauncherConfigChanged,
       config: { isFirstLaunch },
     },
   }: ReturnType<typeof getState> = yield select(getState);
+
   if (!isLauncherInitialised && (location.pathname === Routes.MAIN_SCREEN)) {
     yield call(initLauncherSaga);
 
@@ -523,13 +521,49 @@ function* locationChangeSaga(
   }
 
   if (GAME_SETTINGS_PATH_REGEXP.test(location.pathname)) {
+    const {
+      main: {
+        isDeveloperMode,
+        isLauncherConfigChanged,
+      },
+    }: ReturnType<typeof getState> = yield select(getState);
+
     if (isLauncherInitialised) {
       if (
         (!isDeveloperMode && !isGameSettingsLoaded && location.state?.isFromMainPage)
         || isLauncherConfigChanged
       ) {
         yield call(initGameSettingsSaga, false);
-      } else {
+
+        if (location.state?.isFromMainPage) {
+          const {
+            gameSettings: {
+              gameSettingsGroups,
+            },
+          }: ReturnType<typeof getState> = yield select(getState);
+
+          if (gameSettingsGroups.length > 0) {
+            yield put(push(`${Routes.GAME_SETTINGS_SCREEN}/${gameSettingsGroups[0].name}`));
+          }
+        }
+      } else if (isDeveloperMode && isGameSettingsLoaded && location.state?.isFromMainPage) {
+        const {
+          gameSettings: {
+            gameSettingsFiles,
+            gameSettingsParameters,
+            moProfile,
+          },
+        }: ReturnType<typeof getState> = yield select(getState);
+
+        const options: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
+          generateGameSettingsOptionsSaga,
+          gameSettingsFiles,
+          gameSettingsParameters,
+          moProfile,
+        );
+
+        yield put(setGameSettingsOptions(options));
+      } else if (location.state?.isGameSettingsOptionsChanged) {
         const {
           gameSettings: { gameSettingsOptions },
         }: ReturnType<typeof getState> = yield select(getState);
@@ -541,7 +575,7 @@ function* locationChangeSaga(
     }
   }
 
-  if (location.pathname === Routes.DEVELOPER_SCREEN && !isGameSettingsLoaded) {
+  if (location.pathname === Routes.DEVELOPER_SCREEN_GAME_SETTINGS && !isGameSettingsLoaded) {
     yield call(initGameSettingsDeveloperSaga);
   }
 }
