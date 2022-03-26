@@ -197,13 +197,14 @@ export const createStorage = (): Store<IAppState> => {
     },
   };
 
-  /* eslint-disable @typescript-eslint/dot-notation */
-  global['state'] = newStore;
+  global.state = newStore;
 
-  const appStore = configureStore(newStore, Scope.MAIN).store;
+  const appStore = configureStore(global.state, Scope.MAIN).store;
 
   appStore.subscribe(() => {
     const currentState = appStore.getState();
+    global.state = currentState;
+
     const newStorageData = Object.keys(currentState).reduce((currentParams, param) => {
       if (saveToStorageParams.includes(param)) {
         return {

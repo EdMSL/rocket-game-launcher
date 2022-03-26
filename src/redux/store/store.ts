@@ -10,6 +10,7 @@ import {
 import { routerMiddleware } from 'connected-react-router';
 import { composeWithStateSync } from 'electron-redux';
 import createSagaMiddleware from 'redux-saga';
+import { composeWithDevTools } from '@redux-devtools/extension';
 
 import { getRootReducer } from '$reducers/root';
 import { SagaManager } from '$sagas/SagaManager';
@@ -24,29 +25,20 @@ export const configureStore = (
   scope: string,
 ): { store: Store<IAppState>, history: any, } => {
   const sagaMiddleware = createSagaMiddleware();
-  let middleware: Middleware[] = [];
+  const middlewares: Middleware[] = [];
+
   let history: History|undefined;
 
   if (scope === Scope.RENDERER) {
     history = createHashHistory();
 
-    middleware = [
-      routerMiddleware(history),
-      sagaMiddleware,
-    ];
+    middlewares.push(routerMiddleware(history), sagaMiddleware);
   }
 
-  const enhanced = applyMiddleware(...middleware);
-
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  const composeEnhancers = typeof window === 'object'
-    && (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-    ? (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
-    : compose;
-  /* eslint-enable @typescript-eslint/no-explicit-any */
+  const enhanced = applyMiddleware(...middlewares);
 
   const rootReducer = getRootReducer(scope, history);
-  const enhancer: StoreEnhancer = composeWithStateSync(enhanced, composeEnhancers());
+  const enhancer: StoreEnhancer = composeWithDevTools(composeWithStateSync(enhanced));
 
   const store = createStore(rootReducer, initialState, enhancer);
 
