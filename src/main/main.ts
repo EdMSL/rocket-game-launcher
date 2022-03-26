@@ -18,10 +18,8 @@ import { showErrorBox } from '$utils/errors';
 import { getSystemInfo } from '$utils/data';
 import { createBackupFolders } from '$utils/backup';
 import { createFolderSync, getPathFromFileInput } from '$utils/files';
-import { IPathVariables, USER_THEMES_DIR } from '$constants/paths';
+import { USER_THEMES_DIR } from '$constants/paths';
 import { AppChannel } from '$constants/misc';
-
-require('@electron/remote/main').initialize();
 
 let mainWindow: BrowserWindow|null = null;
 let devWindow: BrowserWindow|null = null;

@@ -46,6 +46,7 @@ const configuration = merge([
     module: {
       strictExportPresence: true,
     },
+    experiments: { topLevelAwait: true },
     stats: {
       all: false,
       modules: true,

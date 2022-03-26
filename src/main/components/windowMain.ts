@@ -40,7 +40,6 @@ export const createMainWindow = (
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true,
       devTools: process.env.NODE_ENV === 'development',
     },
   });

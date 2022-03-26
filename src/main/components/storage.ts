@@ -1,7 +1,7 @@
 import Storage from 'electron-store';
 import { Store } from 'redux';
 import path from 'path';
-import { app } from 'electron';
+import { app, ipcMain } from 'electron';
 import fs from 'fs';
 
 import { configureStore, IAppState } from '$store/store';
@@ -45,7 +45,7 @@ import { INITIAL_STATE as gameSettingsInitialState } from '$reducers/gameSetting
 import { INITIAL_STATE as userSettingsInitialState } from '$reducers/userSettings';
 import { ILauncherConfig, IUserMessage } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
-import { Scope } from '$constants/misc';
+import { AppChannel, Scope } from '$constants/misc';
 import { IGameSettingsConfig } from '$types/gameSettings';
 import { RoutesWindowName } from '$constants/routes';
 
@@ -197,13 +197,10 @@ export const createStorage = (): Store<IAppState> => {
     },
   };
 
-  global.state = newStore;
-
-  const appStore = configureStore(global.state, Scope.MAIN).store;
+  const appStore = configureStore(newStore, Scope.MAIN).store;
 
   appStore.subscribe(() => {
     const currentState = appStore.getState();
-    global.state = currentState;
 
     const newStorageData = Object.keys(currentState).reduce((currentParams, param) => {
       if (saveToStorageParams.includes(param)) {
@@ -218,6 +215,8 @@ export const createStorage = (): Store<IAppState> => {
 
     storage.set(newStorageData);
   });
+
+  ipcMain.handle(AppChannel.GET_APP_STATE, () => appStore.getState());
 
   writeToLogFileSync(`Working directory: ${GAME_DIR}`);
   writeToLogFileSync(`Paths variables: \n  ${getObjectAsList(pathVariables)}`);

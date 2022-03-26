@@ -1,5 +1,5 @@
 import {
-  createStore, applyMiddleware, compose, Store, Middleware, StoreEnhancer,
+  createStore, applyMiddleware, Store, Middleware, StoreEnhancer,
 } from 'redux';
 import {
   TypedUseSelectorHook, useSelector,

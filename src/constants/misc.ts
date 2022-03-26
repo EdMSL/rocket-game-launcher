@@ -104,6 +104,7 @@ export const AppChannel = {
   WINDOW_RESIZED: 'window resized',
   CLOSE_APP: 'close app',
   GET_PATH_BY_PATH_SELECTOR: 'get path from native window',
+  GET_APP_STATE: 'get app state',
 };
 
 export const AppWindowName = {
