@@ -44,3 +44,38 @@ export interface ILocationState {
   isFromMainPage?: boolean,
   isGameSettingsOptionsChanged?: boolean,
 }
+
+interface IIniLine {
+  text: string,
+  comment: string,
+  lineType: number,
+  key?: string,
+  value?: string,
+}
+
+interface IIniSection {
+  lines: IIniLine[],
+  name: string,
+  getValue: (key: string) => string,
+  setValue: (key: string, value: string|number) => void,
+  getLine: (key: string) => IIniLine,
+}
+
+export interface IIniObj {
+  globals: {
+    lines: IIniLine[],
+  },
+  lineBreak: string,
+  sections: IIniSection[],
+  stringify: () => string,
+  getSection: (name: string) => IIniSection,
+  addSection: (name: string) => IIniSection,
+}
+
+export interface IXmlObj {
+  [key: string]: any,
+}
+
+export interface IGetDataFromFilesResult {
+  [key: string]: IIniObj|IXmlObj,
+}

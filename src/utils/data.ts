@@ -1,14 +1,15 @@
 import { screen } from 'electron';
 import si from 'systeminformation';
 import fs from 'fs';
+import path from 'path';
 
 import {
   PathRegExp,
   PathVariableName,
   GameSettingsFileView,
   LauncherButtonAction,
+  GameSettingsOptionType,
 } from '$constants/misc';
-import { IIniObj, IXmlObj } from './files';
 import {
   LogMessageType,
   writeToLogFile,
@@ -50,7 +51,9 @@ import {
 } from '$types/main';
 import { defaultGameSettingsConfig, defaultModOrganizerParams } from '$constants/defaultParameters';
 import { getReadWriteError } from './errors';
-import { IValidationErrors } from '$types/common';
+import {
+  IGetDataFromFilesResult, IIniObj, IValidationErrors, IXmlObj,
+} from '$types/common';
 
 const ONE_GB = 1073741824;
 const SYMBOLS_TO_TYPE = 8;
@@ -204,30 +207,28 @@ export const setValueForObjectDeepKey = (lib, keys, newValue): void => {
  * объекта игровой опции для записи в state.
  * @param currentFileData Данные из файла, которые используются в опции.
  * @param currentGameSettingParameter Объект параметра, на основе которого создается опция.
- * @param fileView Вид структуры файла.
- * @param gameSettingsFileName Имя, используемой в settings.json для данного файла.
- * @param baseFileName Полное базовое имя файла.
+ * @param currentGameSettingsFile Объект файла, используемого параметром.
  * @param moProfileName Профиль МО.
 */
 export const getOptionData = (
   currentFileData: IIniObj|IXmlObj,
   currentGameSettingParameter: IGameSettingsParameter|IGameSettingsItemParameter,
-  fileView: string,
-  gameSettingsFileName: string,
-  baseFileName: string,
+  currentGameSettingsFile: IGameSettingsFile,
   moProfileName = '',
 ): IGeneratedGameSettingsParam => {
   const optionErrors: IUserMessage[] = [];
+  const baseFileName = path.basename(currentGameSettingsFile.path);
+
   let optionName;
   let optionSettingGroup;
   let optionValue = '';
 
-  if (fileView === GameSettingsFileView.SECTIONAL) {
+  if (currentGameSettingsFile.view === GameSettingsFileView.SECTIONAL) {
     optionSettingGroup = currentFileData.getSection(currentGameSettingParameter.iniGroup);
 
     if (!optionSettingGroup) {
       optionErrors.push(CreateUserMessage.warning(
-        `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain the "${currentGameSettingParameter.iniGroup}" group specified in ${currentGameSettingParameter.name} from "${gameSettingsFileName}"`, //eslint-disable-line max-len
+        `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain the "${currentGameSettingParameter.iniGroup}" group specified in ${currentGameSettingParameter.name} from "${currentGameSettingsFile.label}"`, //eslint-disable-line max-len
       ));
     } else {
       const parameterLine = optionSettingGroup.getLine(currentGameSettingParameter.name);
@@ -237,11 +238,11 @@ export const getOptionData = (
         optionValue = parameterLine.value;
       } else {
         optionErrors.push(CreateUserMessage.warning(
-          `The "${currentGameSettingParameter.iniGroup}" group from the ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain the "${currentGameSettingParameter.name}" parameter specified in "${gameSettingsFileName}"`, //eslint-disable-line max-len
+          `The "${currentGameSettingParameter.iniGroup}" group from the ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain the "${currentGameSettingParameter.name}" parameter specified in "${currentGameSettingsFile.label}"`, //eslint-disable-line max-len
         ));
       }
     }
-  } else if (fileView === GameSettingsFileView.LINE) {
+  } else if (currentGameSettingsFile.view === GameSettingsFileView.LINE) {
     currentFileData.globals.lines.some((line) => {
       const searchRegexp = getParameterRegExp(currentGameSettingParameter.name!.trim());
 
@@ -256,10 +257,10 @@ export const getOptionData = (
 
     if (!optionName) {
       optionErrors.push(CreateUserMessage.warning(
-        `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain the "${currentGameSettingParameter.name}" parameter, specified in "${gameSettingsFileName}"`, //eslint-disable-line max-len
+        `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain the "${currentGameSettingParameter.name}" parameter, specified in "${currentGameSettingsFile.label}"`, //eslint-disable-line max-len
       ));
     }
-  } else if (fileView === GameSettingsFileView.TAG) {
+  } else if (currentGameSettingsFile.view === GameSettingsFileView.TAG) {
     const valuePathArr = [...currentGameSettingParameter.valuePath!?.split('/')];
     const pathArr = [
       ...valuePathArr,
@@ -284,11 +285,11 @@ export const getOptionData = (
     if (!optionName || !optionValue) {
       let errorMsg = '';
       if (index === pathArr.length) {
-        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingParameter.valueName}" attribute in "${currentGameSettingParameter.name}" parameter specified in "${gameSettingsFileName}".`; //eslint-disable-line max-len
+        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingParameter.valueName}" attribute in "${currentGameSettingParameter.name}" parameter specified in "${currentGameSettingsFile.label}".`; //eslint-disable-line max-len
       } else if (index === pathArr.length - 1) {
-        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingParameter.name}" parameter specified in "${gameSettingsFileName}".`; //eslint-disable-line max-len
+        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingParameter.name}" parameter specified in "${currentGameSettingsFile.label}".`; //eslint-disable-line max-len
       } else {
-        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${pathArr[index - 1]}" tag specified in "valuePath" in "${gameSettingsFileName}".`; //eslint-disable-line max-len
+        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${pathArr[index - 1]}" tag specified in "valuePath" in "${currentGameSettingsFile.label}".`; //eslint-disable-line max-len
       }
       optionErrors.push(CreateUserMessage.warning(errorMsg));
     }
@@ -299,6 +300,100 @@ export const getOptionData = (
     optionValue,
     optionErrors,
   };
+};
+
+export const generateGameSettingsOptions = (
+  gameSettingsParameters: IGameSettingsParameter[],
+  gameSettingsFiles: IGameSettingsFile[],
+  currentFilesDataObj: IGetDataFromFilesResult,
+  moProfile: string,
+): { data: IGameSettingsOptions, errors: IUserMessage[], } => {
+  let errors: IUserMessage[] = [];
+
+  const data: IGameSettingsOptions = gameSettingsParameters.reduce(
+    (gameSettingsOptions, currentParameter, index) => {
+      const incorrectIndexes: number[] = [];
+      const currentGameSettingsFile: IGameSettingsFile = gameSettingsFiles.find((file) => file.name === currentParameter.file)!;
+      //Если опция с типом group, combined или related,
+      // то генерация производится для каждого параметра в items.
+      if (
+        currentParameter.optionType === GameSettingsOptionType.RELATED
+        || currentParameter.optionType === GameSettingsOptionType.GROUP
+        || currentParameter.optionType === GameSettingsOptionType.COMBINED
+      ) {
+        let specParamsErrors: IUserMessage[] = [];
+
+        const optionsFromParameter = currentParameter.items!.reduce<IGameSettingsOptionsItem>(
+          (options, currentOption) => {
+            const {
+              optionName, optionValue, optionErrors,
+            } = getOptionData(
+              currentFilesDataObj[currentParameter.file],
+              currentOption,
+              currentGameSettingsFile,
+              moProfile,
+            );
+
+            if (optionErrors.length > 0) {
+              specParamsErrors = [...optionErrors];
+              incorrectIndexes.push(index);
+
+              return { ...options };
+            }
+
+            return {
+              ...options,
+              [optionName]: {
+                default: optionValue,
+                value: optionValue,
+                parent: currentGameSettingsFile!.name,
+              },
+            };
+          },
+          {},
+        );
+
+        if (specParamsErrors.length > 0) {
+          errors = [...errors, ...specParamsErrors];
+
+          return { ...gameSettingsOptions };
+        }
+
+        return {
+          ...gameSettingsOptions,
+          ...optionsFromParameter,
+        };
+      }
+
+      const {
+        optionName, optionValue, optionErrors,
+      } = getOptionData(
+        currentFilesDataObj[currentGameSettingsFile!.name],
+        currentParameter,
+        currentGameSettingsFile,
+        moProfile,
+      );
+
+      if (optionErrors.length > 0) {
+        errors = [...errors, ...optionErrors];
+        incorrectIndexes.push(index);
+
+        return { ...gameSettingsOptions };
+      }
+
+      return {
+        ...gameSettingsOptions,
+        [optionName]: {
+          default: optionValue,
+          value: optionValue,
+          parent: currentGameSettingsFile.name,
+        },
+      };
+    },
+    {},
+  );
+
+  return { data, errors };
 };
 
 /**

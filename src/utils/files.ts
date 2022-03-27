@@ -24,39 +24,9 @@ import {
 } from '$constants/misc';
 import { IPathVariables, USER_THEMES_DIR } from '$constants/paths';
 import { IGameSettingsFile } from '$types/gameSettings';
+import { IIniObj, IXmlObj } from '$types/common';
 
 export const xmlAttributePrefix = '@_';
-
-interface IIniLine {
-  text: string,
-  comment: string,
-  lineType: number,
-  key?: string,
-  value?: string,
-}
-
-interface IIniSection {
-  lines: IIniLine[],
-  name: string,
-  getValue: (key: string) => string,
-  setValue: (key: string, value: string|number) => void,
-  getLine: (key: string) => IIniLine,
-}
-
-export interface IIniObj {
-  globals: {
-    lines: IIniLine[],
-  },
-  lineBreak: string,
-  sections: IIniSection[],
-  stringify: () => string,
-  getSection: (name: string) => IIniSection,
-  addSection: (name: string) => IIniSection,
-}
-
-export interface IXmlObj {
-  [key: string]: any,
-}
 
 export const iconvDecode = (str: string, encoding = Encoding.CP866): string => iconv.decode(
   Buffer.from(str, 'binary'),

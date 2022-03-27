@@ -8,40 +8,31 @@ import {
   SagaReturnType,
   delay,
 } from 'redux-saga/effects';
-import path from 'path';
-import Joi from 'joi';
 
 import { IAppState } from '$store/store';
 import {
-  IIniObj,
-  IXmlObj,
   readDirectory,
   readFileForGameSettingsOptions,
   readINIFile,
   readJSONFile,
-  readJSONFileSync,
   writeGameSettingsFile,
   writeINIFile,
   xmlAttributePrefix,
 } from '$utils/files';
-import { IUnwrap, IUnwrapSync } from '$types/common';
+import { IGetDataFromFilesResult, IUnwrap } from '$types/common';
 import {
   addMessages,
-  setIsGameSettingsAvailable,
   setIsGameSettingsLoaded,
   setIsGameSettingsLoading,
   setIsGameSettingsSaving,
   setIsLauncherConfigChanged,
 } from '$actions/main';
 import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
-import {
-  checkGameSettingsFiles, checkGameSettingsParameters, checkGameSettingsConfigShallow, checkGameSettingsConfigFull, ICheckResult,
-} from '$utils/check';
+import { checkGameSettingsConfigFull, ICheckResult } from '$utils/check';
 import {
   GAME_SETTINGS_TYPES,
   IGameSettingsConfig,
   IGameSettingsFile,
-  // IGameSettingsFiles,
   IGameSettingsOptions,
   IGameSettingsOptionsItem,
   IGameSettingsParameter,
@@ -69,6 +60,7 @@ import {
 } from '$utils/errors';
 import {
   changeSectionalIniParameter,
+  generateGameSettingsOptions,
   // filterIncorrectGameSettingsFiles,
   getGameSettingsOptionsWithDefaultValues,
   getOptionData,
@@ -88,10 +80,6 @@ import {
   getPathToFile,
   getStringPartFromIniLineParameterForReplace,
 } from '$utils/strings';
-
-interface IGetDataFromFilesResult {
-  [key: string]: IIniObj|IXmlObj,
-}
 
 export interface IIncorrectGameSettingsFiles {
   [key: string]: number[],
@@ -289,137 +277,26 @@ export function* generateGameSettingsOptionsSaga(
   moProfile: string,
 ): SagaIterator<IGameSettingsOptions> {
   try {
-    // let incorrectGameSettingsFiles: IIncorrectGameSettingsFiles = {};
-    let optionsErrors: IUserMessage[] = [];
-
     const currentFilesDataObj: SagaReturnType<typeof getDataFromGameSettingsFilesSaga> = yield call(
       getDataFromGameSettingsFilesSaga,
       gameSettingsFiles,
       moProfile,
     );
 
-    const totalGameSettingsOptions: IGameSettingsOptions = gameSettingsParameters.reduce(
-      (gameSettingsOptions, currentParameter, index) => {
-        const incorrectIndexes: number[] = [];
-        const currentGameSettingsFile: IGameSettingsFile = gameSettingsFiles.find((file) => file.name === currentParameter.file)!;
-
-        // const optionsFromFile = currentGameSettingsFile.optionsList.reduce<IGameSettingsOptionsItem>(
-        // (currentOptions, currentParameter, index) => {
-        //Если опция с типом group, combined или related,
-        // то генерация производится для каждого параметра в items.
-        if (
-          currentParameter.optionType === GameSettingsOptionType.RELATED
-              || currentParameter.optionType === GameSettingsOptionType.GROUP
-              || currentParameter.optionType === GameSettingsOptionType.COMBINED
-        ) {
-          let specParamsErrors: IUserMessage[] = [];
-
-          const optionsFromParameter = currentParameter.items!.reduce<IGameSettingsOptionsItem>(
-            (options, currentOption) => {
-              const {
-                optionName, optionValue, optionErrors,
-              } = getOptionData(
-                currentFilesDataObj[currentParameter.file],
-                currentOption,
-                currentGameSettingsFile!.view,
-                currentGameSettingsFile!.name,
-                path.basename(currentGameSettingsFile!.path),
-                moProfile,
-              );
-
-              if (optionErrors.length > 0) {
-                specParamsErrors = [...optionErrors];
-                incorrectIndexes.push(index);
-
-                return { ...options };
-              }
-
-              return {
-                ...options,
-                [optionName]: {
-                  default: optionValue,
-                  value: optionValue,
-                  parent: currentGameSettingsFile!.name,
-                },
-              };
-            },
-            {},
-          );
-
-          if (specParamsErrors.length > 0) {
-            optionsErrors = [...optionsErrors, ...specParamsErrors];
-
-            return { ...gameSettingsOptions };
-          }
-
-          return {
-            ...gameSettingsOptions,
-            ...optionsFromParameter,
-          };
-        }
-
-        const {
-          optionName, optionValue, optionErrors,
-        } = getOptionData(
-          currentFilesDataObj[currentGameSettingsFile!.name],
-          currentParameter,
-          currentGameSettingsFile.view,
-          currentGameSettingsFile.name,
-          path.basename(currentGameSettingsFile.path),
-          moProfile,
-        );
-
-        if (optionErrors.length > 0) {
-          optionsErrors = [...optionsErrors, ...optionErrors];
-          incorrectIndexes.push(index);
-
-          return { ...gameSettingsOptions };
-        }
-
-        return {
-          ...gameSettingsOptions,
-          [optionName]: {
-            default: optionValue,
-            value: optionValue,
-            parent: currentGameSettingsFile.name,
-          },
-        };
-        // };
-        //   {},
-        // );
-
-        // if (incorrectIndexes.length > 0) {
-        //   incorrectGameSettingsFiles = {
-        //     ...incorrectGameSettingsFiles,
-        //     [currentGameSettingsFileName]: incorrectIndexes,
-        //   };
-        // }
-
-        // if (Object.keys(optionsFromFile).length > 0) {
-        //   return {
-        //     ...gameSettingsOptions,
-        //     [currentGameSettingsFileName]: optionsFromFile,
-        //   };
-        // }
-
-        // return {
-        //   ...gameSettingsOptions,
-        // };
-      },
-      {},
+    const { data: totalGameSettingsOptions, errors } = generateGameSettingsOptions(
+      gameSettingsParameters,
+      gameSettingsFiles,
+      currentFilesDataObj,
+      moProfile,
     );
 
-    if (optionsErrors.length > 0) {
-      optionsErrors.forEach((message) => {
+    if (errors.length > 0) {
+      errors.forEach((message) => {
         writeToLogFile(message.text, message.type);
       });
     }
-    console.log(totalGameSettingsOptions);
+
     return totalGameSettingsOptions;
-    // return {
-    //   totalGameSettingsOptions,
-    //   incorrectGameSettingsFiles,
-    // };
   } catch (error: any) {
     throw new SagaError('Generate game settings options', error.message);
   }
