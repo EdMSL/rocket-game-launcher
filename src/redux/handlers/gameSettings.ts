@@ -8,25 +8,12 @@ const setGameSettingsOptions: IGameSettingsActionHadler<
   typeof GAME_SETTINGS_ACTIONS.setGameSettingsOptions
 > = (
   state,
-  { payload: gameSettingsOptions },
-) => ({
-  ...state,
-  gameSettingsOptions,
-});
-
-const changeGameSettingsOption: IGameSettingsActionHadler<
-  typeof GAME_SETTINGS_ACTIONS.changeGameSettingsOption
-> = (
-  state,
-  { payload: { parent, gameSettingsOptions } },
+  { payload: newGameSettingsOptions },
 ) => ({
   ...state,
   gameSettingsOptions: {
     ...state.gameSettingsOptions,
-    [parent]: {
-      ...state.gameSettingsOptions[parent],
-      ...gameSettingsOptions,
-    },
+    ...newGameSettingsOptions,
   },
 });
 
@@ -82,7 +69,6 @@ const setMoProfiles: IGameSettingsActionHadler<
 
 export const GAME_SETTINGS_HANDLERS = {
   [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_OPTIONS]: setGameSettingsOptions,
-  [GAME_SETTINGS_TYPES.CHANGE_GAME_SETTINGS_OPTION]: changeGameSettingsOption,
   [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_CONFIG]: setGameSettingsConfig,
   [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_FILES]: setGameSettingsFiles,
   [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_PARAMETERS]: setGameSettingsParameters,

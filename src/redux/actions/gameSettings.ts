@@ -1,7 +1,6 @@
 import {
   GAME_SETTINGS_TYPES,
   IGameSettingsConfig,
-  IGameSettingsOptionsItem,
   IGameSettingsOptions,
   IGameSettingsRootState,
 } from '$types/gameSettings';
@@ -12,14 +11,6 @@ export const setGameSettingsOptions = (
 ) => ({
   type: GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_OPTIONS,
   payload: gameSettingsOptions,
-});
-
-export const changeGameSettingsOption = (
-  parent: string,
-  gameSettingsOptions: IGameSettingsOptionsItem,
-) => ({
-  type: GAME_SETTINGS_TYPES.CHANGE_GAME_SETTINGS_OPTION,
-  payload: { parent, gameSettingsOptions },
 });
 
 export const updateGameSettingsOptions = () => ({

@@ -1,6 +1,5 @@
 export const GAME_SETTINGS_TYPES = {
   SET_GAME_SETTINGS_OPTIONS: 'SET_GAME_SETTINGS_OPTIONS',
-  CHANGE_GAME_SETTINGS_OPTION: 'CHANGE_GAME_SETTINGS_OPTION',
   UPDATE_GAME_SETTINGS_OPTIONS: 'UPDATE_GAME_SETTINGS_OPTIONS',
   SET_GAME_SETTINGS_CONFIG: 'SET_GAME_SETTINGS_CONFIG',
   SET_GAME_SETTINGS_FILES: 'SET_GAME_SETTINGS_FILES',
@@ -11,14 +10,10 @@ export const GAME_SETTINGS_TYPES = {
   SET_MO_PROFILES: 'SET_MO_PROFILES',
 };
 
-export interface IGameSettingsOptionContent {
+export interface IGameSettingsOptionsItem {
   default: string,
   value: string,
   parent: string,
-}
-
-export interface IGameSettingsOptionsItem {
-  [key: string]: IGameSettingsOptionContent,
 }
 
 export interface IGameSettingsOptions {

@@ -32,8 +32,9 @@ import {
   IGameSettingsRootState,
   IGameSettingsOptions,
   IGameSettingsOptionsItem,
-  IGameSettingsOptionContent,
+  // IGameSettingsOptionContent,
   IGameSettingsFile,
+  IGameSettingsGroup,
 } from '$types/gameSettings';
 import { ISelectOption } from '$components/UI/Select';
 import { IIncorrectGameSettingsFiles } from '$sagas/gameSettings';
@@ -151,6 +152,17 @@ export const getOptionName = (
 
   return parameter.name!;
 };
+
+/**
+ *
+ * @param optionName Имя опции.
+ * @param parameterId Id параметра опции.
+ * @returns Id опции.
+ */
+export const getOptionId = (
+  optionName: string,
+  parameterId: string,
+): string => `${parameterId}:${optionName}`;
 
 /**
  * Глубокое клонирование объекта.
@@ -323,7 +335,7 @@ export const generateGameSettingsOptions = (
       ) {
         let specParamsErrors: IUserMessage[] = [];
 
-        const optionsFromParameter = currentParameter.items!.reduce<IGameSettingsOptionsItem>(
+        const optionsFromParameter = currentParameter.items!.reduce<IGameSettingsOptions>(
           (options, currentOption) => {
             const {
               optionName, optionValue, optionErrors,
@@ -343,10 +355,11 @@ export const generateGameSettingsOptions = (
 
             return {
               ...options,
-              [optionName]: {
+              [getOptionId(optionName, currentParameter.id)]: {
                 default: optionValue,
                 value: optionValue,
-                parent: currentGameSettingsFile!.name,
+                name: optionName,
+                parent: currentParameter.id,
               },
             };
           },
@@ -383,10 +396,11 @@ export const generateGameSettingsOptions = (
 
       return {
         ...gameSettingsOptions,
-        [optionName]: {
+        [getOptionId(optionName, currentParameter.id)]: {
           default: optionValue,
+          name: optionName,
           value: optionValue,
-          parent: currentGameSettingsFile.name,
+          parent: currentParameter.id,
         },
       };
     },
@@ -418,6 +432,24 @@ export const generateSelectOptions = (
     value: isKeyLabel ? obj[key] : key,
   }));
 };
+
+/**
+ *
+ * @param gameSettingsFiles Игровые файлы из `state`.
+ * @returns Массив имен игровых файлов.
+ */
+export const getGameSettingsFilesNames = (
+  gameSettingsFiles: IGameSettingsFile[],
+): string[] => gameSettingsFiles.map((file) => file.name);
+
+/**
+ *
+ * @param gameSettingsGroups Группы игровых настроек из `state`.
+ * @returns Массив имен групп.
+ */
+export const getGameSettingsGroupsNames = (
+  gameSettingsGroups: IGameSettingsGroup[],
+): string[] => gameSettingsGroups.map((group) => group.name);
 
 /**
  * Фильтрует файлы с ошибками в параметрах.
@@ -458,23 +490,30 @@ export const generateSelectOptions = (
 /**
  * Получает список параметров для вывода в виде опций. Если есть `gameSettingsGroups`,
  * то фильтрует по текущей группе.
- * @param GameSettingsFile Объект текущего обрабатываемого файла из `state`.
+ * @param gameSettingsParameters Список параметров из `state`.
  * @param gameSettingsGroups Список доступных групп настроек из `state`.
+ * @param gameSettingsFiles Список файлов из `state`.
  * @param currentGameSettingGroup текущая группа настроек.
  * @returns Массив с параметрами для генерации игровый опций.
 */
 export const getParametersForOptionsGenerate = (
   gameSettingsParameters: IGameSettingsRootState['gameSettingsParameters'],
   gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
+  gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
   currentGameSettingGroup: string,
 ): IGameSettingsParameter[] => {
+  const availableFiles = getGameSettingsFilesNames(gameSettingsFiles);
+  let currentParameters = [...gameSettingsParameters];
+
+  currentParameters = currentParameters.filter((parameter) => availableFiles.includes(parameter.file));
+
   if (gameSettingsGroups.length > 0 && currentGameSettingGroup) {
-    return gameSettingsParameters.filter(
+    return currentParameters.filter(
       (currentParameter) => currentParameter.settingGroup === currentGameSettingGroup,
     );
   }
 
-  return gameSettingsParameters;
+  return currentParameters;
 };
 
 /**
@@ -486,15 +525,11 @@ export const getParametersForOptionsGenerate = (
  * @returns Объект опции.
 */
 export const generateNewGameSettingsOption = (
-  gameSettingsOptions: IGameSettingsOptions,
-  fileName: string,
-  optionName: string,
+  currentOption: IGameSettingsOptionsItem,
   newValue: string|number,
 ): IGameSettingsOptionsItem => ({
-  [optionName]: {
-    ...gameSettingsOptions[fileName][optionName],
-    value: String(newValue),
-  },
+  ...currentOption,
+  value: String(newValue),
 });
 
 /**
@@ -504,31 +539,14 @@ export const generateNewGameSettingsOption = (
 export const getChangedGameSettingsOptions = (
   gameSettingsOptions: IGameSettingsOptions,
 ): IGameSettingsOptions => Object.keys(gameSettingsOptions)
-  .reduce<IGameSettingsOptions>((totalOptions, fileName) => {
-    const currentOptions = Object.keys(gameSettingsOptions[fileName])
-      .reduce<IGameSettingsOptionsItem>((options, optionName) => {
-        const parameter = gameSettingsOptions[fileName][optionName];
+  .reduce<IGameSettingsOptions>((totalOptions, optionName) => {
+    const parameter = gameSettingsOptions[optionName];
 
-        if (parameter.value !== parameter.default) {
-          return {
-            ...options,
-            [optionName]: {
-              ...gameSettingsOptions[fileName][optionName],
-            },
-          };
-        }
-
-        return {
-          ...options,
-        };
-      }, {});
-
-    if (Object.keys(currentOptions).length > 0) {
+    if (parameter.value !== parameter.default) {
       return {
         ...totalOptions,
-        [fileName]: {
-          ...totalOptions[fileName],
-          ...currentOptions,
+        [optionName]: {
+          ...gameSettingsOptions[optionName],
         },
       };
     }
@@ -549,7 +567,7 @@ export const getGameSettingsOptionsWithDefaultValues = (
   const newOptionsObj = { ...gameSettingsOptions };
 
   const getProp = (
-    obj: IGameSettingsOptions|IGameSettingsOptionsItem|IGameSettingsOptionContent,
+    obj: IGameSettingsOptions|IGameSettingsOptionsItem,
   ): void => {
     Object.keys(obj).forEach((key) => {
       if (typeof obj[key] === 'object') {

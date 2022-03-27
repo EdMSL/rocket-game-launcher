@@ -26,7 +26,9 @@ import {
 import { CustomError, ErrorName } from './errors';
 import { getRandomId } from './strings';
 import { ILauncherConfig, IWindowSettings } from '$types/main';
-import { getUniqueValidationErrors } from './data';
+import {
+  getGameSettingsFilesNames, getGameSettingsGroupsNames, getUniqueValidationErrors,
+} from './data';
 import { IValidationErrors } from '$types/common';
 
 export interface IValidationData {
@@ -529,9 +531,8 @@ export const checkGameSettingsParameters = (
     },
     context: {
       isGameSettingsGroupsExists: gameSettingsGroups.length > 0,
-      gameSettingsGroups: gameSettingsGroups.map((group) => group.name),
-      gameSettingsFiles: gameSettingsFiles.map((file) => file.name),
-      // fileName,
+      gameSettingsGroups: getGameSettingsGroupsNames(gameSettingsGroups),
+      gameSettingsFiles: getGameSettingsFilesNames(gameSettingsFiles),
     },
   };
 

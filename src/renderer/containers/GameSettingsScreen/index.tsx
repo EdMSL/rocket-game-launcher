@@ -16,13 +16,12 @@ import {
 import { GameSettingsContent } from '$components/GameSettingsContent';
 import { Select } from '$components/UI/Select';
 import {
-  changeGameSettingsOption,
   changeMoProfile,
   saveGameSettingsFiles,
   setGameSettingsOptions,
   updateGameSettingsOptions,
 } from '$actions/gameSettings';
-import { IGameSettingsOptionsItem } from '$types/gameSettings';
+import { IGameSettingsOptions, IGameSettingsOptionsItem } from '$types/gameSettings';
 import { Loader } from '$components/UI/Loader';
 import { GameSettingsFormControls } from '$components/GameSettingsFormControls';
 import { createGameSettingsFilesBackup, getGameSettingsFilesBackup } from '$actions/main';
@@ -41,8 +40,9 @@ export const GameSettingsScreen: React.FC = () => {
   const isGameSettingsFilesBackuping = useAppSelector((state) => state.main.isGameSettingsFilesBackuping);
   const gameSettingsFilesBackup = useAppSelector((state) => state.main.gameSettingsFilesBackup);
   const isGameSettingsSaving = useAppSelector((state) => state.main.isGameSettingsSaving);
-  const gameSettingsParameters = useAppSelector((state) => state.gameSettings.gameSettingsParameters);
   const gameSettingsGroups = useAppSelector((state) => state.gameSettings.gameSettingsGroups);
+  const gameSettingsFiles = useAppSelector((state) => state.gameSettings.gameSettingsFiles);
+  const gameSettingsParameters = useAppSelector((state) => state.gameSettings.gameSettingsParameters);
   const gameSettingsOptions = useAppSelector((state) => state.gameSettings.gameSettingsOptions);
   const moProfile = useAppSelector((state) => state.gameSettings.moProfile);
   const moProfiles = useAppSelector((state) => state.gameSettings.moProfiles);
@@ -62,10 +62,9 @@ export const GameSettingsScreen: React.FC = () => {
   );
 
   const onSettingOptionChange = useCallback((
-    parent: string,
-    options: IGameSettingsOptionsItem,
+    options: IGameSettingsOptions,
   ) => {
-    dispatch(changeGameSettingsOption(parent, options));
+    dispatch(setGameSettingsOptions(options));
   }, [dispatch]);
 
   const onGameSettingsFormSubmit = useCallback((event) => {
@@ -182,6 +181,7 @@ export const GameSettingsScreen: React.FC = () => {
                       isGameSettingsLoaded={isGameSettingsLoaded}
                       gameSettingsOptions={gameSettingsOptions}
                       gameSettingsParameters={gameSettingsParameters}
+                      gameSettingsFiles={gameSettingsFiles}
                       gameSettingsGroups={gameSettingsGroups}
                       onSettingOptionChange={onSettingOptionChange}
                     />
