@@ -1,9 +1,10 @@
-const path = require('path');
 const { merge } = require('webpack-merge');
+const path = require('path');
 
 const js = require('./webpack/rules/js-ts');
 const images = require('./webpack/rules/images');
 const generateHtmlPlugin = require('./webpack/plugins/html-webpack-plugin');
+const ignorePlugin = require('./webpack/plugins/ignore-plugin');
 
 const PATHS = {
   src: path.join(__dirname, '../src'),
@@ -14,6 +15,7 @@ const PATHS = {
 
 const plugins = [
   generateHtmlPlugin(`${PATHS.src}/public`),
+  ignorePlugin(),
 ];
 
 const configuration = merge([
