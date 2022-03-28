@@ -27,7 +27,8 @@
     "eslint-nofix": "eslint --config ./.eslintrc.js src --ext .ts,.tsx,.js,.jsx",
     "tslint": "bash -c tsc --noEmit --project tsconfig.json",
     "lint": "npm run stylelint && npm run eslint && npm run tslint",
-    "test": "mocha --config ./.mocharc.js"
+    "test": "mocha --config ./.mocharc.js",
+    "prepare": "husky install"
   },
   "lint-staged": {
     "*.{css,scss}": [
