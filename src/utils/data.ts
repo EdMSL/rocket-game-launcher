@@ -9,6 +9,7 @@ import {
   GameSettingsFileView,
   LauncherButtonAction,
   GameSettingsOptionType,
+  GameSettingParameterControllerType,
 } from '$constants/misc';
 import {
   LogMessageType,
@@ -53,6 +54,7 @@ import {
 import { defaultGameSettingsConfig, defaultModOrganizerParams } from '$constants/defaultParameters';
 import { getReadWriteError } from './errors';
 import {
+  IGameSettingsControllerType,
   IGetDataFromFilesResult, IIniObj, IValidationErrors, IXmlObj,
 } from '$types/common';
 
@@ -155,14 +157,18 @@ export const getOptionName = (
 
 /**
  *
- * @param optionName Имя опции.
+ * @param option Имя опции.
  * @param parameterId Id параметра опции.
  * @returns Id опции.
  */
-export const getOptionId = (
-  optionName: string,
-  parameterId: string,
-): string => `${parameterId}:${optionName}`;
+export const getOptionNameAndId = (
+  option: IGameSettingsParameter|IGameSettingsItemParameter,
+): { name: string, id: string, } => {
+  const name = getOptionName(option);
+  const id = `${option.id}:${name}`;
+
+  return { id, name };
+};
 
 /**
  * Глубокое клонирование объекта.
@@ -355,7 +361,7 @@ export const generateGameSettingsOptions = (
 
             return {
               ...options,
-              [getOptionId(optionName, currentParameter.id)]: {
+              [getOptionNameAndId(currentOption).id]: {
                 default: optionValue,
                 value: optionValue,
                 name: optionName,
@@ -396,7 +402,7 @@ export const generateGameSettingsOptions = (
 
       return {
         ...gameSettingsOptions,
-        [getOptionId(optionName, currentParameter.id)]: {
+        [getOptionNameAndId(currentParameter).id]: {
           default: optionValue,
           name: optionName,
           value: optionValue,

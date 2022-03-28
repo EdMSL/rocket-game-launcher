@@ -1,3 +1,5 @@
+import { IGameSettingsControllerType } from './common';
+
 export const GAME_SETTINGS_TYPES = {
   SET_GAME_SETTINGS_OPTIONS: 'SET_GAME_SETTINGS_OPTIONS',
   UPDATE_GAME_SETTINGS_OPTIONS: 'UPDATE_GAME_SETTINGS_OPTIONS',
@@ -44,7 +46,7 @@ export interface IGameSettingsParameter {
   optionType: string,
   file: string,
   name?: string,
-  controllerType?: string,
+  controllerType?: IGameSettingsControllerType,
   iniGroup?: string,
   settingGroup?: string,
   valueName?: string,

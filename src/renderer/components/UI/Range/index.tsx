@@ -16,8 +16,7 @@ interface IProps extends IUIElementProps<HTMLInputElement> {
   step: number,
   onChangeBtnClick?: (
     btnName: string,
-    parent: string,
-    name: string,
+    id: string,
     min: number,
     max: number,
     step: number,
@@ -49,9 +48,9 @@ export const Range: React.FunctionComponent<IProps> = ({
 
   const onRangeBtnClick = useCallback(({ currentTarget }) => {
     if (onChangeBtnClick) {
-      onChangeBtnClick(currentTarget.name, parent, name, min, max, step);
+      onChangeBtnClick(currentTarget.name, id, min, max, step);
     }
-  }, [onChangeBtnClick, parent, name, step, max, min]);
+  }, [onChangeBtnClick, id, step, max, min]);
 
   const debouncedChangeValue = useDebouncedFunction(
     (newValue) => onChange(newValue),
