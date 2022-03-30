@@ -10,7 +10,7 @@ import {
 import { routerMiddleware } from 'connected-react-router';
 import { composeWithStateSync } from 'electron-redux';
 import createSagaMiddleware from 'redux-saga';
-import { composeWithDevTools } from '@redux-devtools/extension';
+import { composeWithDevToolsDevelopmentOnly } from '@redux-devtools/extension';
 
 import { getRootReducer } from '$reducers/root';
 import { SagaManager } from '$sagas/SagaManager';
@@ -38,7 +38,7 @@ export const configureStore = (
   const enhanced = applyMiddleware(...middlewares);
 
   const rootReducer = getRootReducer(scope, history);
-  const enhancer: StoreEnhancer = composeWithDevTools(composeWithStateSync(enhanced));
+  const enhancer: StoreEnhancer = composeWithDevToolsDevelopmentOnly(composeWithStateSync(enhanced));
 
   const store = createStore(rootReducer, initialState, enhancer);
 
