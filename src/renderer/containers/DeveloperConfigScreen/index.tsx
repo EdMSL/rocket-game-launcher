@@ -46,7 +46,7 @@ import { getRandomId } from '$utils/strings';
 import { IValidationErrors } from '$types/common';
 import { DeveloperScreenController } from '$components/DeveloperScreenController';
 
-export const DeveloperScreenConfig: React.FC = () => {
+export const DeveloperConfigScreen: React.FC = () => {
   const pathVariables = useAppSelector((state) => state.main.pathVariables);
   const launcherConfig = useAppSelector((state) => state.main.config);
 

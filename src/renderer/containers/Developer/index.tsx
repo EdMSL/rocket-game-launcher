@@ -14,11 +14,11 @@ import {
 } from '$constants/misc';
 import { Loader } from '$components/UI/Loader';
 import { Header } from '$components/Header';
-import { DeveloperScreenConfig } from '$containers/DeveloperScreenConfig';
+import { DeveloperConfigScreen } from '$containers/DeveloperConfigScreen';
 import { Routes } from '$constants/routes';
-import { DeveloperScreenGameSettings } from '$containers/DeveloperScreenGameSettings';
+import { DeveloperGameSettingsScreen } from '$containers/DeveloperGameSettingsScreen';
 
-export const DeveloperScreen: React.FC = () => {
+export const Developer: React.FC = () => {
   const isGameSettingsSaving = useAppSelector((state) => state.main.isGameSettingsSaving);
   const isGameSettingsLoading = useAppSelector((state) => state.main.isGameSettingsLoading);
   const isFirstLaunch = useAppSelector((state) => state.main.config.isFirstLaunch);
@@ -59,12 +59,12 @@ export const DeveloperScreen: React.FC = () => {
           <Route
             exact
             path={Routes.DEVELOPER_SCREEN_CONFIG}
-            component={DeveloperScreenConfig}
+            component={DeveloperConfigScreen}
           />
           <Route
             exact
             path={Routes.DEVELOPER_SCREEN_GAME_SETTINGS}
-            component={DeveloperScreenGameSettings}
+            component={DeveloperGameSettingsScreen}
           />
           <Redirect to={Routes.DEVELOPER_SCREEN_CONFIG} />
         </Switch>

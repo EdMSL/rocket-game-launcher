@@ -36,7 +36,7 @@ import { GAME_DIR } from '$constants/paths';
 import { CreateUserMessage } from '$utils/message';
 import { RoutesWindowName } from '$constants/routes';
 
-export const DeveloperScreenGameSettings: React.FC = () => {
+export const DeveloperGameSettingsScreen: React.FC = () => {
   const baseFilesEncoding = useAppSelector((state) => state.gameSettings.baseFilesEncoding);
   const gameSettingsGroups = useAppSelector((state) => state.gameSettings.gameSettingsGroups);
   const gameSettingsFiles = useAppSelector((state) => state.gameSettings.gameSettingsFiles);
