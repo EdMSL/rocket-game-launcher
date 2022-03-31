@@ -24,6 +24,8 @@ import { AppChannel, userThemeStyleFile } from '$constants/misc';
 export const App = (): JSX.Element => {
   const userTheme = useAppSelector((state) => state.userSettings.theme);
   const launcherVersion = useAppSelector((state) => state.main.launcherVersion);
+  const gameName = useAppSelector((state) => state.main.config.gameName);
+  const isResizable = useAppSelector((state) => state.main.config.isResizable);
 
   const [isOpenAppInfo, setIsOpenAppInfo] = useState<boolean>(false);
 
@@ -68,6 +70,8 @@ export const App = (): JSX.Element => {
         !pathname.includes(Routes.DEVELOPER_SCREEN)
           && (
           <Header
+            isResizable={isResizable}
+            gameName={gameName}
             openAppInfo={openAppInfo}
             onClose={closeApp}
           />

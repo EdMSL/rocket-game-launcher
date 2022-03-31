@@ -3,6 +3,7 @@ import { createReducer } from 'reduxsauce';
 import { DEVELOPER_HANDLERS } from '$handlers/developer';
 import { IDeveloperRootState } from '$types/developer';
 import { defaultLauncherConfig } from '$constants/defaultParameters';
+import { DefaultPathVariable } from '$constants/paths';
 
 export const INITIAL_STATE: IDeveloperRootState = {
   config: {
@@ -20,6 +21,9 @@ export const INITIAL_STATE: IDeveloperRootState = {
     playButton: defaultLauncherConfig.playButton,
     customButtons: defaultLauncherConfig.customButtons,
   },
+  pathVariables: DefaultPathVariable,
+  isGameSettingsConfigLoading: false,
+  isGameSettingsConfigSaving: false,
   messages: [],
 };
 

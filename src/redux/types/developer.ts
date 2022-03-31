@@ -1,3 +1,4 @@
+import { IPathVariables } from '$constants/paths';
 import { ILauncherConfig, IUserMessage } from './main';
 
 export const DEVELOPER_TYPES = {
@@ -9,5 +10,8 @@ export const DEVELOPER_TYPES = {
 
 export type IDeveloperRootState = Readonly<{
   config: ILauncherConfig,
+  pathVariables: IPathVariables,
+  isGameSettingsConfigLoading: boolean,
+  isGameSettingsConfigSaving: boolean,
   messages: IUserMessage[],
 }>;

@@ -5,8 +5,10 @@ import { SagaIterator } from '@redux-saga/types';
 
 import mainSaga from '$sagas/main';
 import gameSetingsSaga from '$sagas/gameSettings';
+import developerSaga from './developer';
 
-const sagas = [mainSaga, gameSetingsSaga];
+const appSagas = [mainSaga, gameSetingsSaga];
+const developerSagas = [developerSaga];
 
 export const CANCEL_SAGAS_HMR = 'CANCEL_SAGAS_HMR';
 
@@ -24,11 +26,11 @@ const createAbortableSaga = (saga): ReturnType<typeof saga> => {
 
 export const SagaManager = {
   startAppSagas(sagaMiddleware): void {
-    sagas.map(createAbortableSaga).forEach((saga) => sagaMiddleware.run(saga));
+    appSagas.map(createAbortableSaga).forEach((saga) => sagaMiddleware.run(saga));
   },
 
-  startDevSagas(sagaMiddleware): void {
-    sagas.map(createAbortableSaga).forEach((saga) => sagaMiddleware.run(saga));
+  startDeveloperSagas(sagaMiddleware): void {
+    developerSagas.map(createAbortableSaga).forEach((saga) => sagaMiddleware.run(saga));
   },
 
   cancelSagas(store): void {

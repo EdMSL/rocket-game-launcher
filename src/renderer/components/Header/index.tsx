@@ -6,30 +6,26 @@ import classNames from 'classnames';
 
 import { Button } from '$components/UI/Button';
 import styles from './styles.module.scss';
-import { useAppSelector } from '$store/store';
 import { AppChannel, AppWindowName } from '$constants/misc';
 
 const launcherIcon = require('$images/icon.png');
 
 // передача функции openAppInfo в компонент означает, что окно с этим компонентом является главным
 interface IProps {
+  gameName: string,
+  isResizable: boolean,
   isCloseBtnDisabled?: boolean,
   onClose: (event) => void,
   openAppInfo?: () => void,
 }
 
 export const Header: React.FunctionComponent<IProps> = ({
+  gameName,
+  isResizable,
   isCloseBtnDisabled = false,
   onClose,
   openAppInfo = null,
 }) => {
-  const gameName = useAppSelector((state) => state.main.config.gameName);
-  let isResizable = useAppSelector((state) => state.main.config.isResizable);
-
-  if (!openAppInfo) {
-    isResizable = true;
-  }
-
   const [isMaximize, setIsMaximize] = useState(false);
 
   useEffect(() => {

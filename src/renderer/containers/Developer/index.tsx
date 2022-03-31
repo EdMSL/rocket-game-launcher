@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 
 import styles from './styles.module.scss';
-import { useAppSelector } from '$store/store';
+import { useDeveloperSelector } from '$store/store';
 import {
   AppChannel,
 } from '$constants/misc';
@@ -19,9 +19,12 @@ import { Routes } from '$constants/routes';
 import { DeveloperGameSettingsScreen } from '$containers/DeveloperGameSettingsScreen';
 
 export const Developer: React.FC = () => {
-  const isGameSettingsSaving = useAppSelector((state) => state.main.isGameSettingsSaving);
-  const isGameSettingsLoading = useAppSelector((state) => state.main.isGameSettingsLoading);
-  const isFirstLaunch = useAppSelector((state) => state.main.config.isFirstLaunch);
+  /* eslint-disable max-len */
+  const isGameSettingsConfigSaving = useDeveloperSelector((state) => state.developer.isGameSettingsConfigSaving);
+  const isGameSettingsConfigLoading = useDeveloperSelector((state) => state.developer.isGameSettingsConfigLoading);
+  const isFirstLaunch = useDeveloperSelector((state) => state.developer.config.isFirstLaunch);
+  const gameName = useDeveloperSelector((state) => state.developer.config.gameName);
+  /* eslint-enable max-len */
 
   const onCloseWindowBtnClick = useCallback(() => {
     ipcRenderer.send(AppChannel.CLOSE_DEV_WINDOW, true);
@@ -31,6 +34,8 @@ export const Developer: React.FC = () => {
   return (
     <React.Fragment>
       <Header
+        isResizable
+        gameName={gameName}
         onClose={onCloseWindowBtnClick}
         isCloseBtnDisabled={isFirstLaunch}
       />
@@ -69,7 +74,7 @@ export const Developer: React.FC = () => {
           <Redirect to={Routes.DEVELOPER_SCREEN_CONFIG} />
         </Switch>
         {
-          (isGameSettingsSaving || isGameSettingsLoading) && <Loader />
+          (isGameSettingsConfigSaving || isGameSettingsConfigLoading) && <Loader />
         }
       </main>
     </React.Fragment>

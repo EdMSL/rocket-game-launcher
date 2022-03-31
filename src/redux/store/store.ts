@@ -19,6 +19,7 @@ export type IAppState = ReturnType<ReturnType<typeof getRootReducer>>;
 export type IDeveloperState = ReturnType<ReturnType<typeof getDeveloperRootReducer>>;
 
 export const useAppSelector: TypedUseSelectorHook<IAppState> = useSelector;
+export const useDeveloperSelector: TypedUseSelectorHook<IDeveloperState> = useSelector;
 
 export const configureAppStore = (
   initialState,
@@ -49,7 +50,9 @@ export const configureAppStore = (
   return { store, history };
 };
 
-export const configureDeveloperStore = (initialState): { store: Store<IDeveloperState>, history: any, } => {
+export const configureDeveloperStore = (
+  initialState,
+): { store: Store<IDeveloperState>, history: History, } => {
   const sagaMiddleware = createSagaMiddleware();
   const history = createHashHistory();
 
@@ -62,7 +65,7 @@ export const configureDeveloperStore = (initialState): { store: Store<IDeveloper
 
   const store = createStore(rootReducer, initialState, enhancer);
 
-  SagaManager.startDevSagas(sagaMiddleware);
+  SagaManager.startDeveloperSagas(sagaMiddleware);
 
   return { store, history };
 };

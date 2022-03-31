@@ -5,14 +5,22 @@ import unhandled from 'electron-unhandled';
 import { Provider } from 'react-redux';
 import { ipcRenderer } from 'electron';
 
+import './styles/main.scss';
+import { Developer } from '$containers/Developer';
 import { LogMessageType, writeToLogFile } from '$utils/log';
 import { reportError } from '$utils/errors';
-import { Developer } from '$containers/Developer';
-import { configureDeveloperStore } from '$store/store';
+import {
+  configureDeveloperStore, IAppState,
+} from '$store/store';
 import { AppChannel } from '$constants/misc';
 
-const { main } = await ipcRenderer.invoke(AppChannel.GET_APP_STATE);
-const { store, history } = configureDeveloperStore(main.config);
+const { main }: IAppState = await ipcRenderer.invoke(AppChannel.GET_APP_STATE);
+const initialState = {
+  developer: {
+    config: main.config,
+  },
+};
+const { store, history } = configureDeveloperStore(initialState);
 
 if (!module.hot) {
   unhandled({

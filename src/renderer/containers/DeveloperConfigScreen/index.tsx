@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import Scrollbars from 'react-custom-scrollbars-2';
 
 import styles from './styles.module.scss';
-import { useAppSelector } from '$store/store';
+import { useDeveloperSelector } from '$store/store';
 import { NumberField } from '$components/UI/NumberField';
 import { TextField } from '$components/UI/TextField';
 import { Switcher } from '$components/UI/Switcher';
@@ -47,8 +47,8 @@ import { IValidationErrors } from '$types/common';
 import { DeveloperScreenController } from '$components/DeveloperScreenController';
 
 export const DeveloperConfigScreen: React.FC = () => {
-  const pathVariables = useAppSelector((state) => state.main.pathVariables);
-  const launcherConfig = useAppSelector((state) => state.main.config);
+  const pathVariables = useDeveloperSelector((state) => state.developer.pathVariables);
+  const launcherConfig = useDeveloperSelector((state) => state.developer.config);
 
   const dispatch = useDispatch();
 
