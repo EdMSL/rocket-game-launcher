@@ -15,17 +15,20 @@ const devWebpackConfig = (env) => {
       mode: 'development',
       entry: MAIN
         ? path.resolve(`${baseWebpackConfig.externals.paths.src}/main/main.ts`)
-        : path.resolve(`${baseWebpackConfig.externals.paths.src}/renderer/renderer.tsx`),
+        : {
+            [baseWebpackConfig.externals.processes.app]: path.resolve(`${baseWebpackConfig.externals.paths.src}/renderer/${baseWebpackConfig.externals.processes.app}.tsx`),
+            [baseWebpackConfig.externals.processes.developer]: path.resolve(`${baseWebpackConfig.externals.paths.src}/renderer/${baseWebpackConfig.externals.processes.developer}.tsx`),
+          },
       output: {
-        path: `${baseWebpackConfig.externals.paths.build}`,
-        filename: MAIN ? 'index.js' : 'renderer.js',
-        publicPath: 'http://localhost:8081/build/',
+        path: baseWebpackConfig.externals.paths.build,
+        filename: MAIN ? 'index.js' : '[name].js',
+        publicPath: baseWebpackConfig.externals.devServerUrl,
       },
-      target: MAIN ? 'electron12.0-main' : 'electron-renderer',
+      target: MAIN ? 'electron17.0-main' : 'electron-renderer',
       devtool: 'cheap-module-source-map',
       optimization: {},
       devServer: !MAIN ? {
-        publicPath: 'http://localhost:8081/build/',
+        publicPath: baseWebpackConfig.externals.devServerUrl,
         port: '8081',
         host: '0.0.0.0',
         historyApiFallback: true,

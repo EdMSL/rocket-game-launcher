@@ -13,8 +13,24 @@ const PATHS = {
   conf: path.join(__dirname, '.'),
 };
 
+const devServerUrl = 'http://localhost:8081/build/';
+const appProcess = 'app';
+const developerProcess = 'developer';
+
 const plugins = [
-  generateHtmlPlugin(`${PATHS.src}/public`),
+  generateHtmlPlugin(
+    `${PATHS.src}/public`,
+    process.env.NODE_ENV === 'development'
+      ? `${devServerUrl}${appProcess}.js`
+      : `${appProcess}.js`,
+  ),
+  generateHtmlPlugin(
+    `${PATHS.src}/public`,
+    process.env.NODE_ENV === 'development'
+      ? `${devServerUrl}${developerProcess}.js`
+      : `${developerProcess}.js`,
+    'developer',
+  ),
   ignorePlugin(),
 ];
 
@@ -22,6 +38,11 @@ const configuration = merge([
   {
     externals: {
       paths: PATHS,
+      processes: {
+        app: appProcess,
+        developer: developerProcess,
+      },
+      devServerUrl,
     },
     resolve: {
       alias: {

@@ -9,7 +9,7 @@ const plugins = [
   CssExtractPlugin(),
 ];
 
-const buildWebpackConfig = (env, isRelease) => {
+const buildWebpackConfig = (env) => {
   const MAIN = !!(env && env.main);
 
   return merge([
@@ -18,10 +18,13 @@ const buildWebpackConfig = (env, isRelease) => {
       mode: 'production',
       entry: MAIN
         ? path.resolve(`${baseWebpackConfig.externals.paths.src}/main/main.ts`)
-        : path.resolve(`${baseWebpackConfig.externals.paths.src}/renderer/renderer.tsx`),
+        : {
+            [baseWebpackConfig.externals.processes.app]: path.resolve(`${baseWebpackConfig.externals.paths.src}/renderer/${baseWebpackConfig.externals.processes.app}.tsx`),
+            [baseWebpackConfig.externals.processes.developer]: path.resolve(`${baseWebpackConfig.externals.paths.src}/renderer/${baseWebpackConfig.externals.processes.developer}.tsx`),
+          },
       output: {
-        path: `${baseWebpackConfig.externals.paths[isRelease ? 'dist' : 'build']}`,
-        filename: MAIN ? 'index.js' : 'renderer.js',
+        path: `${baseWebpackConfig.externals.paths.dist}`,
+        filename: MAIN ? 'index.js' : '[name].js',
       },
       target: MAIN ? 'electron-main' : 'electron-renderer',
       optimization: {
