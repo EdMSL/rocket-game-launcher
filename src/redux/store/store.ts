@@ -4,23 +4,23 @@ import {
 import {
   TypedUseSelectorHook, useSelector,
 } from 'react-redux';
-import {
-  createHashHistory, History,
-} from 'history';
+import { createHashHistory, History } from 'history';
 import { routerMiddleware } from 'connected-react-router';
 import { composeWithStateSync } from 'electron-redux';
 import createSagaMiddleware from 'redux-saga';
 import { composeWithDevToolsDevelopmentOnly } from '@redux-devtools/extension';
 
-import { getRootReducer } from '$reducers/root';
+import { getDeveloperRootReducer, getRootReducer } from '$reducers/root';
 import { SagaManager } from '$sagas/SagaManager';
 import { Scope } from '$constants/misc';
 
 ///FIXME Выглядит не особо изящно, попробовать переделать
 export type IAppState = ReturnType<ReturnType<typeof getRootReducer>>;
+export type IDeveloperState = ReturnType<ReturnType<typeof getDeveloperRootReducer>>;
+
 export const useAppSelector: TypedUseSelectorHook<IAppState> = useSelector;
 
-export const configureStore = (
+export const configureAppStore = (
   initialState,
   scope: string,
 ): { store: Store<IAppState>, history: any, } => {
@@ -43,8 +43,26 @@ export const configureStore = (
   const store = createStore(rootReducer, initialState, enhancer);
 
   if (scope === Scope.RENDERER) {
-    SagaManager.startSagas(sagaMiddleware);
+    SagaManager.startAppSagas(sagaMiddleware);
   }
+
+  return { store, history };
+};
+
+export const configureDeveloperStore = (initialState): { store: Store<IDeveloperState>, history: any, } => {
+  const sagaMiddleware = createSagaMiddleware();
+  const history = createHashHistory();
+
+  const middlewares = [routerMiddleware(history), sagaMiddleware];
+
+  const enhanced = applyMiddleware(...middlewares);
+
+  const rootReducer = getDeveloperRootReducer(history);
+  const enhancer: StoreEnhancer = composeWithDevToolsDevelopmentOnly(enhanced);
+
+  const store = createStore(rootReducer, initialState, enhancer);
+
+  SagaManager.startDevSagas(sagaMiddleware);
 
   return { store, history };
 };

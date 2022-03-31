@@ -23,7 +23,11 @@ const createAbortableSaga = (saga): ReturnType<typeof saga> => {
 };
 
 export const SagaManager = {
-  startSagas(sagaMiddleware): void {
+  startAppSagas(sagaMiddleware): void {
+    sagas.map(createAbortableSaga).forEach((saga) => sagaMiddleware.run(saga));
+  },
+
+  startDevSagas(sagaMiddleware): void {
     sagas.map(createAbortableSaga).forEach((saga) => sagaMiddleware.run(saga));
   },
 

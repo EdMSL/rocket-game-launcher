@@ -1,23 +1,18 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { ConnectedRouter } from 'connected-react-router';
-import { createHashHistory } from 'history';
-// import { Provider } from 'react-redux';
-// import { ConnectedRouter } from 'connected-react-router';
 import unhandled from 'electron-unhandled';
-// import { ipcRenderer } from 'electron';
+import { Provider } from 'react-redux';
+import { ipcRenderer } from 'electron';
 
-// import './styles/main.scss';
-// import { App } from '$containers/App';
-// import { configureStore } from '$store/store';
-// import { AppChannel, Scope } from '$constants/misc';
 import { LogMessageType, writeToLogFile } from '$utils/log';
 import { reportError } from '$utils/errors';
 import { Developer } from '$containers/Developer';
+import { configureDeveloperStore } from '$store/store';
+import { AppChannel } from '$constants/misc';
 
-// const initialState = await ipcRenderer.invoke(AppChannel.GET_APP_STATE);
-// const { store, history } = configureStore(initialState, Scope.RENDERER);
-const history = createHashHistory();
+const { main } = await ipcRenderer.invoke(AppChannel.GET_APP_STATE);
+const { store, history } = configureDeveloperStore(main.config);
 
 if (!module.hot) {
   unhandled({
@@ -31,8 +26,10 @@ if (!module.hot) {
 }
 
 render(
-  <ConnectedRouter history={history}>
-    <Developer />
-  </ConnectedRouter>,
+  <Provider store={store}>
+    <ConnectedRouter history={history}>
+      <Developer />
+    </ConnectedRouter>
+  </Provider>,
   document.getElementById('root'),
 );

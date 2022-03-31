@@ -4,6 +4,7 @@ import { connectRouter } from 'connected-react-router';
 import { gameSettingsReducer } from './gameSettings';
 import { userSettingsReducer } from './userSettings';
 import { mainReducer } from './main';
+import { developerReducer } from './developer';
 import { Scope } from '$constants/misc';
 
 interface IReducers {
@@ -29,3 +30,8 @@ export const getRootReducer = (scope: string, history) => {
 
   return combineReducers({ ...reducers });
 };
+
+export const getDeveloperRootReducer = (history) => combineReducers({
+  developer: developerReducer,
+  router: connectRouter(history),
+});

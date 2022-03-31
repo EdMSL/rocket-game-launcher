@@ -8,6 +8,8 @@ import windowStateKeeper from 'electron-window-state';
 import { createWaitForWebpackDevServer } from './waitDevServer';
 import { defaultDevWindowResolution } from '$constants/defaultParameters';
 import { AppChannel, AppWindowName } from '$constants/misc';
+import { ILauncherConfig } from '$types/main';
+import { IGameSettingsConfig } from '$types/gameSettings';
 
 /**
  * Функция для создания и показа окна разработчика
@@ -40,10 +42,10 @@ export const createDevWindow = (): BrowserWindow => {
   });
 
   if (process.env.NODE_ENV === 'production') {
-    devWindow.loadURL(`file://${__dirname}/index.html#/developer`);
+    devWindow.loadURL(`file://${__dirname}/developer.html`);
   } else {
     const waitForWebpackDevServer = createWaitForWebpackDevServer(
-      devWindow, 'http://localhost:8081/build/index.html/#developer',
+      devWindow, 'http://localhost:8081/build/developer.html',
     );
     waitForWebpackDevServer();
   }
@@ -89,8 +91,15 @@ export const addDevWindowListeners = (
     afterCreateCallback();
   });
 
-  devWindow.on('show', () => {
-    mainWindow.webContents.send(AppChannel.DEV_WINDOW_OPENED);
+  devWindow.on('show', (
+    event,
+    launcherConfig: ILauncherConfig,
+    gameSettingsConfig: IGameSettingsConfig,
+  ) => {
+    mainWindow.webContents.send(AppChannel.DEV_WINDOW_OPENED, {
+      launcherConfig,
+      gameSettingsConfig,
+    });
   });
 
   devWindow.on('maximize', () => {

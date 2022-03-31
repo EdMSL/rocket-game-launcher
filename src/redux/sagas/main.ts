@@ -574,10 +574,6 @@ function* locationChangeSaga(
       yield put(push(`${Routes.MAIN_SCREEN}`));
     }
   }
-
-  if (location.pathname === Routes.DEVELOPER_SCREEN_GAME_SETTINGS && !isGameSettingsLoaded) {
-    yield call(initGameSettingsDeveloperSaga);
-  }
 }
 
 /* eslint-disable max-len */

@@ -4,7 +4,7 @@ import path from 'path';
 import { app, ipcMain } from 'electron';
 import fs from 'fs';
 
-import { configureStore, IAppState } from '$store/store';
+import { configureAppStore, IAppState } from '$store/store';
 import { IUserSettingsRootState } from '$types/userSettings';
 import {
   defaultGameSettingsConfig,
@@ -198,7 +198,7 @@ export const createStorage = (): Store<IAppState> => {
     },
   };
 
-  const appStore = configureStore(newStore, Scope.MAIN).store;
+  const appStore = configureAppStore(newStore, Scope.MAIN).store;
 
   appStore.subscribe(() => {
     const currentState = appStore.getState();
