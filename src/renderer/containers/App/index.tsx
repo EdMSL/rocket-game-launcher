@@ -18,8 +18,8 @@ import { Header } from '$components/Header';
 import { useAppSelector } from '$store/store';
 import { Modal } from '$components/UI/Modal';
 import { AppInfo } from '$components/AppInfo';
-import { DeveloperScreen } from '$containers/DeveloperScreen';
-import { AppChannel } from '$constants/misc';
+import { Developer } from '$containers/Developer';
+import { AppChannel, userThemeStyleFile } from '$constants/misc';
 
 export const App = (): JSX.Element => {
   const userTheme = useAppSelector((state) => state.userSettings.theme);
@@ -34,13 +34,14 @@ export const App = (): JSX.Element => {
       }
     });
 
-    document
-      .getElementById('theme')?.setAttribute(
+    if (userTheme) {
+      document.getElementById('theme')?.setAttribute(
         'href',
-        userTheme === '' ? 'css/styles.css' : `../../../themes/${userTheme}/styles.css`,
+        `../../../themes/${userTheme}/${userThemeStyleFile}`,
       );
-    // Служит для загрузки стилей пользователя при запуске приложения.
-    // Дальше изменение стилей идет через UI. Поэтому у useEffect нет заваисимостей.
+      // Служит для загрузки стилей пользователя при запуске приложения.
+      // Дальше изменение стилей идет через UI. Поэтому у useEffect нет заваисимостей.
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { pathname } = useLocation<{ [key: string]: string, }>();
@@ -84,7 +85,7 @@ export const App = (): JSX.Element => {
         />
         <Route
           path={Routes.DEVELOPER_SCREEN}
-          component={DeveloperScreen}
+          component={Developer}
         />
         <Redirect
           from="/"

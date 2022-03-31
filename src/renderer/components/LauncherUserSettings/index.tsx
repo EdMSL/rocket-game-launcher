@@ -8,6 +8,10 @@ import { IMainRootState } from '$types/main';
 import { generateSelectOptions } from '$utils/data';
 import { setIsAutoClose, setUserTheme } from '$actions/userSettings';
 import { Switcher } from '$components/UI/Switcher';
+import { appProcess, userThemeStyleFile } from '$constants/misc';
+import { checkIsThemeExists } from '$utils/files';
+import { addMessages } from '$actions/main';
+import { CreateUserMessage } from '$utils/message';
 
 interface IProps {
   isAutoclose: IUserSettingsRootState['isAutoclose'],
@@ -25,13 +29,26 @@ export const LauncherUserSettings: React.FC<IProps> = ({
   const onUserThemeSelectChange = useCallback((
     { target }: React.ChangeEvent<HTMLSelectElement>,
   ) => {
+    let theme = target.value;
+
+    if (target.value !== '') {
+      const isExists = checkIsThemeExists(target.value);
+
+      if (!isExists) {
+        theme = '';
+        dispatch(addMessages([CreateUserMessage.warning('Не найдена выбранная пользовательская тема оформления. Установлена тема по умолчанию.')])); //eslint-disable-line
+      }
+    }
+
     document
       .getElementById('theme')?.setAttribute(
         'href',
-        target.value === '' ? 'css/styles.css' : `../../../themes/${target.value}/styles.css`,
+        theme === ''
+          ? `css/${appProcess}.css`
+          : `../../../themes/${target.value}/${userThemeStyleFile}`,
       );
 
-    dispatch(setUserTheme(target.value));
+    dispatch(setUserTheme(theme));
   }, [dispatch]);
 
   const onConfigIniSwitcherToggle = useCallback((

@@ -1,3 +1,7 @@
+export const appProcess = 'app';
+export const developerProcess = 'developer';
+export const userThemeStyleFile = 'styles.css';
+
 export const Scope = {
   MAIN: 'main',
   RENDERER: 'renderer',

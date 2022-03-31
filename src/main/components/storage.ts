@@ -129,6 +129,7 @@ export const createStorage = (): Store<IAppState> => {
       'No themes found, but user theme is set in storage. Theme will be set to default.',
       LogMessageType.WARNING,
     );
+    messages.push(CreateUserMessage.warning('Не найдена выбранная пользовательская тема оформления. Установлена тема по умолчанию.')); //eslint-disable-line max-len
 
     // Игнорируем перезапись ReadOnly, т.к. это еще не state.
     //@ts-ignore

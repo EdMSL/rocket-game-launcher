@@ -20,7 +20,7 @@ import {
   ErrorMessage,
 } from '$utils/errors';
 import {
-  Encoding, GameSettingsFileView, LauncherButtonAction,
+  Encoding, GameSettingsFileView, LauncherButtonAction, userThemeStyleFile,
 } from '$constants/misc';
 import { IPathVariables, USER_THEMES_DIR } from '$constants/paths';
 import { IGameSettingsFile } from '$types/gameSettings';
@@ -547,6 +547,11 @@ export const writeGameSettingsFile = async (
   }
 };
 
+export const checkIsThemeExists = (
+  themeName: string,
+): boolean => fs.existsSync(path.join(USER_THEMES_DIR, themeName))
+    && fs.existsSync(path.join(USER_THEMES_DIR, themeName, userThemeStyleFile));
+
 /**
  * Получить список папок пользовательских тем.
 */
@@ -567,7 +572,7 @@ export const getUserThemesFolders = (): string[] => {
         });
 
         return foldersReadResults.reduce<string[]>((folders, currentResult, index) => {
-          if (currentResult.includes('styles.css')) {
+          if (currentResult.includes(userThemeStyleFile)) {
             return [...folders, themesFolders[index]];
           }
 
