@@ -155,7 +155,7 @@ const configFileDataSchema = Joi.object<ILauncherConfig>({
     })).optional().default([]),
 });
 
-export const checkConfigFileData = (configObj: ILauncherConfig): ILauncherConfig => {
+export const checkLauncherConfigFileData = (configObj: ILauncherConfig): ILauncherConfig => {
   writeToLogFileSync('Started checking the config.json file.');
 
   const validateResult = configFileDataSchema.validate(configObj, {

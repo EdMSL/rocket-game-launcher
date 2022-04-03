@@ -3,9 +3,9 @@ import { useDispatch } from 'react-redux';
 import classNames from 'classnames';
 
 import styles from './styles.module.scss';
-import { IUserMessage } from '$types/main';
 import { Button } from '$components/UI/Button';
 import { deleteMessages } from '$actions/main';
+import { IUserMessage } from '$types/common';
 
 interface IProps {
   message: IUserMessage,

@@ -20,9 +20,10 @@ import {
   writeFileDataSync,
 } from './files';
 import { CustomError, ReadWriteError } from './errors';
-import { IGameSettingsBackup, IUserMessage } from '$types/main';
+import { IGameSettingsBackup } from '$types/main';
 import { CreateUserMessage } from './message';
 import { getRandomId } from './strings';
+import { IUserMessage } from '$types/common';
 
 export const createBackupFolders = (isThrowError = false): void => {
   try {

@@ -1,15 +1,12 @@
 import { screen } from 'electron';
 import si from 'systeminformation';
-import fs from 'fs';
 import path from 'path';
 
 import {
   PathRegExp,
   PathVariableName,
   GameSettingsFileView,
-  LauncherButtonAction,
   GameSettingsOptionType,
-  GameSettingParameterControllerType,
 } from '$constants/misc';
 import {
   LogMessageType,
@@ -23,7 +20,6 @@ import {
   getLineIniParameterValue,
   getParameterRegExp,
   getPathToFile,
-  getRandomId,
   getRandomName,
   replacePathVariableByRootDir,
 } from './strings';
@@ -33,12 +29,10 @@ import {
   IGameSettingsRootState,
   IGameSettingsOptions,
   IGameSettingsOptionsItem,
-  // IGameSettingsOptionContent,
   IGameSettingsFile,
   IGameSettingsGroup,
 } from '$types/gameSettings';
 import { ISelectOption } from '$components/UI/Select';
-import { IIncorrectGameSettingsFiles } from '$sagas/gameSettings';
 import {
   DefaultPathVariable,
   GAME_DIR,
@@ -49,12 +43,11 @@ import {
   ILauncherConfig,
   ILauncherCustomButton,
   IModOrganizerParams,
-  IUserMessage,
 } from '$types/main';
-import { defaultGameSettingsConfig, defaultModOrganizerParams } from '$constants/defaultParameters';
+import { defaultModOrganizerParams } from '$constants/defaultParameters';
 import { getReadWriteError } from './errors';
 import {
-  IGameSettingsControllerType,
+  IUserMessage,
   IGetDataFromFilesResult, IIniObj, IValidationErrors, IXmlObj,
 } from '$types/common';
 

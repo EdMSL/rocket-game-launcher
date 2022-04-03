@@ -40,6 +40,17 @@ export interface IUIElementProps<E> extends IUIElementParams{
   onChange: (event: React.ChangeEvent<E>) => void,
 }
 
+export type IMessageType = 'error'|'warning'|'info'|'success';
+
+export interface IMessage {
+  type: IMessageType,
+  text: string,
+}
+
+export interface IUserMessage extends IMessage {
+  id: string,
+}
+
 export interface ILocationState {
   isFromMainPage?: boolean,
   isGameSettingsOptionsChanged?: boolean,
