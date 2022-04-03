@@ -51,6 +51,10 @@ export const createDevWindow = (): BrowserWindow => {
   }
 
   if (process.env.NODE_ENV === 'development') {
+    globalShortcut.register('F6', () => {
+      devWindow.reload();
+    });
+
     globalShortcut.register('F10', () => {
       devWindow.webContents.openDevTools();
     });

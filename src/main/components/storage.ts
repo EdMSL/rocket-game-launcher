@@ -24,7 +24,6 @@ import {
   CONFIG_FILE_PATH,
   GAME_DIR,
   GAME_SETTINGS_FILE_PATH,
-  IPathVariables,
 } from '$constants/paths';
 import {
   CustomError,
@@ -32,7 +31,7 @@ import {
   ReadWriteError,
   showMessageBox,
 } from '$utils/errors';
-import { checkConfigFileData, checkGameSettingsConfigShallow } from '$utils/check';
+import { checkLauncherConfigFileData } from '$utils/check';
 import { getObjectAsList } from '$utils/strings';
 import {
   createPathVariables,
@@ -41,13 +40,11 @@ import {
   getUserThemes,
 } from '$utils/data';
 import { INITIAL_STATE as mainInitialState } from '$reducers/main';
-import { INITIAL_STATE as gameSettingsInitialState } from '$reducers/gameSettings';
 import { INITIAL_STATE as userSettingsInitialState } from '$reducers/userSettings';
-import { ILauncherConfig, IUserMessage } from '$types/main';
+import { ILauncherConfig } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
 import { AppChannel, Scope } from '$constants/misc';
-import { IGameSettingsConfig } from '$types/gameSettings';
-import { RoutesWindowName } from '$constants/routes';
+import { IUserMessage } from '$types/common';
 
 interface IStorage {
   userSettings: IUserSettingsRootState,
@@ -104,7 +101,7 @@ const getConfigurationData = (): ILauncherConfig => {
 export const createStorage = (): Store<IAppState> => {
   const messages: IUserMessage[] = [];
   const configurationFileData = getConfigurationData();
-  const configurationData = checkConfigFileData(configurationFileData);
+  const configurationData = checkLauncherConfigFileData(configurationFileData);
 
   // Создаем хранилище пользовательских настроек (настройки темы и т.п.).
   // Хранилище располагается в файле user.json в корне программы.

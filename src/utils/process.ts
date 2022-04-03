@@ -1,5 +1,5 @@
 import { execFile } from 'child_process';
-import { shell } from 'electron';
+import { BrowserWindow, shell } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import mime from 'mime';
@@ -9,6 +9,8 @@ import { iconvDecode } from '$utils/files';
 import { GAME_DIR } from '$constants/paths';
 import { ErrorCode, ErrorMessage } from '$utils/errors';
 import { getApplicationArgs } from './data';
+import { ILauncherConfig } from '$types/main';
+import { MinWindowSize } from '$constants/defaultParameters';
 
 /**
  * Запустить приложение (.exe).
@@ -206,3 +208,45 @@ export const openFolder = (
  * @param url Адрес сайта для перехода
  */
 export const openSite = (url: string): void => { shell.openExternal(url); };
+
+/**
+ * Изменяет размеры выбранного окна программы.
+ * @param window Окно для изменения.
+ * @param config Конфигурация лаунчера.
+ */
+export const changeWindowSize = (
+  window: BrowserWindow,
+  config: ILauncherConfig,
+): void => {
+  if (window.isFullScreen()) {
+    window.unmaximize();
+  }
+
+  window.setResizable(config.isResizable);
+
+  if (config.isResizable) {
+    window.setMinimumSize(config.minWidth, config.minHeight);
+    window.setMaximumSize(config.maxWidth, config.maxHeight);
+
+    const currentSize = window.getSize();
+
+    if (currentSize[0] < config.minWidth || currentSize[1] < config.minHeight) {
+      window.setSize(
+        currentSize[0] < config.minWidth ? config.minWidth : currentSize[0],
+        currentSize[1] < config.minHeight ? config.minHeight : currentSize[1],
+      );
+    } else if ((
+      config.maxWidth > 0 && currentSize[0] > config.maxWidth)
+        || (config.maxHeight > 0 && currentSize[1] > config.maxHeight)
+    ) {
+      window.setSize(
+        currentSize[0] > config.maxHeight ? config.maxWidth : currentSize[0],
+        currentSize[1] > config.maxHeight ? config.maxHeight : currentSize[1],
+      );
+    }
+  } else {
+    window.setMinimumSize(MinWindowSize.WIDTH, MinWindowSize.HEIGHT);
+    window.setMaximumSize(0, 0);
+    window.setSize(config.width, config.height);
+  }
+};

@@ -7,7 +7,7 @@ import {
 } from 'electron';
 
 import { createStorage } from './components/storage';
-import { addMainWindowListeners, createMainWindow } from './components/windowMain';
+import { createMainWindow } from './components/windowMain';
 import { addDevWindowListeners, createDevWindow } from './components/windowDev';
 import {
   createLogFile,
@@ -50,9 +50,7 @@ const start = async (): Promise<void> => {
 
   const store = createStorage();
 
-  mainWindow = createMainWindow(store.getState().main.config);
-
-  addMainWindowListeners(mainWindow!, devWindow!, quitApp);
+  mainWindow = createMainWindow(store, quitApp);
 
   if (process.env.NODE_ENV === 'production') {
     createBackupFolders();
