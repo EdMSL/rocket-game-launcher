@@ -5,7 +5,7 @@ import { ConnectedRouter } from 'connected-react-router';
 import unhandled from 'electron-unhandled';
 import { ipcRenderer } from 'electron';
 
-import './styles/main.scss';
+import './styles/app.scss';
 import { App } from '$containers/App';
 import { configureAppStore, IAppState } from '$store/store';
 import { AppChannel, Scope } from '$constants/misc';

@@ -5,7 +5,8 @@ import unhandled from 'electron-unhandled';
 import { Provider } from 'react-redux';
 import { ipcRenderer } from 'electron';
 
-import './styles/main.scss';
+import { INITIAL_STATE as developerInitialState } from '$reducers/developer';
+import './styles/developer.scss';
 import { Developer } from '$containers/Developer';
 import { LogMessageType, writeToLogFile } from '$utils/log';
 import { reportError } from '$utils/errors';
@@ -17,7 +18,9 @@ import { AppChannel } from '$constants/misc';
 const { main }: IAppState = await ipcRenderer.invoke(AppChannel.GET_APP_STATE);
 const initialState = {
   developer: {
-    config: main.config,
+    ...developerInitialState,
+    launcherConfig: main.config,
+    isGameSettingsConfigLoaded: main.isGameSettingsLoaded,
   },
 };
 const { store, history } = configureDeveloperStore(initialState);
