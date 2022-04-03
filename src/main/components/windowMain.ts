@@ -6,19 +6,31 @@ import {
 import fs from 'fs';
 import path from 'path';
 import windowStateKeeper from 'electron-window-state';
+import { Store } from 'redux';
 
 import { createWaitForWebpackDevServer } from './waitDevServer';
-import { defaultLauncherWindowSettings, MinWindowSize } from '$constants/defaultParameters';
-import { IMainRootState, IWindowSettings } from '$types/main';
+import { defaultLauncherWindowSettings } from '$constants/defaultParameters';
+import { ILauncherConfig } from '$types/main';
 import { getDisplaysInfo } from '$utils/data';
 import { AppChannel, AppWindowName } from '$constants/misc';
+import { IPathVariables } from '$constants/paths';
+import { changeWindowSize } from '$utils/process';
+import { IAppState } from '$store/store';
+import {
+  setIsLauncherConfigChanged, setLauncherConfig, setPathVariables,
+} from '$actions/main';
+import { IGameSettingsConfig } from '$types/gameSettings';
+import { setGameSettingsConfig } from '$actions/gameSettings';
 
 /**
  * Функция для создания и показа главного окна приложения
 */
 export const createMainWindow = (
-  config: IMainRootState['config'],
+  appStore: Store<IAppState>,
+  closeWindowCallback: () => void,
 ): BrowserWindow => {
+  const { config } = appStore.getState().main;
+
   const mainWindowState = windowStateKeeper({
     defaultWidth: config.width ? config.width : defaultLauncherWindowSettings.width,
     defaultHeight: config.height ? config.height : defaultLauncherWindowSettings.height,
@@ -79,14 +91,6 @@ export const createMainWindow = (
 
   mainWindowState.manage(mainWindow);
 
-  return mainWindow;
-};
-
-export const addMainWindowListeners = (
-  mainWindow: BrowserWindow,
-  devWindow: BrowserWindow,
-  closeWindowCallback: () => void,
-): void => {
   ipcMain.on(AppChannel.MINIMIZE_WINDOW, (event, windowName) => {
     if (windowName === AppWindowName.MAIN) {
       mainWindow.minimize();
@@ -103,38 +107,40 @@ export const addMainWindowListeners = (
     }
   });
 
-  ipcMain.on(AppChannel.CHANGE_WINDOW_SETTINGS, (event, windowSettings: IWindowSettings) => {
-    if (mainWindow.isFullScreen()) {
-      mainWindow.unmaximize();
+  ipcMain.on(AppChannel.SAVE_LAUNCHER_CONFIG, (
+    event,
+    isProcessing: boolean,
+    newConfig: ILauncherConfig,
+    pathVariables: IPathVariables,
+    isChangeWindowSize: boolean,
+  ) => {
+    if (isChangeWindowSize !== undefined) {
+      changeWindowSize(mainWindow, newConfig);
     }
 
-    mainWindow.setResizable(windowSettings.isResizable);
-
-    if (windowSettings.isResizable) {
-      mainWindow.setMinimumSize(windowSettings.minWidth, windowSettings.minHeight);
-      mainWindow.setMaximumSize(windowSettings.maxWidth, windowSettings.maxHeight);
-
-      const currentSize = mainWindow.getSize();
-
-      if (currentSize[0] < windowSettings.minWidth || currentSize[1] < windowSettings.minHeight) {
-        mainWindow.setSize(
-          currentSize[0] < windowSettings.minWidth ? windowSettings.minWidth : currentSize[0],
-          currentSize[1] < windowSettings.minHeight ? windowSettings.minHeight : currentSize[1],
-        );
-      } else if ((
-        windowSettings.maxWidth > 0 && currentSize[0] > windowSettings.maxWidth)
-        || (windowSettings.maxHeight > 0 && currentSize[1] > windowSettings.maxHeight)
-      ) {
-        mainWindow.setSize(
-          currentSize[0] > windowSettings.maxHeight ? windowSettings.maxWidth : currentSize[0],
-          currentSize[1] > windowSettings.maxHeight ? windowSettings.maxHeight : currentSize[1],
-        );
-      }
-    } else {
-      mainWindow.setMinimumSize(MinWindowSize.WIDTH, MinWindowSize.HEIGHT);
-      mainWindow.setMaximumSize(0, 0);
-      mainWindow.setSize(windowSettings.width, windowSettings.height);
+    if (newConfig !== undefined && pathVariables !== undefined) {
+      appStore.dispatch(setLauncherConfig(newConfig));
+      appStore.dispatch(setPathVariables(pathVariables));
+      appStore.dispatch(setIsLauncherConfigChanged(true));
     }
+
+    mainWindow.webContents.send(
+      AppChannel.SAVE_LAUNCHER_CONFIG,
+      isProcessing,
+    );
+  });
+
+  ipcMain.on(AppChannel.SAVE_GAME_SETTINGS_CONFIG, (
+    event,
+    isProcessing: boolean,
+    newConfig: IGameSettingsConfig,
+  ) => {
+    if (newConfig !== undefined) {
+      appStore.dispatch(setGameSettingsConfig(newConfig));
+      appStore.dispatch(setIsLauncherConfigChanged(true));
+    }
+
+    mainWindow.webContents.send(AppChannel.SAVE_GAME_SETTINGS_CONFIG, isProcessing);
   });
 
   mainWindow.once('ready-to-show', () => {
@@ -152,4 +158,6 @@ export const addMainWindowListeners = (
   mainWindow.on('close', () => {
     closeWindowCallback();
   });
+
+  return mainWindow;
 };

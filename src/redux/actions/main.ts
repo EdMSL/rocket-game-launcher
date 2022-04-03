@@ -32,23 +32,6 @@ export const setIsLauncherConfigChanged = (
   type: MAIN_TYPES.SET_IS_LAUNCHER_CONFIG_CHANGED,
   payload: isLauncherConfigChanged,
 });
-
-export const saveLauncherConfig = (
-  newConfig: IMainRootState['config'],
-  isGoToMainScreen = false,
-) => ({
-  type: MAIN_TYPES.SAVE_LAUNCHER_CONFIG,
-  payload: { newConfig, isGoToMainScreen },
-});
-
-export const saveGameSettingsConfig = (
-  newConfig: IGameSettingsConfig,
-  isGoToMainScreen = false,
-) => ({
-  type: MAIN_TYPES.SAVE_GAME_SETTINGS_CONFIG,
-  payload: { newConfig, isGoToMainScreen },
-});
-
 export const setIsGameRunning = (
   isGameRunning: IMainRootState['isGameRunning'],
 ) => ({
@@ -148,11 +131,6 @@ export const setGameSettingsFilesBackup = (
 ) => ({
   type: MAIN_TYPES.SET_GAME_SETTINGS_FILES_BACKUP,
   payload: gameSettingsFilesBackup,
-});
-
-export const updateConfig = (config: string) => ({
-  type: MAIN_TYPES.UPDATE_CONFIG,
-  payload: config,
 });
 
 export const setUserThemes = (

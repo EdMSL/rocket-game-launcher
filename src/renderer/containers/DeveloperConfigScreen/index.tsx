@@ -13,7 +13,6 @@ import { TextField } from '$components/UI/TextField';
 import { Switcher } from '$components/UI/Switcher';
 import { Select } from '$components/UI/Select';
 import { PathSelector } from '$components/UI/PathSelector';
-import { saveLauncherConfig, updateConfig } from '$actions/main';
 import {
   appWindowFields,
   FileExtension,
@@ -27,7 +26,6 @@ import { CustomBtnItem } from '$components/CustomBtnItem';
 import {
   IButtonArg,
   ILauncherCustomButton,
-  IMainRootState,
 } from '$types/main';
 import {
   clearValidationErrors,
@@ -45,34 +43,28 @@ import {
 import { getRandomId } from '$utils/strings';
 import { IValidationErrors } from '$types/common';
 import { DeveloperScreenController } from '$components/DeveloperScreenController';
+import { IDeveloperRootState } from '$types/developer';
+import { saveLauncherConfig, updateConfig } from '$actions/developer';
 
 export const DeveloperConfigScreen: React.FC = () => {
+  /* eslint-disable max-len */
   const pathVariables = useDeveloperSelector((state) => state.developer.pathVariables);
-  const launcherConfig = useDeveloperSelector((state) => state.developer.config);
+  const launcherConfig = useDeveloperSelector((state) => state.developer.launcherConfig);
+  const isLauncherConfigProcessing = useDeveloperSelector((state) => state.developer.isLauncherConfigProcessing);
 
   const dispatch = useDispatch();
 
-  const [currentConfig, setCurrentConfig] = useState<IMainRootState['config']>(launcherConfig);
+  const [currentConfig, setCurrentConfig] = useState<IDeveloperRootState['launcherConfig']>(launcherConfig);
   const [validationErrors, setValidationErrors] = useState<IValidationErrors>({});
   const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
   const [lastAddedBtnItemId, setLastAddedBtnItemId] = useState<string>('');
+  const [isSettingsInitialized, setIsSettingsInitialized] = useState<boolean>(true);
+  /* eslint-enable max-len */
 
   const saveConfigChanges = useCallback((
     isGoToMainScreen: boolean,
   ) => {
     const newConfig = { ...currentConfig, isFirstLaunch: false };
-
-    if (!getIsWindowSettingEqual(launcherConfig, currentConfig)) {
-      ipcRenderer.send(AppChannel.CHANGE_WINDOW_SETTINGS, {
-        isResizable: currentConfig.isResizable,
-        width: currentConfig.width,
-        height: currentConfig.height,
-        minWidth: currentConfig.minWidth,
-        maxWidth: currentConfig.maxWidth,
-        minHeight: currentConfig.minHeight,
-        maxHeight: currentConfig.maxHeight,
-      });
-    }
 
     dispatch(saveLauncherConfig(
       newConfig,
@@ -80,7 +72,7 @@ export const DeveloperConfigScreen: React.FC = () => {
     ));
 
     setIsConfigChanged(false);
-  }, [dispatch, currentConfig, launcherConfig]);
+  }, [dispatch, currentConfig]);
 
   const resetConfigChanges = useCallback(() => {
     setIsConfigChanged(false);
@@ -95,8 +87,13 @@ export const DeveloperConfigScreen: React.FC = () => {
       }
     });
 
+    if (!isSettingsInitialized && !isLauncherConfigProcessing) {
+      resetConfigChanges();
+      setIsSettingsInitialized(true);
+    }
+
     return (): void => { ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED); };
-  }, [resetConfigChanges]);
+  }, [isSettingsInitialized, isLauncherConfigProcessing, resetConfigChanges]);
 
   const setNewValidationErrors = useCallback((errors: IValidationErrors) => {
     setValidationErrors(errors);
@@ -119,6 +116,7 @@ export const DeveloperConfigScreen: React.FC = () => {
 
   const onUpdateBtnClick = useCallback(() => {
     dispatch(updateConfig('launcher'));
+    setIsSettingsInitialized(false);
   }, [dispatch]);
 
   const changeCurrentConfig = useCallback((fieldName: string, value, parent?: string|undefined) => {
@@ -264,7 +262,7 @@ export const DeveloperConfigScreen: React.FC = () => {
         isConfigChanged={isConfigChanged}
         isHaveValidationErrors={Object.keys(validationErrors).length > 0}
         isFirstLaunch={launcherConfig.isFirstLaunch}
-        config="launcher"
+        isUpdateBtnDisabled
         onSaveBtnClick={onSaveBtnClick}
         onCancelBtnClick={onCancelBtnClick}
         onResetBtnClick={onResetBtnClick}

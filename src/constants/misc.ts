@@ -103,12 +103,13 @@ export const AppChannel = {
   DEV_WINDOW_OPENED: 'dev window opened',
   DEV_WINDOW_CLOSED: 'dev window closed',
   MINIMIZE_WINDOW: 'minimize window',
-  CHANGE_WINDOW_SETTINGS: 'change window settings',
   MAX_UNMAX_WINDOW: 'max-unmax window',
   WINDOW_RESIZED: 'window resized',
   CLOSE_APP: 'close app',
   GET_PATH_BY_PATH_SELECTOR: 'get path from native window',
   GET_APP_STATE: 'get app state',
+  SAVE_LAUNCHER_CONFIG: 'save launcher config',
+  SAVE_GAME_SETTINGS_CONFIG: 'save game settings config',
 };
 
 export const AppWindowName = {

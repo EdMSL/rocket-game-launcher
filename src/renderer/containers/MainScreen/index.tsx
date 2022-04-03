@@ -11,7 +11,10 @@ import { Routes } from '$constants/routes';
 import { runApplication, openFolder } from '$utils/process';
 import { Button } from '$components/UI/Button';
 import {
-  setIsGameRunning, addMessages, setIsDeveloperMode, setIsDevWindowOpening,
+  setIsGameRunning,
+  addMessages,
+  setIsDeveloperMode,
+  setIsDevWindowOpening,
 } from '$actions/main';
 import { useAppSelector } from '$store/store';
 import { CreateUserMessage } from '$utils/message';
@@ -37,11 +40,12 @@ export const MainScreen: React.FC = () => {
   const isGameSettingsAvailable = useAppSelector((state) => state.main.isGameSettingsAvailable);
   const isGameSettingsFileExists = useAppSelector((state) => state.main.isGameSettingsFileExists);
   const gameSettingsGroups = useAppSelector((state) => state.gameSettings.gameSettingsGroups);
-  /* eslint-enable max-len */
 
   const dispatch = useDispatch();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  /* eslint-enable max-len */
 
   useEffect(() => {
     ipcRenderer.on(AppChannel.DEV_WINDOW_CLOSED, () => {
@@ -53,9 +57,17 @@ export const MainScreen: React.FC = () => {
       dispatch(setIsDeveloperMode(true));
     });
 
+    ipcRenderer.on(AppChannel.SAVE_LAUNCHER_CONFIG, (
+      event: Electron.Event,
+      isLauncherConfigProcessing: boolean,
+    ) => {
+      setIsProcessing(isLauncherConfigProcessing);
+    });
+
     return (): void => {
       ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED);
       ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_OPENED);
+      ipcRenderer.removeAllListeners(AppChannel.SAVE_LAUNCHER_CONFIG);
     };
   }, [dispatch]);
 
@@ -213,7 +225,7 @@ export const MainScreen: React.FC = () => {
           )
         }
         {
-          isDevWindowOpening && <Loader />
+          (isDevWindowOpening || isProcessing) && <Loader />
         }
       </main>
     </React.Fragment>

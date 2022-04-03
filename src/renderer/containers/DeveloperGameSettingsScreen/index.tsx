@@ -1,5 +1,5 @@
 import React, {
-  ReactElement, useCallback, useEffect, useMemo, useState,
+  ReactElement, useCallback, useEffect, useState,
 } from 'react';
 import Scrollbars from 'react-custom-scrollbars-2';
 import { useDispatch } from 'react-redux';
@@ -9,15 +9,12 @@ import classNames from 'classnames';
 import styles from './styles.module.scss';
 import { DeveloperScreenController } from '$components/DeveloperScreenController';
 import { IValidationErrors } from '$types/common';
-import { useAppSelector } from '$store/store';
+import { useDeveloperSelector } from '$store/store';
 import { IGameSettingsConfig, IGameSettingsFile } from '$types/gameSettings';
 import {
   deepClone, getDefaultGameSettingsFile, getNewConfig, getUniqueValidationErrors,
 } from '$utils/data';
 import { checkObjectForEqual } from '$utils/check';
-import {
-  addMessages, saveGameSettingsConfig, updateConfig,
-} from '$actions/main';
 import {
   AppChannel, gameSettingsFileAvailableVariables, LauncherButtonAction,
 } from '$constants/misc';
@@ -34,31 +31,26 @@ import { HintItem } from '$components/HintItem';
 import { GameSettingsFileItem } from '$components/GameSettingsFileItem';
 import { GAME_DIR } from '$constants/paths';
 import { CreateUserMessage } from '$utils/message';
-import { RoutesWindowName } from '$constants/routes';
+import {
+  addDeveloperMessages, saveGameSettingsConfig, updateConfig,
+} from '$actions/developer';
 
 export const DeveloperGameSettingsScreen: React.FC = () => {
-  const baseFilesEncoding = useAppSelector((state) => state.gameSettings.baseFilesEncoding);
-  const gameSettingsGroups = useAppSelector((state) => state.gameSettings.gameSettingsGroups);
-  const gameSettingsFiles = useAppSelector((state) => state.gameSettings.gameSettingsFiles);
-  const gameSettingsParameters = useAppSelector((state) => state.gameSettings.gameSettingsParameters);
-  const isGameSettingsLoaded = useAppSelector((state) => state.main.isGameSettingsLoaded);
-  const isFirstLaunch = useAppSelector((state) => state.main.config.isFirstLaunch);
-  const pathVariables = useAppSelector((state) => state.main.pathVariables);
+  /* eslint-disable max-len */
+  const gameSettingsConfig = useDeveloperSelector((state) => state.developer.gameSettingsConfig);
+  const isGameSettingsConfigProcessing = useDeveloperSelector((state) => state.developer.isGameSettingsConfigProcessing);
+  const isGameSettingsConfigLoaded = useDeveloperSelector((state) => state.developer.isGameSettingsConfigLoaded);
+  const isFirstLaunch = useDeveloperSelector((state) => state.developer.launcherConfig.isFirstLaunch);
+  const pathVariables = useDeveloperSelector((state) => state.developer.pathVariables);
 
   const dispatch = useDispatch();
 
-  const settingsConfig: IGameSettingsConfig = useMemo(() => ({
-    gameSettingsGroups,
-    baseFilesEncoding,
-    gameSettingsFiles,
-    gameSettingsParameters,
-  }), [gameSettingsGroups, baseFilesEncoding, gameSettingsFiles, gameSettingsParameters]);
-
-  const [currentSettingsConfig, setCurrentSettingsConfig] = useState<IGameSettingsConfig>(settingsConfig);
+  const [currentConfig, setCurrentConfig] = useState<IGameSettingsConfig>(gameSettingsConfig);
   const [validationErrors, setValidationErrors] = useState<IValidationErrors>({});
   const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
   const [lastCreatedGroupName, setLastCreatedGroupName] = useState<string>('');
-  const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [isSettingsInitialized, setIsSettingsInitialized] = useState<boolean>(isGameSettingsConfigLoaded);
+  /* eslint-enable max-len */
 
   const getPathFromPathSelector = useCallback(async (
   ): Promise<string> => ipcRenderer.invoke(
@@ -71,18 +63,18 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     isGoToMainScreen: boolean,
   ) => {
     dispatch(saveGameSettingsConfig(
-      currentSettingsConfig,
+      currentConfig,
       isGoToMainScreen,
     ));
 
     setIsConfigChanged(false);
-  }, [dispatch, currentSettingsConfig]);
+  }, [dispatch, currentConfig]);
 
   const resetConfigChanges = useCallback(() => {
     setIsConfigChanged(false);
     setValidationErrors({});
-    setCurrentSettingsConfig(settingsConfig);
-  }, [settingsConfig]);
+    setCurrentConfig(gameSettingsConfig);
+  }, [gameSettingsConfig]);
 
   useEffect(() => {
     ipcRenderer.on(AppChannel.DEV_WINDOW_CLOSED, (event, isByCloseWindowBtnClick: boolean) => {
@@ -91,36 +83,36 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
       }
     });
 
-    if (isUpdating) {
+    if (!isSettingsInitialized && !isGameSettingsConfigProcessing) {
       resetConfigChanges();
-      setIsUpdating(false);
+      setIsSettingsInitialized(true);
     }
 
     return (): void => { ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED); };
-  }, [isUpdating, resetConfigChanges]);
+  }, [isSettingsInitialized, isGameSettingsConfigProcessing, resetConfigChanges]);
 
   const changeCurrentConfig = useCallback((value, fieldName: string, parent?: string) => {
-    const newConfig = getNewConfig(currentSettingsConfig, value, fieldName, parent);
+    const newConfig = getNewConfig(currentConfig, value, fieldName, parent);
 
-    setCurrentSettingsConfig(newConfig);
-    setIsConfigChanged(!checkObjectForEqual(settingsConfig, newConfig));
-  }, [settingsConfig, currentSettingsConfig]);
+    setCurrentConfig(newConfig);
+    setIsConfigChanged(!checkObjectForEqual(gameSettingsConfig, newConfig));
+  }, [gameSettingsConfig, currentConfig]);
 
   const changeGameSettingsFiles = useCallback((
     fileName: string,
     fileData: IGameSettingsFile,
   ) => {
     const newConfig = {
-      ...currentSettingsConfig,
+      ...currentConfig,
       gameSettingsFiles: {
-        ...currentSettingsConfig.gameSettingsFiles,
+        ...currentConfig.gameSettingsFiles,
         [fileName]: fileData,
       },
     };
 
-    setCurrentSettingsConfig(newConfig);
-    setIsConfigChanged(!checkObjectForEqual(settingsConfig, newConfig));
-  }, [currentSettingsConfig, settingsConfig]);
+    setCurrentConfig(newConfig);
+    setIsConfigChanged(!checkObjectForEqual(gameSettingsConfig, newConfig));
+  }, [currentConfig, gameSettingsConfig]);
 
   const onSaveBtnClick = useCallback(() => {
     saveSettingsChanges(false);
@@ -137,14 +129,14 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
 
   const onUpdateBtnClick = useCallback(() => {
     dispatch(updateConfig('gameSettings'));
-    setIsUpdating(true);
+    setIsSettingsInitialized(false);
   }, [dispatch]);
 
   const createNewGroup = useCallback(() => {
     const newName = getRandomName();
 
     changeCurrentConfig(
-      [...currentSettingsConfig.gameSettingsGroups, {
+      [...currentConfig.gameSettingsGroups, {
         name: newName,
         label: '',
       }],
@@ -152,11 +144,11 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     );
 
     setLastCreatedGroupName(newName);
-  }, [currentSettingsConfig, changeCurrentConfig]);
+  }, [currentConfig, changeCurrentConfig]);
 
   const editGroupItem = useCallback((value: string, name: string) => {
     changeCurrentConfig(
-      currentSettingsConfig.gameSettingsGroups.map((currentGroup) => {
+      currentConfig.gameSettingsGroups.map((currentGroup) => {
         if (currentGroup.name === name) {
           return {
             ...currentGroup,
@@ -172,25 +164,25 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     if (lastCreatedGroupName === name) {
       setLastCreatedGroupName('');
     }
-  }, [currentSettingsConfig, lastCreatedGroupName, changeCurrentConfig]);
+  }, [currentConfig, lastCreatedGroupName, changeCurrentConfig]);
 
   const validateGroupLabel = useCallback((value: string, name: string) => {
     setValidationErrors(getUniqueValidationErrors(
       validationErrors,
       { [name]: ['already exists'] },
-      currentSettingsConfig.gameSettingsGroups.map((group) => group.label).includes(value)
-      && currentSettingsConfig.gameSettingsGroups.find((group) => group.name === name)?.label !== value,
+      currentConfig.gameSettingsGroups.map((group) => group.label).includes(value)
+      && currentConfig.gameSettingsGroups.find((group) => group.name === name)?.label !== value,
     ));
-  }, [currentSettingsConfig.gameSettingsGroups, validationErrors]);
+  }, [currentConfig.gameSettingsGroups, validationErrors]);
 
   const deleteGroupItem = useCallback((name: string) => {
     changeCurrentConfig(
-      currentSettingsConfig.gameSettingsGroups.filter((group) => group.name !== name),
+      currentConfig.gameSettingsGroups.filter((group) => group.name !== name),
       'gameSettingsGroups',
     );
 
     setLastCreatedGroupName('');
-  }, [currentSettingsConfig, changeCurrentConfig]);
+  }, [currentConfig, changeCurrentConfig]);
 
   const setNewValidationErrors = useCallback((errors: IValidationErrors) => {
     setValidationErrors(errors);
@@ -216,7 +208,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
         );
 
         changeCurrentConfig({
-          ...currentSettingsConfig.gameSettingsFiles,
+          ...currentConfig.gameSettingsFiles,
           [getRandomName()]: getDefaultGameSettingsFile(
             getFileNameFromPathToFile(pathStr),
             pathWithVariable,
@@ -224,28 +216,27 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
         },
         'gameSettingsFiles');
       } catch (error: any) {
-        dispatch(addMessages([CreateUserMessage.error(
+        dispatch(addDeveloperMessages([CreateUserMessage.error(
           'Выбранный файл находится в недопустимой папке.',
-          RoutesWindowName.DEV,
         )]));
       }
     }
   }, [pathVariables,
-    currentSettingsConfig.gameSettingsFiles,
+    currentConfig.gameSettingsFiles,
     dispatch,
     changeCurrentConfig,
     getPathFromPathSelector]);
 
   const deleteGameSettingsFile = useCallback((fileName: string) => {
-    const newGameSettingsFiles = deepClone(currentSettingsConfig.gameSettingsFiles);
+    const newGameSettingsFiles = deepClone(currentConfig.gameSettingsFiles);
     delete newGameSettingsFiles[fileName];
 
     changeCurrentConfig(newGameSettingsFiles, 'gameSettingsFiles');
-  }, [currentSettingsConfig.gameSettingsFiles, changeCurrentConfig]);
+  }, [currentConfig.gameSettingsFiles, changeCurrentConfig]);
 
   const currentGameSettingsFiles: IGameSettingsFile[] = Object
-    .keys(currentSettingsConfig.gameSettingsFiles)
-    .map((file) => currentSettingsConfig.gameSettingsFiles[file]);
+    .keys(currentConfig.gameSettingsFiles)
+    .map((file) => currentConfig.gameSettingsFiles[file]);
 
   /* eslint-disable react/jsx-props-no-spreading */
   return (
@@ -256,7 +247,6 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
         isConfigChanged={isConfigChanged}
         isHaveValidationErrors={Object.keys(validationErrors).length > 0}
         isFirstLaunch={isFirstLaunch}
-        config="gameSettings"
         onSaveBtnClick={onSaveBtnClick}
         onCancelBtnClick={onCancelBtnClick}
         onResetBtnClick={onResetBtnClick}
@@ -281,7 +271,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
         )}
       >
         {
-          isGameSettingsLoaded && (
+          isGameSettingsConfigLoaded && (
           <React.Fragment>
             <div className={styles['developer-screen__game-settings']}>
               <div className="developer-screen__block">
@@ -299,8 +289,8 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                 </Button>
                 <ul className={styles['developer-screen__groups-container']}>
                   {
-                  currentSettingsConfig.gameSettingsGroups.length > 0
-                    && currentSettingsConfig.gameSettingsGroups.map((item) => (
+                  currentConfig.gameSettingsGroups.length > 0
+                    && currentConfig.gameSettingsGroups.map((item) => (
                       <li
                         key={item.name}
                         className={classNames(
@@ -329,7 +319,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                     ))
                 }
                   {
-                  currentSettingsConfig.gameSettingsGroups.length === 0 && (
+                  currentConfig.gameSettingsGroups.length === 0 && (
                     <li className={styles['developer-screen__groups-item']}>
                       Нет групп игровых настроек
                     </li>
@@ -344,7 +334,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                 className="developer-screen__item"
                 id="baseFilesEncoding"
                 label="Кодировка"
-                value={currentSettingsConfig.baseFilesEncoding}
+                value={currentConfig.baseFilesEncoding}
                 description="Кодировка, которая будет по умолчанию применяться при чтении и записи данных файлов игровых настроек." //eslint-disable-line max-len
                 onChange={onTextFieldChange}
               />

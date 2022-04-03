@@ -1,9 +1,12 @@
-import React, { useCallback, useState } from 'react';
+import React, {
+  useCallback, useEffect, useState,
+} from 'react';
 import {
   Switch, Route, NavLink, Link,
 } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import classNames from 'classnames';
+import { ipcRenderer } from 'electron';
 
 import styles from './styles.module.scss';
 import { Routes } from '$constants/routes';
@@ -21,13 +24,18 @@ import {
   setGameSettingsOptions,
   updateGameSettingsOptions,
 } from '$actions/gameSettings';
-import { IGameSettingsOptions, IGameSettingsOptionsItem } from '$types/gameSettings';
+import { IGameSettingsOptions } from '$types/gameSettings';
 import { Loader } from '$components/UI/Loader';
 import { GameSettingsFormControls } from '$components/GameSettingsFormControls';
-import { createGameSettingsFilesBackup, getGameSettingsFilesBackup } from '$actions/main';
+import {
+  createGameSettingsFilesBackup,
+  getGameSettingsFilesBackup,
+  setIsGameSettingsLoading,
+} from '$actions/main';
 import { Modal } from '$components/UI/Modal';
 import { GameSettingsBackup } from '$components/GameSettingsBackup';
 import { ILocationState } from '$types/common';
+import { AppChannel } from '$constants/misc';
 
 /**
  * Контейнер, в котором располагаются блок (`GameSettingsContent`) с контроллерами для изменения
@@ -47,13 +55,26 @@ export const GameSettingsScreen: React.FC = () => {
   const moProfile = useAppSelector((state) => state.gameSettings.moProfile);
   const moProfiles = useAppSelector((state) => state.gameSettings.moProfiles);
   const isModOrganizerUsed = useAppSelector((state) => state.main.config.modOrganizer.isUsed);
-  /* eslint-enable max-len */
 
   const dispatch = useDispatch();
 
   const [isGameOptionsChanged, setIsGameOptionsChanged] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isBackupsModalFirstOpen, setIsBackupsModalFirstOpen] = useState<boolean>(true);
+  /* eslint-enable max-len */
+
+  useEffect(() => {
+    ipcRenderer.on(AppChannel.SAVE_GAME_SETTINGS_CONFIG, (
+      event,
+      isGameSettingsProcessing: boolean,
+    ) => {
+      dispatch(setIsGameSettingsLoading(isGameSettingsProcessing));
+    });
+
+    return (): void => {
+      ipcRenderer.removeAllListeners(AppChannel.SAVE_GAME_SETTINGS_CONFIG);
+    };
+  }, [dispatch]);
 
   const onMOProfilesSelectChange = useCallback(
     ({ target }: React.ChangeEvent<HTMLSelectElement>) => {

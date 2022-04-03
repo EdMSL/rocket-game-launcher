@@ -22,10 +22,12 @@ import {
 import { IGetDataFromFilesResult, IUnwrap } from '$types/common';
 import {
   addMessages,
+  setIsGameSettingsAvailable,
   setIsGameSettingsLoaded,
   setIsGameSettingsLoading,
   setIsGameSettingsSaving,
   setIsLauncherConfigChanged,
+  // setIsLauncherConfigChanged,
 } from '$actions/main';
 import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import { checkGameSettingsConfigFull, ICheckResult } from '$utils/check';
@@ -67,14 +69,12 @@ import {
   isDataFromIniFile,
   setValueForObjectDeepKey,
 } from '$utils/data';
-import { IUserMessage } from '$types/main';
 import {
   PathRegExp,
   Encoding,
   GameSettingsOptionType,
   GameSettingsFileView,
 } from '$constants/misc';
-import { RoutesWindowName } from '$constants/routes';
 import {
   getParameterRegExp,
   getPathToFile,
@@ -95,7 +95,7 @@ const getState = (state: IAppState): IAppState => state;
 export function* getGameSettingsConfigSaga(): SagaIterator<ICheckResult<IGameSettingsConfig>> {
   try {
     const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_FILE_PATH);
-    yield delay(3000);
+    yield delay(2000);
     return checkGameSettingsConfigFull(gameSettingsObj);
   } catch (error: any) {
     let errorMessage = '';
@@ -303,48 +303,6 @@ export function* generateGameSettingsOptionsSaga(
 }
 
 /**
- * Инициализация игровых настроек для режима разработчика.
- * Только проверка полей на валидность и запись в `state`.
- */
-export function* initGameSettingsDeveloperSaga(
-  isFromUpdateAction = false,
-): SagaIterator {
-  try {
-    yield put(setIsGameSettingsLoading(true));
-    yield put(setIsGameSettingsLoaded(false));
-
-    const {
-      data: settingsConfig,
-      errors,
-    }: SagaReturnType<typeof getGameSettingsConfigSaga> = yield call(getGameSettingsConfigSaga);
-
-    if (errors.length > 0) {
-      yield put(addMessages([CreateUserMessage.warning('Обнаружены ошибки в файле settings.json. Подробности в файле лога.', RoutesWindowName.DEV)]));//eslint-disable-line max-len
-    }
-    yield put(setGameSettingsConfig(settingsConfig));
-    yield put(setIsGameSettingsLoaded(true));
-  } catch (error: any) {
-    let errorMessage = '';
-
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path "${error.path}".`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
-    writeToLogFile(errorMessage);
-  } finally {
-    yield put(setIsGameSettingsLoading(false));
-    // if (isFromUpdateAction) {
-    // }
-  }
-}
-
-/**
  * Инициализация игровых настроек. Осуществляется при первом переходе на экран настроек.
  * Получаем данные МО, проверяем на валидность параметры игровых настроек (`gameSettingsFiles`)
  * и переписываем их в случае невалидности некоторых полей, генерируем опции игровых настроек.
@@ -356,16 +314,18 @@ export function* initGameSettingsSaga(
   try {
     writeToLogFileSync('Game settings initialization started.');
 
-    yield put(setIsGameSettingsLoading(true));
-    yield put(setIsGameSettingsLoaded(false));
+    if (!isFromUpdateAction) {
+      yield put(setIsGameSettingsLoading(true));
+      yield put(setIsGameSettingsLoaded(false));
+    }
 
     const {
-      gameSettings: {
-        baseFilesEncoding,
-        gameSettingsGroups,
-        gameSettingsFiles: settingsFilesFromState,
-        gameSettingsParameters,
-      },
+      // gameSettings: {
+      //   baseFilesEncoding,
+      //   gameSettingsGroups,
+      //   gameSettingsFiles: settingsFilesFromState,
+      //   gameSettingsParameters,
+      // },
       main: {
         config: {
           modOrganizer: {
@@ -440,7 +400,7 @@ export function* initGameSettingsSaga(
     yield put(setGameSettingsOptions(totalGameSettingsOptions));
     yield put(setGameSettingsConfig(settingsConfig));
     // yield put(setGameSettingsFiles(gameSettingsFiles));
-    // yield put(setGameSettingsParameters(parameters));
+    yield put(setIsGameSettingsAvailable(true));
     yield put(setIsGameSettingsLoaded(true));
 
     if (isLauncherConfigChanged) {
@@ -479,7 +439,9 @@ export function* initGameSettingsSaga(
       throw new SagaError('Init game settings', errorMessage);
     }
   } finally {
-    yield put(setIsGameSettingsLoading(false));
+    if (!isFromUpdateAction) {
+      yield put(setIsGameSettingsLoading(false));
+    }
   }
 }
 

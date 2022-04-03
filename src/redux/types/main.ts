@@ -1,16 +1,14 @@
 import { IPathVariables } from '$constants/paths';
-import { IMessage } from '$utils/message';
+import { IUserMessage } from './common';
 
 export const MAIN_TYPES = {
   SET_LAUNCHER_CONFIG: 'SET_LAUNCHER_CONFIG',
   SET_PATH_VARIABLES: 'SET_PATH_VARIABLES',
   SET_IS_FIRST_LAUNCH: 'SET_IS_FIRST_LAUNCH',
-  SET_IS_LAUNCHER_CONFIG_CHANGED: 'SET_IS_LAUNCHER_CONFIG_CHANGED',
-  SAVE_LAUNCHER_CONFIG: 'SAVE_LAUNCHER_CONFIG',
-  SAVE_GAME_SETTINGS_CONFIG: 'SAVE_GAME_SETTINGS_CONFIG',
   SET_IS_DEV_WINDOW_OPENING: 'SET_IS_DEV_WINDOW_OPENING',
   SET_IS_GAME_RUNNING: 'SET_IS_GAME_RUNNING',
   SET_IS_LAUNCHER_INITIALISED: 'SET_IS_LAUNCHER_INITIALISED',
+  SET_IS_LAUNCHER_CONFIG_CHANGED: 'SET_IS_LAUNCHER_CONFIG_CHANGED',
   SET_IS_GAME_SETTINGS_LOADING: 'SET_IS_GAME_SETTINGS_LOADING',
   SET_IS_GAME_SETTINGS_LOADED: 'SET_IS_GAME_SETTINGS_LOADED',
   SET_IS_GAME_SETTINGS_AVAILABLE: 'SET_IS_GAME_SETTINGS_AVAILABLE',
@@ -44,11 +42,6 @@ export interface ILauncherAppButton {
 export interface ILauncherCustomButton extends ILauncherAppButton {
   id: string,
   action: string,
-}
-
-export interface IUserMessage extends IMessage {
-  id: string,
-  window: string,
 }
 
 export interface IBackupFile {

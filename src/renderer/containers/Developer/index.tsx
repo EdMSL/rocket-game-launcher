@@ -20,10 +20,10 @@ import { DeveloperGameSettingsScreen } from '$containers/DeveloperGameSettingsSc
 
 export const Developer: React.FC = () => {
   /* eslint-disable max-len */
-  const isGameSettingsConfigSaving = useDeveloperSelector((state) => state.developer.isGameSettingsConfigSaving);
-  const isGameSettingsConfigLoading = useDeveloperSelector((state) => state.developer.isGameSettingsConfigLoading);
-  const isFirstLaunch = useDeveloperSelector((state) => state.developer.config.isFirstLaunch);
-  const gameName = useDeveloperSelector((state) => state.developer.config.gameName);
+  const isGameSettingsConfigProcessing = useDeveloperSelector((state) => state.developer.isGameSettingsConfigProcessing);
+  const isLauncherConfigProcessing = useDeveloperSelector((state) => state.developer.isLauncherConfigProcessing);
+  const isFirstLaunch = useDeveloperSelector((state) => state.developer.launcherConfig.isFirstLaunch);
+  const gameName = useDeveloperSelector((state) => state.developer.launcherConfig.gameName);
   /* eslint-enable max-len */
 
   const onCloseWindowBtnClick = useCallback(() => {
@@ -32,7 +32,7 @@ export const Developer: React.FC = () => {
 
   /* eslint-disable react/jsx-props-no-spreading */
   return (
-    <React.Fragment>
+    <div className={styles.developer}>
       <Header
         isResizable
         gameName={gameName}
@@ -74,9 +74,9 @@ export const Developer: React.FC = () => {
           <Redirect to={Routes.DEVELOPER_SCREEN_CONFIG} />
         </Switch>
         {
-          (isGameSettingsConfigSaving || isGameSettingsConfigLoading) && <Loader />
+          (isLauncherConfigProcessing || isGameSettingsConfigProcessing) && <Loader />
         }
       </main>
-    </React.Fragment>
+    </div>
   );
 };
