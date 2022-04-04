@@ -64,15 +64,15 @@ export const GameSettingsScreen: React.FC = () => {
   /* eslint-enable max-len */
 
   useEffect(() => {
-    ipcRenderer.on(AppChannel.SAVE_GAME_SETTINGS_CONFIG, (
+    ipcRenderer.on(AppChannel.SAVE_CONFIG, (
       event,
-      isGameSettingsProcessing: boolean,
+      isGameSettingsConfigProcessing: boolean,
     ) => {
-      dispatch(setIsGameSettingsLoading(isGameSettingsProcessing));
+      dispatch(setIsGameSettingsLoading(isGameSettingsConfigProcessing));
     });
 
     return (): void => {
-      ipcRenderer.removeAllListeners(AppChannel.SAVE_GAME_SETTINGS_CONFIG);
+      ipcRenderer.removeAllListeners(AppChannel.SAVE_CONFIG);
     };
   }, [dispatch]);
 

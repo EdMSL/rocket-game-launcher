@@ -107,40 +107,33 @@ export const createMainWindow = (
     }
   });
 
-  ipcMain.on(AppChannel.SAVE_LAUNCHER_CONFIG, (
+  ipcMain.on(AppChannel.SAVE_CONFIG, (
     event,
     isProcessing: boolean,
-    newConfig: ILauncherConfig,
+    newConfig: ILauncherConfig|IGameSettingsConfig,
     pathVariables: IPathVariables,
     isChangeWindowSize: boolean,
   ) => {
-    if (isChangeWindowSize !== undefined) {
-      changeWindowSize(mainWindow, newConfig);
-    }
-
-    if (newConfig !== undefined && pathVariables !== undefined) {
-      appStore.dispatch(setLauncherConfig(newConfig));
-      appStore.dispatch(setPathVariables(pathVariables));
-      appStore.dispatch(setIsLauncherConfigChanged(true));
-    }
-
-    mainWindow.webContents.send(
-      AppChannel.SAVE_LAUNCHER_CONFIG,
-      isProcessing,
-    );
-  });
-
-  ipcMain.on(AppChannel.SAVE_GAME_SETTINGS_CONFIG, (
-    event,
-    isProcessing: boolean,
-    newConfig: IGameSettingsConfig,
-  ) => {
     if (newConfig !== undefined) {
-      appStore.dispatch(setGameSettingsConfig(newConfig));
-      appStore.dispatch(setIsLauncherConfigChanged(true));
+      if ('baseFilesEncoding' in newConfig) {
+        appStore.dispatch(setGameSettingsConfig(newConfig));
+        appStore.dispatch(setIsLauncherConfigChanged(true));
+      } else if ('playButton' in newConfig) {
+        if (isChangeWindowSize !== undefined && isChangeWindowSize) {
+          changeWindowSize(mainWindow, newConfig);
+        }
+
+        if (pathVariables !== undefined) {
+          appStore.dispatch(setLauncherConfig(newConfig));
+          appStore.dispatch(setPathVariables(pathVariables));
+          appStore.dispatch(setIsLauncherConfigChanged(true));
+        }
+      }
     }
 
-    mainWindow.webContents.send(AppChannel.SAVE_GAME_SETTINGS_CONFIG, isProcessing);
+    if (isProcessing !== undefined) {
+      mainWindow.webContents.send(AppChannel.SAVE_CONFIG, isProcessing);
+    }
   });
 
   mainWindow.once('ready-to-show', () => {

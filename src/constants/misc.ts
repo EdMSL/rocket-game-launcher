@@ -7,6 +7,11 @@ export const Scope = {
   RENDERER: 'renderer',
 };
 
+export const AppWindowName = {
+  MAIN: 'Main Window',
+  DEV: 'Developer Window',
+};
+
 export const Encoding = {
   UTF8: 'utf-8',
   WIN1251: 'win1251',
@@ -108,13 +113,7 @@ export const AppChannel = {
   CLOSE_APP: 'close app',
   GET_PATH_BY_PATH_SELECTOR: 'get path from native window',
   GET_APP_STATE: 'get app state',
-  SAVE_LAUNCHER_CONFIG: 'save launcher config',
-  SAVE_GAME_SETTINGS_CONFIG: 'save game settings config',
-};
-
-export const AppWindowName = {
-  MAIN: 'Main Window',
-  DEV: 'Developer Window',
+  SAVE_CONFIG: 'save config',
 };
 
 export interface IWindowField {

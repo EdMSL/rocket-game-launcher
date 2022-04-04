@@ -90,7 +90,7 @@ function* saveLauncherConfigSaga(
 ): SagaIterator {
   // Ставим здесь именно сохранение игровых настроек только из-за показа лоадера
   yield put(setIsLauncherConfigProcessing(true));
-  yield call(ipcRenderer.send, AppChannel.SAVE_LAUNCHER_CONFIG, true);
+  yield call(ipcRenderer.send, AppChannel.SAVE_CONFIG, true);
   yield delay(2000);
 
   try {
@@ -113,7 +113,7 @@ function* saveLauncherConfigSaga(
 
     const isChangeWindowSize = !getIsWindowSettingEqual(launcherConfig, newConfig);
 
-    yield call(ipcRenderer.send, AppChannel.SAVE_LAUNCHER_CONFIG, false, newConfig, newPathVariables, isChangeWindowSize);
+    yield call(ipcRenderer.send, AppChannel.SAVE_CONFIG, false, newConfig, newPathVariables, isChangeWindowSize);
 
     if (isGoToMainScreen) {
       yield call(ipcRenderer.send, AppChannel.CLOSE_DEV_WINDOW);
@@ -146,13 +146,13 @@ function* saveGameSettingsConfigSaga(
   { payload: { newConfig, isGoToMainScreen } }: ReturnType<typeof saveGameSettingsConfig>,
 ): SagaIterator {
   yield put(setIsGameSettingsConfigProcessing(true));
-  yield call(ipcRenderer.send, AppChannel.SAVE_GAME_SETTINGS_CONFIG, true);
+  yield call(ipcRenderer.send, AppChannel.SAVE_CONFIG, true);
   yield delay(2000);
   try {
     yield call(writeJSONFile, GAME_SETTINGS_FILE_PATH, deepClone(newConfig, 'id'));
     yield put(setGameSettingsConfig(newConfig));
 
-    yield call(ipcRenderer.send, AppChannel.SAVE_GAME_SETTINGS_CONFIG, false, newConfig);
+    yield call(ipcRenderer.send, AppChannel.SAVE_CONFIG, false, newConfig);
 
     if (isGoToMainScreen) {
       yield call(ipcRenderer.send, AppChannel.CLOSE_DEV_WINDOW);

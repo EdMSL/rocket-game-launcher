@@ -15,6 +15,7 @@ import {
   addMessages,
   setIsDeveloperMode,
   setIsDevWindowOpening,
+  setIsConfigLoading,
 } from '$actions/main';
 import { useAppSelector } from '$store/store';
 import { CreateUserMessage } from '$utils/message';
@@ -28,6 +29,7 @@ import { ILocationState } from '$types/common';
 
 export const MainScreen: React.FC = () => {
   /* eslint-disable max-len */
+  const isConfigLoading = useAppSelector((state) => state.main.isConfigLoading);
   const playButton = useAppSelector((state) => state.main.config.playButton);
   const customButtons = useAppSelector((state) => state.main.config.customButtons);
   const isGameRunning = useAppSelector((state) => state.main.isGameRunning);
@@ -44,7 +46,6 @@ export const MainScreen: React.FC = () => {
   const dispatch = useDispatch();
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
   /* eslint-enable max-len */
 
   useEffect(() => {
@@ -57,17 +58,17 @@ export const MainScreen: React.FC = () => {
       dispatch(setIsDeveloperMode(true));
     });
 
-    ipcRenderer.on(AppChannel.SAVE_LAUNCHER_CONFIG, (
+    ipcRenderer.on(AppChannel.SAVE_CONFIG, (
       event: Electron.Event,
       isLauncherConfigProcessing: boolean,
     ) => {
-      setIsProcessing(isLauncherConfigProcessing);
+      dispatch(setIsConfigLoading(isLauncherConfigProcessing));
     });
 
     return (): void => {
       ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED);
       ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_OPENED);
-      ipcRenderer.removeAllListeners(AppChannel.SAVE_LAUNCHER_CONFIG);
+      ipcRenderer.removeAllListeners(AppChannel.SAVE_CONFIG);
     };
   }, [dispatch]);
 
@@ -225,7 +226,7 @@ export const MainScreen: React.FC = () => {
           )
         }
         {
-          (isDevWindowOpening || isProcessing) && <Loader />
+          (isDevWindowOpening || isConfigLoading) && <Loader />
         }
       </main>
     </React.Fragment>

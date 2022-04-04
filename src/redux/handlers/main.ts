@@ -67,6 +67,16 @@ const setIsLauncherInitialised: IMainActionHadler<
   isLauncherInitialised,
 });
 
+const setIsConfigLoading: IMainActionHadler<
+  typeof MAIN_ACTIONS.setIsConfigLoading
+> = (
+  state,
+  { payload: isConfigLoading },
+) => ({
+  ...state,
+  isConfigLoading,
+});
+
 const setIsGameSettingsLoading: IMainActionHadler<
   typeof MAIN_ACTIONS.setIsGameSettingsLoading
 > = (
@@ -197,6 +207,7 @@ export const MAIN_HANDLERS = {
   [MAIN_TYPES.SET_IS_LAUNCHER_CONFIG_CHANGED]: setIsLauncherConfigChanged,
   [MAIN_TYPES.SET_IS_GAME_RUNNING]: setIsGameRunning,
   [MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED]: setIsLauncherInitialised,
+  [MAIN_TYPES.SET_IS_CONFIG_LOADING]: setIsConfigLoading,
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_LOADING]: setIsGameSettingsLoading,
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_LOADED]: setIsGameSettingsLoaded,
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_AVAILABLE]: setIsGameSettingsAvailable,
