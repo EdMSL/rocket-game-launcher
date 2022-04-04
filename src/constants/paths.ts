@@ -9,7 +9,7 @@ export const GAME_SETTINGS_FILE_PATH = process.env.NODE_ENV === 'development'
   ? path.resolve('./app/files/settings.json') : path.resolve('./settings.json');
 
 export const GAME_DIR = process.env.NODE_ENV === 'development'
-  ? 'D:\\Oblivion'
+  ? path.resolve('./src/tests/fixtures/files')
   : path.resolve('../');
 
 export const BACKUP_DIR = process.env.NODE_ENV === 'development'

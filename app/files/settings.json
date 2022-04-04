@@ -2,33 +2,33 @@
   "baseFilesEncoding": "win1251",
   "gameSettingsGroups": [
     {
-      "name": "5",
+      "name": "qM3joLYOXUE5qD6J",
       "label": "Audio"
     },
     {
       "name": "7uED7Xd7gPyIIvlu",
-      "label": "Video"
+      "label": "Graphic"
     }
   ],
   "gameSettingsFiles": [
     {
       "name": "oudf7Xd78FdyIIvaq",
       "label": "OblivionIni",
-      "path": "%MO_PROFILE%\\oblivion.ini",
+      "path": "%GAME_DIR%\\oblivion.ini",
       "view": "sectional",
       "encoding": ""
     },
     {
       "name": "qM3jeQhgXUE505GJ",
       "label": "MenuIni",
-      "path": "%GAME_DIR%\\Data\\Ini\\DMS\\Menu.ini",
+      "path": "%GAME_DIR%\\Menu.ini",
       "view": "line",
       "encoding": "win1251"
     },
     {
       "name": "h5TjeQhgXpv605HQ",
       "label": "OblivionReloaded",
-      "path": "%GAME_DIR%\\Data\\Obse\\Plugins\\OblivionReloaded.ini",
+      "path": "%GAME_DIR%\\OblivionReloaded.dll.config",
       "view": "tag",
       "encoding": ""
     }
@@ -37,7 +37,7 @@
     {
       "file": "oudf7Xd78FdyIIvaq",
       "optionType": "combined",
-      "settingGroup": "qM3joLYOXUE5qD6J",
+      "settingGroup": "7uED7Xd7gPyIIvlu",
       "label": "Разрешение экрана",
       "description": "Устанавливает разрешение экрана",
       "controllerType": "select",
@@ -89,7 +89,7 @@
       "name": "AnisotropicFilter",
       "valueName": "Value",
       "valuePath": "_Main/Main/Misc",
-      "settingGroup": "7uED7Xd7gPyIIvlu",
+      "settingGroup": "qM3joLYOXUE5qD6J",
       "controllerType": "range",
       "label": "Фильтрация",
       "min": "1",
