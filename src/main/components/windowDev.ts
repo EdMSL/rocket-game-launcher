@@ -7,7 +7,9 @@ import windowStateKeeper from 'electron-window-state';
 
 import { createWaitForWebpackDevServer } from './waitDevServer';
 import { defaultDevWindowResolution } from '$constants/defaultParameters';
-import { AppChannel, AppWindowName } from '$constants/misc';
+import {
+  AppChannel, AppWindowName, AppWindowStateAction,
+} from '$constants/misc';
 import { ILauncherConfig } from '$types/main';
 import { IGameSettingsConfig } from '$types/gameSettings';
 
@@ -75,18 +77,18 @@ export const addDevWindowListeners = (
     devWindow.focus();
   });
 
-  ipcMain.on(AppChannel.MINIMIZE_WINDOW, (event, windowName) => {
+  ipcMain.on(AppChannel.CHANGE_WINDOW_SIZE_STATE, (
+    event,
+    action: string,
+    windowName: string,
+  ) => {
     if (windowName === AppWindowName.DEV) {
-      devWindow.minimize();
-    }
-  });
-
-  ipcMain.on(AppChannel.MAX_UNMAX_WINDOW, (evt, isMax, windowName) => {
-    if (windowName === AppWindowName.DEV) {
-      if (isMax) {
-        devWindow.unmaximize();
-      } else {
+      if (action === AppWindowStateAction.MINIMIZE_WINDOW) {
+        devWindow.minimize();
+      } else if (action === AppWindowStateAction.MAXIMIZE_WINDOW) {
         devWindow.maximize();
+      } else if (action === AppWindowStateAction.UNMAXIMIZE_WINDOW) {
+        devWindow.unmaximize();
       }
     }
   });
@@ -107,15 +109,30 @@ export const addDevWindowListeners = (
   });
 
   devWindow.on('maximize', () => {
-    devWindow.webContents.send(AppChannel.MAX_UNMAX_WINDOW, true);
+    devWindow.webContents.send(
+      AppChannel.CHANGE_WINDOW_SIZE_STATE,
+      AppWindowStateAction.MAXIMIZE_WINDOW,
+      AppWindowName.DEV,
+    );
   });
 
   devWindow.on('unmaximize', () => {
-    devWindow.webContents.send(AppChannel.MAX_UNMAX_WINDOW, false);
+    devWindow.webContents.send(
+      AppChannel.CHANGE_WINDOW_SIZE_STATE,
+      AppWindowStateAction.UNMAXIMIZE_WINDOW,
+      AppWindowName.DEV,
+    );
   });
 
   devWindow.on('show', () => {
-    devWindow.webContents.send(AppChannel.MAX_UNMAX_WINDOW, devWindow.isMaximized());
+    const isMax = devWindow.isMaximized();
+
+    devWindow.webContents.send(
+      AppChannel.CHANGE_WINDOW_SIZE_STATE,
+      isMax ? AppWindowStateAction.MAXIMIZE_WINDOW : AppWindowStateAction.UNMAXIMIZE_WINDOW,
+      AppWindowName.DEV,
+      isMax,
+    );
   });
 
   ipcMain.on(AppChannel.CLOSE_DEV_WINDOW, (event, isByCloseWindowBtnClick = false) => {

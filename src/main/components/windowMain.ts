@@ -12,7 +12,9 @@ import { createWaitForWebpackDevServer } from './waitDevServer';
 import { defaultLauncherWindowSettings } from '$constants/defaultParameters';
 import { ILauncherConfig } from '$types/main';
 import { getDisplaysInfo } from '$utils/data';
-import { AppChannel, AppWindowName } from '$constants/misc';
+import {
+  AppChannel, AppWindowName, AppWindowStateAction,
+} from '$constants/misc';
 import { IPathVariables } from '$constants/paths';
 import { changeWindowSize } from '$utils/process';
 import { IAppState } from '$store/store';
@@ -91,22 +93,6 @@ export const createMainWindow = (
 
   mainWindowState.manage(mainWindow);
 
-  ipcMain.on(AppChannel.MINIMIZE_WINDOW, (event, windowName) => {
-    if (windowName === AppWindowName.MAIN) {
-      mainWindow.minimize();
-    }
-  });
-
-  ipcMain.on(AppChannel.MAX_UNMAX_WINDOW, (event, isMax, windowName) => {
-    if (windowName === AppWindowName.MAIN) {
-      if (isMax) {
-        mainWindow.unmaximize();
-      } else {
-        mainWindow.maximize();
-      }
-    }
-  });
-
   ipcMain.on(AppChannel.SAVE_CONFIG, (
     event,
     isProcessing: boolean,
@@ -136,16 +122,46 @@ export const createMainWindow = (
     }
   });
 
+  ipcMain.on(AppChannel.CHANGE_WINDOW_SIZE_STATE, (
+    event,
+    action: string,
+    windowName: string,
+  ) => {
+    if (windowName === AppWindowName.MAIN) {
+      if (action === AppWindowStateAction.MINIMIZE_WINDOW) {
+        mainWindow.minimize();
+      } else if (action === AppWindowStateAction.MAXIMIZE_WINDOW) {
+        mainWindow.maximize();
+      } else if (action === AppWindowStateAction.UNMAXIMIZE_WINDOW) {
+        mainWindow.unmaximize();
+      }
+    }
+  });
+
   mainWindow.once('ready-to-show', () => {
-    mainWindow.webContents.send(AppChannel.MAX_UNMAX_WINDOW, mainWindow.isMaximized());
+    const isMax = mainWindow.isMaximized();
+
+    mainWindow.webContents.send(
+      AppChannel.CHANGE_WINDOW_SIZE_STATE,
+      isMax ? AppWindowStateAction.MAXIMIZE_WINDOW : AppWindowStateAction.UNMAXIMIZE_WINDOW,
+      AppWindowName.MAIN,
+    );
   });
 
   mainWindow.on('maximize', () => {
-    mainWindow.webContents.send(AppChannel.MAX_UNMAX_WINDOW, true);
+    mainWindow.webContents.send(
+      AppChannel.CHANGE_WINDOW_SIZE_STATE,
+      AppWindowStateAction.MAXIMIZE_WINDOW,
+      AppWindowName.MAIN,
+    );
   });
 
   mainWindow.on('unmaximize', () => {
-    mainWindow.webContents.send(AppChannel.MAX_UNMAX_WINDOW, false);
+    mainWindow.webContents.send(
+      AppChannel.CHANGE_WINDOW_SIZE_STATE,
+      AppWindowStateAction.UNMAXIMIZE_WINDOW,
+      AppWindowName.MAIN,
+    );
   });
 
   mainWindow.on('close', () => {

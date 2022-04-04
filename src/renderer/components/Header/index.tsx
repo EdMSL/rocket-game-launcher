@@ -6,7 +6,9 @@ import classNames from 'classnames';
 
 import { Button } from '$components/UI/Button';
 import styles from './styles.module.scss';
-import { AppChannel, AppWindowName } from '$constants/misc';
+import {
+  AppChannel, AppWindowName, AppWindowStateAction,
+} from '$constants/misc';
 
 const launcherIcon = require('$images/icon.png');
 
@@ -26,14 +28,19 @@ export const Header: React.FunctionComponent<IProps> = ({
   onClose,
   openAppInfo = null,
 }) => {
-  const [isMaximize, setIsMaximize] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   useEffect(() => {
-    ipcRenderer.on(AppChannel.MAX_UNMAX_WINDOW, (evt, isMax) => {
-      setIsMaximize(isMax);
+    ipcRenderer.on(AppChannel.CHANGE_WINDOW_SIZE_STATE, (evt, action: string) => {
+      if (
+        action === AppWindowStateAction.MAXIMIZE_WINDOW
+        || action === AppWindowStateAction.UNMAXIMIZE_WINDOW
+      ) {
+        setIsMaximized(action === AppWindowStateAction.MAXIMIZE_WINDOW);
+      }
     });
 
-    return (): void => { ipcRenderer.removeAllListeners(AppChannel.MAX_UNMAX_WINDOW); };
+    return (): void => { ipcRenderer.removeAllListeners(AppChannel.CHANGE_WINDOW_SIZE_STATE); };
   }, []);
 
   const onInfoAppClick = useCallback(() => {
@@ -43,12 +50,20 @@ export const Header: React.FunctionComponent<IProps> = ({
   }, [openAppInfo]);
 
   const onMinimizeWindowClick = useCallback(() => {
-    ipcRenderer.send(AppChannel.MINIMIZE_WINDOW, openAppInfo ? AppWindowName.MAIN : AppWindowName.DEV);
+    ipcRenderer.send(
+      AppChannel.CHANGE_WINDOW_SIZE_STATE,
+      AppWindowStateAction.MINIMIZE_WINDOW,
+      openAppInfo ? AppWindowName.MAIN : AppWindowName.DEV,
+    );
   }, [openAppInfo]);
 
   const onMaximizeWindowClick = useCallback(() => {
-    ipcRenderer.send(AppChannel.MAX_UNMAX_WINDOW, isMaximize, openAppInfo ? AppWindowName.MAIN : AppWindowName.DEV);
-  }, [isMaximize, openAppInfo]);
+    ipcRenderer.send(
+      AppChannel.CHANGE_WINDOW_SIZE_STATE,
+      isMaximized ? AppWindowStateAction.UNMAXIMIZE_WINDOW : AppWindowStateAction.MAXIMIZE_WINDOW,
+      openAppInfo ? AppWindowName.MAIN : AppWindowName.DEV,
+    );
+  }, [isMaximized, openAppInfo]);
 
   const onCloseWindowBtnClick = useCallback((event) => {
     onClose(event);
@@ -96,12 +111,12 @@ export const Header: React.FunctionComponent<IProps> = ({
             <Button
               className={classNames(
                 styles.header__btn,
-                styles[`header__btn--${isMaximize ? 'unmaximize' : 'maximize'}`],
+                styles[`header__btn--${isMaximized ? 'unmaximize' : 'maximize'}`],
               )}
               onClick={onMaximizeWindowClick}
             >
               <span className={styles['header__btn-text']}>
-                {isMaximize ? 'Unmaximize' : 'Maximize'}
+                {isMaximized ? 'Unmaximize' : 'Maximize'}
               </span>
             </Button>
           )

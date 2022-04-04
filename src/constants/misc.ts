@@ -12,6 +12,12 @@ export const AppWindowName = {
   DEV: 'Developer Window',
 };
 
+export const AppWindowStateAction = {
+  MINIMIZE_WINDOW: 'minimize',
+  MAXIMIZE_WINDOW: 'maximize',
+  UNMAXIMIZE_WINDOW: 'unmaximize',
+};
+
 export const Encoding = {
   UTF8: 'utf-8',
   WIN1251: 'win1251',
@@ -103,17 +109,15 @@ export const FileExtension = {
 };
 
 export const AppChannel = {
+  CHANGE_WINDOW_SIZE_STATE: 'change window state',
+  SAVE_CONFIG: 'save config',
+  CLOSE_APP: 'close app',
+  GET_PATH_BY_PATH_SELECTOR: 'get path from native window',
+  GET_APP_STATE: 'get app state',
   OPEN_DEV_WINDOW: 'open dev window',
   CLOSE_DEV_WINDOW: 'close dev window',
   DEV_WINDOW_OPENED: 'dev window opened',
   DEV_WINDOW_CLOSED: 'dev window closed',
-  MINIMIZE_WINDOW: 'minimize window',
-  MAX_UNMAX_WINDOW: 'max-unmax window',
-  WINDOW_RESIZED: 'window resized',
-  CLOSE_APP: 'close app',
-  GET_PATH_BY_PATH_SELECTOR: 'get path from native window',
-  GET_APP_STATE: 'get app state',
-  SAVE_CONFIG: 'save config',
 };
 
 export interface IWindowField {
