@@ -64,17 +64,10 @@ const start = async (): Promise<void> => {
   writeToLogFileSync('Application ready.');
 };
 
-const showDevWindow = (): void => {
-  devWindow!.show();
-  devWindow!.focus();
-};
-
-ipcMain.on(AppChannel.OPEN_DEV_WINDOW, () => {
-  if (!devWindow) {
+ipcMain.on(AppChannel.CHANGE_DEV_WINDOW_STATE, (event, isOpen: boolean) => {
+  if (!devWindow && isOpen !== undefined && isOpen) {
     devWindow = createDevWindow();
-    addDevWindowListeners(devWindow, mainWindow!, showDevWindow);
-  } else {
-    showDevWindow();
+    addDevWindowListeners(devWindow, mainWindow!);
   }
 });
 

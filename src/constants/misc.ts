@@ -114,10 +114,7 @@ export const AppChannel = {
   CLOSE_APP: 'close app',
   GET_PATH_BY_PATH_SELECTOR: 'get path from native window',
   GET_APP_STATE: 'get app state',
-  OPEN_DEV_WINDOW: 'open dev window',
-  CLOSE_DEV_WINDOW: 'close dev window',
-  DEV_WINDOW_OPENED: 'dev window opened',
-  DEV_WINDOW_CLOSED: 'dev window closed',
+  CHANGE_DEV_WINDOW_STATE: 'change dev window state',
 };
 
 export interface IWindowField {

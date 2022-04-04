@@ -10,8 +10,6 @@ import { defaultDevWindowResolution } from '$constants/defaultParameters';
 import {
   AppChannel, AppWindowName, AppWindowStateAction,
 } from '$constants/misc';
-import { ILauncherConfig } from '$types/main';
-import { IGameSettingsConfig } from '$types/gameSettings';
 
 /**
  * Функция для создания и показа окна разработчика
@@ -70,13 +68,7 @@ export const createDevWindow = (): BrowserWindow => {
 export const addDevWindowListeners = (
   devWindow: BrowserWindow,
   mainWindow: BrowserWindow,
-  afterCreateCallback: () => void,
 ): void => {
-  ipcMain.on(AppChannel.OPEN_DEV_WINDOW, () => {
-    devWindow.show();
-    devWindow.focus();
-  });
-
   ipcMain.on(AppChannel.CHANGE_WINDOW_SIZE_STATE, (
     event,
     action: string,
@@ -93,19 +85,42 @@ export const addDevWindowListeners = (
     }
   });
 
-  devWindow.on('ready-to-show', () => {
-    afterCreateCallback();
+  ipcMain.on(AppChannel.CHANGE_DEV_WINDOW_STATE, (
+    event,
+    isOpen: boolean,
+    isCloseEvent = false,
+  ) => {
+    if (devWindow && isOpen !== undefined) {
+      if (isCloseEvent) {
+        devWindow.close();
+      } else {
+        if (isOpen) {
+          devWindow.show();
+          devWindow.focus();
+        } else {
+          devWindow.hide();
+        }
+
+        devWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, isOpen);
+        mainWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, isOpen);
+      }
+    }
   });
 
-  devWindow.on('show', (
-    event,
-    launcherConfig: ILauncherConfig,
-    gameSettingsConfig: IGameSettingsConfig,
-  ) => {
-    mainWindow.webContents.send(AppChannel.DEV_WINDOW_OPENED, {
-      launcherConfig,
-      gameSettingsConfig,
-    });
+  devWindow.on('ready-to-show', () => {
+    const isMax = devWindow.isMaximized();
+
+    devWindow.show();
+    devWindow.focus();
+
+    devWindow.webContents.send(
+      AppChannel.CHANGE_WINDOW_SIZE_STATE,
+      isMax ? AppWindowStateAction.MAXIMIZE_WINDOW : AppWindowStateAction.UNMAXIMIZE_WINDOW,
+      AppWindowName.DEV,
+      isMax,
+    );
+
+    mainWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, true);
   });
 
   devWindow.on('maximize', () => {
@@ -124,27 +139,11 @@ export const addDevWindowListeners = (
     );
   });
 
-  devWindow.on('show', () => {
-    const isMax = devWindow.isMaximized();
-
-    devWindow.webContents.send(
-      AppChannel.CHANGE_WINDOW_SIZE_STATE,
-      isMax ? AppWindowStateAction.MAXIMIZE_WINDOW : AppWindowStateAction.UNMAXIMIZE_WINDOW,
-      AppWindowName.DEV,
-      isMax,
-    );
-  });
-
-  ipcMain.on(AppChannel.CLOSE_DEV_WINDOW, (event, isByCloseWindowBtnClick = false) => {
-    devWindow.webContents.send(AppChannel.DEV_WINDOW_CLOSED, isByCloseWindowBtnClick);
-    mainWindow.webContents.send(AppChannel.DEV_WINDOW_CLOSED);
-    devWindow.hide();
-  });
-
   devWindow.on('close', (event) => {
     // Изменено ввиду проблем с закрытием окон из панели задач системы
     event.preventDefault();
-    mainWindow.webContents.send(AppChannel.DEV_WINDOW_CLOSED);
+    mainWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false);
+    devWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false, true);
     devWindow.hide();
   });
 };

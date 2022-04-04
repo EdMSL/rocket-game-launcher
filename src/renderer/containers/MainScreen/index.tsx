@@ -49,13 +49,15 @@ export const MainScreen: React.FC = () => {
   /* eslint-enable max-len */
 
   useEffect(() => {
-    ipcRenderer.on(AppChannel.DEV_WINDOW_CLOSED, () => {
-      dispatch(setIsDeveloperMode(false));
-    });
-
-    ipcRenderer.on(AppChannel.DEV_WINDOW_OPENED, () => {
-      dispatch(setIsDevWindowOpening(false));
-      dispatch(setIsDeveloperMode(true));
+    ipcRenderer.on(AppChannel.CHANGE_DEV_WINDOW_STATE, (event, isOpened: boolean) => {
+      if (isOpened !== undefined) {
+        if (isOpened) {
+          dispatch(setIsDevWindowOpening(false));
+          dispatch(setIsDeveloperMode(true));
+        } else {
+          dispatch(setIsDeveloperMode(false));
+        }
+      }
     });
 
     ipcRenderer.on(AppChannel.SAVE_CONFIG, (
@@ -66,8 +68,7 @@ export const MainScreen: React.FC = () => {
     });
 
     return (): void => {
-      ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED);
-      ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_OPENED);
+      ipcRenderer.removeAllListeners(AppChannel.CHANGE_DEV_WINDOW_STATE);
       ipcRenderer.removeAllListeners(AppChannel.SAVE_CONFIG);
     };
   }, [dispatch]);
@@ -126,8 +127,8 @@ export const MainScreen: React.FC = () => {
   }, []);
 
   const onDeveloperScreenBtnClick = useCallback(() => {
-    ipcRenderer.send(AppChannel.OPEN_DEV_WINDOW);
     dispatch(setIsDevWindowOpening(true));
+    ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, true);
   }, [dispatch]);
 
   const getBtnArgs = useCallback((

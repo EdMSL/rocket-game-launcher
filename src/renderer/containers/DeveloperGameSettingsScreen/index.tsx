@@ -77,8 +77,17 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   }, [gameSettingsConfig]);
 
   useEffect(() => {
-    ipcRenderer.on(AppChannel.DEV_WINDOW_CLOSED, (event, isByCloseWindowBtnClick: boolean) => {
-      if (isByCloseWindowBtnClick) {
+    ipcRenderer.on(AppChannel.CHANGE_DEV_WINDOW_STATE, (
+      event,
+      isOpen: boolean,
+      isByCloseWindowBtnClick: boolean,
+    ) => {
+      if (
+        isOpen !== undefined
+        && isByCloseWindowBtnClick !== undefined
+        && !isOpen
+        && isByCloseWindowBtnClick
+      ) {
         resetConfigChanges();
       }
     });
@@ -88,7 +97,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
       setIsSettingsInitialized(true);
     }
 
-    return (): void => { ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED); };
+    return (): void => { ipcRenderer.removeAllListeners(AppChannel.CHANGE_DEV_WINDOW_STATE); };
   }, [isSettingsInitialized, isGameSettingsConfigProcessing, resetConfigChanges]);
 
   const changeCurrentConfig = useCallback((value, fieldName: string, parent?: string) => {
@@ -120,7 +129,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
 
   const onCancelBtnClick = useCallback(() => {
     resetConfigChanges();
-    ipcRenderer.send(AppChannel.CLOSE_DEV_WINDOW);
+    ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false);
   }, [resetConfigChanges]);
 
   const onResetBtnClick = useCallback(() => {

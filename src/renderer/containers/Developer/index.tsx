@@ -26,8 +26,8 @@ export const Developer: React.FC = () => {
   const gameName = useDeveloperSelector((state) => state.developer.launcherConfig.gameName);
   /* eslint-enable max-len */
 
-  const onCloseWindowBtnClick = useCallback(() => {
-    ipcRenderer.send(AppChannel.CLOSE_DEV_WINDOW, true);
+  const closeDevWindow = useCallback(() => {
+    ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false, true);
   }, []);
 
   /* eslint-disable react/jsx-props-no-spreading */
@@ -36,7 +36,7 @@ export const Developer: React.FC = () => {
       <Header
         isResizable
         gameName={gameName}
-        onClose={onCloseWindowBtnClick}
+        onClose={closeDevWindow}
         isCloseBtnDisabled={isFirstLaunch}
       />
       <main className={classNames('main', styles['developer-screen__main'])}>

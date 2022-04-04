@@ -36,7 +36,6 @@ import {
 import { ArgumentsBlock } from '$components/ArgumentsBlock';
 import {
   checkObjectForEqual,
-  getIsWindowSettingEqual,
   IValidationData,
   validateNumberInputs,
 } from '$utils/check';
@@ -81,8 +80,17 @@ export const DeveloperConfigScreen: React.FC = () => {
   }, [launcherConfig, setValidationErrors]);
 
   useEffect(() => {
-    ipcRenderer.on(AppChannel.DEV_WINDOW_CLOSED, (event, isByCloseWindowBtnClick: boolean) => {
-      if (isByCloseWindowBtnClick) {
+    ipcRenderer.on(AppChannel.CHANGE_DEV_WINDOW_STATE, (
+      event,
+      isOpen: boolean,
+      isByCloseWindowBtnClick: boolean,
+    ) => {
+      if (
+        isOpen !== undefined
+        && isByCloseWindowBtnClick !== undefined
+        && !isOpen
+        && isByCloseWindowBtnClick
+      ) {
         resetConfigChanges();
       }
     });
@@ -92,7 +100,7 @@ export const DeveloperConfigScreen: React.FC = () => {
       setIsSettingsInitialized(true);
     }
 
-    return (): void => { ipcRenderer.removeAllListeners(AppChannel.DEV_WINDOW_CLOSED); };
+    return (): void => { ipcRenderer.removeAllListeners(AppChannel.CHANGE_DEV_WINDOW_STATE); };
   }, [isSettingsInitialized, isLauncherConfigProcessing, resetConfigChanges]);
 
   const setNewValidationErrors = useCallback((errors: IValidationErrors) => {
@@ -111,7 +119,7 @@ export const DeveloperConfigScreen: React.FC = () => {
 
   const onCancelBtnClick = useCallback(() => {
     resetConfigChanges();
-    ipcRenderer.send(AppChannel.CLOSE_DEV_WINDOW);
+    ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false);
   }, [resetConfigChanges]);
 
   const onUpdateBtnClick = useCallback(() => {

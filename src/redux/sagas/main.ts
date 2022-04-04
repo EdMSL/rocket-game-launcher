@@ -421,7 +421,7 @@ function* locationChangeSaga(
 
       // Здесь должен быть action на setDevWindowOpening, перенесен в storage основного процесса
       // чтобы убрать эффект мигания окна
-      ipcRenderer.send(AppChannel.OPEN_DEV_WINDOW);
+      ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, true);
     }
   }
 

@@ -113,10 +113,17 @@ function* saveLauncherConfigSaga(
 
     const isChangeWindowSize = !getIsWindowSettingEqual(launcherConfig, newConfig);
 
-    yield call(ipcRenderer.send, AppChannel.SAVE_CONFIG, false, newConfig, newPathVariables, isChangeWindowSize);
+    yield call(
+      ipcRenderer.send,
+      AppChannel.SAVE_CONFIG,
+      false,
+      newConfig,
+      newPathVariables,
+      isChangeWindowSize,
+    );
 
     if (isGoToMainScreen) {
-      yield call(ipcRenderer.send, AppChannel.CLOSE_DEV_WINDOW);
+      yield call(ipcRenderer.send, AppChannel.CHANGE_DEV_WINDOW_STATE, false);
     }
   } catch (error: any) {
     let errorMessage = '';
@@ -155,7 +162,7 @@ function* saveGameSettingsConfigSaga(
     yield call(ipcRenderer.send, AppChannel.SAVE_CONFIG, false, newConfig);
 
     if (isGoToMainScreen) {
-      yield call(ipcRenderer.send, AppChannel.CLOSE_DEV_WINDOW);
+      yield call(ipcRenderer.send, AppChannel.CHANGE_DEV_WINDOW_STATE, false);
     }
   } catch (error: any) {
     let errorMessage = '';
