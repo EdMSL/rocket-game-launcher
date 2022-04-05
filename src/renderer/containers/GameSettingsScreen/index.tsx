@@ -55,6 +55,7 @@ export const GameSettingsScreen: React.FC = () => {
   const moProfile = useAppSelector((state) => state.gameSettings.moProfile);
   const moProfiles = useAppSelector((state) => state.gameSettings.moProfiles);
   const isModOrganizerUsed = useAppSelector((state) => state.main.config.modOrganizer.isUsed);
+  const isDeveloperMode = useAppSelector((state) => state.main.isDeveloperMode);
 
   const dispatch = useDispatch();
 
@@ -68,7 +69,9 @@ export const GameSettingsScreen: React.FC = () => {
       event,
       isGameSettingsConfigProcessing: boolean,
     ) => {
-      dispatch(setIsGameSettingsLoading(isGameSettingsConfigProcessing));
+      if (isGameSettingsConfigProcessing !== undefined) {
+        dispatch(setIsGameSettingsLoading(isGameSettingsConfigProcessing));
+      }
     });
 
     return (): void => {
@@ -215,6 +218,7 @@ export const GameSettingsScreen: React.FC = () => {
             isGameOptionsChanged={getIsSaveResetSettingsButtonsDisabled()}
             isBackuping={isGameSettingsFilesBackuping}
             isSaving={isGameSettingsSaving}
+            isDeveloperMode={isDeveloperMode}
             onRefreshSettingsBtnClick={onRefreshSettingsBtnClick}
             onCancelSettingsBtnClick={onCancelSettingsBtnClick}
             onCreateBackupBtnClick={onCreateBackupBtnClick}

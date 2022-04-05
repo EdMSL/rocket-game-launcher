@@ -8,6 +8,7 @@ interface IProps {
   isGameOptionsChanged: boolean,
   isBackuping: boolean,
   isSaving: boolean,
+  isDeveloperMode: boolean,
   onRefreshSettingsBtnClick: () => void,
   onCancelSettingsBtnClick: () => void,
   onCreateBackupBtnClick: () => void,
@@ -18,6 +19,7 @@ export const GameSettingsFormControls: React.FunctionComponent<IProps> = ({
   isGameOptionsChanged,
   isBackuping,
   isSaving,
+  isDeveloperMode,
   onRefreshSettingsBtnClick,
   onCancelSettingsBtnClick,
   onCreateBackupBtnClick,
@@ -40,7 +42,7 @@ export const GameSettingsFormControls: React.FunctionComponent<IProps> = ({
     </Button>
     <Button
       className={classNames('main-btn', styles['game-settings-form__btn'])}
-      isDisabled={isBackuping || isSaving}
+      isDisabled={isBackuping || isSaving || isDeveloperMode}
       onClick={onRefreshSettingsBtnClick}
     >
       Обновить

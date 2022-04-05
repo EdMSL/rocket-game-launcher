@@ -64,7 +64,9 @@ export const MainScreen: React.FC = () => {
       event: Electron.Event,
       isLauncherConfigProcessing: boolean,
     ) => {
-      dispatch(setIsConfigLoading(isLauncherConfigProcessing));
+      if (isLauncherConfigProcessing !== undefined) {
+        dispatch(setIsConfigLoading(isLauncherConfigProcessing));
+      }
     });
 
     return (): void => {

@@ -19,6 +19,7 @@ import { IPathVariables } from '$constants/paths';
 import { changeWindowSize } from '$utils/process';
 import { IAppState } from '$store/store';
 import {
+  setIsGameSettingsLoaded,
   setIsLauncherConfigChanged, setLauncherConfig, setPathVariables,
 } from '$actions/main';
 import { IGameSettingsConfig } from '$types/gameSettings';
@@ -99,11 +100,17 @@ export const createMainWindow = (
     newConfig: ILauncherConfig|IGameSettingsConfig,
     pathVariables: IPathVariables,
     isChangeWindowSize: boolean,
+    isUpdateGameSettingsOptions = true,
   ) => {
     if (newConfig !== undefined) {
       if ('baseFilesEncoding' in newConfig) {
         appStore.dispatch(setGameSettingsConfig(newConfig));
-        appStore.dispatch(setIsLauncherConfigChanged(true));
+
+        if (isUpdateGameSettingsOptions) {
+          appStore.dispatch(setIsLauncherConfigChanged(true));
+        } else {
+          appStore.dispatch(setIsGameSettingsLoaded(true));
+        }
       } else if ('playButton' in newConfig) {
         if (isChangeWindowSize !== undefined && isChangeWindowSize) {
           changeWindowSize(mainWindow, newConfig);

@@ -58,6 +58,7 @@ export function* initGameSettingsDeveloperSaga(): SagaIterator {
 
     yield put(setGameSettingsConfig(settingsConfig));
     yield put(setIsGameSettingsConfigLoaded(true));
+    yield call(ipcRenderer.send, AppChannel.SAVE_CONFIG, undefined, settingsConfig, undefined, undefined, false);
   } catch (error: any) {
     let errorMessage = '';
 

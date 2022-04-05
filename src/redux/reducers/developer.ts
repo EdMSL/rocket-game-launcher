@@ -6,21 +6,7 @@ import { defaultGameSettingsConfig, defaultLauncherConfig } from '$constants/def
 import { DefaultPathVariable } from '$constants/paths';
 
 export const INITIAL_STATE: IDeveloperRootState = {
-  launcherConfig: {
-    isResizable: defaultLauncherConfig.isResizable,
-    minWidth: defaultLauncherConfig.minWidth,
-    minHeight: defaultLauncherConfig.minHeight,
-    maxWidth: defaultLauncherConfig.maxWidth,
-    maxHeight: defaultLauncherConfig.maxHeight,
-    width: defaultLauncherConfig.width,
-    height: defaultLauncherConfig.height,
-    isFirstLaunch: defaultLauncherConfig.isFirstLaunch,
-    modOrganizer: defaultLauncherConfig.modOrganizer,
-    documentsPath: defaultLauncherConfig.documentsPath,
-    gameName: defaultLauncherConfig.gameName,
-    playButton: defaultLauncherConfig.playButton,
-    customButtons: defaultLauncherConfig.customButtons,
-  },
+  launcherConfig: defaultLauncherConfig,
   gameSettingsConfig: defaultGameSettingsConfig,
   isLauncherConfigProcessing: false,
   isGameSettingsConfigProcessing: false,

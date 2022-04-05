@@ -428,14 +428,13 @@ function* locationChangeSaga(
   if (GAME_SETTINGS_PATH_REGEXP.test(location.pathname)) {
     const {
       main: {
-        isDeveloperMode,
         isLauncherConfigChanged,
       },
     }: ReturnType<typeof getState> = yield select(getState);
 
     if (isLauncherInitialised) {
       if (
-        (!isDeveloperMode && !isGameSettingsLoaded && location.state?.isFromMainPage)
+        (!isGameSettingsLoaded && location.state?.isFromMainPage)
         || isLauncherConfigChanged
       ) {
         yield call(initGameSettingsSaga, false);
@@ -451,7 +450,7 @@ function* locationChangeSaga(
             yield put(push(`${Routes.GAME_SETTINGS_SCREEN}/${gameSettingsGroups[0].name}`));
           }
         }
-      } else if (isDeveloperMode && isGameSettingsLoaded && location.state?.isFromMainPage) {
+      } else if (isGameSettingsLoaded && location.state?.isFromMainPage) {
         const {
           gameSettings: {
             gameSettingsFiles,

@@ -114,6 +114,7 @@ export const AppChannel = {
   CLOSE_APP: 'close app',
   GET_PATH_BY_PATH_SELECTOR: 'get path from native window',
   GET_APP_STATE: 'get app state',
+  APP_STORE_UPDATED: 'app store updated',
   CHANGE_DEV_WINDOW_STATE: 'change dev window state',
 };
 
