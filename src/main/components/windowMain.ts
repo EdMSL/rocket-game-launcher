@@ -9,7 +9,7 @@ import windowStateKeeper from 'electron-window-state';
 import { Store } from 'redux';
 
 import { createWaitForWebpackDevServer } from './waitDevServer';
-import { defaultLauncherWindowSettings } from '$constants/defaultParameters';
+import { defaultLauncherWindowSettings } from '$constants/defaultData';
 import { ILauncherConfig } from '$types/main';
 import { getDisplaysInfo } from '$utils/data';
 import {

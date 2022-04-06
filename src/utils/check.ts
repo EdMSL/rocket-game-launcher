@@ -22,7 +22,7 @@ import {
 } from '$utils/log';
 import {
   defaultLauncherConfig, defaultLauncherWindowSettings, MinWindowSize,
-} from '$constants/defaultParameters';
+} from '$constants/defaultData';
 import { CustomError, ErrorName } from './errors';
 import { getRandomId } from './strings';
 import { ILauncherConfig, IWindowSettings } from '$types/main';

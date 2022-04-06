@@ -20,7 +20,7 @@ import {
   PathVariableName,
   AppChannel,
 } from '$constants/misc';
-import { MinWindowSize } from '$constants/defaultParameters';
+import { MinWindowSize } from '$constants/defaultData';
 import { Button } from '$components/UI/Button';
 import { CustomBtnItem } from '$components/CustomBtnItem';
 import {

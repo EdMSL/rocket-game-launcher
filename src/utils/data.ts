@@ -44,7 +44,7 @@ import {
   ILauncherCustomButton,
   IModOrganizerParams,
 } from '$types/main';
-import { defaultModOrganizerParams } from '$constants/defaultParameters';
+import { defaultModOrganizerParams } from '$constants/defaultData';
 import { getReadWriteError } from './errors';
 import {
   IUserMessage,

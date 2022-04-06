@@ -6,7 +6,7 @@ import {
 import windowStateKeeper from 'electron-window-state';
 
 import { createWaitForWebpackDevServer } from './waitDevServer';
-import { defaultDevWindowResolution } from '$constants/defaultParameters';
+import { defaultDevWindowResolution } from '$constants/defaultData';
 import {
   AppChannel, AppWindowName, AppWindowStateAction,
 } from '$constants/misc';

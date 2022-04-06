@@ -3,7 +3,7 @@ import classNames from 'classnames';
 
 import { IUIElementProps } from '$types/common';
 import { HintItem } from '$components/HintItem';
-import { TEXT_INPUT_MAX_LENGTH } from '$constants/defaultParameters';
+import { TEXT_INPUT_MAX_LENGTH } from '$constants/defaultData';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {
   value: string,

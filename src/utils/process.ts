@@ -10,7 +10,7 @@ import { GAME_DIR } from '$constants/paths';
 import { ErrorCode, ErrorMessage } from '$utils/errors';
 import { getApplicationArgs } from './data';
 import { ILauncherConfig } from '$types/main';
-import { MinWindowSize } from '$constants/defaultParameters';
+import { MinWindowSize } from '$constants/defaultData';
 
 /**
  * Запустить приложение (.exe).

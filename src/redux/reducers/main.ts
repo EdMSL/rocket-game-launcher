@@ -2,7 +2,7 @@ import { createReducer } from 'reduxsauce';
 
 import { MAIN_HANDLERS } from '$handlers/main';
 import { IMainRootState } from '$types/main';
-import { defaultLauncherConfig } from '$constants/defaultParameters';
+import { defaultLauncherConfig } from '$constants/defaultData';
 import { DefaultPathVariable } from '$constants/paths';
 
 export const INITIAL_STATE: IMainRootState = {

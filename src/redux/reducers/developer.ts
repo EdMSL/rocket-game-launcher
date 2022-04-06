@@ -2,7 +2,7 @@ import { createReducer } from 'reduxsauce';
 
 import { DEVELOPER_HANDLERS } from '$handlers/developer';
 import { IDeveloperRootState } from '$types/developer';
-import { defaultGameSettingsConfig, defaultLauncherConfig } from '$constants/defaultParameters';
+import { defaultGameSettingsConfig, defaultLauncherConfig } from '$constants/defaultData';
 import { DefaultPathVariable } from '$constants/paths';
 
 export const INITIAL_STATE: IDeveloperRootState = {

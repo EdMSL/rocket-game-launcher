@@ -9,7 +9,7 @@ import { IUserSettingsRootState } from '$types/userSettings';
 import {
   defaultGameSettingsConfig,
   defaultLauncherConfig,
-} from '$constants/defaultParameters';
+} from '$constants/defaultData';
 import {
   LogMessageType,
   writeToLogFile,
