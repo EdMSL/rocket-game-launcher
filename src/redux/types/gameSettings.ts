@@ -12,10 +12,14 @@ export const GAME_SETTINGS_TYPES = {
   SET_MO_PROFILES: 'SET_MO_PROFILES',
 };
 
+export type IGameSettingsOptionType = 'default'|'combined'|'related'|'group';
+
 export interface IGameSettingsOptionsItem {
+  name: string,
   default: string,
   value: string,
-  parent: string,
+  parameter: string,
+  file: string,
 }
 
 export interface IGameSettingsOptions {
@@ -43,22 +47,53 @@ export interface IGameSettingsItemParameter {
 
 export interface IGameSettingsParameter {
   id: string,
-  optionType: string,
   file: string,
-  name?: string,
-  controllerType?: IGameSettingsControllerType,
-  iniGroup?: string,
-  settingGroup?: string,
-  valueName?: string,
-  valuePath?: string,
+  optionType: string,
+  controllerType: IGameSettingsControllerType,
   label: string,
   description: string,
+  name?: string,
+  settingGroup?: string,
+  iniGroup?: string,
+  items?: IGameSettingsItemParameter[],
+  separator?: string,
+  valueName?: string,
+  valuePath?: string,
   min?: number,
   max?: number,
   step?: number,
   options?: { [key: string]: string, },
-  separator?: string,
-  items?: IGameSettingsItemParameter[],
+}
+
+export interface IGameSettingsParameter1 {
+  id: string,
+  file: string,
+  optionType: IGameSettingsOptionType,
+  controllerType: IGameSettingsControllerType,
+  label: string,
+  description: string,
+  settingGroup?: string,
+}
+
+export interface IGameSettingsParameterDefault extends IGameSettingsParameter {
+  optionType: 'default',
+  name: string,
+}
+
+export interface IGameSettingsParameterGroup extends IGameSettingsParameter {
+  optionType: 'group',
+  items: IGameSettingsItemParameter[],
+}
+
+export interface IGameSettingsParameterRelated extends IGameSettingsParameter {
+  optionType: 'related',
+  items: IGameSettingsItemParameter[],
+}
+
+export interface IGameSettingsParameterCombined extends IGameSettingsParameter {
+  optionType: 'combined',
+  items: IGameSettingsItemParameter[],
+  separator: string,
 }
 
 export interface IGameSettingsFile {
@@ -68,10 +103,6 @@ export interface IGameSettingsFile {
   view: string,
   encoding: string,
 }
-
-// export interface IGameSettingsFiles {
-//   [key: string]: IGameSettingsFile,
-// }
 
 export interface IGameSettingsConfig {
   gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],

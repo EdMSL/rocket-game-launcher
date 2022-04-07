@@ -63,16 +63,13 @@ import {
 import {
   changeSectionalIniParameter,
   generateGameSettingsOptions,
-  // filterIncorrectGameSettingsFiles,
-  getGameSettingsOptionsWithDefaultValues,
-  getOptionData,
+  getGameSettingsOptionsWithNewValues,
   isDataFromIniFile,
   setValueForObjectDeepKey,
 } from '$utils/data';
 import {
   PathRegExp,
   Encoding,
-  GameSettingsOptionType,
   GameSettingsFileView,
 } from '$constants/misc';
 import {
@@ -493,7 +490,7 @@ function* changeMOProfileSaga(
 
 /**
  * Сохранить изменения в файлах игровых настроек.
- * @param changedGameSettingsOptions Измененные опции параметров из файлов.
+ * @param changedGameSettingsOptions Измененные опции игровых параметров.
 */
 function* saveGameSettingsFilesSaga(
   { payload: changedGameSettingsOptions }: ReturnType<typeof saveGameSettingsFiles>,
@@ -503,13 +500,18 @@ function* saveGameSettingsFilesSaga(
 
     const {
       gameSettings: {
-        moProfile, gameSettingsFiles, gameSettingsOptions, baseFilesEncoding,
+        moProfile,
+        gameSettingsFiles,
+        baseFilesEncoding,
       },
       main: { pathVariables },
     }: ReturnType<typeof getState> = yield select(getState);
-
-    const changedFilesNames = Object.keys(changedGameSettingsOptions);
-    const changedGameSettingsFiles = gameSettingsFiles.filter((file) => changedFilesNames.includes(file.name));
+    const changedGameSettingsFiles = Array.from(
+      new Set(
+        Object.values(changedGameSettingsOptions)
+          .map((option) => gameSettingsFiles.find((file) => option.file === file.name)!),
+      ),
+    );
 
     const currentFilesData: SagaReturnType<typeof getDataFromGameSettingsFilesSaga> = yield call(
       getDataFromGameSettingsFilesSaga,
@@ -519,31 +521,34 @@ function* saveGameSettingsFilesSaga(
     );
 
     const filesForWrite = changedGameSettingsFiles.map((file) => {
-      const changedGameSettingsOptionsNames = Object.keys(changedGameSettingsOptions[file.name]);
-      const currWriteFileData = currentFilesData[file.name];
-      const currWriteFileView = changedGameSettingsFiles.find((currFile) => file.name === currFile.name)!.view;
+      const changedGameSettingsOptionsId = Object.keys(changedGameSettingsOptions);
+      const currWriteFileContent = currentFilesData[file.name];
+      const currWriteFileView = file.view;
 
-      changedGameSettingsOptionsNames.forEach((optionName) => {
+      changedGameSettingsOptionsId.forEach((optionId) => {
+        const currentOption = changedGameSettingsOptions[optionId];
+
         if (
           currWriteFileView === GameSettingsFileView.SECTIONAL
-          && isDataFromIniFile(currWriteFileView, currWriteFileData)
+          && isDataFromIniFile(currWriteFileView, currWriteFileContent)
         ) {
-          const parameterNameParts = optionName.split('/');
+          const parameterNameParts = currentOption.name.split('/');
+
           changeSectionalIniParameter(
-            currWriteFileData,
+            currWriteFileContent,
             parameterNameParts[0],
             parameterNameParts[1],
-            changedGameSettingsOptions[file.name][optionName].value,
+            currentOption.value,
           );
         } else if (
           currWriteFileView === GameSettingsFileView.LINE
-          && isDataFromIniFile(currWriteFileView, currWriteFileData)
+          && isDataFromIniFile(currWriteFileView, currWriteFileContent)
         ) {
-          currWriteFileData.globals.lines.some((line) => {
-            if (getParameterRegExp(optionName).test(line.text)) {
+          currWriteFileContent.globals.lines.some((line) => {
+            if (getParameterRegExp(currentOption.name).test(line.text)) {
               line.text = line.text.replace(//eslint-disable-line no-param-reassign
-                getStringPartFromIniLineParameterForReplace(line.text, optionName),
-                `set ${optionName} to ${changedGameSettingsOptions[file.name][optionName].value}`,
+                getStringPartFromIniLineParameterForReplace(line.text, currentOption.name),
+                `set ${currentOption.name} to ${changedGameSettingsOptions[optionId].value}`,
               );
 
               return true;
@@ -553,60 +558,38 @@ function* saveGameSettingsFilesSaga(
           });
         } else if (
           currWriteFileView === GameSettingsFileView.TAG
-          && !isDataFromIniFile(currWriteFileView, currWriteFileData)
+          && !isDataFromIniFile(currWriteFileView, currWriteFileContent)
         ) {
-          const pathArr = [...optionName.split('/')];
+          const pathArr = [...currentOption.name.split('/')];
 
           if (pathArr[pathArr.length - 1] !== '#text') {
             pathArr[pathArr.length - 1] = `${xmlAttributePrefix}${pathArr[pathArr.length - 1]}`;
           }
 
           setValueForObjectDeepKey(
-            currWriteFileData,
+            currWriteFileContent,
             pathArr,
-            changedGameSettingsOptions[file.name][optionName].value,
+            changedGameSettingsOptions[optionId].value,
           );
         }
       });
 
-      return { [file.name]: currWriteFileData };
+      return { fileContent: currWriteFileContent, fileData: file };
     });
 
     yield all(
-      filesForWrite.map((file) => {
-        const fileName = Object.keys(file)[0];
-
-        return call(
-          writeGameSettingsFile,
-          getPathToFile(changedGameSettingsFiles[fileName].path, pathVariables, moProfile),
-          file[fileName],
-          changedGameSettingsFiles[fileName].view,
-          changedGameSettingsFiles[fileName].encoding || baseFilesEncoding,
-        );
-      }),
+      filesForWrite.map((file) => call(
+        writeGameSettingsFile,
+        getPathToFile(file.fileData.path, pathVariables, moProfile),
+        file.fileContent,
+        file.fileData.view,
+        file.fileData.encoding || baseFilesEncoding,
+      )),
     );
 
-    const newChangedGameoptions = changedFilesNames.reduce<IGameSettingsOptions>(
-      (totalOptions, fileName) => {
-        const fileOtions = {
-          ...gameSettingsOptions[fileName],
-          ...getGameSettingsOptionsWithDefaultValues(changedGameSettingsOptions, false)[fileName],
-        };
-
-        return {
-          ...totalOptions,
-          [fileName]: fileOtions,
-        };
-      },
-      {},
-    );
-
-    const newGameOptions = {
-      ...gameSettingsOptions,
-      ...newChangedGameoptions,
-    };
-
-    yield put(setGameSettingsOptions(newGameOptions));
+    yield put(setGameSettingsOptions(
+      getGameSettingsOptionsWithNewValues(changedGameSettingsOptions),
+    ));
     yield put(addMessages([CreateUserMessage.success('Настройки успешно сохранены.')]));
   } catch (error: any) {
     let errorMessage = '';
