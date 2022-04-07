@@ -14,7 +14,7 @@ import { useAppSelector } from '$store/store';
 import {
   generateSelectOptions,
   getChangedGameSettingsOptions,
-  getGameSettingsOptionsWithDefaultValues,
+  getGameSettingsOptionsWithNewValues,
 } from '$utils/data';
 import { GameSettingsContent } from '$components/GameSettingsContent';
 import { Select } from '$components/UI/Select';
@@ -104,7 +104,7 @@ export const GameSettingsScreen: React.FC = () => {
   }, [dispatch]);
 
   const onCancelSettingsBtnClick = useCallback(() => {
-    dispatch(setGameSettingsOptions(getGameSettingsOptionsWithDefaultValues(gameSettingsOptions)));
+    dispatch(setGameSettingsOptions(getGameSettingsOptionsWithNewValues(gameSettingsOptions, false)));
     setIsGameOptionsChanged(false);
   }, [dispatch, gameSettingsOptions]);
 

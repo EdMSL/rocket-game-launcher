@@ -2,69 +2,69 @@ export const appProcess = 'app';
 export const developerProcess = 'developer';
 export const userThemeStyleFile = 'styles.css';
 
-export const Scope = {
-  MAIN: 'main',
-  RENDERER: 'renderer',
-};
+export enum Scope {
+  MAIN = 'main',
+  RENDERER = 'renderer',
+}
 
-export const AppWindowName = {
-  MAIN: 'Main Window',
-  DEV: 'Developer Window',
-};
+export enum AppWindowName {
+  MAIN = 'Main Window',
+  DEV = 'Developer Window',
+}
 
-export const AppWindowStateAction = {
-  MINIMIZE_WINDOW: 'minimize',
-  MAXIMIZE_WINDOW: 'maximize',
-  UNMAXIMIZE_WINDOW: 'unmaximize',
-};
+export enum AppWindowStateAction {
+  MINIMIZE_WINDOW = 'minimize',
+  MAXIMIZE_WINDOW = 'maximize',
+  UNMAXIMIZE_WINDOW = 'unmaximize',
+}
 
-export const Encoding = {
-  UTF8: 'utf-8',
-  WIN1251: 'win1251',
-  CP866: 'cp866',
-};
+export enum Encoding {
+  UTF8 = 'utf-8',
+  WIN1251 = 'win1251',
+  CP866 = 'cp866',
+}
 
-export const GameSettingsFileView = {
-  SECTIONAL: 'sectional',
-  LINE: 'line',
-  TAG: 'tag',
-};
+export enum GameSettingsFileView {
+  SECTIONAL = 'sectional',
+  LINE = 'line',
+  TAG = 'tag',
+}
 
-export const GameSettingParameterControllerType = {
-  CHECKBOX: 'checkbox',
-  RANGE: 'range',
-  SELECT: 'select',
-  SWITCHER: 'switcher',
-};
+export enum GameSettingControllerType {
+  CHECKBOX = 'checkbox',
+  RANGE = 'range',
+  SELECT = 'select',
+  SWITCHER = 'switcher',
+}
 
-export const HTMLInputType = {
-  CHECKBOX: 'checkbox',
-  RANGE: 'range',
-  SELECT: 'select-one',
-  SWITCHER: 'checkbox',
-};
+export enum HTMLInputType {
+  CHECKBOX = 'checkbox',
+  RANGE = 'range',
+  SELECT = 'select-one',
+  SWITCHER = 'checkbox',
+}
 
-export const GameSettingsOptionType = {
-  DEFAULT: 'default',
-  GROUP: 'group',
-  RELATED: 'related',
-  COMBINED: 'combined',
-};
+export enum GameSettingsOptionType {
+  DEFAULT = 'default',
+  GROUP = 'group',
+  RELATED = 'related',
+  COMBINED = 'combined',
+}
 
-export const RangeButtonName = {
-  DECREASE: 'decrease',
-  INCREASE: 'increase',
-};
+export enum RangeButtonName {
+  DECREASE = 'decrease',
+  INCREASE = 'increase',
+}
 
-export const PathVariableName = {
-  GAME_DIR: '%GAME_DIR%',
-  DOCUMENTS: '%DOCUMENTS%',
-  DOCS_GAME: '%DOCS_GAME%',
-  MO_DIR: '%MO_DIR%',
-  MO_INI: '%MO_INI%',
-  MO_MODS: '%MO_MODS%',
-  MO_PROFILE: '%MO_PROFILE%',
-};
+export enum PathVariableName {
+  GAME_DIR = '%GAME_DIR%',
+  DOCUMENTS = '%DOCUMENTS%',
+  DOCS_GAME = '%DOCS_GAME%',
+  MO_DIR = '%MO_DIR%',
+  MO_INI = '%MO_INI%',
+  MO_MODS = '%MO_MODS%',
+  MO_PROFILE = '%MO_PROFILE%',
+}
 
 export const gameSettingsFileAvailableVariables = [
   PathVariableName.GAME_DIR,
@@ -98,27 +98,27 @@ export const PathRegExp = {
   CORRECT_PATH_WITH_VARIABLE_TO_FOLDER: /^%[A-Z_]+%(\\(?:[a-zA-Z0-9]+\\)*([a-zA-Z0-9]+)\\?(?!\.[a-zA-Z0-9]{3}))?/,
 };
 
-export const LauncherButtonAction = {
-  RUN: 'run',
-  OPEN: 'open',
-};
+export enum LauncherButtonAction {
+  RUN = 'run',
+  OPEN = 'open',
+}
 
 export const FileExtension = {
   EXECUTABLE: ['exe', 'lnk'],
   INI: ['ini'],
 };
 
-export const AppChannel = {
-  CHANGE_WINDOW_SIZE_STATE: 'change window state',
-  SAVE_CONFIG: 'save config',
-  CLOSE_APP: 'close app',
-  GET_PATH_BY_PATH_SELECTOR: 'get path from native window',
-  GET_APP_STATE: 'get app state',
-  APP_STORE_UPDATED: 'app store updated',
-  CHANGE_DEV_WINDOW_STATE: 'change dev window state',
-};
+export enum AppChannel {
+  CHANGE_WINDOW_SIZE_STATE = 'change window state',
+  SAVE_CONFIG = 'save config',
+  CLOSE_APP = 'close app',
+  GET_PATH_BY_PATH_SELECTOR = 'get path from native window',
+  GET_APP_STATE = 'get app state',
+  APP_STORE_UPDATED = 'app store updated',
+  CHANGE_DEV_WINDOW_STATE = 'change dev window state',
+}
 
-export interface IWindowField {
+interface IWindowField {
   id: string,
   label: string,
   description: string,

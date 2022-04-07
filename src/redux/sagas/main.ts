@@ -61,7 +61,7 @@ import { getPathToFile } from '$utils/strings';
 import { ILocationState, IUnwrap } from '$types/common';
 import { setGameSettingsConfig, setGameSettingsOptions } from '$actions/gameSettings';
 import {
-  deepClone, getGameSettingsOptionsWithDefaultValues, updatePathVariables,
+  deepClone, getGameSettingsOptionsWithNewValues, updatePathVariables,
 } from '$utils/data';
 import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
 import { writeJSONFile } from '$utils/files';
@@ -472,7 +472,7 @@ function* locationChangeSaga(
           gameSettings: { gameSettingsOptions },
         }: ReturnType<typeof getState> = yield select(getState);
 
-        yield put(setGameSettingsOptions(getGameSettingsOptionsWithDefaultValues(gameSettingsOptions)));
+        yield put(setGameSettingsOptions(getGameSettingsOptionsWithNewValues(gameSettingsOptions, false)));
       }
     } else if (!isLauncherInitialised) {
       yield put(push(`${Routes.MAIN_SCREEN}`));

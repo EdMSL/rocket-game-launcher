@@ -377,15 +377,15 @@ export const readFileForGameSettingsOptions = async (
   file: IGameSettingsFile,
   pathVariables: IPathVariables,
   moProfile: string,
-  defaultEncoding: string,
+  defaultEncoding: Encoding,
   isWithPrefix: boolean,
 ): Promise<{ [key: string]: IIniObj|IXmlObj, }> => {
   let fileData: IIniObj|IXmlObj = {};
 
   if (file.view === GameSettingsFileView.LINE || file.view === GameSettingsFileView.SECTIONAL) {
-    fileData = await readINIFile(getPathToFile(file.path, pathVariables, moProfile), file.encoding || defaultEncoding);
+    fileData = await readINIFile(getPathToFile(file.path, pathVariables, moProfile), file.encoding as Encoding || defaultEncoding);
   } else if (file.view === GameSettingsFileView.TAG) {
-    fileData = await readXMLFile(getPathToFile(file.path, pathVariables, moProfile), isWithPrefix, file.encoding || defaultEncoding);
+    fileData = await readXMLFile(getPathToFile(file.path, pathVariables, moProfile), isWithPrefix, file.encoding as Encoding || defaultEncoding);
   }
 
   return {

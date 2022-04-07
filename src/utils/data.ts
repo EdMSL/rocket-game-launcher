@@ -32,7 +32,6 @@ import {
   IGameSettingsFile,
   IGameSettingsGroup,
 } from '$types/gameSettings';
-import { ISelectOption } from '$components/UI/Select';
 import {
   DefaultPathVariable,
   GAME_DIR,
@@ -48,7 +47,7 @@ import { defaultModOrganizerParams } from '$constants/defaultData';
 import { getReadWriteError } from './errors';
 import {
   IUserMessage,
-  IGetDataFromFilesResult, IIniObj, IValidationErrors, IXmlObj,
+  IGetDataFromFilesResult, IIniObj, IValidationErrors, IXmlObj, ISelectOption,
 } from '$types/common';
 
 const ONE_GB = 1073741824;
@@ -321,7 +320,7 @@ export const generateGameSettingsOptions = (
 ): { data: IGameSettingsOptions, errors: IUserMessage[], } => {
   let errors: IUserMessage[] = [];
 
-  const data: IGameSettingsOptions = gameSettingsParameters.reduce(
+  const data = gameSettingsParameters.reduce<IGameSettingsOptions>(
     (gameSettingsOptions, currentParameter, index) => {
       const incorrectIndexes: number[] = [];
       const currentGameSettingsFile: IGameSettingsFile = gameSettingsFiles.find((file) => file.name === currentParameter.file)!;
@@ -358,7 +357,8 @@ export const generateGameSettingsOptions = (
                 default: optionValue,
                 value: optionValue,
                 name: optionName,
-                parent: currentParameter.id,
+                parameter: currentParameter.id,
+                file: currentParameter.file,
               },
             };
           },
@@ -399,7 +399,8 @@ export const generateGameSettingsOptions = (
           default: optionValue,
           name: optionName,
           value: optionValue,
-          parent: currentParameter.id,
+          parameter: currentParameter.id,
+          file: currentParameter.file,
         },
       };
     },
@@ -417,7 +418,6 @@ export const generateGameSettingsOptions = (
 */
 export const generateSelectOptions = (
   obj: { [key: string]: string, } | string[],
-  isKeyLabel = false,
 ): ISelectOption[] => {
   if (Array.isArray(obj)) {
     return obj.map((key) => ({
@@ -427,8 +427,8 @@ export const generateSelectOptions = (
   }
 
   return Object.keys(obj).map((key) => ({
-    label: isKeyLabel ? key : obj[key],
-    value: isKeyLabel ? obj[key] : key,
+    label: key,
+    value: obj[key],
   }));
 };
 
@@ -449,42 +449,6 @@ export const getGameSettingsFilesNames = (
 export const getGameSettingsGroupsNames = (
   gameSettingsGroups: IGameSettingsGroup[],
 ): string[] => gameSettingsGroups.map((group) => group.name);
-
-/**
- * Фильтрует файлы с ошибками в параметрах.
- * @param gameSettingsFiles Игровые файлы.
- * @param incorrectGameSettingsFiles Объект с массивами некорректных параметров файлов.
- * @returns Объект `gameSettingsFiles`, содержащий только корректные значения.
-*/
-// export const filterIncorrectGameSettingsFiles = (
-//   gameSettingsFiles: IGameSettingsFiles,
-//   incorrectGameSettingsFiles: IIncorrectGameSettingsFiles,
-// ): IGameSettingsFiles => Object.keys(gameSettingsFiles)
-//   .reduce<IGameSettingsFiles>((newGameSettingsFiles, gameSettingsFileName) => {
-//     const currentFile = gameSettingsFiles[gameSettingsFileName];
-//     const currentFileIncorrectIndexes = incorrectGameSettingsFiles[gameSettingsFileName];
-
-//     if (Object.keys(incorrectGameSettingsFiles).includes(gameSettingsFileName)) {
-//       if (currentFile.optionsList.length === currentFileIncorrectIndexes.length) {
-//         return { ...newGameSettingsFiles };
-//       }
-
-//       return {
-//         ...newGameSettingsFiles,
-//         [gameSettingsFileName]: {
-//           ...currentFile,
-//           optionsList: [
-//             ...currentFile.optionsList
-//               .filter((parameter, index) => !currentFileIncorrectIndexes.includes(index)),
-//           ],
-//         },
-//       };
-//     }
-//     return {
-//       ...newGameSettingsFiles,
-//       [gameSettingsFileName]: { ...currentFile },
-//     };
-//   }, {});
 
 /**
  * Получает список параметров для вывода в виде опций. Если есть `gameSettingsGroups`,
@@ -558,10 +522,13 @@ export const getChangedGameSettingsOptions = (
 /**
  * Получить опции игровых настроек со стандартными значениями (последними сохраненными).
  * @param gameSettingsOptions Игровые опции из `state`.
+ * @param isForDefaultValue Определяет, прописать опциям новые значения по умолчанию
+ * или заменить текущие значения значениями по умолчанию.
+ * @returns Объект игровых опций с новыми значениями.
 */
-export const getGameSettingsOptionsWithDefaultValues = (
+export const getGameSettingsOptionsWithNewValues = (
   gameSettingsOptions: IGameSettingsOptions,
-  isWithDefaultValue = true,
+  isForDefaultValue = true,
 ): IGameSettingsOptions => {
   const newOptionsObj = { ...gameSettingsOptions };
 
@@ -571,9 +538,9 @@ export const getGameSettingsOptionsWithDefaultValues = (
     Object.keys(obj).forEach((key) => {
       if (typeof obj[key] === 'object') {
         getProp(obj[key]);
-      } else if (obj.value !== obj.default && isWithDefaultValue) {
+      } else if (obj.value !== obj.default && !isForDefaultValue) {
         obj.value = obj.default; //eslint-disable-line no-param-reassign
-      } else if (obj.default !== obj.value && !isWithDefaultValue) {
+      } else if (obj.default !== obj.value && isForDefaultValue) {
         obj.default = obj.value; //eslint-disable-line no-param-reassign
       }
     });
@@ -651,13 +618,21 @@ export const getApplicationArgs = (args: string[]): string[] => args.map((arg) =
  * Получить список пользовательских тем для записи в `state`.
 */
 export const getUserThemes = (themesFolders: string[]): { [key: string]: string, } => {
-  const themesObjects = themesFolders.reduce((themes, theme) => ({
-    ...themes,
-    [theme]: theme,
-  }), {});
+  const themesObjects = themesFolders.reduce((themes, theme) => {
+    if (theme.toLowerCase() === 'default') {
+      writeToLogFile('A theme with the name "default" was found. This theme will be unavailable.');
+
+      return { ...themes };
+    }
+
+    return {
+      ...themes,
+      [theme]: theme,
+    };
+  }, {});
 
   return {
-    '': 'default',
+    default: '',
     ...themesObjects,
   };
 };
@@ -910,16 +885,16 @@ export const clearValidationErrors = (
 /**
  * Сгенерировать новый объект файла игровых настроек.
  * @param label Загловок файла.
- * @param path Путь к файлу.
+ * @param pathToFile Путь к файлу.
  * @returns Объект файла из `state`.
  */
 export const getDefaultGameSettingsFile = (
   label: string,
-  path: string,
+  pathToFile: string,
 ): IGameSettingsFile => ({
   name: getRandomName(),
   label: label.trim().replaceAll(/\s/g, ''),
-  path,
+  path: pathToFile,
   view: GameSettingsFileView.SECTIONAL,
   encoding: '',
 });

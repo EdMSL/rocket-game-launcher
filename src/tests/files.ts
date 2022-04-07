@@ -222,7 +222,7 @@ describe('#Files', () => {
     it('Should return correct object', async () => {
       assert.deepEqual(readJSONFileSync(`${process.cwd()}/folderName/test.json`), { test: "I'am a test string!" });
 
-      const obj = await readINIFile(`${process.cwd()}/folderName/readOnly.ini`, 'utf-8')
+      const obj = await readINIFile(`${process.cwd()}/folderName/readOnly.ini`, 'utf-8' as Encoding)
         .then((data) => data);
 
       assert.hasAllKeys(obj, ['globals', 'lineBreak', 'sections']);
@@ -231,7 +231,7 @@ describe('#Files', () => {
       assert.equal(obj.sections[0].lines[1].key, 'param');
       assert.equal(obj.sections[0].lines[1].value, 'data');
 
-      const obj1 = await readXMLFile(`${process.cwd()}/folderName/readOnly.xml`, false, 'utf-8')
+      const obj1 = await readXMLFile(`${process.cwd()}/folderName/readOnly.xml`, false, 'utf-8' as Encoding)
         .then((data) => data);
 
       assert.hasAllDeepKeys(obj1, ['Content']);
@@ -262,7 +262,7 @@ describe('#Files', () => {
     });
 
     it('Should correct write to INI file', async () => {
-      const obj = await readINIFile(`${process.cwd()}/writeFolder/readOnly.ini`, 'utf-8')
+      const obj = await readINIFile(`${process.cwd()}/writeFolder/readOnly.ini`, 'utf-8' as Encoding)
         .then((data) => data);
       obj.addSection('New');
       await writeINIFile(`${process.cwd()}/writeFolder/test.ini`, obj, Encoding.UTF8);
@@ -270,7 +270,7 @@ describe('#Files', () => {
     });
 
     it('Should correct write to XML file', async () => {
-      const obj = await readXMLFile(`${process.cwd()}/writeFolder/readOnly.xml`, true, 'utf-8')
+      const obj = await readXMLFile(`${process.cwd()}/writeFolder/readOnly.xml`, true, 'utf-8' as Encoding)
         .then((data) => data);
       obj.Content.New = {};
       await writeXMLFile(`${process.cwd()}/writeFolder/test.xml`, obj, Encoding.UTF8);
