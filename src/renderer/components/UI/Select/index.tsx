@@ -25,12 +25,12 @@ export const Select: (React.FunctionComponent<IProps>) = ({
   isCombined,
   value,
   isDisabled = false,
-  optionsArr,
+  options,
   className = '',
   parentClassname = '',
   onChange,
 }) => {
-  const currentOptionsArr = optionsArr.length !== 0 ? optionsArr : defaultOptionsArr;
+  const currentOptionsArr = options.length !== 0 ? options : defaultOptionsArr;
 
   return (
     <div className={classNames(
@@ -62,7 +62,7 @@ export const Select: (React.FunctionComponent<IProps>) = ({
         data-multiparameters={multiparameters}
         onChange={onChange}
         value={value}
-        disabled={isDisabled || optionsArr.length === 0}
+        disabled={isDisabled || options.length === 0}
       >
         {
           currentOptionsArr.map((option) => (

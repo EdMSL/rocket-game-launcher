@@ -120,10 +120,6 @@ export interface IGeneratedGameSettingsParam {
   optionErrors: IUserMessage[],
 }
 
-export const isIGameSettingsItemParameter = (
-  parameter: IGameSettingsParameter | IGameSettingsItemParameter,
-): parameter is IGameSettingsItemParameter => parameter.valuePath !== undefined && parameter.valueName !== undefined;
-
 export const isDataFromIniFile = (
   fileView: string,
   obj: IIniObj|IXmlObj,
@@ -136,8 +132,8 @@ export const isDataFromIniFile = (
 export const getOptionName = (
   parameter: IGameSettingsParameter|IGameSettingsItemParameter,
 ): string => {
-  if (isIGameSettingsItemParameter(parameter)) {
-    return `${parameter.valuePath}/${parameter.name}/${parameter.valueName}`;
+  if (parameter.valueName) {
+    return `${parameter.valuePath ? `${parameter.valuePath}/` : ''}${parameter.name}/${parameter.valueName}`; //eslint-disable-line max-len
   }
 
   if (parameter.iniGroup) {

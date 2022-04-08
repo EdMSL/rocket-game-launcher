@@ -427,7 +427,7 @@ export const DeveloperConfigScreen: React.FC = () => {
             id="version"
             parent="modOrganizer"
             label="Версия MO"
-            optionsArr={[
+            options={[
               { label: 'Mod Organizer', value: '1' },
               { label: 'Mod Organizer 2', value: '2' },
             ]}

@@ -121,7 +121,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
           name="view"
           label="Тип структуры файла"
           description='Определяет, какая структура содержимого у файла. Неправильно выбранная структура приведет к ошибке обработки.' //eslint-disable-line
-          optionsArr={generateSelectOptions(GameSettingsFileView)}
+          options={generateSelectOptions(GameSettingsFileView)}
           value={file.view}
           onChange={onSelectChange}
         />

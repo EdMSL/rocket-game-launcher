@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useState, ReactElement,
+  useCallback, ReactElement,
 } from 'react';
 import { useParams } from 'react-router-dom';
 import classNames from 'classnames';
@@ -7,22 +7,18 @@ import { Scrollbars } from 'react-custom-scrollbars-2';
 
 import styles from './styles.module.scss';
 import {
-  IGameSettingsItemParameter,
   IGameSettingsOptions,
-  IGameSettingsOptionsItem,
   IGameSettingsParameter,
   IGameSettingsRootState,
 } from '$types/gameSettings';
 import {
   generateNewGameSettingsOption,
   generateSelectOptions,
-  getOptionName,
   getOptionNameAndId,
   getParametersForOptionsGenerate,
-  isIGameSettingsItemParameter,
 } from '$utils/data';
 import {
-  GameSettingParameterControllerType,
+  GameSettingControllerType,
   GameSettingsOptionType,
   HTMLInputType,
   RangeButtonName,
@@ -34,7 +30,6 @@ import { HintItem } from '$components/HintItem';
 import { getNumberOfDecimalPlaces, getValueFromRange } from '$utils/strings';
 import { Switcher } from '$components/UI/Switcher';
 import { IMainRootState } from '$types/main';
-import { IGameSettingsControllerType } from '$types/common';
 
 interface IProps {
   isGameSettingsLoaded: IMainRootState['isGameSettingsLoaded'],
@@ -116,15 +111,25 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
     if (target.dataset.multiparameters) {
       newGameOptions = target.dataset.multiparameters
         .split(',')
-        .reduce<IGameSettingsOptions>((options, currentOptionName, index) => ({
-          ...options,
-          [currentOptionName]: generateNewGameSettingsOption(
-            gameSettingsOptions[currentOptionName],
-            target.dataset.iscombined
-              ? value.toString().split(target.dataset.separator!)[index]
-              : value,
-          ),
-        }), {});
+        .reduce<IGameSettingsOptions>((options, currentOptionName, index) => {
+          let newValue: string|number = '';
+
+          if (target.dataset.iscombined) {
+            newValue = value.toString().split(target.dataset.separator!)[index];
+          } else {
+            newValue = currentOptionName === target.id
+              ? value
+              : gameSettingsOptions[currentOptionName].value;
+          }
+
+          return {
+            ...options,
+            [currentOptionName]: generateNewGameSettingsOption(
+              gameSettingsOptions[currentOptionName],
+              newValue,
+            ),
+          };
+        }, {});
     } else {
       newGameOptions = {
         [target.id]: generateNewGameSettingsOption(
@@ -144,16 +149,16 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
     .join(parameter.separator);
 
   const getValue = useCallback((
-    controllerType: IGameSettingsControllerType,
+    controllerType: GameSettingControllerType,
     optionId: string,
   ) => {
     if (
-      controllerType === GameSettingParameterControllerType.CHECKBOX
-      || controllerType === GameSettingParameterControllerType.SWITCHER
-      || controllerType === GameSettingParameterControllerType.RANGE
+      controllerType === GameSettingControllerType.CHECKBOX
+      || controllerType === GameSettingControllerType.SWITCHER
+      || controllerType === GameSettingControllerType.RANGE
     ) {
       return (gameSettingsOptions[optionId] && gameSettingsOptions[optionId].value) || '0';
-    } else if (controllerType === GameSettingParameterControllerType.SELECT) {
+    } else if (controllerType === GameSettingControllerType.SELECT) {
       return (gameSettingsOptions[optionId] && gameSettingsOptions[optionId].value) || 'None';
     }
 
@@ -181,10 +186,10 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
       )}
     >
       {
-        //Так как опция из gameSettingsFile может
-        // иметь разное кол-во параметров из файла,
-        // то вывод опций делаем на основе параметров (gameSettingsFiles[fileName].optionsList),
-        // а не опций (gameSettingsOptions), иначе получаем дубли контроллеров.
+        // Так как опция может состоять из нескольких полей,
+        // она может содержать в себе несколько значений параметров из файла,
+        // поэтому вывод опций делаем на основе параметров (gameSettingsParameters),
+        // а не самих опций (gameSettingsOptions), иначе получаем дубли контроллеров.
         (isGameSettingsLoaded && Object.keys(gameSettingsOptions).length > 0)
         && getParametersForOptionsGenerate(
           gameSettingsParameters,
@@ -210,31 +215,33 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                   </div>
                   <div className={styles['game-settings-content__subblock']}>
                     {
-                          parameter.items!.map((item) => {
-                            optionData = getOptionNameAndId(item);
+                      parameter.items!.map((item) => {
+                        optionData = getOptionNameAndId(item);
+                        const multiparameters = parameter.items!.map((param) => getOptionNameAndId(param).id).join();
 
-                            if (item.controllerType === GameSettingParameterControllerType.SELECT) {
-                              return (
-                                <Select
-                                  key={optionData.id}
-                                  className={classNames(
-                                    styles['game-settings-content__item'],
-                                    styles['game-settings-content__select'],
-                                  )}
-                                  id={optionData.id}
-                                  name={optionData.name}
-                                  parent={parameter.file}
-                                  description={parameter.description}
-                                  value={getValue(parameter.controllerType!, optionData.id)}
-                                  optionsArr={generateSelectOptions(item.options!)}
-                                  onChange={onOptionInputChange}
-                                />
-                              );
-                            }
-
-                            return undefined;
-                          })
+                        if (item.controllerType === GameSettingControllerType.SELECT) {
+                          return (
+                            <Select
+                              key={optionData.id}
+                              className={classNames(
+                                styles['game-settings-content__item'],
+                                styles['game-settings-content__select'],
+                              )}
+                              id={optionData.id}
+                              name={optionData.name}
+                              parent={parameter.file}
+                              description={parameter.description}
+                              multiparameters={multiparameters}
+                              value={getValue(item.controllerType, optionData.id)}
+                              options={generateSelectOptions(item.options!)}
+                              onChange={onOptionInputChange}
+                            />
+                          );
                         }
+
+                        return <React.Fragment />;
+                      })
+                    }
                   </div>
                 </div>
               );
@@ -244,7 +251,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
               optionData = getOptionNameAndId(parameter.items![0]);
               const multiparameters = parameter.items!.map((param) => getOptionNameAndId(param).id).join();
 
-              if (parameter.controllerType === GameSettingParameterControllerType.SELECT) {
+              if (parameter.controllerType === GameSettingControllerType.SELECT) {
                 return (
                   <Select
                     key={optionData.id}
@@ -259,13 +266,13 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     label={parameter.label}
                     description={parameter.description}
                     value={getValue(parameter.controllerType!, optionData.id)}
-                    optionsArr={generateSelectOptions(parameter.options!)}
+                    options={generateSelectOptions(parameter.options!)}
                     onChange={onOptionInputChange}
                   />
                 );
               }
 
-              if (parameter.controllerType === GameSettingParameterControllerType.CHECKBOX) {
+              if (parameter.controllerType === GameSettingControllerType.CHECKBOX) {
                 return (
                   <Checkbox
                     key={optionData.id}
@@ -282,7 +289,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                 );
               }
 
-              if (parameter.controllerType === GameSettingParameterControllerType.SWITCHER) {
+              if (parameter.controllerType === GameSettingControllerType.SWITCHER) {
                 return (
                   <Switcher
                     key={optionData.id}
@@ -300,7 +307,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                 );
               }
 
-              if (parameter.controllerType === GameSettingParameterControllerType.RANGE) {
+              if (parameter.controllerType === GameSettingControllerType.RANGE) {
                 return (
                   <Range
                     key={optionData.id}
@@ -327,7 +334,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
               optionData = getOptionNameAndId(parameter.items![0]);
               const multiparameters = parameter.items!.map((item) => getOptionNameAndId(item).id).join();
 
-              if (parameter.controllerType === GameSettingParameterControllerType.SELECT) {
+              if (parameter.controllerType === GameSettingControllerType.SELECT) {
                 return (
                   <Select
                     key={optionData.id}
@@ -344,7 +351,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     label={parameter.label}
                     description={parameter.description}
                     value={getCombinedValue(parameter)}
-                    optionsArr={generateSelectOptions(parameter.options!)}
+                    options={generateSelectOptions(parameter.options!)}
                     onChange={onOptionInputChange}
                   />
                 );
@@ -352,7 +359,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
             }
 
             if (parameter.optionType === GameSettingsOptionType.DEFAULT) {
-              if (parameter.controllerType === GameSettingParameterControllerType.RANGE) {
+              if (parameter.controllerType === GameSettingControllerType.RANGE) {
                 return (
                   <Range
                     key={optionData.id}
@@ -373,7 +380,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                 );
               }
 
-              if (parameter.controllerType === GameSettingParameterControllerType.CHECKBOX) {
+              if (parameter.controllerType === GameSettingControllerType.CHECKBOX) {
                 return (
                   <Checkbox
                     key={optionData.id}
@@ -390,7 +397,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                 );
               }
 
-              if (parameter.controllerType === GameSettingParameterControllerType.SWITCHER) {
+              if (parameter.controllerType === GameSettingControllerType.SWITCHER) {
                 return (
                   <Switcher
                     key={optionData.id}
@@ -407,7 +414,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                 );
               }
 
-              if (parameter.controllerType === GameSettingParameterControllerType.SELECT) {
+              if (parameter.controllerType === GameSettingControllerType.SELECT) {
                 return (
                   <Select
                     key={optionData.id}
@@ -421,7 +428,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     label={parameter.label}
                     description={parameter.description}
                     value={getValue(parameter.controllerType!, optionData.id)}
-                    optionsArr={generateSelectOptions(parameter.options!)}
+                    options={generateSelectOptions(parameter.options!)}
                     onChange={onOptionInputChange}
                   />
                 );

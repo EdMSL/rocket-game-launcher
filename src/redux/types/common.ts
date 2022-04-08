@@ -37,7 +37,7 @@ export interface IUIControllerCheckbox {
 }
 
 export interface IUIControllerSelect {
-  optionsArr: ISelectOption[],
+  options: ISelectOption[],
 }
 
 export interface IUIElementParams {
@@ -109,5 +109,3 @@ export interface IXmlObj {
 export interface IGetDataFromFilesResult {
   [key: string]: IIniObj|IXmlObj,
 }
-
-export type IGameSettingsControllerType = 'checkbox'|'range'|'select'|'switcher';

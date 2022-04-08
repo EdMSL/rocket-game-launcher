@@ -1,4 +1,6 @@
-import { IGameSettingsControllerType } from './common';
+import {
+  Encoding, GameSettingControllerType, GameSettingsOptionType,
+} from '$constants/misc';
 
 export const GAME_SETTINGS_TYPES = {
   SET_GAME_SETTINGS_OPTIONS: 'SET_GAME_SETTINGS_OPTIONS',
@@ -11,8 +13,6 @@ export const GAME_SETTINGS_TYPES = {
   CHANGE_MO_PROFILE: 'CHANGE_MO_PROFILE',
   SET_MO_PROFILES: 'SET_MO_PROFILES',
 };
-
-export type IGameSettingsOptionType = 'default'|'combined'|'related'|'group';
 
 export interface IGameSettingsOptionsItem {
   name: string,
@@ -34,9 +34,8 @@ export interface IGameSettingsGroup {
 export interface IGameSettingsItemParameter {
   id: string,
   name: string,
-  controllerType?: string,
+  controllerType?: GameSettingControllerType,
   iniGroup?: string,
-  settingGroup?: string,
   valueName?: string,
   valuePath?: string,
   min?: number,
@@ -48,8 +47,8 @@ export interface IGameSettingsItemParameter {
 export interface IGameSettingsParameter {
   id: string,
   file: string,
-  optionType: string,
-  controllerType: IGameSettingsControllerType,
+  optionType: GameSettingsOptionType,
+  controllerType: GameSettingControllerType,
   label: string,
   description: string,
   name?: string,
@@ -63,37 +62,6 @@ export interface IGameSettingsParameter {
   max?: number,
   step?: number,
   options?: { [key: string]: string, },
-}
-
-export interface IGameSettingsParameter1 {
-  id: string,
-  file: string,
-  optionType: IGameSettingsOptionType,
-  controllerType: IGameSettingsControllerType,
-  label: string,
-  description: string,
-  settingGroup?: string,
-}
-
-export interface IGameSettingsParameterDefault extends IGameSettingsParameter {
-  optionType: 'default',
-  name: string,
-}
-
-export interface IGameSettingsParameterGroup extends IGameSettingsParameter {
-  optionType: 'group',
-  items: IGameSettingsItemParameter[],
-}
-
-export interface IGameSettingsParameterRelated extends IGameSettingsParameter {
-  optionType: 'related',
-  items: IGameSettingsItemParameter[],
-}
-
-export interface IGameSettingsParameterCombined extends IGameSettingsParameter {
-  optionType: 'combined',
-  items: IGameSettingsItemParameter[],
-  separator: string,
 }
 
 export interface IGameSettingsFile {
@@ -113,7 +81,7 @@ export interface IGameSettingsConfig {
 
 export type IGameSettingsRootState = Readonly<{
   gameSettingsGroups: IGameSettingsGroup[],
-  baseFilesEncoding: string,
+  baseFilesEncoding: Encoding,
   gameSettingsFiles: IGameSettingsFile[],
   gameSettingsParameters: IGameSettingsParameter[],
   moProfile: string,

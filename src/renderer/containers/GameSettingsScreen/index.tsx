@@ -183,7 +183,7 @@ export const GameSettingsScreen: React.FC = () => {
               id="profiles-select"
               label="Профиль Mod Organizer"
               value={moProfile}
-              optionsArr={generateSelectOptions(moProfiles)}
+              options={generateSelectOptions(moProfiles)}
               onChange={onMOProfilesSelectChange}
             />
           </div>
