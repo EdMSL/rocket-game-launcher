@@ -4,10 +4,9 @@ import React, {
 import classNames from 'classnames';
 import { ipcRenderer } from 'electron';
 
-import { IUIElementParams } from '$types/common';
+import { ISelectOption, IUIElementParams } from '$types/common';
 import { HintItem } from '$components/HintItem';
 import { Button } from '../Button';
-import { ISelectOption } from '../Select';
 import { getVariableAndValueFromPath } from '$utils/data';
 import { IPathVariables } from '$constants/paths';
 import { checkIsPathIsNotOutsideValidFolder, replaceRootDirByPathVariable } from '$utils/strings';
@@ -21,7 +20,6 @@ interface IProps extends IUIElementParams {
   isSelectDisabled?: boolean,
   selectorType?: string,
   isGameDocuments?: boolean,
-  value: string,
   onChange: (
     value: string,
     id: string,

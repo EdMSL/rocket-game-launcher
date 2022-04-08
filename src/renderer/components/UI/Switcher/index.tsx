@@ -1,12 +1,10 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { IUIElementProps } from '$types/common';
+import { IUIControllerCheckbox, IUIElementProps } from '$types/common';
 import { HintItem } from '$components/HintItem';
 
-interface IProps extends IUIElementProps<HTMLInputElement> {
-  isChecked: boolean,
-}
+interface IProps extends IUIElementProps<HTMLInputElement>, IUIControllerCheckbox {}
 
 export const Switcher: React.FunctionComponent<IProps> = ({
   id,

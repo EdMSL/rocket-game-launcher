@@ -21,6 +21,25 @@ export interface IValidationErrors {
   [id: string]: string[],
 }
 
+export interface ISelectOption {
+  label: string,
+  value: string,
+}
+
+export interface IUIControllerRange {
+  min: number,
+  max: number,
+  step: number,
+}
+
+export interface IUIControllerCheckbox {
+  isChecked: boolean,
+}
+
+export interface IUIControllerSelect {
+  optionsArr: ISelectOption[],
+}
+
 export interface IUIElementParams {
   id: string,
   className?: string,

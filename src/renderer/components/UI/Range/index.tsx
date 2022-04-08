@@ -5,15 +5,12 @@ import classNames from 'classnames';
 
 import { HintItem } from '$components/HintItem';
 import { RangeButtonName } from '$constants/misc';
-import { IUIElementProps } from '$types/common';
+import { IUIElementProps, IUIControllerRange } from '$types/common';
 import { getNumberOfDecimalPlaces } from '$utils/strings';
 import { useDebouncedFunction } from '$utils/hooks';
 
-interface IProps extends IUIElementProps<HTMLInputElement> {
+interface IProps extends IUIElementProps<HTMLInputElement>, IUIControllerRange {
   defaultValue: string,
-  min: number,
-  max: number,
-  step: number,
   onChangeBtnClick?: (
     btnName: string,
     id: string,

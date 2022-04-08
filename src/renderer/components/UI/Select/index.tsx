@@ -2,18 +2,11 @@ import React from 'react';
 import classNames from 'classnames';
 
 import { HintItem } from '$components/HintItem';
-import { IUIElementProps } from '$types/common';
+import { IUIControllerSelect, IUIElementProps } from '$types/common';
 
-export interface ISelectOption {
-  label: string,
-  value: string,
-}
-
-interface IProps extends IUIElementProps<HTMLSelectElement> {
+interface IProps extends IUIElementProps<HTMLSelectElement>, IUIControllerSelect {
   isCombined?: boolean,
   separator?: string,
-  value: string,
-  optionsArr: ISelectOption[],
 }
 
 const defaultOptionsArr = [{

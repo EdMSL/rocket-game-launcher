@@ -2,11 +2,9 @@ import React from 'react';
 import classNames from 'classnames';
 
 import { HintItem } from '$components/HintItem';
-import { IUIElementProps } from '$types/common';
+import { IUIControllerCheckbox, IUIElementProps } from '$types/common';
 
-interface IProps extends IUIElementProps<HTMLInputElement> {
-  isChecked: boolean,
-}
+interface IProps extends IUIElementProps<HTMLInputElement>, IUIControllerCheckbox {}
 
 export const Checkbox: React.FunctionComponent<IProps> = ({
   id,
