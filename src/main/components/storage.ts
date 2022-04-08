@@ -31,7 +31,7 @@ import {
   ReadWriteError,
   showMessageBox,
 } from '$utils/errors';
-import { checkLauncherConfigFileData } from '$utils/check';
+import { checkLauncherConfigFileData, checkObjectForEqual } from '$utils/check';
 import { getObjectAsList } from '$utils/strings';
 import {
   createPathVariables,
@@ -211,7 +211,14 @@ export const createStorage = (): Store<IAppState> => {
       return { ...currentParams };
     }, {});
 
-    storage.set(newStorageData);
+    // `storage.set` записывает данные в файл. При каждом изменении `state` происходит запись.
+    // Чтобы избежать этого, обновляем `storage` только при изменении данных.
+    if (!checkObjectForEqual(
+      storage.get('userSettings'),
+      (newStorageData as IStorage).userSettings,
+    )) {
+      storage.set(newStorageData);
+    }
   });
 
   ipcMain.handle(AppChannel.GET_APP_STATE, () => appStore.getState());
