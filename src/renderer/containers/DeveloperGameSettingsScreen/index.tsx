@@ -10,9 +10,11 @@ import styles from './styles.module.scss';
 import { DeveloperScreenController } from '$components/DeveloperScreenController';
 import { IValidationErrors } from '$types/common';
 import { useDeveloperSelector } from '$store/store';
-import { IGameSettingsConfig, IGameSettingsFile } from '$types/gameSettings';
 import {
-  deepClone, getDefaultGameSettingsFile, getNewConfig, getUniqueValidationErrors,
+  IGameSettingsConfig, IGameSettingsFile, IGameSettingsParameter,
+} from '$types/gameSettings';
+import {
+  getDefaultGameSettingsFile, getNewConfig, getUniqueValidationErrors,
 } from '$utils/data';
 import { checkObjectForEqual } from '$utils/check';
 import {
@@ -34,6 +36,8 @@ import { CreateUserMessage } from '$utils/message';
 import {
   addDeveloperMessages, saveGameSettingsConfig, updateConfig,
 } from '$actions/developer';
+import { GameSettingsParameterItem } from '$components/GameSettingsParameterItem';
+import { SpoilerItem } from '$components/SpoilerItem';
 
 export const DeveloperGameSettingsScreen: React.FC = () => {
   /* eslint-disable max-len */
@@ -108,20 +112,16 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   }, [gameSettingsConfig, currentConfig]);
 
   const changeGameSettingsFiles = useCallback((
-    fileName: string,
+    fileId: string,
     fileData: IGameSettingsFile,
   ) => {
-    const newConfig = {
-      ...currentConfig,
-      gameSettingsFiles: {
-        ...currentConfig.gameSettingsFiles,
-        [fileName]: fileData,
-      },
-    };
+    const fileIndex = currentConfig.gameSettingsFiles.findIndex((currFile) => currFile.id === fileId);
+    const newFiles = [...currentConfig.gameSettingsFiles];
 
-    setCurrentConfig(newConfig);
-    setIsConfigChanged(!checkObjectForEqual(gameSettingsConfig, newConfig));
-  }, [currentConfig, gameSettingsConfig]);
+    newFiles[fileIndex] = { ...fileData };
+
+    changeCurrentConfig(newFiles, 'gameSettingsFiles');
+  }, [currentConfig, changeCurrentConfig]);
 
   const onSaveBtnClick = useCallback(() => {
     saveSettingsChanges(false);
@@ -236,16 +236,21 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     changeCurrentConfig,
     getPathFromPathSelector]);
 
-  const deleteGameSettingsFile = useCallback((fileName: string) => {
-    const newGameSettingsFiles = deepClone(currentConfig.gameSettingsFiles);
-    delete newGameSettingsFiles[fileName];
+  const deleteGameSettingsFile = useCallback((items: IGameSettingsFile[]) => {
+    changeCurrentConfig(items, 'gameSettingsFiles');
+  }, [changeCurrentConfig]);
 
-    changeCurrentConfig(newGameSettingsFiles, 'gameSettingsFiles');
-  }, [currentConfig.gameSettingsFiles, changeCurrentConfig]);
+  const deleteGameSettingsParameter = useCallback((params: IGameSettingsParameter[]) => {
+    changeCurrentConfig(params, 'gameSettingsParameters');
+  }, [changeCurrentConfig]);
 
-  const currentGameSettingsFiles: IGameSettingsFile[] = Object
-    .keys(currentConfig.gameSettingsFiles)
-    .map((file) => currentConfig.gameSettingsFiles[file]);
+  const changeGameSettingsParameterOrder = useCallback((params: IGameSettingsParameter[]) => {
+    changeCurrentConfig(params, 'gameSettingsParameters');
+  }, [changeCurrentConfig]);
+
+  const onAddGameSettingsParameter = useCallback(() => {
+
+  }, []);
 
   /* eslint-disable react/jsx-props-no-spreading */
   return (
@@ -349,29 +354,36 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
               />
             </div>
             <div className="developer-screen__block">
-              <p className="developer-screen__block-title">Игровые параметры</p>
+              <p className="developer-screen__block-title">Настройка игровых опций</p>
               <p className="developer-screen__text">Файлы игровых параметров</p>
-              <ul className={styles['developer-screen__files-container']}>
+              <ul className={styles['developer-screen__list']}>
                 {
-                currentGameSettingsFiles.length > 0 && currentGameSettingsFiles.map((file) => (
-                  <GameSettingsFileItem
-                    key={file.name}
-                    file={file}
-                    pathVariables={pathVariables}
+                currentConfig.gameSettingsFiles.length > 0 && currentConfig.gameSettingsFiles.map((file, index) => (
+                  <SpoilerItem<IGameSettingsFile>
+                    key={file.id}
+                    item={file}
+                    items={currentConfig.gameSettingsFiles}
+                    // quantity={currentConfig.gameSettingsParameters.length}
+                    position={index}
+                    summaryText={[{ label: 'Имя файла:', text: file.id }, { label: 'Путь:', text: file.path }]}
                     validationErrors={validationErrors}
-                    onFileDataChange={changeGameSettingsFiles}
-                    onValidation={setNewValidationErrors}
-                    deleteFile={deleteGameSettingsFile}
-                  />
+                    onDeleteItem={deleteGameSettingsFile}
+                  >
+                    <GameSettingsFileItem
+                      file={file}
+                      pathVariables={pathVariables}
+                      validationErrors={validationErrors}
+                      onFileDataChange={changeGameSettingsFiles}
+                      onValidation={setNewValidationErrors}
+                      // deleteFile={deleteGameSettingsFile}
+                    />
+                  </SpoilerItem>
                 ))
-              }
+                }
                 {
-                currentGameSettingsFiles.length === 0 && (
-                <li className={styles['developer-screen__files-container']}>
-                  Нет игровых параметров
-                </li>
-                )
-              }
+                currentConfig.gameSettingsFiles.length === 0
+                && <li> Нет игровых файлов </li>
+                }
               </ul>
               <Button
                 className={classNames(
@@ -383,6 +395,43 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
               >
                 Добавить файл
               </Button>
+              <p className="developer-screen__text">Игровые параметры</p>
+              <Button
+                className={classNames(
+                  'main-btn',
+                  'control-panel__btn',
+                  'developer-screen__btn',
+                )}
+                onClick={onAddGameSettingsParameter}
+              >
+                Добавить параметр
+              </Button>
+              <ul className={styles['developer-screen__list']}>
+                {
+                currentConfig.gameSettingsParameters.length > 0 && currentConfig.gameSettingsParameters.map((param, index) => (
+                  <SpoilerItem<IGameSettingsParameter>
+                    key={param.id}
+                    item={param}
+                    items={currentConfig.gameSettingsParameters}
+                    position={index}
+                    summaryText={[param.label]}
+                    validationErrors={validationErrors}
+                    onDeleteItem={deleteGameSettingsParameter}
+                    onChangeOrderItem={changeGameSettingsParameterOrder}
+                  >
+                    <GameSettingsParameterItem
+                      parameter={param}
+                      validationErrors={validationErrors}
+                      onValidation={setNewValidationErrors}
+                    />
+                  </SpoilerItem>
+                ))
+                }
+                {
+                currentConfig.gameSettingsParameters.length === 0
+                && <li> Нет игровых параметров</li>
+                }
+              </ul>
             </div>
           </React.Fragment>
           )

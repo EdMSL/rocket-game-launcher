@@ -21,7 +21,7 @@ interface IProps {
   validationErrors: IValidationErrors,
   onFileDataChange: (fileName: string, fileData: IGameSettingsFile) => void,
   onValidation: (errors: IValidationErrors) => void,
-  deleteFile: (fileName: string) => void,
+  // deleteFile: (fileName: string) => void,
 }
 
 export const GameSettingsFileItem: React.FC<IProps> = ({
@@ -30,12 +30,12 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
   validationErrors,
   onFileDataChange,
   onValidation,
-  deleteFile,
+  // deleteFile,
 }) => {
   const onTextFieldChange = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    onFileDataChange(file.name, {
+    onFileDataChange(file.id, {
       ...file,
       [target.name]: target.value,
     });
@@ -44,7 +44,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
   const onSelectChange = useCallback((
     { target }: React.ChangeEvent<HTMLSelectElement>,
   ) => {
-    onFileDataChange(file.name, {
+    onFileDataChange(file.id, {
       ...file,
       [target.name]: target.value,
     });
@@ -56,7 +56,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
     validationData: IValidationData,
     fileName?: string|undefined,
   ) => {
-    onFileDataChange(file.name, {
+    onFileDataChange(file.id, {
       ...file,
       [fileName!]: value,
     });
@@ -68,92 +68,63 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
     ));
   }, [file, validationErrors, onFileDataChange, onValidation]);
 
-  const onDeleteFileBtnClick = useCallback(() => {
-    deleteFile(file.name);
-  }, [file.name, deleteFile]);
+  // const onDeleteFileBtnClick = useCallback(() => {
+  //   deleteFile(file.id);
+  // }, [file.id, deleteFile]);
 
   return (
-    <li className={classNames(
-      'developer-screen__spoiler-item',
-      styles['game-settings-file__item'],
-    )}
-    >
-      <details className="developer-screen__spoiler-block">
-        <summary
-          className={classNames(
-            'developer-screen__spoiler-title',
-            Object.keys(validationErrors).find((error) => error.includes(file.name))
-            && 'developer-screen__spoiler-title--error',
-          )}
-        >
-          <span className="developer-screen__spoiler-text">Имя файла:</span>
-          <span className="developer-screen__spoiler-text">{file.name}</span>
-          <span className="developer-screen__spoiler-text">Путь:</span>
-          <span className="developer-screen__spoiler-text">{file.path}</span>
-          <span className="developer-screen__spoiler-text">Тип:</span>
-          <span className="developer-screen__spoiler-text">{file.view}</span>
-          <Button
-            className={classNames(
-              'developer-screen__spoiler-title-btn',
-              'developer-screen__spoiler-title-btn--delete',
-            )}
-            onClick={onDeleteFileBtnClick}
-          >
-            Удалить
-          </Button>
-        </summary>
-        <PathSelector
-          className="developer-screen__item"
-          id={`file-path_${file.name}`}
-          parent="path"
-          pathVariables={pathVariables}
-          validationErrors={validationErrors[`file-path_${file.name}`]}
-          value={file.path}
-          label="Путь до файла настроек"
+    <React.Fragment>
+      <PathSelector
+        className="developer-screen__item"
+        id={`file-path_${file.id}`}
+        parent="path"
+        pathVariables={pathVariables}
+        validationErrors={validationErrors[`file-path_${file.id}`]}
+        value={file.path}
+        label="Путь до файла настроек"
           description="Состоит из переменной пути и самого пути к файлу. При выборе пути через диалоговое окно, переменная определяется автоматически." //eslint-disable-line
-          selectorType={LauncherButtonAction.RUN}
-          options={generateSelectOptions(gameSettingsFileAvailableVariables)}
-          onChange={onPathSelectorChange}
-        />
-        <Select
-          className="developer-screen__item"
-          id={`game-settings-file-view_${file.name}`}
-          name="view"
-          label="Тип структуры файла"
+        selectorType={LauncherButtonAction.RUN}
+        options={generateSelectOptions(gameSettingsFileAvailableVariables)}
+        onChange={onPathSelectorChange}
+      />
+      <Select
+        className="developer-screen__item"
+        id={`game-settings-file-view_${file.id}`}
+        name="view"
+        label="Тип структуры файла"
           description='Определяет, какая структура содержимого у файла. Неправильно выбранная структура приведет к ошибке обработки.' //eslint-disable-line
-          options={generateSelectOptions(GameSettingsFileView)}
-          value={file.view}
-          onChange={onSelectChange}
-        />
-        <TextField
-          className="developer-screen__item"
-          id={`game-settings-file-name_${file.name}`}
-          name="name"
-          value={file.name}
-          description="Имя файла для идентификации"
-          label="Имя файла"
-          onChange={onTextFieldChange}
-        />
-        <TextField
-          className="developer-screen__item"
-          id={`game-settings-file-encoding_${file.name}`}
-          name="encoding"
-          value={file.encoding}
-          description="Кодировка файла, которая будет применяться при чтении и сохранении файла. Если не указано, берется значение по умолчанию." //eslint-disable-line max-len
-          label="Кодировка файла"
-          onChange={onTextFieldChange}
-        />
-        <Button
-          className={classNames(
-            'main-btn',
-            'developer-screen__spoiler-button',
-          )}
-          onClick={onDeleteFileBtnClick}
-        >
-          Удалить
-        </Button>
-      </details>
-    </li>
+        options={generateSelectOptions(GameSettingsFileView)}
+        value={file.view}
+        onChange={onSelectChange}
+      />
+      <TextField
+        className="developer-screen__item"
+        id={`game-settings-file-label_${file.id}`}
+        name="label"
+        value={file.label}
+        description="Имя файла для идентификации"
+        label="Имя файла"
+        onChange={onTextFieldChange}
+      />
+      <TextField
+        className="developer-screen__item"
+        id={`game-settings-file-encoding_${file.id}`}
+        name="encoding"
+        value={file.encoding}
+        description="Кодировка файла, которая будет применяться при чтении и сохранении файла. Если не указано, берется значение по умолчанию." //eslint-disable-line max-len
+        label="Кодировка файла"
+        onChange={onTextFieldChange}
+      />
+      {/* <Button
+        className={classNames(
+          'main-btn',
+          'developer-screen__spoiler-button',
+        )}
+        onClick={onDeleteFileBtnClick}
+      >
+        Удалить
+      </Button> */}
+    </React.Fragment>
   );
 };
 

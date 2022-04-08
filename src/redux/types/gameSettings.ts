@@ -65,7 +65,7 @@ export interface IGameSettingsParameter {
 }
 
 export interface IGameSettingsFile {
-  name: string,
+  id: string,
   label: string,
   path: string,
   view: string,
