@@ -115,7 +115,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     fileId: string,
     fileData: IGameSettingsFile,
   ) => {
-    const fileIndex = currentConfig.gameSettingsFiles.findIndex((currFile) => currFile.id === fileId);
+    const fileIndex = currentConfig.gameSettingsFiles.findIndex((currFile) => currFile.name === fileId);
     const newFiles = [...currentConfig.gameSettingsFiles];
 
     newFiles[fileIndex] = { ...fileData };
@@ -360,12 +360,12 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                 {
                 currentConfig.gameSettingsFiles.length > 0 && currentConfig.gameSettingsFiles.map((file, index) => (
                   <SpoilerItem<IGameSettingsFile>
-                    key={file.id}
+                    key={file.name}
                     item={file}
                     items={currentConfig.gameSettingsFiles}
                     // quantity={currentConfig.gameSettingsParameters.length}
                     position={index}
-                    summaryText={[{ label: 'Имя файла:', text: file.id }, { label: 'Путь:', text: file.path }]}
+                    summaryText={[{ label: 'Имя файла:', text: file.name }, { label: 'Путь:', text: file.path }]}
                     validationErrors={validationErrors}
                     onDeleteItem={deleteGameSettingsFile}
                   >

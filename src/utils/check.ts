@@ -179,7 +179,8 @@ const GameSettingsGroupSchema = Joi.object<IGameSettingsGroup>({
 });
 
 const gameSettingsFileSchema = Joi.object<IGameSettingsFile>({
-  id: Joi.string().required().alphanum(),
+  id: Joi.string().optional().default(() => getRandomId('game-settings-file')),
+  name: Joi.string().required().alphanum(),
   label: Joi.string().optional().default(Joi.ref('name')),
   path: Joi.string().required().custom(checkIsPathWithVariableCorrect),
   view: Joi.string().required().valid(...Object.values(GameSettingsFileView)),
@@ -537,7 +538,7 @@ export const checkGameSettingsParameters = (
   };
 
   const resultParameters = parameters.reduce<IGameSettingsParameter[]>((currentParams, currentParam) => {
-    const fileForParameter = gameSettingsFiles.find((file) => file.id === currentParam.file);
+    const fileForParameter = gameSettingsFiles.find((file) => file.name === currentParam.file);
 
     let validationResult: Joi.ValidationResult;
 

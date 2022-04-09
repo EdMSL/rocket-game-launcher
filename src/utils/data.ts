@@ -20,6 +20,7 @@ import {
   getLineIniParameterValue,
   getParameterRegExp,
   getPathToFile,
+  getRandomId,
   getRandomName,
   replacePathVariableByRootDir,
 } from './strings';
@@ -319,7 +320,7 @@ export const generateGameSettingsOptions = (
   const data = gameSettingsParameters.reduce<IGameSettingsOptions>(
     (gameSettingsOptions, currentParameter, index) => {
       const incorrectIndexes: number[] = [];
-      const currentGameSettingsFile: IGameSettingsFile = gameSettingsFiles.find((file) => file.id === currentParameter.file)!;
+      const currentGameSettingsFile: IGameSettingsFile = gameSettingsFiles.find((file) => file.name === currentParameter.file)!;
       //Если опция с типом group, combined или related,
       // то генерация производится для каждого параметра в items.
       if (
@@ -376,7 +377,7 @@ export const generateGameSettingsOptions = (
       const {
         optionName, optionValue, optionErrors,
       } = getOptionData(
-        currentFilesDataObj[currentGameSettingsFile!.id],
+        currentFilesDataObj[currentGameSettingsFile!.name],
         currentParameter,
         currentGameSettingsFile,
         moProfile,
@@ -435,7 +436,7 @@ export const generateSelectOptions = (
  */
 export const getGameSettingsFilesNames = (
   gameSettingsFiles: IGameSettingsFile[],
-): string[] => gameSettingsFiles.map((file) => file.id);
+): string[] => gameSettingsFiles.map((file) => file.name);
 
 /**
  *
@@ -888,7 +889,8 @@ export const getDefaultGameSettingsFile = (
   label: string,
   pathToFile: string,
 ): IGameSettingsFile => ({
-  id: getRandomName(),
+  id: getRandomId('game-settings-file'),
+  name: getRandomName(),
   label: label.trim().replaceAll(/\s/g, ''),
   path: pathToFile,
   view: GameSettingsFileView.SECTIONAL,

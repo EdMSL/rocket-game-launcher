@@ -389,7 +389,7 @@ export const readFileForGameSettingsOptions = async (
   }
 
   return {
-    [file.id]: fileData,
+    [file.name]: fileData,
   };
 };
 /**

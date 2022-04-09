@@ -449,7 +449,7 @@ function* changeMOProfileSaga(
     );
 
     const MOProfileGameSettingsOnly = gameSettingsFiles.filter((file) => PathRegExp.MO_PROFILE.test(file.path));
-    const availableFileNames = MOProfileGameSettingsOnly.map((file) => file.id);
+    const availableFileNames = MOProfileGameSettingsOnly.map((file) => file.name);
     const filteredGameSettingParameters = gameSettingsParameters.filter((parameter) => availableFileNames.includes(parameter.file));
 
     const moProfileGameSettingsOptions: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
@@ -509,7 +509,7 @@ function* saveGameSettingsFilesSaga(
     const changedGameSettingsFiles = Array.from(
       new Set(
         Object.values(changedGameSettingsOptions)
-          .map((option) => gameSettingsFiles.find((file) => option.file === file.id)!),
+          .map((option) => gameSettingsFiles.find((file) => option.file === file.name)!),
       ),
     );
 
@@ -522,7 +522,7 @@ function* saveGameSettingsFilesSaga(
 
     const filesForWrite = changedGameSettingsFiles.map((file) => {
       const changedGameSettingsOptionsId = Object.keys(changedGameSettingsOptions);
-      const currWriteFileContent = currentFilesData[file.id];
+      const currWriteFileContent = currentFilesData[file.name];
       const currWriteFileView = file.view;
 
       changedGameSettingsOptionsId.forEach((optionId) => {

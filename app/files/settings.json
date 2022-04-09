@@ -14,21 +14,21 @@
     {
       "name": "oudf7Xd78FdyIIvaq",
       "label": "OblivionIni",
-      "path": "%GAME_DIR%\\oblivion.ini",
+      "path": "%MO_PROFILE%\\oblivion.ini",
       "view": "sectional",
       "encoding": ""
     },
     {
       "name": "qM3jeQhgXUE505GJ",
       "label": "MenuIni",
-      "path": "%GAME_DIR%\\Menu.ini",
+      "path": "%GAME_DIR%\\\\Data\\Obse\\Plugins\\Menu.ini",
       "view": "line",
       "encoding": "win1251"
     },
     {
       "name": "h5TjeQhgXpv605HQ",
       "label": "OblivionReloaded",
-      "path": "%GAME_DIR%\\OblivionReloaded.dll.config",
+      "path": "%GAME_DIR%\\Data\\Obse\\Plugins\\OblivionReloaded.dll.config",
       "view": "tag",
       "encoding": ""
     }
@@ -61,14 +61,15 @@
     {
       "file": "oudf7Xd78FdyIIvaq",
       "optionType": "default",
-      "name": "bFull Screen",
+      "name": "bFull Scree",
       "iniGroup": "Display",
       "settingGroup": "7uED7Xd7gPyIIvlu",
       "label": "Полный экран",
       "controllerType": "range",
       "min": 0,
       "max": 10,
-      "step": 1
+      "step": 1,
+      "description": ""
     },
     {
       "file": "qM3jeQhgXUE505GJ",
@@ -81,7 +82,8 @@
         "sv_Construct\t\"Dialog & Pause\"": "sv_Construct\t\"Dialog & Pause\"",
         "sv_Construct\t\"Some Value\"": "sv_Construct\t\"Some Value\"",
         "sv_Construct\t\"Other text value\"": "sv_Construct\t\"Other text value\""
-      }
+      },
+      "description": ""
     },
     {
       "file": "h5TjeQhgXpv605HQ",
@@ -92,9 +94,10 @@
       "settingGroup": "qM3joLYOXUE5qD6J",
       "controllerType": "range",
       "label": "Фильтрация",
-      "min": "1",
-      "max": "5",
-      "step": "0.125"
+      "min": 1,
+      "max": 5,
+      "step": 0.125,
+      "description": ""
     }
   ]
 }
