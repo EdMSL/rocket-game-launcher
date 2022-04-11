@@ -94,7 +94,7 @@ export const createMainWindow = (
 
   mainWindowState.manage(mainWindow);
 
-  ipcMain.on(AppChannel.SAVE_CONFIG, (
+  ipcMain.on(AppChannel.SAVE_DEV_CONFIG, (
     event,
     isProcessing: boolean,
     newConfig: ILauncherConfig|IGameSettingsConfig,
@@ -125,7 +125,7 @@ export const createMainWindow = (
     }
 
     if (isProcessing !== undefined) {
-      mainWindow.webContents.send(AppChannel.SAVE_CONFIG, isProcessing);
+      mainWindow.webContents.send(AppChannel.SAVE_DEV_CONFIG, isProcessing);
     }
   });
 

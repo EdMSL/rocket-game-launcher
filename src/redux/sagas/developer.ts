@@ -46,7 +46,7 @@ const getState = (state: IDeveloperState): IDeveloperState => state;
 export function* initGameSettingsDeveloperSaga(): SagaIterator {
   yield call(
     ipcRenderer.send,
-    AppChannel.SAVE_CONFIG,
+    AppChannel.SAVE_DEV_CONFIG,
     true,
     undefined,
     undefined,
@@ -68,7 +68,7 @@ export function* initGameSettingsDeveloperSaga(): SagaIterator {
 
     yield put(setGameSettingsConfig(settingsConfig));
     yield put(setIsGameSettingsConfigLoaded(true));
-    yield call(ipcRenderer.send, AppChannel.SAVE_CONFIG, undefined, settingsConfig, undefined, undefined, false);
+    yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, undefined, settingsConfig, undefined, undefined, false);
   } catch (error: any) {
     let errorMessage = '';
 
@@ -89,7 +89,7 @@ export function* initGameSettingsDeveloperSaga(): SagaIterator {
     yield put(setIsGameSettingsConfigProcessing(false));
     yield call(
       ipcRenderer.send,
-      AppChannel.SAVE_CONFIG,
+      AppChannel.SAVE_DEV_CONFIG,
       false,
       undefined,
       undefined,
@@ -110,7 +110,7 @@ function* saveLauncherConfigSaga(
 ): SagaIterator {
   // Ставим здесь именно сохранение игровых настроек только из-за показа лоадера
   yield put(setIsLauncherConfigProcessing(true));
-  yield call(ipcRenderer.send, AppChannel.SAVE_CONFIG, true);
+  yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, true);
   yield delay(2000);
 
   try {
@@ -135,7 +135,7 @@ function* saveLauncherConfigSaga(
 
     yield call(
       ipcRenderer.send,
-      AppChannel.SAVE_CONFIG,
+      AppChannel.SAVE_DEV_CONFIG,
       false,
       newConfig,
       newPathVariables,
@@ -173,13 +173,13 @@ function* saveGameSettingsConfigSaga(
   { payload: { newConfig, isGoToMainScreen } }: ReturnType<typeof saveGameSettingsConfig>,
 ): SagaIterator {
   yield put(setIsGameSettingsConfigProcessing(true));
-  yield call(ipcRenderer.send, AppChannel.SAVE_CONFIG, true);
+  yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, true);
   yield delay(2000);
   try {
     yield call(writeJSONFile, GAME_SETTINGS_FILE_PATH, deepClone(newConfig, 'id'));
     yield put(setGameSettingsConfig(newConfig));
 
-    yield call(ipcRenderer.send, AppChannel.SAVE_CONFIG, false, newConfig);
+    yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, false, newConfig);
 
     if (isGoToMainScreen) {
       yield call(ipcRenderer.send, AppChannel.CHANGE_DEV_WINDOW_STATE, false);

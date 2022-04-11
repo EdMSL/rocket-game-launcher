@@ -60,7 +60,7 @@ export const MainScreen: React.FC = () => {
       }
     });
 
-    ipcRenderer.on(AppChannel.SAVE_CONFIG, (
+    ipcRenderer.on(AppChannel.SAVE_DEV_CONFIG, (
       event: Electron.Event,
       isLauncherConfigProcessing: boolean,
     ) => {
@@ -71,7 +71,7 @@ export const MainScreen: React.FC = () => {
 
     return (): void => {
       ipcRenderer.removeAllListeners(AppChannel.CHANGE_DEV_WINDOW_STATE);
-      ipcRenderer.removeAllListeners(AppChannel.SAVE_CONFIG);
+      ipcRenderer.removeAllListeners(AppChannel.SAVE_DEV_CONFIG);
     };
   }, [dispatch]);
 

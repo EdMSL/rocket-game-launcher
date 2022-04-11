@@ -110,7 +110,7 @@ export const FileExtension = {
 
 export enum AppChannel {
   CHANGE_WINDOW_SIZE_STATE = 'change window state',
-  SAVE_CONFIG = 'save config',
+  SAVE_DEV_CONFIG = 'save dev config',
   CLOSE_APP = 'close app',
   GET_PATH_BY_PATH_SELECTOR = 'get path from native window',
   GET_APP_STATE = 'get app state',
