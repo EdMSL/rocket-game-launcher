@@ -5,7 +5,7 @@ import { IUIElementProps } from '$types/common';
 import { HintItem } from '$components/HintItem';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {
-  min?: number,
+  min?: number|'',
 }
 
 export const NumberField: React.FunctionComponent<IProps> = ({
