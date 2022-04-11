@@ -422,19 +422,9 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                 )}
                 onClick={onAddGameSettingsFile}
               >
-                Добавить файл
+                Добавить
               </Button>
               <p className="developer-screen__text">Игровые параметры</p>
-              <Button
-                className={classNames(
-                  'main-btn',
-                  'control-panel__btn',
-                  'developer-screen__btn',
-                )}
-                onClick={onAddGameSettingsParameter}
-              >
-                Добавить параметр
-              </Button>
               <ul className={styles['developer-screen__list']}>
                 {
                 currentConfig.gameSettingsParameters.length > 0 && currentConfig.gameSettingsParameters.map((param, index) => (
@@ -469,6 +459,16 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                 && <li> Добавьте хотя бы один игровой файл, чтобы добавлять игровые параметры</li>
                 }
               </ul>
+              <Button
+                className={classNames(
+                  'main-btn',
+                  'control-panel__btn',
+                  'developer-screen__btn',
+                )}
+                onClick={onAddGameSettingsParameter}
+              >
+                Добавить
+              </Button>
             </div>
           </React.Fragment>
           )

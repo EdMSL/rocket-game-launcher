@@ -44,6 +44,16 @@ const getState = (state: IDeveloperState): IDeveloperState => state;
  * Только проверка полей на валидность и запись в `state`.
  */
 export function* initGameSettingsDeveloperSaga(): SagaIterator {
+  yield call(
+    ipcRenderer.send,
+    AppChannel.SAVE_CONFIG,
+    true,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+  );
+
   try {
     yield put(setIsGameSettingsConfigProcessing(true));
 
@@ -77,6 +87,15 @@ export function* initGameSettingsDeveloperSaga(): SagaIterator {
     yield put(setIsGameSettingsConfigLoaded(false));
   } finally {
     yield put(setIsGameSettingsConfigProcessing(false));
+    yield call(
+      ipcRenderer.send,
+      AppChannel.SAVE_CONFIG,
+      false,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+    );
   }
 }
 

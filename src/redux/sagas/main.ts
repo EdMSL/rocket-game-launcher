@@ -405,78 +405,82 @@ function* restoreGameSettingsFilesBackupSaga({
 function* locationChangeSaga(
   { payload: { location } }: LocationChangeAction<ILocationState>,
 ): SagaIterator {
-  const {
-    main: {
-      isLauncherInitialised,
-      isGameSettingsLoaded,
-      config: { isFirstLaunch },
-    },
-  }: ReturnType<typeof getState> = yield select(getState);
-
-  if (!isLauncherInitialised && (location.pathname === Routes.MAIN_SCREEN)) {
-    yield call(initLauncherSaga);
-
-    if (isFirstLaunch) {
-      yield take(MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED);
-
-      // Здесь должен быть action на setDevWindowOpening, перенесен в storage основного процесса
-      // чтобы убрать эффект мигания окна
-      ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, true);
-    }
-  }
-
-  if (GAME_SETTINGS_PATH_REGEXP.test(location.pathname)) {
+  try {
     const {
       main: {
-        isLauncherConfigChanged,
+        isLauncherInitialised,
+        isGameSettingsLoaded,
+        config: { isFirstLaunch },
       },
     }: ReturnType<typeof getState> = yield select(getState);
 
-    if (isLauncherInitialised) {
-      if (
-        (!isGameSettingsLoaded && location.state?.isFromMainPage)
-        || isLauncherConfigChanged
-      ) {
-        yield call(initGameSettingsSaga, false);
+    if (!isLauncherInitialised && (location.pathname === Routes.MAIN_SCREEN)) {
+      yield call(initLauncherSaga);
 
-        if (location.state?.isFromMainPage) {
+      if (isFirstLaunch) {
+        yield take(MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED);
+
+        // Здесь должен быть action на setDevWindowOpening, перенесен в storage основного процесса
+        // чтобы убрать эффект мигания окна
+        ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, true);
+      }
+    }
+
+    if (GAME_SETTINGS_PATH_REGEXP.test(location.pathname)) {
+      const {
+        main: {
+          isLauncherConfigChanged,
+        },
+      }: ReturnType<typeof getState> = yield select(getState);
+
+      if (isLauncherInitialised) {
+        if (
+          (!isGameSettingsLoaded && location.state?.isFromMainPage)
+        || isLauncherConfigChanged
+        ) {
+          yield call(initGameSettingsSaga, false);
+
+          if (location.state?.isFromMainPage) {
+            const {
+              gameSettings: {
+                gameSettingsGroups,
+              },
+            }: ReturnType<typeof getState> = yield select(getState);
+
+            if (gameSettingsGroups.length > 0) {
+              yield put(push(`${Routes.GAME_SETTINGS_SCREEN}/${gameSettingsGroups[0].name}`));
+            }
+          }
+        } else if (isGameSettingsLoaded && location.state?.isFromMainPage) {
           const {
             gameSettings: {
-              gameSettingsGroups,
+              gameSettingsFiles,
+              gameSettingsParameters,
+              moProfile,
             },
           }: ReturnType<typeof getState> = yield select(getState);
 
-          if (gameSettingsGroups.length > 0) {
-            yield put(push(`${Routes.GAME_SETTINGS_SCREEN}/${gameSettingsGroups[0].name}`));
-          }
-        }
-      } else if (isGameSettingsLoaded && location.state?.isFromMainPage) {
-        const {
-          gameSettings: {
+          const options: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
+            generateGameSettingsOptionsSaga,
             gameSettingsFiles,
             gameSettingsParameters,
             moProfile,
-          },
-        }: ReturnType<typeof getState> = yield select(getState);
+          );
 
-        const options: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
-          generateGameSettingsOptionsSaga,
-          gameSettingsFiles,
-          gameSettingsParameters,
-          moProfile,
-        );
+          yield put(setGameSettingsOptions(options));
+        } else if (location.state?.isGameSettingsOptionsChanged) {
+          const {
+            gameSettings: { gameSettingsOptions },
+          }: ReturnType<typeof getState> = yield select(getState);
 
-        yield put(setGameSettingsOptions(options));
-      } else if (location.state?.isGameSettingsOptionsChanged) {
-        const {
-          gameSettings: { gameSettingsOptions },
-        }: ReturnType<typeof getState> = yield select(getState);
-
-        yield put(setGameSettingsOptions(getGameSettingsOptionsWithNewValues(gameSettingsOptions, false)));
+          yield put(setGameSettingsOptions(getGameSettingsOptionsWithNewValues(gameSettingsOptions, false)));
+        }
+      } else if (!isLauncherInitialised) {
+        yield put(push(`${Routes.MAIN_SCREEN}`));
       }
-    } else if (!isLauncherInitialised) {
-      yield put(push(`${Routes.MAIN_SCREEN}`));
     }
+  } catch (error: any) {
+    yield put(addMessages([CreateUserMessage.error(error.message)]));
   }
 }
 
