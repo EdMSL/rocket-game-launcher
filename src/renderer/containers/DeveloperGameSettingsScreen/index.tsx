@@ -14,7 +14,10 @@ import {
   IGameSettingsConfig, IGameSettingsFile, IGameSettingsParameter,
 } from '$types/gameSettings';
 import {
-  getDefaultGameSettingsFile, getNewConfig, getUniqueValidationErrors,
+  getDefaultGameSettingsFile,
+  getDefaultGameSettingsParameter,
+  getNewConfig,
+  getUniqueValidationErrors,
 } from '$utils/data';
 import { checkObjectForEqual } from '$utils/check';
 import {
@@ -216,13 +219,13 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
           pathVariables,
         );
 
-        changeCurrentConfig({
+        changeCurrentConfig([
           ...currentConfig.gameSettingsFiles,
-          [getRandomName()]: getDefaultGameSettingsFile(
+          getDefaultGameSettingsFile(
             getFileNameFromPathToFile(pathStr),
             pathWithVariable,
           ),
-        },
+        ],
         'gameSettingsFiles');
       } catch (error: any) {
         dispatch(addDeveloperMessages([CreateUserMessage.error(
@@ -236,6 +239,14 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     changeCurrentConfig,
     getPathFromPathSelector]);
 
+  const onAddGameSettingsParameter = useCallback(() => {
+    changeCurrentConfig([
+      ...currentConfig.gameSettingsFiles,
+      getDefaultGameSettingsParameter(currentConfig.gameSettingsFiles),
+    ],
+    'gameSettingsFiles');
+  }, [currentConfig.gameSettingsFiles, changeCurrentConfig]);
+
   const deleteGameSettingsFile = useCallback((items: IGameSettingsFile[]) => {
     changeCurrentConfig(items, 'gameSettingsFiles');
   }, [changeCurrentConfig]);
@@ -247,10 +258,6 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   const changeGameSettingsParameterOrder = useCallback((params: IGameSettingsParameter[]) => {
     changeCurrentConfig(params, 'gameSettingsParameters');
   }, [changeCurrentConfig]);
-
-  const onAddGameSettingsParameter = useCallback(() => {
-
-  }, []);
 
   /* eslint-disable react/jsx-props-no-spreading */
   return (
@@ -316,7 +323,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                         lastCreatedGroupName === item.name && (
                         <p className={styles['developer-screen__group-label']}>
                           <span>Заголовок группы</span>
-                          <HintItem description="Задать заголовок группы. Отображается как имя вкладки в экране игровых настроек." />
+                          <HintItem description="Задать заголовок группы. Отображается как имя вкладки на экране игровых настроек." />
                         </p>
                         )
                       }
@@ -331,7 +338,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                         />
                       </li>
                     ))
-                }
+                  }
                   {
                   currentConfig.gameSettingsGroups.length === 0 && (
                     <li className={styles['developer-screen__groups-item']}>

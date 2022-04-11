@@ -7,6 +7,7 @@ import {
   PathVariableName,
   GameSettingsFileView,
   GameSettingsOptionType,
+  GameSettingControllerType,
 } from '$constants/misc';
 import {
   LogMessageType,
@@ -895,4 +896,21 @@ export const getDefaultGameSettingsFile = (
   path: pathToFile,
   view: GameSettingsFileView.SECTIONAL,
   encoding: '',
+});
+
+/**
+ * Сгенерировать новый объект параметра игровых настроек.
+ * @param files Массив игровых файлов.
+ * @returns Объект параметра из `state`.
+ */
+export const getDefaultGameSettingsParameter = (
+  files: IGameSettingsFile[],
+): IGameSettingsParameter => ({
+  id: getRandomId('game-settings-parameter'),
+  file: files[0].name,
+  name: '',
+  optionType: GameSettingsOptionType.DEFAULT,
+  label: '',
+  controllerType: GameSettingControllerType.CHECKBOX,
+  description: '',
 });
