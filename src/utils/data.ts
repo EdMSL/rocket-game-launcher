@@ -914,3 +914,23 @@ export const getDefaultGameSettingsParameter = (
   controllerType: GameSettingControllerType.CHECKBOX,
   description: '',
 });
+
+/**
+ * Заменяет данные элемента массива на новые.
+ * @param id Идентификатор элемента массива.
+ * @param data Данные для замены.
+ * @param items Элементы массива, данные элемента которого меняем.
+ * @returns Массив элементов с измененным элементом.
+ */
+export const changeConfigArrayItem = <P extends { id: string, }>(
+  id: string,
+  data: P,
+  items: P[],
+): P[] => {
+  const index = items.findIndex((item) => item.id === id);
+  const newParams = [...items];
+
+  newParams[index] = { ...data };
+
+  return newParams;
+};

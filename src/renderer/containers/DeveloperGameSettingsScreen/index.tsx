@@ -14,6 +14,7 @@ import {
   IGameSettingsConfig, IGameSettingsFile, IGameSettingsParameter,
 } from '$types/gameSettings';
 import {
+  changeConfigArrayItem,
   getDefaultGameSettingsFile,
   getDefaultGameSettingsParameter,
   getNewConfig,
@@ -113,18 +114,6 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     setCurrentConfig(newConfig);
     setIsConfigChanged(!checkObjectForEqual(gameSettingsConfig, newConfig));
   }, [gameSettingsConfig, currentConfig]);
-
-  const changeGameSettingsFiles = useCallback((
-    fileId: string,
-    fileData: IGameSettingsFile,
-  ) => {
-    const fileIndex = currentConfig.gameSettingsFiles.findIndex((currFile) => currFile.name === fileId);
-    const newFiles = [...currentConfig.gameSettingsFiles];
-
-    newFiles[fileIndex] = { ...fileData };
-
-    changeCurrentConfig(newFiles, 'gameSettingsFiles');
-  }, [currentConfig, changeCurrentConfig]);
 
   const onSaveBtnClick = useCallback(() => {
     saveSettingsChanges(false);
@@ -239,6 +228,16 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     changeCurrentConfig,
     getPathFromPathSelector]);
 
+  const changeGameSettingsFiles = useCallback((
+    fileId: string,
+    fileData: IGameSettingsFile,
+  ) => {
+    changeCurrentConfig(
+      changeConfigArrayItem(fileId, fileData, currentConfig.gameSettingsFiles),
+      'gameSettingsFiles',
+    );
+  }, [currentConfig, changeCurrentConfig]);
+
   const deleteGameSettingsFile = useCallback((items: IGameSettingsFile[]) => {
     changeCurrentConfig(items, 'gameSettingsFiles');
   }, [changeCurrentConfig]);
@@ -249,6 +248,16 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
       'gameSettingsFiles',
     );
   }, [currentConfig.gameSettingsFiles, changeCurrentConfig]);
+
+  const changeGameSettingsParameters = useCallback((
+    paramId: string,
+    paramData: IGameSettingsParameter,
+  ) => {
+    changeCurrentConfig(
+      changeConfigArrayItem(paramId, paramData, currentConfig.gameSettingsParameters),
+      'gameSettingsParameters',
+    );
+  }, [currentConfig, changeCurrentConfig]);
 
   const onAddGameSettingsParameter = useCallback(() => {
     changeCurrentConfig([
@@ -441,6 +450,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                   >
                     <GameSettingsParameterItem
                       parameter={param}
+                      onParameterDataChange={changeGameSettingsParameters}
                       validationErrors={validationErrors}
                       onValidation={setNewValidationErrors}
                       deleteParameter={deleteGameSettingsParameterById}
