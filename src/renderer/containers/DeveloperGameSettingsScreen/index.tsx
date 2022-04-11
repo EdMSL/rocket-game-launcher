@@ -239,14 +239,6 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     changeCurrentConfig,
     getPathFromPathSelector]);
 
-  const onAddGameSettingsParameter = useCallback(() => {
-    changeCurrentConfig([
-      ...currentConfig.gameSettingsParameters,
-      getDefaultGameSettingsParameter(currentConfig.gameSettingsFiles),
-    ],
-    'gameSettingsParameters');
-  }, [currentConfig.gameSettingsParameters, currentConfig.gameSettingsFiles, changeCurrentConfig]);
-
   const deleteGameSettingsFile = useCallback((items: IGameSettingsFile[]) => {
     changeCurrentConfig(items, 'gameSettingsFiles');
   }, [changeCurrentConfig]);
@@ -258,9 +250,24 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     );
   }, [currentConfig.gameSettingsFiles, changeCurrentConfig]);
 
+  const onAddGameSettingsParameter = useCallback(() => {
+    changeCurrentConfig([
+      ...currentConfig.gameSettingsParameters,
+      getDefaultGameSettingsParameter(currentConfig.gameSettingsFiles),
+    ],
+    'gameSettingsParameters');
+  }, [currentConfig.gameSettingsParameters, currentConfig.gameSettingsFiles, changeCurrentConfig]);
+
   const deleteGameSettingsParameter = useCallback((params: IGameSettingsParameter[]) => {
     changeCurrentConfig(params, 'gameSettingsParameters');
   }, [changeCurrentConfig]);
+
+  const deleteGameSettingsParameterById = useCallback((id: string) => {
+    changeCurrentConfig(
+      currentConfig.gameSettingsParameters.filter((item) => id !== item.id),
+      'gameSettingsParameters',
+    );
+  }, [currentConfig.gameSettingsParameters, changeCurrentConfig]);
 
   const changeGameSettingsParameterOrder = useCallback((params: IGameSettingsParameter[]) => {
     changeCurrentConfig(params, 'gameSettingsParameters');
@@ -436,13 +443,18 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                       parameter={param}
                       validationErrors={validationErrors}
                       onValidation={setNewValidationErrors}
+                      deleteParameter={deleteGameSettingsParameterById}
                     />
                   </SpoilerItem>
                 ))
                 }
                 {
-                currentConfig.gameSettingsParameters.length === 0
+                currentConfig.gameSettingsParameters.length === 0 && currentConfig.gameSettingsFiles.length !== 0
                 && <li> Нет игровых параметров</li>
+                }
+                {
+                currentConfig.gameSettingsParameters.length === 0 && currentConfig.gameSettingsFiles.length === 0
+                && <li> Добавьте хотя бы один игровой файл, чтобы добавлять игровые параметры</li>
                 }
               </ul>
             </div>
