@@ -394,7 +394,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                     item={file}
                     items={currentConfig.gameSettingsFiles}
                     position={index}
-                    summaryText={[{ label: 'Имя файла:', text: file.name }, { label: 'Путь:', text: file.path }]}
+                    summaryText={[{ label: 'Имя файла:', text: file.label }, { label: 'Путь:', text: file.path }]}
                     validationErrors={validationErrors}
                     onDeleteItem={deleteGameSettingsFile}
                   >
@@ -450,6 +450,8 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                   >
                     <GameSettingsParameterItem
                       parameter={param}
+                      gameSettingsFiles={currentConfig.gameSettingsFiles}
+                      gameSettingsGroups={currentConfig.gameSettingsGroups}
                       onParameterDataChange={changeGameSettingsParameters}
                       validationErrors={validationErrors}
                       onValidation={setNewValidationErrors}
