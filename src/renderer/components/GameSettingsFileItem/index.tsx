@@ -21,7 +21,7 @@ interface IProps {
   validationErrors: IValidationErrors,
   onFileDataChange: (fileName: string, fileData: IGameSettingsFile) => void,
   onValidation: (errors: IValidationErrors) => void,
-  // deleteFile: (fileName: string) => void,
+  deleteFile: (id: string) => void,
 }
 
 export const GameSettingsFileItem: React.FC<IProps> = ({
@@ -30,7 +30,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
   validationErrors,
   onFileDataChange,
   onValidation,
-  // deleteFile,
+  deleteFile,
 }) => {
   const onTextFieldChange = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
@@ -68,9 +68,9 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
     ));
   }, [file, validationErrors, onFileDataChange, onValidation]);
 
-  // const onDeleteFileBtnClick = useCallback(() => {
-  //   deleteFile(file.name);
-  // }, [file.name, deleteFile]);
+  const onDeleteFileBtnClick = useCallback(() => {
+    deleteFile(file.id);
+  }, [file.id, deleteFile]);
 
   return (
     <React.Fragment>
@@ -82,7 +82,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         validationErrors={validationErrors[`file-path_${file.name}`]}
         value={file.path}
         label="Путь до файла настроек"
-          description="Состоит из переменной пути и самого пути к файлу. При выборе пути через диалоговое окно, переменная определяется автоматически." //eslint-disable-line
+        description="Состоит из переменной пути и самого пути к файлу. При выборе пути через диалоговое окно, переменная определяется автоматически." //eslint-disable-line
         selectorType={LauncherButtonAction.RUN}
         options={generateSelectOptions(gameSettingsFileAvailableVariables)}
         onChange={onPathSelectorChange}
@@ -92,7 +92,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         id={`game-settings-file-view_${file.name}`}
         name="view"
         label="Тип структуры файла"
-          description='Определяет, какая структура содержимого у файла. Неправильно выбранная структура приведет к ошибке обработки.' //eslint-disable-line
+        description='Определяет, какая структура содержимого у файла. Неправильно выбранная структура приведет к ошибке обработки.' //eslint-disable-line
         options={generateSelectOptions(GameSettingsFileView)}
         value={file.view}
         onChange={onSelectChange}
@@ -115,7 +115,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         label="Кодировка файла"
         onChange={onTextFieldChange}
       />
-      {/* <Button
+      <Button
         className={classNames(
           'main-btn',
           'developer-screen__spoiler-button',
@@ -123,7 +123,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         onClick={onDeleteFileBtnClick}
       >
         Удалить
-      </Button> */}
+      </Button>
     </React.Fragment>
   );
 };

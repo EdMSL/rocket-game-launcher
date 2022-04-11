@@ -251,6 +251,10 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     changeCurrentConfig(items, 'gameSettingsFiles');
   }, [changeCurrentConfig]);
 
+  const deleteGameSettingsFileById = useCallback((id: string) => {
+    changeCurrentConfig(currentConfig.gameSettingsFiles.filter((item) => id !== item.id), 'gameSettingsFiles');
+  }, [currentConfig.gameSettingsFiles, changeCurrentConfig]);
+
   const deleteGameSettingsParameter = useCallback((params: IGameSettingsParameter[]) => {
     changeCurrentConfig(params, 'gameSettingsParameters');
   }, [changeCurrentConfig]);
@@ -370,7 +374,6 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                     key={file.name}
                     item={file}
                     items={currentConfig.gameSettingsFiles}
-                    // quantity={currentConfig.gameSettingsParameters.length}
                     position={index}
                     summaryText={[{ label: 'Имя файла:', text: file.name }, { label: 'Путь:', text: file.path }]}
                     validationErrors={validationErrors}
@@ -382,7 +385,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                       validationErrors={validationErrors}
                       onFileDataChange={changeGameSettingsFiles}
                       onValidation={setNewValidationErrors}
-                      // deleteFile={deleteGameSettingsFile}
+                      deleteFile={deleteGameSettingsFileById}
                     />
                   </SpoilerItem>
                 ))
