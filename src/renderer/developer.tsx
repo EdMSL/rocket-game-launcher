@@ -15,12 +15,20 @@ import {
 } from '$store/store';
 import { AppChannel } from '$constants/misc';
 
-const { main }: IAppState = await ipcRenderer.invoke(AppChannel.GET_APP_STATE);
+const { main, gameSettings }: IAppState = await ipcRenderer.invoke(AppChannel.GET_APP_STATE);
 const initialState = {
   developer: {
     ...developerInitialState,
     launcherConfig: main.config,
-    isGameSettingsConfigLoaded: main.isGameSettingsLoaded,
+    ...main.isGameSettingsLoaded ? {
+      isGameSettingsConfigLoaded: main.isGameSettingsLoaded,
+      gameSettingsConfig: {
+        baseFilesEncoding: gameSettings.baseFilesEncoding,
+        gameSettingsGroups: gameSettings.gameSettingsGroups,
+        gameSettingsFiles: gameSettings.gameSettingsFiles,
+        gameSettingsParameters: gameSettings.gameSettingsParameters,
+      },
+    } : {},
   },
 };
 const { store, history } = configureDeveloperStore(initialState);
