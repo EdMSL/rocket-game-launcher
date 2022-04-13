@@ -110,11 +110,7 @@ function* updateGameSettingsOptionsSaga(): SagaIterator {
   try {
     yield put(setIsGameSettingsAvailable(false));
 
-    const newConfigData: SagaReturnType<typeof getGameSettingsConfigSaga> = yield call(
-      getGameSettingsConfigSaga,
-    );
-
-    yield call(initGameSettingsSaga, true, newConfigData.data.gameSettingsFiles);
+    yield call(initGameSettingsSaga, true);
   } catch (error: any) {
     if (
       error instanceof SagaError
@@ -370,14 +366,14 @@ function* restoreGameSettingsFilesBackupSaga({
       },
     }: ReturnType<typeof getState> = yield select(getState);
 
-    const totalGameSettingsOptions: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
+    const { gameSettingsOptions }: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
       generateGameSettingsOptionsSaga,
       gameSettingsFiles,
       gameSettingsParameters,
       moProfile,
     );
 
-    yield put(setGameSettingsOptions(totalGameSettingsOptions));
+    yield put(setGameSettingsOptions(gameSettingsOptions));
   } catch (error: any) {
     let errorMessage = '';
 
@@ -460,7 +456,9 @@ function* locationChangeSaga(
             },
           }: ReturnType<typeof getState> = yield select(getState);
 
-          const options: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
+          const {
+            gameSettingsOptions: options,
+          }: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
             generateGameSettingsOptionsSaga,
             gameSettingsFiles,
             gameSettingsParameters,

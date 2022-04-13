@@ -319,8 +319,9 @@ export const generateGameSettingsOptions = (
   gameSettingsFiles: IGameSettingsFile[],
   currentFilesDataObj: IGetDataFromFilesResult,
   moProfile: string,
-): { data: IGameSettingsOptions, errors: IUserMessage[], } => {
+): { data: IGameSettingsOptions, errors: IUserMessage[], parametersWithError: string[], } => {
   let errors: IUserMessage[] = [];
+  let parametersWithError: string[] = [];
 
   const data = gameSettingsParameters.reduce<IGameSettingsOptions>(
     (gameSettingsOptions, currentParameter, index) => {
@@ -369,6 +370,7 @@ export const generateGameSettingsOptions = (
 
         if (specParamsErrors.length > 0) {
           errors = [...errors, ...specParamsErrors];
+          parametersWithError.push(currentParameter.id);
 
           return { ...gameSettingsOptions };
         }
@@ -391,6 +393,7 @@ export const generateGameSettingsOptions = (
       if (optionErrors.length > 0) {
         errors = [...errors, ...optionErrors];
         incorrectIndexes.push(index);
+        parametersWithError.push(currentParameter.id);
 
         return { ...gameSettingsOptions };
       }
@@ -409,13 +412,16 @@ export const generateGameSettingsOptions = (
     {},
   );
 
-  return { data, errors };
+  parametersWithError = Array.from(new Set(parametersWithError));
+
+  return {
+    data, errors, parametersWithError,
+  };
 };
 
 /**
  * Генерирует опции (`options`) для UI компонента `Select`.
  * @param obj Объект или массив строк, на основе которых будет сгенерирован список опций.
- * @param isKeyLabel Определяет, что в паре ключ-значение будет заголовком, а что значением.
  * @returns Массив с опциями.
 */
 export const generateSelectOptions = (
