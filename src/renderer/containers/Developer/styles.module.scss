@@ -106,6 +106,10 @@
   &[open]::after {
     display: block;
   }
+
+  &[open] summary {
+    background-color: var(--btn-color);
+  }
 }
 
 .developer-screen__spoiler-title {

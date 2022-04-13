@@ -88,6 +88,14 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
 
   return (
     <React.Fragment>
+      <TextField
+        className="developer-screen__item"
+        id={`label_${parameter.id}`}
+        name="label"
+        label="Заголовок параметра"
+        value={parameter.label}
+        onChange={onParameterInputChange}
+      />
       <Select
         className="developer-screen__item"
         id={`optionType_${parameter.id}`}
@@ -119,14 +127,6 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
           />
         )
       }
-      <TextField
-        className="developer-screen__item"
-        id={`label_${parameter.id}`}
-        name="label"
-        label="Заголовок параметра"
-        value={parameter.label}
-        onChange={onParameterInputChange}
-      />
       <TextField
         className="developer-screen__item"
         id={`description_${parameter.id}`}

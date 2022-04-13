@@ -58,6 +58,8 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
   const [lastCreatedGroupName, setLastCreatedGroupName] = useState<string>('');
   const [isSettingsInitialized, setIsSettingsInitialized] = useState<boolean>(isGameSettingsConfigLoaded);
+  const [lastAddedFileId, setLastAddedFileId] = useState<string>('');
+  const [lastAddedParameterId, setLastAddedParameterId] = useState<string>('');
   /* eslint-enable max-len */
 
   const getPathFromPathSelector = useCallback(async (
@@ -208,14 +210,17 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
           pathVariables,
         );
 
+        const file = getDefaultGameSettingsFile(
+          getFileNameFromPathToFile(pathStr),
+          pathWithVariable,
+        );
+
         changeCurrentConfig([
           ...currentConfig.gameSettingsFiles,
-          getDefaultGameSettingsFile(
-            getFileNameFromPathToFile(pathStr),
-            pathWithVariable,
-          ),
+          file,
         ],
         'gameSettingsFiles');
+        setLastAddedFileId(file.id);
       } catch (error: any) {
         dispatch(addDeveloperMessages([CreateUserMessage.error(
           'Выбранный файл находится в недопустимой папке.',
@@ -240,6 +245,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
 
   const deleteGameSettingsFile = useCallback((items: IGameSettingsFile[]) => {
     changeCurrentConfig(items, 'gameSettingsFiles');
+    setLastAddedFileId('');
   }, [changeCurrentConfig]);
 
   const deleteGameSettingsFileById = useCallback((id: string) => {
@@ -247,6 +253,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
       currentConfig.gameSettingsFiles.filter((item) => id !== item.id),
       'gameSettingsFiles',
     );
+    setLastAddedFileId('');
   }, [currentConfig.gameSettingsFiles, changeCurrentConfig]);
 
   const changeGameSettingsParameters = useCallback((
@@ -260,15 +267,19 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   }, [currentConfig, changeCurrentConfig]);
 
   const onAddGameSettingsParameter = useCallback(() => {
+    const paramerter = getDefaultGameSettingsParameter(currentConfig.gameSettingsFiles[0]);
+
     changeCurrentConfig([
       ...currentConfig.gameSettingsParameters,
-      getDefaultGameSettingsParameter(currentConfig.gameSettingsFiles[0]),
+      paramerter,
     ],
     'gameSettingsParameters');
+    setLastAddedParameterId(paramerter.id);
   }, [currentConfig.gameSettingsParameters, currentConfig.gameSettingsFiles, changeCurrentConfig]);
 
   const deleteGameSettingsParameter = useCallback((params: IGameSettingsParameter[]) => {
     changeCurrentConfig(params, 'gameSettingsParameters');
+    setLastAddedParameterId('');
   }, [changeCurrentConfig]);
 
   const deleteGameSettingsParameterById = useCallback((id: string) => {
@@ -276,6 +287,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
       currentConfig.gameSettingsParameters.filter((item) => id !== item.id),
       'gameSettingsParameters',
     );
+    setLastAddedParameterId('');
   }, [currentConfig.gameSettingsParameters, changeCurrentConfig]);
 
   const changeGameSettingsParameterOrder = useCallback((params: IGameSettingsParameter[]) => {
@@ -394,6 +406,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                     item={file}
                     items={currentConfig.gameSettingsFiles}
                     position={index}
+                    lastItemId={lastAddedFileId}
                     summaryText={[{ label: 'Имя файла:', text: file.label }, { label: 'Путь:', text: file.path }]}
                     validationErrors={validationErrors}
                     onDeleteItem={deleteGameSettingsFile}
@@ -434,6 +447,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                     items={currentConfig.gameSettingsParameters}
                     position={index}
                     summaryText={[param.label]}
+                    lastItemId={lastAddedParameterId}
                     validationErrors={validationErrors}
                     onDeleteItem={deleteGameSettingsParameter}
                     onChangeOrderItem={changeGameSettingsParameterOrder}

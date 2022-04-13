@@ -1,5 +1,5 @@
 import React, {
-  PropsWithChildren, ReactElement, useCallback,
+  PropsWithChildren, ReactElement, useCallback, useEffect, useRef, useState,
 } from 'react';
 import classNames from 'classnames';
 
@@ -16,6 +16,7 @@ interface IProps<Item> {
   item: Item,
   items: Item[],
   position: number,
+  lastItemId: string,
   validationErrors: IValidationErrors,
   summaryText?: ISummaryText[]|string[],
   onDeleteItem: (items: Item[]) => void,
@@ -24,16 +25,25 @@ interface IProps<Item> {
 
 //eslint-disable-next-line @typescript-eslint/comma-dangle
 export const SpoilerItem = <Item extends { id: string, },>({
-// export const SpoilerItem: React.FC<IProps> = ({
   children,
   item,
   items,
   position,
+  lastItemId,
   validationErrors,
   summaryText = [],
   onDeleteItem,
   onChangeOrderItem,
 }: PropsWithChildren<IProps<Item>>): ReactElement => {
+  const detailsElementRef = useRef<HTMLDetailsElement>(null);
+
+  useEffect(() => {
+    if (item.id === lastItemId) {
+      detailsElementRef.current?.setAttribute('open', 'open');
+      detailsElementRef.current?.querySelector('input')?.focus();
+    }
+  }, [item.id, lastItemId]);
+
   const onChangeItemOrderBtnClick = useCallback(({ currentTarget }) => {
     if (onChangeOrderItem) {
       const newItems = [...items];
@@ -60,7 +70,10 @@ export const SpoilerItem = <Item extends { id: string, },>({
 
   return (
     <li className={classNames('developer-screen__spoiler-item')}>
-      <details className="developer-screen__spoiler-block">
+      <details
+        className={classNames('developer-screen__spoiler-block')}
+        ref={detailsElementRef}
+      >
         <summary
           className={classNames(
             'developer-screen__spoiler-title',
