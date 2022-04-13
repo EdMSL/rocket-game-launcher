@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useMemo, useState,
+  useCallback, useEffect, useMemo, useState,
 } from 'react';
 import classNames from 'classnames';
 
@@ -44,6 +44,26 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
     () => gameSettingsFiles.find((currFile) => currFile.name === parameter.file),
     [gameSettingsFiles, parameter.file],
   );
+
+  useEffect(() => {
+    const isSettingGroupExists = gameSettingsGroups.length > 0
+      && parameter.settingGroup
+      && gameSettingsGroups.map((group) => group.name).includes(parameter.settingGroup!);
+
+    if (!isSettingGroupExists) {
+      const { newParameter, newFullParameter } = generateGameSettingsParameter({
+        ...parameter,
+        ...gameSettingsGroups.length > 0 ? { settingGroup: gameSettingsGroups[0].name } : {},
+      },
+      fullParameter,
+      file!);
+
+      onParameterDataChange(parameter.id, newParameter);
+      setFullParameter(newFullParameter);
+    }
+    // Нам нужно менять только settingGroup и только если изменился массив settingsGroups,
+    // поэтому все остальные зависимости удаляем.
+  }, [gameSettingsGroups]);//eslint-disable-line
 
   const onParameterInputChange = useCallback((
     { currentTarget }: React.ChangeEvent<HTMLInputElement|HTMLSelectElement>,
