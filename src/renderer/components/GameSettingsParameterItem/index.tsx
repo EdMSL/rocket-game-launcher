@@ -1,9 +1,13 @@
-import React, { useCallback } from 'react';
+import React, {
+  useCallback, useMemo, useState,
+} from 'react';
 import classNames from 'classnames';
 
 import { Select } from '$components/UI/Select';
 import { ISelectOption, IValidationErrors } from '$types/common';
-import { generateSelectOptions } from '$utils/data';
+import {
+  generateGameSettingsParameter, generateSelectOptions, getDefaultGameSettingsParameter,
+} from '$utils/data';
 import { GameSettingControllerType, GameSettingsOptionType } from '$constants/misc';
 import {
   IGameSettingsFile, IGameSettingsGroup, IGameSettingsParameter,
@@ -11,6 +15,7 @@ import {
 import { Button } from '$components/UI/Button';
 import { TextField } from '$components/UI/TextField';
 import { NumberField } from '$components/UI/NumberField';
+import { defaultFullGameSettingsParameter } from '$constants/defaultData';
 
 interface IProps {
   parameter: IGameSettingsParameter,
@@ -30,32 +35,29 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
   onParameterDataChange,
   deleteParameter,
 }) => {
-  const onOptionTypeChange = useCallback((
-    { currentTarget }: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    onParameterDataChange(
-      parameter.id,
-      { ...parameter, optionType: GameSettingsOptionType[currentTarget.value.toUpperCase()] },
-    );
-  }, [parameter, onParameterDataChange]);
+  const [fullParameter, setFullParameter] = useState<IGameSettingsParameter>({
+    ...defaultFullGameSettingsParameter,
+    ...parameter,
+  });
 
-  const onParameterSelectChange = useCallback((
-    { currentTarget }: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    onParameterDataChange(parameter.id, {
-      ...parameter,
-      [currentTarget.name]: currentTarget.value,
-    });
-  }, [parameter, onParameterDataChange]);
+  const file = useMemo(
+    () => gameSettingsFiles.find((currFile) => currFile.name === parameter.file),
+    [gameSettingsFiles, parameter.file],
+  );
 
   const onParameterInputChange = useCallback((
-    { currentTarget }: React.ChangeEvent<HTMLInputElement>,
+    { currentTarget }: React.ChangeEvent<HTMLInputElement|HTMLSelectElement>,
   ) => {
-    onParameterDataChange(parameter.id, {
+    const { newParameter, newFullParameter } = generateGameSettingsParameter({
       ...parameter,
       [currentTarget.name]: currentTarget.value,
-    });
-  }, [parameter, onParameterDataChange]);
+    },
+    fullParameter,
+    file!);
+
+    onParameterDataChange(parameter.id, newParameter);
+    setFullParameter(newFullParameter);
+  }, [parameter, file, fullParameter, onParameterDataChange]);
 
   const onDeleteFileBtnClick = useCallback(() => {
     deleteParameter(parameter.id);
@@ -70,9 +72,10 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         className="developer-screen__item"
         id={`optionType_${parameter.id}`}
         options={generateSelectOptions(GameSettingsOptionType)}
+        name="optionType"
         label="Тип параметра"
         value={parameter.optionType}
-        onChange={onOptionTypeChange}
+        onChange={onParameterInputChange}
       />
       <Select
         className="developer-screen__item"
@@ -81,7 +84,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         name="file"
         label="Файл"
         value={parameter.file}
-        onChange={onParameterSelectChange}
+        onChange={onParameterInputChange}
       />
       {
         gameSettingsGroups.length !== 0 && (
@@ -92,7 +95,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
             options={gameSettingsGroupsOptions}
             name="settingGroup"
             value={parameter.settingGroup}
-            onChange={onParameterSelectChange}
+            onChange={onParameterInputChange}
           />
         )
       }
@@ -113,7 +116,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         onChange={onParameterInputChange}
       />
       {
-        parameter.name && (
+        parameter.name !== undefined && (
           <TextField
             className="developer-screen__item"
             id={`name_${parameter.id}`}
@@ -125,7 +128,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         )
       }
       {
-        parameter.iniGroup && (
+        parameter.iniGroup !== undefined && (
           <TextField
             className="developer-screen__item"
             id={`iniGroup_${parameter.id}`}
@@ -137,7 +140,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         )
       }
       {
-        parameter.valueName && (
+        parameter.valueName !== undefined && (
           <TextField
             className="developer-screen__item"
             id={`valueName_${parameter.id}`}
@@ -149,7 +152,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         )
       }
       {
-        parameter.valuePath && (
+        parameter.valuePath !== undefined && (
           <TextField
             className="developer-screen__item"
             id={`valuePath_${parameter.id}`}
@@ -161,11 +164,11 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         )
       }
       {
-        parameter.separator && (
+        parameter.separator !== undefined && (
           <TextField
             className="developer-screen__item"
-            id={`valuePath_${parameter.id}`}
-            name="valuePath"
+            id={`separator_${parameter.id}`}
+            name="separator"
             label="Разделитель"
             value={parameter.separator}
             onChange={onParameterInputChange}
@@ -173,7 +176,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         )
       }
       {
-        parameter.controllerType && (
+        parameter.controllerType && parameter.optionType !== GameSettingsOptionType.COMBINED && (
           <Select
             className="developer-screen__item"
             id={`controllerType_${parameter.id}`}
@@ -181,8 +184,22 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
             options={generateSelectOptions(GameSettingControllerType)}
             label="Тип контроллера"
             value={parameter.controllerType}
-            onChange={onParameterSelectChange}
+            onChange={onParameterInputChange}
           />
+        )
+      }
+      {
+        parameter.options && (
+          <ul>
+            {
+              Object.keys(parameter.options).map((key) => (
+                <li key={`${parameter.id}_${key}`}>
+                  <span>{key}</span>
+                  <span>{parameter.options![key]}</span>
+                </li>
+              ))
+            }
+          </ul>
         )
       }
       {
@@ -228,7 +245,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         parameter.items && (
           <ul>
             {
-              parameter.items.map((item) => <li>{item.name}</li>)
+              parameter.items.map((item) => <li key={item.id}>{item.name}</li>)
             }
           </ul>
         )

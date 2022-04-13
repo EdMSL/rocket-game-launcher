@@ -2,14 +2,18 @@ import {
   IError,
   ISuccess,
 } from '$types/common';
-import { IGameSettingsConfig } from '$types/gameSettings';
+import {
+  IGameSettingsConfig, IGameSettingsItemParameter, IGameSettingsParameter,
+} from '$types/gameSettings';
 import {
   ILauncherConfig,
   ILauncherCustomButton,
   IModOrganizerParams,
   IWindowSettings,
 } from '$types/main';
-import { Encoding, LauncherButtonAction } from './misc';
+import {
+  Encoding, GameSettingControllerType, GameSettingsOptionType, LauncherButtonAction,
+} from './misc';
 
 export const SUCCESS_STATUS: ISuccess = 'success';
 export const ERROR_STATUS: IError = 'error';
@@ -90,4 +94,37 @@ export const defaultGameSettingsConfig: IGameSettingsConfig = {
   gameSettingsGroups: [],
   gameSettingsFiles: [],
   gameSettingsParameters: [],
+};
+
+export const defaultGameSettingsParameterItem: IGameSettingsItemParameter = {
+  id: '',
+  name: '',
+  controllerType: GameSettingControllerType.CHECKBOX,
+  iniGroup: '',
+  min: 0,
+  max: 1,
+  step: 0.1,
+  options: {},
+  valueName: '',
+  valuePath: '',
+};
+
+export const defaultFullGameSettingsParameter: IGameSettingsParameter = {
+  id: '',
+  description: '',
+  file: '',
+  label: '',
+  optionType: GameSettingsOptionType.DEFAULT,
+  controllerType: GameSettingControllerType.CHECKBOX,
+  iniGroup: '',
+  items: [defaultGameSettingsParameterItem],
+  min: 0,
+  max: 1,
+  step: 0.1,
+  name: '',
+  options: {},
+  separator: ':',
+  settingGroup: '',
+  valueName: '',
+  valuePath: '',
 };

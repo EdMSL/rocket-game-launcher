@@ -33,6 +33,7 @@ import {
   IGameSettingsOptionsItem,
   IGameSettingsFile,
   IGameSettingsGroup,
+  IGameSettingsParameterBase,
 } from '$types/gameSettings';
 import {
   DefaultPathVariable,
@@ -45,7 +46,10 @@ import {
   ILauncherCustomButton,
   IModOrganizerParams,
 } from '$types/main';
-import { defaultModOrganizerParams } from '$constants/defaultData';
+import {
+  defaultGameSettingsParameterItem,
+  defaultModOrganizerParams,
+} from '$constants/defaultData';
 import { getReadWriteError } from './errors';
 import {
   IUserMessage,
@@ -899,21 +903,130 @@ export const getDefaultGameSettingsFile = (
 });
 
 /**
- * Сгенерировать новый объект параметра игровых настроек.
- * @param files Массив игровых файлов.
+ * Сгенерировать новый объект параметра игровых настроек типа `default`.
+ * @param file Объект с данными игрового файла.
+ * @param parameterBase Объект с базовыми полями любого типа параметра.
+ * @returns Объект с основными полями игрового параметра.
+**/
+const getParameterBase = (
+  file: IGameSettingsFile,
+  parameterBase?: IGameSettingsParameterBase,
+): IGameSettingsParameterBase => ({
+  id: parameterBase?.id! || getRandomId('game-settings-parameter'),
+  optionType: GameSettingsOptionType.DEFAULT,
+  file: parameterBase?.file || file.name,
+  label: parameterBase?.label || 'Заголовок',
+  description: parameterBase?.description || '',
+  ...parameterBase?.settingGroup ? { settingGroup: parameterBase.settingGroup } : {},
+});
+
+const getFieldsByFileView = (fullParameter: IGameSettingsParameter, file: IGameSettingsFile) => ({
+  ...file.view === GameSettingsFileView.TAG ? {
+    valueName: fullParameter.valueName || defaultGameSettingsParameterItem.valueName,
+    valuePath: fullParameter.valuePath || defaultGameSettingsParameterItem.valuePath,
+  } : {},
+  ...file.view === GameSettingsFileView.SECTIONAL ? {
+    iniGroup: fullParameter.iniGroup || defaultGameSettingsParameterItem.iniGroup,
+  } : {},
+});
+const getFieldsByControllerType = (fullParameter: IGameSettingsParameter) => ({
+  ...fullParameter.controllerType === GameSettingControllerType.RANGE ? {
+    min: fullParameter.min,
+    max: fullParameter.max,
+    step: fullParameter.step,
+  } : {},
+  ...fullParameter.controllerType === GameSettingControllerType.SELECT ? {
+    options: fullParameter.options,
+  } : {},
+});
+
+/**
+ * Сгенерировать новый объект параметра игровых настроек типа `default`.
+ * @param file Объект с данными игрового файла.
  * @returns Объект параметра из `state`.
  */
 export const getDefaultGameSettingsParameter = (
-  files: IGameSettingsFile[],
+  file: IGameSettingsFile,
 ): IGameSettingsParameter => ({
-  id: getRandomId('game-settings-parameter'),
-  file: files[0].name,
+  ...getParameterBase(file),
   name: '',
-  optionType: GameSettingsOptionType.DEFAULT,
-  label: '',
   controllerType: GameSettingControllerType.CHECKBOX,
-  description: '',
+  ...getFieldsByFileView({} as IGameSettingsParameter, file),
 });
+
+/**
+ * Сгенерировать новый объект параметра игровых настроек типа `default`.
+ * @param file Объект с данными игрового файла.
+ * @param currentParameter Объект изменяемого параметра.
+ * @param fullParameter Объект со всеми доступными полями параметра.
+ * @returns Объект параметра из `state`.
+ */
+export const generateGameSettingsParameter = (
+  currentParameter: IGameSettingsParameter,
+  fullParameter: IGameSettingsParameter,
+  file: IGameSettingsFile,
+): { newParameter: IGameSettingsParameter, newFullParameter: IGameSettingsParameter, } => {
+  const newFullParameter = {
+    ...fullParameter,
+    ...currentParameter,
+  };
+
+  let newParameter: IGameSettingsParameter = getParameterBase(file, newFullParameter);
+
+  switch (currentParameter.optionType) {
+    case GameSettingsOptionType.DEFAULT:
+      newParameter = {
+        ...newParameter,
+        name: newFullParameter.name,
+        controllerType: newFullParameter.controllerType,
+        ...getFieldsByFileView(newFullParameter, file),
+        ...getFieldsByControllerType(newFullParameter),
+      };
+      break;
+    case GameSettingsOptionType.COMBINED:
+      newParameter = {
+        ...newParameter,
+        controllerType: GameSettingControllerType.SELECT,
+        options: newFullParameter.options,
+        separator: newFullParameter.separator,
+        items: newFullParameter.items?.map((item): IGameSettingsItemParameter => ({
+          id: item.id,
+          name: item.name,
+          ...getFieldsByFileView(newFullParameter, file),
+        })),
+      };
+      break;
+    case GameSettingsOptionType.RELATED:
+      newParameter = {
+        ...newParameter,
+        items: newFullParameter.items?.map((item): IGameSettingsItemParameter => ({
+          id: item.id,
+          name: item.name,
+          ...getFieldsByFileView(newFullParameter, file),
+          ...getFieldsByControllerType(newFullParameter),
+        })),
+      };
+      break;
+    case GameSettingsOptionType.GROUP:
+      newParameter = {
+        ...newParameter,
+        ...getFieldsByControllerType(newFullParameter),
+        items: newFullParameter.items?.map((item): IGameSettingsItemParameter => ({
+          id: item.id,
+          name: item.name,
+          ...getFieldsByFileView(newFullParameter, file),
+        })),
+      };
+      break;
+    default:
+      break;
+  }
+
+  return {
+    newFullParameter,
+    newParameter,
+  };
+};
 
 /**
  * Заменяет данные элемента массива на новые.

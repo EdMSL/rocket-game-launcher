@@ -31,6 +31,15 @@ export interface IGameSettingsGroup {
   label: string,
 }
 
+export interface IGameSettingsParameterBase {
+  id: string,
+  optionType: GameSettingsOptionType,
+  file: string,
+  label: string,
+  description: string,
+  settingGroup?: string,
+}
+
 export interface IGameSettingsItemParameter {
   id: string,
   name: string,
@@ -44,15 +53,9 @@ export interface IGameSettingsItemParameter {
   options?: { [key: string]: string, },
 }
 
-export interface IGameSettingsParameter {
-  id: string,
-  file: string,
-  optionType: GameSettingsOptionType,
-  controllerType: GameSettingControllerType,
-  label: string,
-  description: string,
+export interface IGameSettingsParameter extends IGameSettingsParameterBase {
+  controllerType?: GameSettingControllerType,
   name?: string,
-  settingGroup?: string,
   iniGroup?: string,
   items?: IGameSettingsItemParameter[],
   separator?: string,

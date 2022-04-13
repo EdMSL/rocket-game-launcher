@@ -262,7 +262,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   const onAddGameSettingsParameter = useCallback(() => {
     changeCurrentConfig([
       ...currentConfig.gameSettingsParameters,
-      getDefaultGameSettingsParameter(currentConfig.gameSettingsFiles),
+      getDefaultGameSettingsParameter(currentConfig.gameSettingsFiles[0]),
     ],
     'gameSettingsParameters');
   }, [currentConfig.gameSettingsParameters, currentConfig.gameSettingsFiles, changeCurrentConfig]);
