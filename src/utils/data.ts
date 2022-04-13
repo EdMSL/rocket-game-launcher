@@ -947,10 +947,12 @@ const getFieldsByControllerType = (fullParameter: IGameSettingsParameter) => ({
  */
 export const getDefaultGameSettingsParameter = (
   file: IGameSettingsFile,
+  settingGroup?: string,
 ): IGameSettingsParameter => ({
   ...getParameterBase(file),
   name: '',
   controllerType: GameSettingControllerType.CHECKBOX,
+  ...settingGroup ? { settingGroup } : {},
   ...getFieldsByFileView({} as IGameSettingsParameter, file),
 });
 

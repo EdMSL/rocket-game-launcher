@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import { Select } from '$components/UI/Select';
 import { ISelectOption, IValidationErrors } from '$types/common';
 import {
-  generateGameSettingsParameter, generateSelectOptions, getDefaultGameSettingsParameter,
+  generateGameSettingsParameter, generateSelectOptions,
 } from '$utils/data';
 import { GameSettingControllerType, GameSettingsOptionType } from '$constants/misc';
 import {
