@@ -35,7 +35,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
   const onTextFieldChange = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    onFileDataChange(file.name, {
+    onFileDataChange(file.id, {
       ...file,
       [target.name]: target.value,
     });
@@ -44,7 +44,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
   const onSelectChange = useCallback((
     { target }: React.ChangeEvent<HTMLSelectElement>,
   ) => {
-    onFileDataChange(file.name, {
+    onFileDataChange(file.id, {
       ...file,
       [target.name]: target.value,
     });
@@ -56,7 +56,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
     validationData: IValidationData,
     fileName?: string|undefined,
   ) => {
-    onFileDataChange(file.name, {
+    onFileDataChange(file.id, {
       ...file,
       [fileName!]: value,
     });
