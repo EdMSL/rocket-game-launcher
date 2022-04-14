@@ -50,6 +50,7 @@ export interface IUIElementParams {
   multiparameters?: string,
   isDisabled?: boolean,
   parent?: string,
+  placeholder?: string,
   description?: string,
   maxLength?: number,
   validationErrors?: string[],
