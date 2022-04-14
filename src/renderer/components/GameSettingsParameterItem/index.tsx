@@ -8,7 +8,9 @@ import { ISelectOption, IValidationErrors } from '$types/common';
 import {
   generateGameSettingsParameter, generateSelectOptions,
 } from '$utils/data';
-import { GameSettingControllerType, GameSettingsOptionType } from '$constants/misc';
+import {
+  GameSettingControllerType, GameSettingsOptionType, HTMLInputType,
+} from '$constants/misc';
 import {
   IGameSettingsFile, IGameSettingsGroup, IGameSettingsParameter,
 } from '$types/gameSettings';
@@ -71,21 +73,35 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
   const onParameterInputChange = useCallback((
     { currentTarget }: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>,
   ) => {
-    const { newParameter, newFullParameter } = generateGameSettingsParameter({
-      ...parameter,
-      [currentTarget.name]: currentTarget.tagName === 'TEXTAREA'
-        ? generateSelectOptionsFromString(currentTarget.value)
-        : currentTarget.value,
-    },
-    fullParameter,
-    file!);
+    let currentParameter: IGameSettingsParameter;
+
+    if (currentTarget.type === HTMLInputType.NUMBER) {
+      currentParameter = {
+        ...parameter,
+        [currentTarget.name]: +currentTarget.value,
+      };
+    } else if (currentTarget.tagName === 'TEXTAREA') {
+      currentParameter = {
+        ...parameter,
+        [currentTarget.name]: generateSelectOptionsFromString(currentTarget.value),
+      };
+
+      setOptionsValue(currentTarget.value);
+    } else {
+      currentParameter = {
+        ...parameter,
+        [currentTarget.name]: currentTarget.value,
+      };
+    }
+
+    const { newParameter, newFullParameter } = generateGameSettingsParameter(
+      currentParameter,
+      fullParameter,
+      file!,
+    );
 
     onParameterDataChange(parameter.id, newParameter);
     setFullParameter(newFullParameter);
-
-    if (currentTarget.tagName === 'TEXTAREA') {
-      setOptionsValue(currentTarget.value);
-    }
   }, [parameter, file, fullParameter, onParameterDataChange]);
 
   const onDeleteFileBtnClick = useCallback(() => {

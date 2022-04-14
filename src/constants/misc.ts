@@ -42,6 +42,7 @@ export enum HTMLInputType {
   RANGE = 'range',
   SELECT = 'select-one',
   SWITCHER = 'checkbox',
+  NUMBER = 'number',
 }
 
 export enum GameSettingsOptionType {
