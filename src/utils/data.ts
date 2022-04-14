@@ -489,9 +489,7 @@ export const getParametersForOptionsGenerate = (
 
 /**
  * Генерирует игровую опцию для `gameSettingsOptions` из `state` с новым значением `value`.
- * @param gameSettingsOptions Опции игровых настроек из `state`.
- * @param fileName Имя файла, из которого взят параметр для генерируемой опции.
- * @param optionName Имя опции из `gameSettingsOptions`.
+ * @param currentOption Опция для изменения.
  * @param newValue Новое значение `value` для опции.
  * @returns Объект опции.
 */
@@ -919,7 +917,7 @@ const getParameterBase = (
   parameterBase?: IGameSettingsParameterBase,
 ): IGameSettingsParameterBase => ({
   id: parameterBase?.id! || getRandomId('game-settings-parameter'),
-  optionType: GameSettingsOptionType.DEFAULT,
+  optionType: parameterBase?.optionType || GameSettingsOptionType.DEFAULT,
   file: parameterBase?.file || file.name,
   label: parameterBase?.label || 'Заголовок',
   description: parameterBase?.description || '',
@@ -927,22 +925,23 @@ const getParameterBase = (
 });
 
 const getFieldsByFileView = (fullParameter: IGameSettingsParameter, file: IGameSettingsFile) => ({
+  ...file.view === GameSettingsFileView.SECTIONAL ? {
+    iniGroup: fullParameter.iniGroup || defaultGameSettingsParameterItem.iniGroup,
+  } : {},
   ...file.view === GameSettingsFileView.TAG ? {
     valueName: fullParameter.valueName || defaultGameSettingsParameterItem.valueName,
     valuePath: fullParameter.valuePath || defaultGameSettingsParameterItem.valuePath,
   } : {},
-  ...file.view === GameSettingsFileView.SECTIONAL ? {
-    iniGroup: fullParameter.iniGroup || defaultGameSettingsParameterItem.iniGroup,
-  } : {},
 });
+
 const getFieldsByControllerType = (fullParameter: IGameSettingsParameter) => ({
+  ...fullParameter.controllerType === GameSettingControllerType.SELECT ? {
+    options: fullParameter.options,
+  } : {},
   ...fullParameter.controllerType === GameSettingControllerType.RANGE ? {
     min: fullParameter.min,
     max: fullParameter.max,
     step: fullParameter.step,
-  } : {},
-  ...fullParameter.controllerType === GameSettingControllerType.SELECT ? {
-    options: fullParameter.options,
   } : {},
 });
 
@@ -956,10 +955,10 @@ export const getDefaultGameSettingsParameter = (
   settingGroup?: string,
 ): IGameSettingsParameter => ({
   ...getParameterBase(file),
-  name: '',
-  controllerType: GameSettingControllerType.CHECKBOX,
   ...settingGroup ? { settingGroup } : {},
+  name: '',
   ...getFieldsByFileView({} as IGameSettingsParameter, file),
+  controllerType: GameSettingControllerType.CHECKBOX,
 });
 
 /**
@@ -974,7 +973,7 @@ export const generateGameSettingsParameter = (
   fullParameter: IGameSettingsParameter,
   file: IGameSettingsFile,
 ): { newParameter: IGameSettingsParameter, newFullParameter: IGameSettingsParameter, } => {
-  const newFullParameter = {
+  const newFullParameter: IGameSettingsParameter = {
     ...fullParameter,
     ...currentParameter,
   };
@@ -987,16 +986,16 @@ export const generateGameSettingsParameter = (
         ...newParameter,
         name: newFullParameter.name,
         controllerType: newFullParameter.controllerType,
-        ...getFieldsByFileView(newFullParameter, file),
         ...getFieldsByControllerType(newFullParameter),
+        ...getFieldsByFileView(newFullParameter, file),
       };
       break;
     case GameSettingsOptionType.COMBINED:
       newParameter = {
         ...newParameter,
         controllerType: GameSettingControllerType.SELECT,
-        options: newFullParameter.options,
         separator: newFullParameter.separator,
+        options: newFullParameter.options,
         items: newFullParameter.items?.map((item): IGameSettingsItemParameter => ({
           id: item.id,
           name: item.name,
@@ -1010,14 +1009,15 @@ export const generateGameSettingsParameter = (
         items: newFullParameter.items?.map((item): IGameSettingsItemParameter => ({
           id: item.id,
           name: item.name,
-          ...getFieldsByFileView(newFullParameter, file),
           ...getFieldsByControllerType(newFullParameter),
+          ...getFieldsByFileView(newFullParameter, file),
         })),
       };
       break;
     case GameSettingsOptionType.GROUP:
       newParameter = {
         ...newParameter,
+        controllerType: newFullParameter.controllerType,
         ...getFieldsByControllerType(newFullParameter),
         items: newFullParameter.items?.map((item): IGameSettingsItemParameter => ({
           id: item.id,

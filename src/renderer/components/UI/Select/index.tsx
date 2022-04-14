@@ -62,7 +62,7 @@ export const Select: (React.FunctionComponent<IProps>) = ({
         data-multiparameters={multiparameters}
         onChange={onChange}
         value={value}
-        disabled={isDisabled || options.length === 0}
+        disabled={isDisabled || options.length <= 1}
       >
         {
           currentOptionsArr.map((option) => (

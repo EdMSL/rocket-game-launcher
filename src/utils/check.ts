@@ -212,17 +212,17 @@ const gameSettingsFileOptionTypeSchema = Joi.string().required().valid(...Object
 // id для опций не указываются в settings.json, вместо этого они генерируются автоматически.
 const defaultOptionTypeSchema = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('game-settings-parameter')),
+  optionType: Joi.string().required().valid(GameSettingsOptionType.DEFAULT),
   file: Joi.string().valid(Joi.in('$gameSettingsFiles'))
     .messages({ 'any.only': '"file" must be one of {$gameSettingsFiles}' }),
-  optionType: Joi.string().required().valid(GameSettingsOptionType.DEFAULT),
+  label: Joi.string().optional().default(Joi.ref('name')),
+  description: Joi.string().optional().default('').allow(''),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ).valid(Joi.in('$gameSettingsGroups'))
     .messages({ 'any.only': '"settingGroup" must be one of {$gameSettingsGroups}' }),
-  label: Joi.string().optional().default(Joi.ref('name')),
-  description: Joi.string().optional().default('').allow(''),
   name: Joi.string().required(),
   iniGroup: Joi.string().when(
     Joi.ref('$view'), {
@@ -259,17 +259,17 @@ const defaultOptionTypeSchema = Joi.object({
 
 const groupOptionTypeSchema = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('game-settings-parameter')),
+  optionType: Joi.string().required().valid(GameSettingsOptionType.GROUP),
   file: Joi.string().valid(Joi.in('$gameSettingsFiles'))
     .messages({ 'any.only': '"file" must be one of {$gameSettingsFiles}' }),
-  optionType: Joi.string().required().valid(GameSettingsOptionType.GROUP),
+  label: Joi.string().required(),
+  description: Joi.string().optional().default('').allow(''),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ).valid(Joi.in('$gameSettingsGroups'))
     .messages({ 'any.only': '"settingGroup" must be one of {$gameSettingsGroups}' }),
-  label: Joi.string().required(),
-  description: Joi.string().optional().default('').allow(''),
   controllerType: Joi.string().required().valid(...Object.values(GameSettingControllerType)),
   options: Joi.object().pattern(
     Joi.string(),
@@ -310,17 +310,17 @@ const groupOptionTypeSchema = Joi.object({
 
 const combinedOptionTypeSchema = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('game-settings-parameter')),
+  optionType: Joi.string().required().valid(GameSettingsOptionType.COMBINED),
   file: Joi.string().valid(Joi.in('$gameSettingsFiles'))
     .messages({ 'any.only': '"file" must be one of {$gameSettingsFiles}' }),
-  optionType: Joi.string().required().valid(GameSettingsOptionType.COMBINED),
+  label: Joi.string().required(),
+  description: Joi.string().optional().default('').allow(''),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ).valid(Joi.in('$gameSettingsGroups'))
     .messages({ 'any.only': '"settingGroup" must be one of {$gameSettingsGroups}' }),
-  label: Joi.string().required(),
-  description: Joi.string().optional().default('').allow(''),
   controllerType: Joi.string().required().valid(GameSettingControllerType.SELECT),
   separator: Joi.string().optional().default(':'),
   options: Joi.object().pattern(
@@ -336,15 +336,6 @@ const combinedOptionTypeSchema = Joi.object({
     });
     return value;
   }),
-  min: Joi.number().when(
-    Joi.ref('controllerType'), { is: GameSettingControllerType.RANGE, then: Joi.required() },
-  ),
-  max: Joi.number().when(
-    Joi.ref('controllerType'), { is: GameSettingControllerType.RANGE, then: Joi.required() },
-  ),
-  step: Joi.number().when(
-    Joi.ref('controllerType'), { is: GameSettingControllerType.RANGE, then: Joi.required() },
-  ),
   items: Joi.array()
     .items(Joi.object({
       id: Joi.string().optional().default(() => getRandomId('item')),
@@ -369,17 +360,17 @@ const combinedOptionTypeSchema = Joi.object({
 
 const relatedOptionTypeSchema = Joi.object({
   id: Joi.string().optional().default(() => getRandomId('game-settings-parameter')),
+  optionType: Joi.string().required().valid(GameSettingsOptionType.RELATED),
   file: Joi.string().valid(Joi.in('$gameSettingsFiles'))
     .messages({ 'any.only': '"file" must be one of {$gameSettingsFiles}' }),
-  optionType: Joi.string().required().valid(GameSettingsOptionType.RELATED),
+  label: Joi.string().required(),
+  description: Joi.string().optional().default('').allow(''),
   settingGroup: Joi.string().when(
     Joi.ref('$isGameSettingsGroupsExists'), {
       is: true, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ).valid(Joi.in('$gameSettingsGroups'))
     .messages({ 'any.only': '"settingGroup" must be one of {$gameSettingsGroups}' }),
-  description: Joi.string().optional().default('').allow(''),
-  label: Joi.string().required(),
   items: Joi.array()
     .items(Joi.object({
       id: Joi.string().optional().default(() => getRandomId('item')),
@@ -578,7 +569,9 @@ export const checkGameSettingsParameters = (
       return [...currentParams];
     }
 
-    return [...currentParams, validationResult.value];
+    // Т.к. id опциональный ключ и гененрируется автоматически, он добавляется в самый низ объекта.
+    // Поэтому для сохранения порядка ключей перегенерируем объект и id прописываем первым.
+    return [...currentParams, { id: validationResult.value.id, ...validationResult.value }];
   }, []);
 
   return {

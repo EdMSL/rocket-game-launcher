@@ -359,3 +359,48 @@ export const isValidName = (name: string): boolean => {
 
   return !/[<>:"/\\|?*]/.test(name);
 };
+
+/**
+ * Генерирует строку опций для `select` из игрового параметра. Использется в `TextArea` компоненте.
+ * @param options Опции для `select` из параметра.
+ * @returns Строка с опциями.
+ */
+export const generateSelectOptionsString = (
+  options: { [key: string]: string, }|undefined,
+): string => {
+  if (options !== undefined) {
+    return Object.keys(options).reduce(
+      (totalString, option) => `${totalString}${option}=${options![option]}\n`,
+      '',
+    );
+  }
+
+  return '';
+};
+
+/**
+ * Генерирует опции из строки опций для `select` из игрового параметра.
+ * Строка используется в `TextArea` компоненте.
+ * @param optionsStr Строка с опциями из `select` для параметра.
+ * @returns Объект опций для `select`.
+ */
+export const generateSelectOptionsFromString = (optionsStr: string): { [key: string]: string, } => {
+  const optionsArr = optionsStr.split('\n');
+
+  if (optionsArr.length > 0) {
+    return optionsArr.reduce((options, currentStr) => {
+      const optionArr = currentStr.split('=');
+
+      if (optionArr.length === 2 && optionArr[0].trim() !== '' && optionArr[1].trim() !== '') {
+        return {
+          ...options,
+          [optionArr[0]]: optionArr[1],
+        };
+      }
+
+      return { ...options };
+    }, {});
+  }
+
+  return {};
+};
