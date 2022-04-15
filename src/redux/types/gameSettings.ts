@@ -54,17 +54,17 @@ export interface IGameSettingsItemParameter {
 }
 
 export interface IGameSettingsParameter extends IGameSettingsParameterBase {
-  controllerType?: GameSettingControllerType,
   name?: string,
   iniGroup?: string,
-  items?: IGameSettingsItemParameter[],
-  separator?: string,
   valueName?: string,
   valuePath?: string,
+  controllerType?: GameSettingControllerType,
+  separator?: string,
+  options?: { [key: string]: string, },
   min?: number,
   max?: number,
   step?: number,
-  options?: { [key: string]: string, },
+  items?: IGameSettingsItemParameter[],
 }
 
 export interface IGameSettingsFile {

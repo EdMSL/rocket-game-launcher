@@ -571,7 +571,14 @@ export const checkGameSettingsParameters = (
 
     // Т.к. id опциональный ключ и гененрируется автоматически, он добавляется в самый низ объекта.
     // Поэтому для сохранения порядка ключей перегенерируем объект и id прописываем первым.
-    return [...currentParams, { id: validationResult.value.id, ...validationResult.value }];
+    const newParam = { id: validationResult.value.id, ...validationResult.value };
+
+    if (newParam.items) {
+      const newItems = newParam.items.map((item) => ({ id: item.id, ...item }));
+      newParam.items = newItems;
+    }
+
+    return [...currentParams, newParam];
   }, []);
 
   return {
@@ -670,14 +677,22 @@ export const checkGameSettingsConfigFull = (
 };
 
 /**
-  Сравнение двух объектов на равенство полей с помощью JSON.stringify.
+  Сравнение двух объектов на равенство полей.
   @param a Первый объект.
   @param b Второй объект.
   @returns Равны ли объекты.
 */
-export const checkObjectForEqual = (a: object, b: object): boolean => JSON.stringify(a) === JSON.stringify(b);
+export const checkObjectForEqual = (a, b): boolean => {
+  if (a === b) return true;
+  if (!a || !b || (typeof a !== 'object' && typeof b !== 'object')) return a === b;
+  if (a === null || a === undefined || b === null || b === undefined) return false;
+  if (a.prototype !== b.prototype) return false;
+  const keys = Object.keys(a);
+  if (keys.length !== Object.keys(b).length) return false;
+  return keys.every((k) => checkObjectForEqual(a[k], b[k]));
+};
 
-const getWindowSettingsFromLauncherConfig = (
+export const getWindowSettingsFromLauncherConfig = (
   config: ILauncherConfig,
 ): IWindowSettings => Object.keys(defaultLauncherWindowSettings).reduce<IWindowSettings>(
   (acc, current) => ({
