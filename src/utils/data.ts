@@ -1042,9 +1042,9 @@ export const generateGameSettingsParameter = (
 };
 
 /**
- * Заменяет данные элемента массива на новые.
+ * Заменяет данные элемента (объект) массива на новые.
  * @param id Идентификатор элемента массива.
- * @param data Данные для замены.
+ * @param data Объект с данными для замены.
  * @param items Элементы массива, данные элемента которого меняем.
  * @returns Массив элементов с измененным элементом.
  */
@@ -1056,7 +1056,7 @@ export const changeConfigArrayItem = <P extends { id: string, }>(
   const index = items.findIndex((item) => item.id === id);
   const newParams = [...items];
 
-  newParams[index] = { ...data };
+  newParams[index] = { ...newParams[index], ...data };
 
   return newParams;
 };

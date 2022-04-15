@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import { Select } from '$components/UI/Select';
 import { ISelectOption, IValidationErrors } from '$types/common';
 import {
+  changeConfigArrayItem,
   generateGameSettingsParameter, generateSelectOptions,
 } from '$utils/data';
 import {
@@ -73,24 +74,50 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
   const onParameterInputChange = useCallback((
     { currentTarget }: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>,
   ) => {
+    const isParameterItemChange = currentTarget.dataset.parent && currentTarget.dataset.parent !== '';
+
     let currentParameter: IGameSettingsParameter;
 
     if (currentTarget.type === HTMLInputType.NUMBER) {
       currentParameter = {
         ...parameter,
-        [currentTarget.name]: +currentTarget.value,
+        ...isParameterItemChange ? {
+          items: changeConfigArrayItem<any>(
+            currentTarget.dataset.parent!,
+            { [currentTarget.name]: +currentTarget.value },
+            parameter.items!,
+          ),
+        } : {
+          [currentTarget.name]: +currentTarget.value,
+        },
       };
     } else if (currentTarget.tagName === 'TEXTAREA') {
       currentParameter = {
         ...parameter,
-        [currentTarget.name]: generateSelectOptionsFromString(currentTarget.value),
+        ...isParameterItemChange ? {
+          items: changeConfigArrayItem<any>(
+            currentTarget.dataset.parent!,
+            { [currentTarget.name]: generateSelectOptionsFromString(currentTarget.value) },
+            parameter.items!,
+          ),
+        } : {
+          [currentTarget.name]: generateSelectOptionsFromString(currentTarget.value),
+        },
       };
 
       setOptionsValue(currentTarget.value);
     } else {
       currentParameter = {
         ...parameter,
-        [currentTarget.name]: currentTarget.value,
+        ...isParameterItemChange ? {
+          items: changeConfigArrayItem<any>(
+            currentTarget.dataset.parent!,
+            { [currentTarget.name]: currentTarget.value },
+            parameter.items!,
+          ),
+        } : {
+          [currentTarget.name]: currentTarget.value,
+        },
       };
     }
 
@@ -117,7 +144,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         className="developer-screen__item"
         id={`label_${parameter.id}`}
         name="label"
-        label="Заголовок параметра"
+        label="Заголовок опции"
         value={parameter.label}
         onChange={onParameterInputChange}
       />
@@ -126,7 +153,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         id={`optionType_${parameter.id}`}
         options={generateSelectOptions(GameSettingsOptionType)}
         name="optionType"
-        label="Тип параметра"
+        label="Тип опции"
         value={parameter.optionType}
         onChange={onParameterInputChange}
       />
@@ -137,6 +164,14 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         name="file"
         label="Файл"
         value={parameter.file}
+        onChange={onParameterInputChange}
+      />
+      <TextField
+        className="developer-screen__item"
+        id={`description_${parameter.id}`}
+        name="description"
+        label="Описание опции"
+        value={parameter.description}
         onChange={onParameterInputChange}
       />
       {
@@ -152,14 +187,6 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
           />
         )
       }
-      <TextField
-        className="developer-screen__item"
-        id={`description_${parameter.id}`}
-        name="description"
-        label="Описание параметра"
-        value={parameter.description}
-        onChange={onParameterInputChange}
-      />
       {
         parameter.name !== undefined && (
           <TextField
@@ -221,7 +248,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         )
       }
       {
-        parameter.controllerType && (
+        parameter.controllerType !== undefined && (
           <Select
             className="developer-screen__item"
             id={`controllerType_${parameter.id}`}
@@ -263,7 +290,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         )
       }
       {
-        parameter.max && (
+        parameter.max !== undefined && (
           <NumberField
             className="developer-screen__item"
             id={`max_${parameter.id}`}
@@ -276,12 +303,12 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         )
       }
       {
-        parameter.step && (
+        parameter.step !== undefined && (
           <NumberField
             className="developer-screen__item"
             id={`step_${parameter.id}`}
             name="step"
-            min=""
+            min={0.001}
             label="Шаг изменения значения"
             value={parameter.step}
             onChange={onParameterInputChange}
@@ -289,10 +316,123 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         )
       }
       {
-        parameter.items && (
+        parameter.items !== undefined && (
           <ul>
             {
-              parameter.items.map((item) => <li key={item.id}>{item.name}</li>)
+              parameter.items.map((item) => (
+                <li
+                  key={item.id}
+                  className="developer-screen__item"
+                >
+                  <TextField
+                    id={`name_${item.id}`}
+                    parent={item.id}
+                    name="name"
+                    label="Имя параметра из файла"
+                    value={item.name}
+                    onChange={onParameterInputChange}
+                  />
+                  {
+                    item.iniGroup !== undefined && (
+                      <TextField
+                        id={`iniGroup_${item.id}`}
+                        parent={item.id}
+                        name="iniGroup"
+                        label="Группа параметра из файла"
+                        value={item.iniGroup}
+                        onChange={onParameterInputChange}
+                      />
+                    )
+                  }
+                  {
+                    item.valueName !== undefined && (
+                      <TextField
+                        id={`valueName_${item.id}`}
+                        parent={item.id}
+                        name="valueName"
+                        label="Имя атрибута параметра из файла"
+                        value={item.valueName}
+                        onChange={onParameterInputChange}
+                      />
+                    )
+                  }
+                  {
+                    item.valuePath !== undefined && (
+                      <TextField
+                        id={`valuePath_${item.id}`}
+                        parent={item.id}
+                        name="valuePath"
+                        label="Путь до параметра из файла"
+                        value={item.valuePath}
+                        onChange={onParameterInputChange}
+                      />
+                    )
+                  }
+                  {
+                    item.controllerType !== undefined && (
+                    <Select
+                      id={`controllerType_${item.id}`}
+                      name="controllerType"
+                      options={generateSelectOptions(parameter.optionType === GameSettingsOptionType.COMBINED
+                        ? [GameSettingControllerType.SELECT.toUpperCase()]
+                        : GameSettingControllerType)}
+                      label="Тип контроллера"
+                      value={item.controllerType}
+                      onChange={onParameterInputChange}
+                    />
+                    )
+                  }
+                  {
+                    item.options !== undefined && (
+                    <TextArea
+                      id={`options_${item.id}`}
+                      name="options"
+                      label="Опции селектора"
+                      value={optionsValue}
+                      wrap="off"
+                      placeholder="Видит пользователь=Запишется в файл"
+                      onChange={onParameterInputChange}
+                    />
+                    )
+                  }
+                  {
+                    item.min !== undefined && (
+                    <NumberField
+                      id={`min_${item.id}`}
+                      name="min"
+                      min=""
+                      label="Минимальное значение"
+                      value={item.min}
+                      onChange={onParameterInputChange}
+                    />
+                    )
+                  }
+                  {
+                    item.max !== undefined && (
+                    <NumberField
+                      id={`max_${item.id}`}
+                      name="max"
+                      min=""
+                      label="Максимальное значение"
+                      value={item.max}
+                      onChange={onParameterInputChange}
+                    />
+                    )
+                  }
+                  {
+                    item.step !== undefined && (
+                    <NumberField
+                      id={`step_${item.id}`}
+                      name="step"
+                      min={0.001}
+                      label="Шаг изменения значения"
+                      value={item.step}
+                      onChange={onParameterInputChange}
+                    />
+                    )
+                  }
+                </li>
+              ))
             }
           </ul>
         )
