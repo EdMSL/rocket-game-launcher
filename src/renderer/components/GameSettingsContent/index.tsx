@@ -1,9 +1,6 @@
-import React, {
-  useCallback, ReactElement,
-} from 'react';
+import React, { useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import classNames from 'classnames';
-import { Scrollbars } from 'react-custom-scrollbars-2';
 
 import styles from './styles.module.scss';
 import {
@@ -30,6 +27,7 @@ import { HintItem } from '$components/HintItem';
 import { getNumberOfDecimalPlaces, getValueFromRange } from '$utils/strings';
 import { Switcher } from '$components/UI/Switcher';
 import { IMainRootState } from '$types/main';
+import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 
 interface IProps {
   isGameSettingsLoaded: IMainRootState['isGameSettingsLoaded'],
@@ -167,24 +165,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
 
   /* eslint-disable react/jsx-props-no-spreading */
   return (
-    <Scrollbars
-      autoHeight
-      autoHide
-      autoHeightMax="100%"
-      hideTracksWhenNotNeeded
-      renderTrackVertical={(props): ReactElement => (
-        <div
-          {...props}
-          className="scrollbar__track"
-        />
-      )}
-      renderThumbVertical={(props): ReactElement => (
-        <div
-          {...props}
-          className="scrollbar__thumb"
-        />
-      )}
-    >
+    <ScrollbarsBlock>
       {
         // Так как опция может состоять из нескольких полей,
         // она может содержать в себе несколько значений параметров из файла,
@@ -438,7 +419,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
             return <React.Fragment />;
           },
         )
-    }
-    </Scrollbars>
+      }
+    </ScrollbarsBlock>
   );
 };

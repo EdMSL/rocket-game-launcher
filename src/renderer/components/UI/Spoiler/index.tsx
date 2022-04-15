@@ -1,5 +1,5 @@
 import React, {
-  PropsWithChildren, ReactElement, useCallback, useEffect, useRef, useState,
+  PropsWithChildren, ReactElement, useCallback, useEffect, useRef,
 } from 'react';
 import classNames from 'classnames';
 
@@ -24,7 +24,7 @@ interface IProps<Item> {
 }
 
 //eslint-disable-next-line @typescript-eslint/comma-dangle
-export const SpoilerItem = <Item extends { id: string, },>({
+export const Spoiler = <Item extends { id: string, },>({
   children,
   item,
   items,

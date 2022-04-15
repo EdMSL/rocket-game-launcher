@@ -1,7 +1,6 @@
-import React, { useCallback, ReactElement } from 'react';
+import React, { useCallback } from 'react';
 import classNames from 'classnames';
 import { useDispatch } from 'react-redux';
-import { Scrollbars } from 'react-custom-scrollbars-2';
 
 import styles from './styles.module.scss';
 import { Button } from '$components/UI/Button';
@@ -16,6 +15,7 @@ import { CreateUserMessage } from '$utils/message';
 import { IMainRootState } from '$types/main';
 import { Loader } from '$components/UI/Loader';
 import { GameSettingsBackupItem } from '$components/GameSettingsBackupItem';
+import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 
 interface IProps {
   gameSettingsFilesBackup: IMainRootState['gameSettingsFilesBackup'],
@@ -65,24 +65,7 @@ export const GameSettingsBackup: React.FC<IProps> = ({
     <div className={styles['game-settings-backup__container']}>
       <React.Fragment>
         <ul className={styles['game-settings-backup__list']}>
-          <Scrollbars
-            autoHeight
-            autoHide
-            autoHeightMax="100%"
-            hideTracksWhenNotNeeded
-            renderTrackVertical={(props): ReactElement => (
-              <div
-                {...props}
-                className="scrollbar__track"
-              />
-            )}
-            renderThumbVertical={(props): ReactElement => (
-              <div
-                {...props}
-                className="scrollbar__thumb"
-              />
-            )}
-          >
+          <ScrollbarsBlock>
             {
               gameSettingsFilesBackup.length > 0
                 ? gameSettingsFilesBackup.map((backupFolder) => (
@@ -98,7 +81,7 @@ export const GameSettingsBackup: React.FC<IProps> = ({
                 ))
                 : <li className={styles['game-settings-backup__item']}>Нет доступных бэкапов</li>
             }
-          </Scrollbars>
+          </ScrollbarsBlock>
         </ul>
         <div className={styles['game-settings-backup__controls']}>
           <Button

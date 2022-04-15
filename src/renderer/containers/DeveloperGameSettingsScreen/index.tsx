@@ -1,7 +1,6 @@
 import React, {
-  ReactElement, useCallback, useEffect, useState,
+  useCallback, useEffect, useState,
 } from 'react';
-import Scrollbars from 'react-custom-scrollbars-2';
 import { useDispatch } from 'react-redux';
 import { ipcRenderer } from 'electron';
 import classNames from 'classnames';
@@ -41,7 +40,8 @@ import {
   addDeveloperMessages, saveGameSettingsConfig, updateConfig,
 } from '$actions/developer';
 import { GameSettingsParameterItem } from '$components/GameSettingsParameterItem';
-import { SpoilerItem } from '$components/SpoilerItem';
+import { Spoiler } from '$components/UI/Spoiler';
+import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 
 export const DeveloperGameSettingsScreen: React.FC = () => {
   /* eslint-disable max-len */
@@ -308,43 +308,26 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
         onResetBtnClick={onResetBtnClick}
         onUpdateBtnClick={onUpdateBtnClick}
       />
-      <Scrollbars
-        autoHeight
-        autoHide
-        autoHeightMax="100%"
-        hideTracksWhenNotNeeded
-        renderTrackVertical={(props): ReactElement => (
-          <div
-            {...props}
-            className="scrollbar__track"
-          />
-        )}
-        renderThumbVertical={(props): ReactElement => (
-          <div
-            {...props}
-            className="scrollbar__thumb"
-          />
-        )}
-      >
+      <ScrollbarsBlock>
         {
           isGameSettingsConfigLoaded && (
-          <React.Fragment>
-            <div className={styles['developer-screen__game-settings']}>
-              <div className="developer-screen__block">
-                <p className="developer-screen__block-title">Группы игровых настроек</p>
-                <Button
-                  className={classNames(
-                    'main-btn',
-                    'control-panel__btn',
-                    'developer-screen__btn',
-                  )}
-                  isDisabled={!!lastCreatedGroupName}
-                  onClick={createNewGroup}
-                >
-                  Добавить
-                </Button>
-                <ul className={styles['developer-screen__groups-container']}>
-                  {
+            <React.Fragment>
+              <div className={styles['developer-screen__game-settings']}>
+                <div className="developer-screen__block">
+                  <p className="developer-screen__block-title">Группы игровых настроек</p>
+                  <Button
+                    className={classNames(
+                      'main-btn',
+                      'control-panel__btn',
+                      'developer-screen__btn',
+                    )}
+                    isDisabled={!!lastCreatedGroupName}
+                    onClick={createNewGroup}
+                  >
+                    Добавить
+                  </Button>
+                  <ul className={styles['developer-screen__groups-container']}>
+                    {
                   currentConfig.gameSettingsGroups.length > 0
                     && currentConfig.gameSettingsGroups.map((item) => (
                       <li
@@ -374,34 +357,34 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                       </li>
                     ))
                   }
-                  {
+                    {
                   currentConfig.gameSettingsGroups.length === 0 && (
                     <li className={styles['developer-screen__groups-item']}>
                       Нет групп игровых настроек
                     </li>
                   )
                 }
-                </ul>
+                  </ul>
+                </div>
               </div>
-            </div>
-            <div className="developer-screen__block">
-              <p className="developer-screen__block-title">Кодировка файлов настроек</p>
-              <TextField
-                className="developer-screen__item"
-                id="baseFilesEncoding"
-                label="Кодировка"
-                value={currentConfig.baseFilesEncoding}
-                description="Кодировка, которая будет по умолчанию применяться при чтении и записи данных файлов игровых настроек." //eslint-disable-line max-len
-                onChange={onTextFieldChange}
-              />
-            </div>
-            <div className="developer-screen__block">
-              <p className="developer-screen__block-title">Настройка игровых опций</p>
-              <p className="developer-screen__text">Файлы игровых параметров</p>
-              <ul className={styles['developer-screen__list']}>
-                {
+              <div className="developer-screen__block">
+                <p className="developer-screen__block-title">Кодировка файлов настроек</p>
+                <TextField
+                  className="developer-screen__item"
+                  id="baseFilesEncoding"
+                  label="Кодировка"
+                  value={currentConfig.baseFilesEncoding}
+                  description="Кодировка, которая будет по умолчанию применяться при чтении и записи данных файлов игровых настроек." //eslint-disable-line max-len
+                  onChange={onTextFieldChange}
+                />
+              </div>
+              <div className="developer-screen__block">
+                <p className="developer-screen__block-title">Настройка игровых опций</p>
+                <p className="developer-screen__text">Файлы игровых параметров</p>
+                <ul className={styles['developer-screen__list']}>
+                  {
                 currentConfig.gameSettingsFiles.length > 0 && currentConfig.gameSettingsFiles.map((file, index) => (
-                  <SpoilerItem<IGameSettingsFile>
+                  <Spoiler<IGameSettingsFile>
                     key={file.name}
                     item={file}
                     items={currentConfig.gameSettingsFiles}
@@ -419,29 +402,29 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                       onValidation={setNewValidationErrors}
                       deleteFile={deleteGameSettingsFileById}
                     />
-                  </SpoilerItem>
+                  </Spoiler>
                 ))
                 }
-                {
+                  {
                 currentConfig.gameSettingsFiles.length === 0
                 && <li> Нет игровых файлов </li>
                 }
-              </ul>
-              <Button
-                className={classNames(
-                  'main-btn',
-                  'control-panel__btn',
-                  'developer-screen__btn',
-                )}
-                onClick={onAddGameSettingsFile}
-              >
-                Добавить
-              </Button>
-              <p className="developer-screen__text">Игровые параметры</p>
-              <ul className={styles['developer-screen__list']}>
-                {
+                </ul>
+                <Button
+                  className={classNames(
+                    'main-btn',
+                    'control-panel__btn',
+                    'developer-screen__btn',
+                  )}
+                  onClick={onAddGameSettingsFile}
+                >
+                  Добавить
+                </Button>
+                <p className="developer-screen__text">Игровые параметры</p>
+                <ul className={styles['developer-screen__list']}>
+                  {
                 currentConfig.gameSettingsParameters.length > 0 && currentConfig.gameSettingsParameters.map((param, index) => (
-                  <SpoilerItem<IGameSettingsParameter>
+                  <Spoiler<IGameSettingsParameter>
                     key={param.id}
                     item={param}
                     items={currentConfig.gameSettingsParameters}
@@ -461,33 +444,33 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                       onValidation={setNewValidationErrors}
                       deleteParameter={deleteGameSettingsParameterById}
                     />
-                  </SpoilerItem>
+                  </Spoiler>
                 ))
                 }
-                {
+                  {
                 currentConfig.gameSettingsParameters.length === 0 && currentConfig.gameSettingsFiles.length !== 0
                 && <li> Нет игровых параметров</li>
                 }
-                {
+                  {
                 currentConfig.gameSettingsParameters.length === 0 && currentConfig.gameSettingsFiles.length === 0
                 && <li> Добавьте хотя бы один игровой файл, чтобы добавлять игровые параметры</li>
                 }
-              </ul>
-              <Button
-                className={classNames(
-                  'main-btn',
-                  'control-panel__btn',
-                  'developer-screen__btn',
-                )}
-                onClick={onAddGameSettingsParameter}
-              >
-                Добавить
-              </Button>
-            </div>
-          </React.Fragment>
+                </ul>
+                <Button
+                  className={classNames(
+                    'main-btn',
+                    'control-panel__btn',
+                    'developer-screen__btn',
+                  )}
+                  onClick={onAddGameSettingsParameter}
+                >
+                  Добавить
+                </Button>
+              </div>
+            </React.Fragment>
           )
         }
-      </Scrollbars>
+      </ScrollbarsBlock>
     </div>
   );
 };
