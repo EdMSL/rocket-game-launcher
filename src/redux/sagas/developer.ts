@@ -35,7 +35,9 @@ import { AppChannel } from '$constants/misc';
 import { writeJSONFile } from '$utils/files';
 import { CONFIG_FILE_PATH, GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import { deepClone, updatePathVariables } from '$utils/data';
-import { getIsWindowSettingEqual } from '$utils/check';
+import {
+  checkObjectForEqual, getWindowSettingsFromLauncherConfig,
+} from '$utils/check';
 
 const getState = (state: IDeveloperState): IDeveloperState => state;
 
@@ -115,7 +117,6 @@ function* saveLauncherConfigSaga(
 
   try {
     yield call(writeJSONFile, CONFIG_FILE_PATH, deepClone(newConfig, 'id'));
-    yield put(setLauncherConfig(newConfig));
 
     const {
       developer: { pathVariables },
@@ -123,15 +124,16 @@ function* saveLauncherConfigSaga(
 
     const newPathVariables = updatePathVariables(pathVariables, newConfig);
 
-    yield put(setPathVariables(newPathVariables));
-
     const {
       developer: {
         launcherConfig,
       },
     }: ReturnType<typeof getState> = yield select(getState);
 
-    const isChangeWindowSize = !getIsWindowSettingEqual(launcherConfig, newConfig);
+    const isChangeWindowSize = !checkObjectForEqual(
+      getWindowSettingsFromLauncherConfig(launcherConfig),
+      getWindowSettingsFromLauncherConfig(newConfig),
+    );
 
     yield call(
       ipcRenderer.send,
@@ -141,6 +143,9 @@ function* saveLauncherConfigSaga(
       newPathVariables,
       isChangeWindowSize,
     );
+
+    yield put(setLauncherConfig(newConfig));
+    yield put(setPathVariables(newPathVariables));
 
     if (isGoToMainScreen) {
       yield call(ipcRenderer.send, AppChannel.CHANGE_DEV_WINDOW_STATE, false);

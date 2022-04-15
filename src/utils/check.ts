@@ -692,6 +692,11 @@ export const checkObjectForEqual = (a, b): boolean => {
   return keys.every((k) => checkObjectForEqual(a[k], b[k]));
 };
 
+/**
+ * Получить объект с данными, относящимися к окну приложения.
+ * @param config Объект конфигурации лаунчера.
+ * @returns Объект с настройками, относящимися к окну приложения.
+ */
 export const getWindowSettingsFromLauncherConfig = (
   config: ILauncherConfig,
 ): IWindowSettings => Object.keys(defaultLauncherWindowSettings).reduce<IWindowSettings>(
@@ -699,20 +704,6 @@ export const getWindowSettingsFromLauncherConfig = (
     ...acc,
     [current]: config[current],
   }), {} as IWindowSettings,
-);
-
-/**
-  Сравнение двух объектов настроек окна приложения на равенство полей.
-  @param settingsFirst Первый объект.
-  @param settingsSecond Второй объект.
-  @returns Равны ли объекты.
-*/
-export const getIsWindowSettingEqual = (
-  settingsFirst: ILauncherConfig,
-  settingsSecond: ILauncherConfig,
-): boolean => checkObjectForEqual(
-  getWindowSettingsFromLauncherConfig(settingsFirst),
-  getWindowSettingsFromLauncherConfig(settingsSecond),
 );
 
 /**
