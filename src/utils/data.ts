@@ -18,6 +18,7 @@ import { CreateUserMessage } from './message';
 import {
   checkIsPathIsNotOutsideValidFolder,
   clearPathVaribaleFromPathString,
+  generateSelectOptionsString,
   getLineIniParameterValue,
   getParameterRegExp,
   getPathToFile,
@@ -58,6 +59,11 @@ import {
 
 const ONE_GB = 1073741824;
 const SYMBOLS_TO_TYPE = 8;
+
+export const isDataFromIniFile = (
+  fileView: string,
+  obj: IIniObj|IXmlObj,
+): obj is IIniObj => fileView === GameSettingsFileView.LINE || fileView === GameSettingsFileView.SECTIONAL;
 
 /**
  * Получить информацию о доступных дисплеях и записать их в файл лога.
@@ -125,11 +131,6 @@ export interface IGeneratedGameSettingsParam {
   optionValue: string,
   optionErrors: IUserMessage[],
 }
-
-export const isDataFromIniFile = (
-  fileView: string,
-  obj: IIniObj|IXmlObj,
-): obj is IIniObj => fileView === GameSettingsFileView.LINE || fileView === GameSettingsFileView.SECTIONAL;
 
 /**
  * Сгенерировать имя игровой опции на основе параметра, который является основой для опции
@@ -1059,4 +1060,31 @@ export const changeConfigArrayItem = <P extends { id: string, }>(
   newParams[index] = { ...newParams[index], ...data };
 
   return newParams;
+};
+
+/**
+ * Получить объект строк для всех `select` игрового параметра.
+ * @param parameter Объект игрового параметра.
+ * @returns Объект, содержащий строковое представление опций всех `select`.
+ */
+export const getSelectsOptionStringObj = (
+  parameter: IGameSettingsParameter,
+): { [key: string]: string, } => {
+  let obj = {};
+
+  if (parameter.options) {
+    obj = {
+      [parameter.id]: generateSelectOptionsString(parameter.options),
+    };
+  }
+
+  if (parameter.items) {
+    parameter.items.forEach((item) => {
+      if (item.options) {
+        obj[item.id] = generateSelectOptionsString(item.options);
+      }
+    });
+  }
+
+  return obj;
 };

@@ -7,7 +7,7 @@ import { Select } from '$components/UI/Select';
 import { ISelectOption, IValidationErrors } from '$types/common';
 import {
   changeConfigArrayItem,
-  generateGameSettingsParameter, generateSelectOptions,
+  generateGameSettingsParameter, generateSelectOptions, getSelectsOptionStringObj,
 } from '$utils/data';
 import {
   GameSettingControllerType, GameSettingsOptionType, HTMLInputType,
@@ -19,7 +19,7 @@ import { Button } from '$components/UI/Button';
 import { TextField } from '$components/UI/TextField';
 import { NumberField } from '$components/UI/NumberField';
 import { defaultFullGameSettingsParameter } from '$constants/defaultData';
-import { generateSelectOptionsFromString, generateSelectOptionsString } from '$utils/strings';
+import { generateSelectOptionsFromString } from '$utils/strings';
 import { TextArea } from '$components/UI/TextArea';
 
 interface IProps {
@@ -44,7 +44,10 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
     ...defaultFullGameSettingsParameter,
     ...parameter,
   });
-  const [optionsValue, setOptionsValue] = useState<string>(generateSelectOptionsString(parameter.options));
+
+  const [optionsValue, setOptionsValue] = useState<{
+    [key: string]: string,
+  }>(getSelectsOptionStringObj(parameter));
 
   const file = useMemo(
     () => gameSettingsFiles.find((currFile) => currFile.name === parameter.file),
@@ -105,7 +108,10 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         },
       };
 
-      setOptionsValue(currentTarget.value);
+      setOptionsValue({
+        ...optionsValue,
+        [isParameterItemChange ? currentTarget.dataset.parent! : parameter.id]: currentTarget.value,
+      });
     } else {
       currentParameter = {
         ...parameter,
@@ -129,7 +135,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
 
     onParameterDataChange(parameter.id, newParameter);
     setFullParameter(newFullParameter);
-  }, [parameter, file, fullParameter, onParameterDataChange]);
+  }, [parameter, optionsValue, file, fullParameter, onParameterDataChange]);
 
   const onDeleteFileBtnClick = useCallback(() => {
     deleteParameter(parameter.id);
@@ -269,7 +275,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
             id={`options_${parameter.id}`}
             name="options"
             label="Опции селектора"
-            value={optionsValue}
+            value={optionsValue[parameter.id]}
             wrap="off"
             placeholder="Видит пользователь=Запишется в файл"
             onChange={onParameterInputChange}
@@ -372,6 +378,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     item.controllerType !== undefined && (
                     <Select
                       id={`controllerType_${item.id}`}
+                      parent={item.id}
                       name="controllerType"
                       options={generateSelectOptions(parameter.optionType === GameSettingsOptionType.COMBINED
                         ? [GameSettingControllerType.SELECT.toUpperCase()]
@@ -386,9 +393,10 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     item.options !== undefined && (
                     <TextArea
                       id={`options_${item.id}`}
+                      parent={item.id}
                       name="options"
                       label="Опции селектора"
-                      value={optionsValue}
+                      value={optionsValue[item.id]}
                       wrap="off"
                       placeholder="Видит пользователь=Запишется в файл"
                       onChange={onParameterInputChange}
@@ -399,6 +407,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     item.min !== undefined && (
                     <NumberField
                       id={`min_${item.id}`}
+                      parent={item.id}
                       name="min"
                       min=""
                       label="Минимальное значение"
@@ -411,6 +420,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     item.max !== undefined && (
                     <NumberField
                       id={`max_${item.id}`}
+                      parent={item.id}
                       name="max"
                       min=""
                       label="Максимальное значение"
@@ -423,6 +433,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     item.step !== undefined && (
                     <NumberField
                       id={`step_${item.id}`}
+                      parent={item.id}
                       name="step"
                       min={0.001}
                       label="Шаг изменения значения"
