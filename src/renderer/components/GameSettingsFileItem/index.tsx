@@ -76,10 +76,10 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
     <React.Fragment>
       <PathSelector
         className="developer-screen__item"
-        id={`file-path_${file.name}`}
+        id={`file-path_${file.id}`}
         parent="path"
         pathVariables={pathVariables}
-        validationErrors={validationErrors[`file-path_${file.name}`]}
+        validationErrors={validationErrors[`file-path_${file.id}`]}
         value={file.path}
         label="Путь до файла настроек"
         description="Состоит из переменной пути и самого пути к файлу. При выборе пути через диалоговое окно, переменная определяется автоматически." //eslint-disable-line
@@ -89,7 +89,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
       />
       <Select
         className="developer-screen__item"
-        id={`game-settings-file-view_${file.name}`}
+        id={`view_${file.id}`}
         name="view"
         label="Тип структуры файла"
         description='Определяет, какая структура содержимого у файла. Неправильно выбранная структура приведет к ошибке обработки.' //eslint-disable-line
@@ -99,7 +99,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
       />
       <TextField
         className="developer-screen__item"
-        id={`game-settings-file-label_${file.name}`}
+        id={`label_${file.id}`}
         name="label"
         value={file.label}
         description="Имя файла для идентификации"
@@ -108,7 +108,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
       />
       <TextField
         className="developer-screen__item"
-        id={`game-settings-file-encoding_${file.name}`}
+        id={`encoding_${file.id}`}
         name="encoding"
         value={file.encoding}
         description="Кодировка файла, которая будет применяться при чтении и сохранении файла. Если не указано, берется значение по умолчанию." //eslint-disable-line max-len

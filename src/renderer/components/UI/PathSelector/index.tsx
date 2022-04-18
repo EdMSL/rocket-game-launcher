@@ -23,7 +23,7 @@ interface IProps extends IUIElementParams {
   isGameDocuments?: boolean,
   onChange: (
     value: string,
-    id: string,
+    name: string,
     validationData: IValidationData,
     parent?: string
   ) => void,
@@ -93,11 +93,11 @@ export const PathSelector: React.FC<IProps> = ({
 
     onChange(
       `${currentPathVariable}\\${target.value}`,
-      id,
+      name || id,
       { errors: { [id]: ['incorrect path'] }, isForAdd: !isCorrectPath },
       parent,
     );
-  }, [currentPathVariable, selectorType, id, parent, extensions, onChange]);
+  }, [currentPathVariable, selectorType, name, id, parent, extensions, onChange]);
 
   const onSelectPatchBtnClick = useCallback(async () => {
     let pathStr = await getPathFromPathSelector();
@@ -121,7 +121,7 @@ export const PathSelector: React.FC<IProps> = ({
 
         onChange(
           `${variablePath}\\${valuePath}`,
-          id,
+          name || id,
           { errors: { [id]: ['not available path', 'incorrect path'] }, isForAdd: !isCorrectPath },
           parent,
         );
@@ -131,13 +131,14 @@ export const PathSelector: React.FC<IProps> = ({
 
         onChange(
           `${availablePathVariables[0]}\\${pathStr}`,
-          id,
+          name || id,
           { errors: { [id]: ['not available path'] }, isForAdd: true },
           parent,
         );
       }
     }
   }, [id,
+    name,
     parent,
     pathVariables,
     isGameDocuments,
@@ -151,8 +152,13 @@ export const PathSelector: React.FC<IProps> = ({
     { target }: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     setCurrentPathVariable(target.value);
-    onChange(`${target.value}\\${currentPathValue}`, id, { errors: {}, isForAdd: false }, parent);
-  }, [currentPathValue, id, parent, onChange]);
+    onChange(
+      `${target.value}\\${currentPathValue}`,
+      name || id,
+      { errors: {}, isForAdd: false },
+      parent,
+    );
+  }, [currentPathValue, id, name, parent, onChange]);
 
   return (
     <div className={classNames(

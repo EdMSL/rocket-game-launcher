@@ -41,7 +41,7 @@ export interface IUIControllerSelect {
 }
 
 export interface IUIElementParams {
-  id?: string,
+  id: string,
   className?: string,
   parentClassname?: string,
   label?: string,

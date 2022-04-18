@@ -1,9 +1,11 @@
 import React, { ReactElement, memo } from 'react';
 import classNames from 'classnames';
 
-import { IUIElementParams } from '$types/common';
-
-interface IButtonProps extends IUIElementParams {
+interface IButtonProps {
+  id?: string,
+  name?: string,
+  className?: string,
+  isDisabled?: boolean,
   children: string | ReactElement | [string | ReactElement, string | ReactElement],
   isSubmit?: boolean,
   tabIndex?: number,
@@ -13,8 +15,8 @@ interface IButtonProps extends IUIElementParams {
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void,
 }
 export const Button: React.FunctionComponent<IButtonProps> = memo(({
-  children,
   id,
+  children,
   name,
   className = '',
   isSubmit,
@@ -39,7 +41,7 @@ export const Button: React.FunctionComponent<IButtonProps> = memo(({
     <button
       type={isSubmit ? 'submit' : 'button'}
       className={classNames('button', className)}
-      disabled={isDisabled}
+      disabled={Boolean(isDisabled)}
       id={id}
       name={name}
       tabIndex={tabIndex}
