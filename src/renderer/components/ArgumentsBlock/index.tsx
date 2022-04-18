@@ -91,11 +91,11 @@ export const ArgumentsBlock: React.FC<IProps> = ({
     currentTarget,
   }: React.MouseEvent<HTMLButtonElement>) => {
     changeArguments(
-      args.filter((currentArg) => currentArg.id !== currentTarget.id.split(':')[1]),
+      args.filter((currentArg) => currentArg.id !== currentTarget.name),
       parent,
     );
 
-    onValidationError(clearValidationErrors(validationErrors, currentTarget.id.split(':')[1]));
+    onValidationError(clearValidationErrors(validationErrors, currentTarget.id));
   }, [args, parent, validationErrors, changeArguments, onValidationError]);
 
   const OnAddArgumentBtnClick = useCallback(({
@@ -104,7 +104,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
     const newArgs = [
       ...args,
       {
-        id: getRandomId(`${parentId || parent}-arg`),
+        id: getRandomId(),
         data: currentTarget.name === 'add-arg-path'
           ? `${PathVariableName.GAME_DIR}\\example.exe`
           : '',
@@ -112,7 +112,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
     ];
 
     changeArguments(newArgs, parent);
-  }, [args, parent, parentId, changeArguments]);
+  }, [args, parent, changeArguments]);
 
   return (
     <div className={classNames(
@@ -157,7 +157,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
                   )
             }
             <Button
-              id={`delete:${currentArg.id}`}
+              name={currentArg.id}
               className={styles['developer-screen__args-delete-btn']}
               onClick={onDeleteArgBtnClick}
             >

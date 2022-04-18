@@ -120,38 +120,38 @@ export enum AppChannel {
 }
 
 interface IWindowField {
-  id: string,
+  name: string,
   label: string,
   description: string,
 }
 
 export const appWindowFields: IWindowField[] = [{
-  id: 'width',
+  name: 'width',
   label: 'Ширина по умолчанию',
   description: 'Ширина окна приложения по умолчанию. Является постоянной, если размеры окна установлены как неизменяемые, и начальной, если размеры окна изменяемые' //eslint-disable-line
 },
 {
-  id: 'height',
+  name: 'height',
   label: 'Высота по умолчанию',
   description: 'Высота окна приложения по умолчанию. Является постоянной, если размеры окна установлены как неизменяемые, и начальной, если размеры окна изменяемые' //eslint-disable-line
 },
 {
-  id: 'minWidth',
+  name: 'minWidth',
   label: 'Минимальная ширина',
   description: 'Минимальная ширина окна приложения, до которой пользователь может уменьшить размер окна' //eslint-disable-line
 },
 {
-  id: 'minHeight',
+  name: 'minHeight',
   label: 'Минимальная высота',
   description: 'Минимальная высота окна приложения, до которой пользователь может уменьшить размер окна' //eslint-disable-line
 },
 {
-  id: 'maxWidth',
+  name: 'maxWidth',
   label: 'Максимальная ширина',
   description: 'Максимальная ширина окна приложения, до которой пользователь может увеличить размер окна. Значение 0 - нет ограничения' //eslint-disable-line
 },
 {
-  id: 'maxHeight',
+  name: 'maxHeight',
   label: 'Максимальная высота',
   description: 'Максимальная высота окна приложения, до которой пользователь может увеличить размер окна. Значение 0 - нет ограничения' //eslint-disable-line
 },

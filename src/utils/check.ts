@@ -137,17 +137,17 @@ const configFileDataSchema = Joi.object<ILauncherConfig>({
     path: Joi.string().optional().allow('').default(defaultLauncherConfig.playButton.path)
       .pattern(PathRegExp.GAME_DIR, 'correct path'),
     args: Joi.array().items(Joi.object({
-      id: Joi.string().optional().default(() => getRandomId('play-btn-arg')),
+      id: Joi.string().optional().default(() => getRandomId()),
       data: Joi.string().required(),
     })).optional().default(defaultLauncherConfig.playButton.args),
     label: Joi.string().optional().allow('').default(defaultLauncherConfig.playButton.label),
   }).required(),
   customButtons: Joi.array()
     .items(Joi.object({
-      id: Joi.string().optional().default(() => getRandomId('custom-btn')),
+      id: Joi.string().optional().default(() => getRandomId()),
       path: Joi.string().required().custom(checkIsPathWithVariableCorrect),
       args: Joi.array().items(Joi.object({
-        id: Joi.string().optional().default((parent, helpers) => getRandomId(`custom-btn-arg_${helpers.state.ancestors[2].id.split('_')[1]}`)),
+        id: Joi.string().optional().default(() => getRandomId()),
         data: Joi.string().required(),
       })).optional().default([]),
       label: Joi.string().optional().default('Запуск'),
@@ -211,7 +211,7 @@ const gameSettingsFileOptionTypeSchema = Joi.string().required().valid(...Object
 
 // id для опций не указываются в settings.json, вместо этого они генерируются автоматически.
 const defaultOptionTypeSchema = Joi.object({
-  id: Joi.string().optional().default(() => getRandomId('game-settings-parameter')),
+  id: Joi.string().optional().default(() => getRandomId()),
   optionType: Joi.string().required().valid(GameSettingsOptionType.DEFAULT),
   file: Joi.string().valid(Joi.in('$gameSettingsFiles'))
     .messages({ 'any.only': '"file" must be one of {$gameSettingsFiles}' }),
@@ -258,7 +258,7 @@ const defaultOptionTypeSchema = Joi.object({
 });
 
 const groupOptionTypeSchema = Joi.object({
-  id: Joi.string().optional().default(() => getRandomId('game-settings-parameter')),
+  id: Joi.string().optional().default(() => getRandomId()),
   optionType: Joi.string().required().valid(GameSettingsOptionType.GROUP),
   file: Joi.string().valid(Joi.in('$gameSettingsFiles'))
     .messages({ 'any.only': '"file" must be one of {$gameSettingsFiles}' }),
@@ -288,7 +288,7 @@ const groupOptionTypeSchema = Joi.object({
   ),
   items: Joi.array()
     .items(Joi.object({
-      id: Joi.string().optional().default(() => getRandomId('item')),
+      id: Joi.string().optional().default(() => getRandomId()),
       name: Joi.string().required(),
       iniGroup: Joi.string().when(
         Joi.ref('$view'), {
@@ -309,7 +309,7 @@ const groupOptionTypeSchema = Joi.object({
 });
 
 const combinedOptionTypeSchema = Joi.object({
-  id: Joi.string().optional().default(() => getRandomId('game-settings-parameter')),
+  id: Joi.string().optional().default(() => getRandomId()),
   optionType: Joi.string().required().valid(GameSettingsOptionType.COMBINED),
   file: Joi.string().valid(Joi.in('$gameSettingsFiles'))
     .messages({ 'any.only': '"file" must be one of {$gameSettingsFiles}' }),
@@ -338,7 +338,7 @@ const combinedOptionTypeSchema = Joi.object({
   }),
   items: Joi.array()
     .items(Joi.object({
-      id: Joi.string().optional().default(() => getRandomId('item')),
+      id: Joi.string().optional().default(() => getRandomId()),
       name: Joi.string().required(),
       iniGroup: Joi.string().when(
         Joi.ref('$view'), {
@@ -359,7 +359,7 @@ const combinedOptionTypeSchema = Joi.object({
 });
 
 const relatedOptionTypeSchema = Joi.object({
-  id: Joi.string().optional().default(() => getRandomId('game-settings-parameter')),
+  id: Joi.string().optional().default(() => getRandomId()),
   optionType: Joi.string().required().valid(GameSettingsOptionType.RELATED),
   file: Joi.string().valid(Joi.in('$gameSettingsFiles'))
     .messages({ 'any.only': '"file" must be one of {$gameSettingsFiles}' }),
@@ -373,7 +373,7 @@ const relatedOptionTypeSchema = Joi.object({
     .messages({ 'any.only': '"settingGroup" must be one of {$gameSettingsGroups}' }),
   items: Joi.array()
     .items(Joi.object({
-      id: Joi.string().optional().default(() => getRandomId('item')),
+      id: Joi.string().optional().default(() => getRandomId()),
       name: Joi.string().required(),
       iniGroup: Joi.string().when(
         Joi.ref('$view'), {
@@ -408,100 +408,6 @@ const relatedOptionTypeSchema = Joi.object({
       ),
     })).required().min(2),
 });
-
-/**
- * Проверка всех полей из `gameSettingsFiles` на соответствие шаблону.
- * Проверка на наличие необходимых и опциональных полей, а так же фильтрация некорректных.
- * На выходе получаем сообщение о результате проверки и итоговые настройки для каждого файла.
-*/
-export const checkGameSettingsFiles = (
-  gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
-  baseFilesEncoding: IGameSettingsRootState['baseFilesEncoding'],
-  // gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
-): ICheckResult<IGameSettingsRootState['gameSettingsFiles']> => {
-  writeToLogFileSync('Started checking "gameSettingsFiles" from settings.json.');
-
-  const validationErrors: Joi.ValidationError[] = [];
-
-  // const availableGameSettingsGroups = gameSettingsGroups.map((group) => group.name);
-  const newGameSettingsFilesObj = gameSettingsFiles
-    .reduce<IGameSettingsFile[]>((currentFiles, currentFile) => {
-      // const validationOptions: Joi.ValidationOptions = {
-      //   abortEarly: false,
-      //   stripUnknown: true,
-
-      //   context: {
-      //     encoding: baseFilesEncoding,
-      //     isGameSettingsGroupsExists: availableGameSettingsGroups.length > 0,
-      //     // view: gameSettingsFiles[fileName].view,
-      //     availableGameSettingsGroups,
-      //     // fileName,
-      //   },
-      // };
-
-      const validationResult = gameSettingsFileSchema.validate(
-        currentFile,
-        {
-          abortEarly: false,
-          stripUnknown: true,
-
-          context: {
-            encoding: baseFilesEncoding,
-            // isGameSettingsGroupsExists: availableGameSettingsGroups.length > 0,
-            // view: gameSettingsFiles[fileName].view,
-            // availableGameSettingsGroups,
-          // fileName,
-          },
-        },
-        // validationOptions,
-      );
-
-      if (validationResult.error) {
-        validationErrors.push(validationResult.error);
-
-        return [...currentFiles];
-      }
-
-      return [...currentFiles, validationResult.value];
-
-      // const {
-      //   resultParameters: parameters,
-      //   errors,
-      // } = checkGameSettingsParameters(
-      //   gameSettingsFiles[fileName].optionsList,
-      //   validationOptions,
-      // );
-
-      // if (errors.length > 0) {
-      //   validationErrors.push(...errors);
-      // }
-
-      // if (parameters.length > 0) {
-      //   return {
-      //     ...filesObj,
-      //     [fileName]: {
-      //       ...validationResult.value,
-      //       optionsList: parameters,
-      //     },
-      //   };
-      // }
-
-      // return {
-      //   ...filesObj,
-      // };
-    }, []);
-
-  if (validationErrors.length > 0) {
-    validationErrors.forEach((currentError) => {
-      writeToLogFile(`${currentError.name}. ${currentError.message}`, LogMessageType.ERROR);//eslint-disable-line
-    });
-  }
-
-  return {
-    data: newGameSettingsFilesObj,
-    errors: validationErrors,
-  };
-};
 
 /**
  * Проверка параметров, указанных в gameSettingsParameters.
@@ -727,7 +633,7 @@ export const validateNumberInputs = (
   );
 
   if (currentConfig.isResizable) {
-    const namesAndValues = target.id.toLowerCase().includes('width')
+    const namesAndValues = target.name === 'width'
       ? {
           default: currentConfig.width,
           min: currentConfig.minWidth,
@@ -745,7 +651,7 @@ export const validateNumberInputs = (
           maxName: 'maxHeight',
         };
 
-    if (target.id === 'width' || target.id === 'height') {
+    if (target.name === 'width' || target.name === 'height') {
       errors = getUniqueValidationErrors(
         errors,
         {
@@ -763,7 +669,7 @@ export const validateNumberInputs = (
         },
         +target.value > namesAndValues.max && namesAndValues.max > 0,
       );
-    } else if (target.id === 'minWidth' || target.id === 'minHeight') {
+    } else if (target.name === 'minWidth' || target.name === 'minHeight') {
       errors = getUniqueValidationErrors(
         errors,
         {
@@ -781,7 +687,7 @@ export const validateNumberInputs = (
         },
         +target.value > namesAndValues.max && namesAndValues.max > 0,
       );
-    } else if (target.id === 'maxWidth' || target.id === 'maxHeight') {
+    } else if (target.name === 'maxWidth' || target.name === 'maxHeight') {
       errors = getUniqueValidationErrors(
         errors,
         {

@@ -27,7 +27,7 @@ export const DeveloperScreenController: React.FC<IProps> = ({
 }) => (
   <div className={styles['develover-screen__controller']}>
     <Button
-      id="ok_save_config_btn"
+      name="ok_save_config_btn"
       className={classNames(
         'main-btn',
         'control-panel__btn',
@@ -38,7 +38,7 @@ export const DeveloperScreenController: React.FC<IProps> = ({
       ОК
     </Button>
     <Button
-      id="save_config_btn"
+      name="save_config_btn"
       className={classNames(
         'main-btn',
         'control-panel__btn',

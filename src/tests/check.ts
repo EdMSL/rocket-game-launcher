@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { checkGameSettingsConfigFull, checkGameSettingsFiles } from '$utils/check';
+import { checkGameSettingsConfigFull } from '$utils/check';
 import { createMockFilesForCheck } from './fixtures/getFiles';
 import { readJSONFileSync } from '$utils/files';
 import { IGameSettingsConfig } from '$types/gameSettings';
@@ -99,13 +99,13 @@ describe('#Check', () => {
   });
 
   describe('#Check game settings files', () => {
-    it('Should return correct result object', () => {
-      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
-      //@ts-ignore
-      const result = checkGameSettingsFiles(obj.gameSettingsFiles, Encoding.WIN1251, obj.gameSettingsGroups);
+    // it('Should return correct result object', () => {
+    //   const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+    //   //@ts-ignore
+    //   const result = checkGameSettingsFiles(obj.gameSettingsFiles, Encoding.WIN1251, obj.gameSettingsGroups);
 
-      assert.hasAllKeys(result.data, ['anyFile', 'relatedFile', 'groupFile', 'newFile', 'someFile', 'tagFile']);
-    });
+    //   assert.hasAllKeys(result.data, ['anyFile', 'relatedFile', 'groupFile', 'newFile', 'someFile', 'tagFile']);
+    // });
 
     // it('Should return correct default data for game settings files main fields', () => {
     //   const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };

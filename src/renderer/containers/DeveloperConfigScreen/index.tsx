@@ -110,7 +110,7 @@ export const DeveloperConfigScreen: React.FC = () => {
   const onSaveBtnClick = useCallback((
     { currentTarget }: React.MouseEvent<HTMLButtonElement>,
   ) => {
-    saveConfigChanges(currentTarget.id === 'ok_save_config_btn');
+    saveConfigChanges(currentTarget.name === 'ok_save_config_btn');
   }, [saveConfigChanges]);
 
   const onResetBtnClick = useCallback(() => {
@@ -167,19 +167,19 @@ export const DeveloperConfigScreen: React.FC = () => {
     const errors = validateNumberInputs(target, currentConfig, validationErrors);
     setValidationErrors(errors);
 
-    changeCurrentConfig(target.id, Math.round(+target.value), target.dataset.parent);
+    changeCurrentConfig(target.name, Math.round(+target.value), target.dataset.parent);
   }, [currentConfig, changeCurrentConfig, validationErrors]);
 
   const OnTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    changeCurrentConfig(target.id, target.value, target.dataset.parent);
+    changeCurrentConfig(target.name, target.value, target.dataset.parent);
   }, [changeCurrentConfig]);
 
   const onSwitcherChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    changeCurrentConfig(target.id, target.checked, target.dataset.parent);
+    changeCurrentConfig(target.name, target.checked, target.dataset.parent);
   }, [changeCurrentConfig]);
 
   const onSelectChange = useCallback(({ target }: React.ChangeEvent<HTMLSelectElement>) => {
-    changeCurrentConfig(target.id, target.value, target.dataset.parent);
+    changeCurrentConfig(target.name, target.value, target.dataset.parent);
   }, [changeCurrentConfig]);
 
   const onDeleteCustomBtnBtnClick = useCallback((id: string) => {
@@ -191,7 +191,7 @@ export const DeveloperConfigScreen: React.FC = () => {
   }, [currentConfig, validationErrors, changeCurrentConfig]);
 
   const onAddCustomBtnBtnClick = useCallback(() => {
-    const newId = getRandomId('custom-btn');
+    const newId = getRandomId();
 
     setLastAddedBtnItemId(newId);
     changeCurrentConfig('customButtons', [
@@ -244,10 +244,10 @@ export const DeveloperConfigScreen: React.FC = () => {
     changeCurrentConfig('args', newArgs, parent);
   }, [changeCurrentConfig]);
 
-  const getNumberFieldMinValue = useCallback((id: string): number => {
-    if (id === 'width' || id === 'minWidth') {
+  const getNumberFieldMinValue = useCallback((name: string): number => {
+    if (name === 'width' || name === 'minWidth') {
       return MinWindowSize.WIDTH;
-    } else if (id === 'height' || id === 'minHeight') {
+    } else if (name === 'height' || name === 'minHeight') {
       return MinWindowSize.HEIGHT;
     }
 
@@ -255,12 +255,12 @@ export const DeveloperConfigScreen: React.FC = () => {
   }, []);
 
   const getNumberFieldIsDisabled = useCallback((
-    id: string,
+    name: string,
   ): boolean => !currentConfig.isResizable && (
-    id === 'minWidth'
-    || id === 'minHeight'
-    || id === 'maxWidth'
-    || id === 'maxHeight'
+    name === 'minWidth'
+    || name === 'minHeight'
+    || name === 'maxWidth'
+    || name === 'maxHeight'
   ), [currentConfig]);
 
   /* eslint-disable react/jsx-props-no-spreading */
@@ -283,6 +283,7 @@ export const DeveloperConfigScreen: React.FC = () => {
             <Switcher
               className="developer-screen__item"
               id="isResizable"
+              name="isResizable"
               label="Изменяемый размер окна?"
               isChecked={currentConfig.isResizable}
               onChange={onSwitcherChange}
@@ -291,14 +292,15 @@ export const DeveloperConfigScreen: React.FC = () => {
             {
             appWindowFields.map((field) => (
               <NumberField
-                key={field.id}
+                key={field.name}
                 className="developer-screen__item"
-                id={field.id}
-                value={currentConfig[field.id]}
+                id={field.name}
+                name={field.name}
+                value={currentConfig[field.name]}
                 label={field.label}
-                min={getNumberFieldMinValue(field.id)}
-                isDisabled={getNumberFieldIsDisabled(field.id)}
-                validationErrors={validationErrors[field.id]}
+                min={getNumberFieldMinValue(field.name)}
+                isDisabled={getNumberFieldIsDisabled(field.name)}
+                validationErrors={validationErrors[field.name]}
                 description={field.description}
                 onChange={onNumberInputChange}
               />
@@ -312,6 +314,7 @@ export const DeveloperConfigScreen: React.FC = () => {
             <TextField
               className="developer-screen__item"
               id="gameName"
+              name="gameName"
               value={currentConfig.gameName}
               label="Заголовок окна программы"
               description="Название игры или любой текст, который будет отображаться в заголовке окна программы"//eslint-disable-line max-len
@@ -320,6 +323,7 @@ export const DeveloperConfigScreen: React.FC = () => {
             <PathSelector
               className="developer-screen__item"
               id="documentsPath"
+              name="documentsPath"
               label="Папка файлов игры в Documents"
               value={currentConfig.documentsPath}
               options={generateSelectOptions([PathVariableName.DOCUMENTS])}
@@ -333,6 +337,7 @@ export const DeveloperConfigScreen: React.FC = () => {
             <TextField
               className="developer-screen__item"
               id="label"
+              name="label"
               parent="playButton"
               value={currentConfig.playButton.label}
               label="Заголовок кнопки запуска"
@@ -343,6 +348,7 @@ export const DeveloperConfigScreen: React.FC = () => {
             <PathSelector
               className="developer-screen__item"
               id="path"
+              name="path"
               parent="playButton"
               label="Исполняемый файл игры"
               value={currentConfig.playButton.path}
@@ -400,6 +406,7 @@ export const DeveloperConfigScreen: React.FC = () => {
             <Switcher
               className="developer-screen__item"
               id="isUsed"
+              name="isUsed"
               parent="modOrganizer"
               label="Используется ли MO?"
               isChecked={currentConfig.modOrganizer.isUsed}
@@ -409,6 +416,7 @@ export const DeveloperConfigScreen: React.FC = () => {
             <Select
               className="developer-screen__item"
               id="version"
+              name="version"
               parent="modOrganizer"
               label="Версия MO"
               options={[
@@ -423,6 +431,7 @@ export const DeveloperConfigScreen: React.FC = () => {
             <PathSelector
               className="developer-screen__item"
               id="pathToMOFolder"
+              name="pathToMOFolder"
               label="Путь до папки MO"
               parent="modOrganizer"
               value={currentConfig.modOrganizer.pathToMOFolder}
@@ -436,6 +445,7 @@ export const DeveloperConfigScreen: React.FC = () => {
             <PathSelector
               className="developer-screen__item"
               id="pathToMods"
+              name="pathToMods"
               label="Путь до папки модов MO"
               parent="modOrganizer"
               value={currentConfig.modOrganizer.pathToMods}
@@ -449,6 +459,7 @@ export const DeveloperConfigScreen: React.FC = () => {
             <PathSelector
               className="developer-screen__item"
               id="pathToProfiles"
+              name="pathToProfiles"
               label="Путь до папки профилей MO"
               parent="modOrganizer"
               value={currentConfig.modOrganizer.pathToProfiles}
@@ -462,6 +473,7 @@ export const DeveloperConfigScreen: React.FC = () => {
             <PathSelector
               className="developer-screen__item"
               id="pathToINI"
+              name="pathToINI"
               label="Путь до конфигурационного файла MO"
               parent="modOrganizer"
               value={currentConfig.modOrganizer.pathToINI}
