@@ -15,10 +15,10 @@ const defaultOptionsArr = [{
 }];
 
 export const Select: (React.FunctionComponent<IProps>) = ({
+  id,
+  name,
   label = '',
   description = '',
-  id,
-  name = id,
   parent,
   separator = '',
   multiparameters = '',

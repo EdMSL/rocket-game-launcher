@@ -1,13 +1,11 @@
 import React, { ReactElement, memo } from 'react';
 import classNames from 'classnames';
 
-interface IButtonProps {
+import { IUIElementParams } from '$types/common';
+
+interface IButtonProps extends IUIElementParams {
   children: string | ReactElement | [string | ReactElement, string | ReactElement],
-  className?: string,
-  id?: string,
-  name?: string,
   isSubmit?: boolean,
-  isDisabled?: boolean,
   tabIndex?: number,
   btnPath?: string,
   btnArgs?: string,
@@ -16,9 +14,9 @@ interface IButtonProps {
 }
 export const Button: React.FunctionComponent<IButtonProps> = memo(({
   children,
-  className = '',
   id,
   name,
+  className = '',
   isSubmit,
   isDisabled,
   tabIndex = 0,

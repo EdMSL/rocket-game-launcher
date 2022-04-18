@@ -10,6 +10,7 @@ import { getNumberOfDecimalPlaces } from '$utils/strings';
 import { useDebouncedFunction } from '$utils/hooks';
 
 interface IProps extends IUIElementProps<HTMLInputElement>, IUIControllerRange {
+  id: string,
   defaultValue: string,
   onChangeBtnClick?: (
     btnName: string,
@@ -22,7 +23,7 @@ interface IProps extends IUIElementProps<HTMLInputElement>, IUIControllerRange {
 
 export const Range: React.FunctionComponent<IProps> = ({
   id,
-  name = id,
+  name,
   parent = '',
   multiparameters = '',
   defaultValue,

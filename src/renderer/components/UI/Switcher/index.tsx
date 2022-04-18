@@ -8,8 +8,8 @@ interface IProps extends IUIElementProps<HTMLInputElement>, IUIControllerCheckbo
 
 export const Switcher: React.FunctionComponent<IProps> = ({
   id,
+  name,
   label,
-  name = id,
   className = '',
   parentClassname = '',
   description = '',

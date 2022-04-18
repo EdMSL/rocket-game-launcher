@@ -14,6 +14,7 @@ import { AppChannel, LauncherButtonAction } from '$constants/misc';
 import { getIsPathWithVariableCorrect, IValidationData } from '$utils/check';
 
 interface IProps extends IUIElementParams {
+  id: string,
   options: ISelectOption[],
   pathVariables: IPathVariables,
   extensions?: string[],

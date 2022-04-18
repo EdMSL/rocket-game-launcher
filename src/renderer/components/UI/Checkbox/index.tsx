@@ -8,7 +8,7 @@ interface IProps extends IUIElementProps<HTMLInputElement>, IUIControllerCheckbo
 
 export const Checkbox: React.FunctionComponent<IProps> = ({
   id,
-  name = id,
+  name,
   parent = '',
   label = '',
   description = '',
