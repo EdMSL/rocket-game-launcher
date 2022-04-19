@@ -35,6 +35,7 @@ import {
   IGameSettingsFile,
   IGameSettingsGroup,
   IGameSettingsParameterBase,
+  IGameSettingsConfig,
 } from '$types/gameSettings';
 import {
   DefaultPathVariable,
@@ -48,6 +49,7 @@ import {
   IModOrganizerParams,
 } from '$types/main';
 import {
+  defaultFullGameSettingsParameter,
   defaultGameSettingsParameterItem,
   defaultModOrganizerParams,
 } from '$constants/defaultData';
@@ -986,9 +988,9 @@ export const getDefaultGameSettingsParameter = (
 
 /**
  * Сгенерировать новый объект параметра игровых настроек типа `default`.
- * @param file Объект с данными игрового файла.
  * @param currentParameter Объект изменяемого параметра.
  * @param fullParameter Объект со всеми доступными полями параметра.
+ * @param file Объект с данными игрового файла.
  * @returns Объект параметра из `state`.
  */
 export const generateGameSettingsParameter = (
@@ -1000,7 +1002,6 @@ export const generateGameSettingsParameter = (
     fullParameter,
     currentParameter,
   );
-
   let newParameter: IGameSettingsParameter = getParameterBase(file, newFullParameter);
 
   switch (currentParameter.optionType) {
@@ -1081,6 +1082,30 @@ export const changeConfigArrayItem = <P extends { id: string, }>(
 
   return newParams;
 };
+
+/**
+ * Получить измененные игровые параметры после удаления игрового файла.
+ * @param parameters Массив игровых параметров.
+ * @param files Массив игровых файлов.
+ * @returns Массив измененных игровых параметров.
+ */
+export const getChangedParametersAfterFileDelete = (
+  parameters: IGameSettingsParameter[],
+  files: IGameSettingsFile[],
+): IGameSettingsParameter[] => parameters.map((param) => {
+  if (!getGameSettingsFilesNames(files).includes(param.file)) {
+    return generateGameSettingsParameter(
+      {
+        ...param,
+        file: files[0].name,
+      },
+      getFullParameter(defaultFullGameSettingsParameter, param),
+      files[0],
+    ).newParameter;
+  }
+
+  return param;
+});
 
 /**
  * Получить объект строк для всех `select` игрового параметра.

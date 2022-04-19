@@ -14,8 +14,11 @@ import {
 } from '$types/gameSettings';
 import {
   changeConfigArrayItem,
+  generateGameSettingsParameter,
+  getChangedParametersAfterFileDelete,
   getDefaultGameSettingsFile,
   getDefaultGameSettingsParameter,
+  getFullParameter,
   getNewConfig,
   getUniqueValidationErrors,
 } from '$utils/data';
@@ -42,6 +45,7 @@ import {
 import { GameSettingsParameterItem } from '$components/GameSettingsParameterItem';
 import { Spoiler } from '$components/UI/Spoiler';
 import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
+import { defaultFullGameSettingsParameter } from '$constants/defaultData';
 
 export const DeveloperGameSettingsScreen: React.FC = () => {
   /* eslint-disable max-len */
@@ -135,6 +139,12 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     setIsSettingsInitialized(false);
   }, [dispatch]);
 
+  const onTextFieldChange = useCallback((
+    { target }: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    changeCurrentConfig(target.value, target.name);
+  }, [changeCurrentConfig]);
+
   const createNewGroup = useCallback(() => {
     const newName = getRandomName();
 
@@ -179,23 +189,30 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   }, [currentConfig.gameSettingsGroups, validationErrors]);
 
   const deleteGroupItem = useCallback((name: string) => {
-    changeCurrentConfig(
-      currentConfig.gameSettingsGroups.filter((group) => group.name !== name),
-      'gameSettingsGroups',
-    );
+    const newGroups = currentConfig.gameSettingsGroups.filter((group) => group.name !== name);
+    const newConfig = {
+      ...currentConfig,
+      gameSettingsGroups: newGroups,
+      gameSettingsParameters: currentConfig.gameSettingsParameters.map((param) => {
+        if (param.settingGroup === name) {
+          return {
+            ...param,
+            settingGroup: newGroups[0].name,
+          };
+        }
+
+        return param;
+      }),
+    };
 
     setLastCreatedGroupName('');
-  }, [currentConfig, changeCurrentConfig]);
+    setCurrentConfig(newConfig);
+    setIsConfigChanged(!checkObjectForEqual(gameSettingsConfig, newConfig));
+  }, [currentConfig, gameSettingsConfig]);
 
   const setNewValidationErrors = useCallback((errors: IValidationErrors) => {
     setValidationErrors(errors);
   }, []);
-
-  const onTextFieldChange = useCallback((
-    { target }: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    changeCurrentConfig(target.value, target.name);
-  }, [changeCurrentConfig]);
 
   const onAddGameSettingsFile = useCallback(async () => {
     const pathStr = await getPathFromPathSelector();
@@ -237,24 +254,48 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     fileId: string,
     fileData: IGameSettingsFile,
   ) => {
-    changeCurrentConfig(
-      changeConfigArrayItem(fileId, fileData, currentConfig.gameSettingsFiles),
-      'gameSettingsFiles',
-    );
-  }, [currentConfig, changeCurrentConfig]);
+    const changedParameters = currentConfig.gameSettingsParameters.map((param) => {
+      if (param.file === fileData.name) {
+        return generateGameSettingsParameter(
+          param,
+          getFullParameter(defaultFullGameSettingsParameter, param),
+          fileData,
+        ).newParameter;
+      }
 
-  const deleteGameSettingsFile = useCallback((items: IGameSettingsFile[]) => {
-    changeCurrentConfig(items, 'gameSettingsFiles');
+      return param;
+    });
+
+    const newConfig = {
+      ...currentConfig,
+      gameSettingsFiles: changeConfigArrayItem(fileId, fileData, currentConfig.gameSettingsFiles),
+      gameSettingsParameters: changedParameters,
+    };
+
+    setCurrentConfig(newConfig);
+    setIsConfigChanged(!checkObjectForEqual(gameSettingsConfig, newConfig));
+  }, [currentConfig, gameSettingsConfig]);
+
+  const deleteGameSettingsFile = useCallback((files: IGameSettingsFile[]) => {
+    const newConfig = {
+      ...currentConfig,
+      gameSettingsFiles: files,
+      gameSettingsParameters: getChangedParametersAfterFileDelete(
+        currentConfig.gameSettingsParameters,
+        files,
+      ),
+    };
+
+    setCurrentConfig(newConfig);
     setLastAddedFileId('');
-  }, [changeCurrentConfig]);
+    setIsConfigChanged(!checkObjectForEqual(gameSettingsConfig, newConfig));
+  }, [currentConfig, gameSettingsConfig]);
 
   const deleteGameSettingsFileById = useCallback((id: string) => {
-    changeCurrentConfig(
-      currentConfig.gameSettingsFiles.filter((item) => id !== item.id),
-      'gameSettingsFiles',
-    );
-    setLastAddedFileId('');
-  }, [currentConfig.gameSettingsFiles, changeCurrentConfig]);
+    const files = currentConfig.gameSettingsFiles.filter((item) => id !== item.id);
+
+    deleteGameSettingsFile(files);
+  }, [currentConfig.gameSettingsFiles, deleteGameSettingsFile]);
 
   const changeGameSettingsParameters = useCallback((
     paramId: string,
