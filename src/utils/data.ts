@@ -908,6 +908,24 @@ export const getDefaultGameSettingsFile = (
 });
 
 /**
+ * Получить полный игровой параметр со всеми полями, измененными текущим параметром.
+ * @param currentFullParam Текущий полный параметр.
+ * @param currentParam Текущий параметр.
+ * @returns Новый полный параметр с обновленными полями.
+ */
+export const getFullParameter = (
+  currentFullParam: IGameSettingsParameter,
+  currentParam: IGameSettingsParameter,
+): IGameSettingsParameter => ({
+  ...currentFullParam,
+  ...currentParam,
+  items: currentParam.items?.map((item) => ({
+    ...currentFullParam.items![0],
+    ...item,
+  })),
+});
+
+/**
  * Сгенерировать новый объект параметра игровых настроек типа `default`.
  * @param file Объект с данными игрового файла.
  * @param parameterBase Объект с базовыми полями любого типа параметра.
@@ -978,10 +996,10 @@ export const generateGameSettingsParameter = (
   fullParameter: IGameSettingsParameter,
   file: IGameSettingsFile,
 ): { newParameter: IGameSettingsParameter, newFullParameter: IGameSettingsParameter, } => {
-  const newFullParameter: IGameSettingsParameter = {
-    ...fullParameter,
-    ...currentParameter,
-  };
+  const newFullParameter: IGameSettingsParameter = getFullParameter(
+    fullParameter,
+    currentParameter,
+  );
 
   let newParameter: IGameSettingsParameter = getParameterBase(file, newFullParameter);
 
@@ -1037,8 +1055,8 @@ export const generateGameSettingsParameter = (
   }
 
   return {
-    newFullParameter,
     newParameter,
+    newFullParameter,
   };
 };
 
@@ -1047,17 +1065,19 @@ export const generateGameSettingsParameter = (
  * @param id Идентификатор элемента массива.
  * @param data Объект с данными для замены.
  * @param items Элементы массива, данные элемента которого меняем.
+ * @param isFullData Задает, полные или частичные данные переданы в параметре `data`.
  * @returns Массив элементов с измененным элементом.
  */
 export const changeConfigArrayItem = <P extends { id: string, }>(
   id: string,
   data: P,
   items: P[],
+  isFullData = true,
 ): P[] => {
   const index = items.findIndex((item) => item.id === id);
   const newParams = [...items];
 
-  newParams[index] = { ...newParams[index], ...data };
+  newParams[index] = { ...isFullData ? {} : newParams[index], ...data };
 
   return newParams;
 };

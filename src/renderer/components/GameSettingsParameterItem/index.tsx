@@ -7,7 +7,10 @@ import { Select } from '$components/UI/Select';
 import { ISelectOption, IValidationErrors } from '$types/common';
 import {
   changeConfigArrayItem,
-  generateGameSettingsParameter, generateSelectOptions, getSelectsOptionStringObj,
+  generateGameSettingsParameter,
+  generateSelectOptions,
+  getFullParameter,
+  getSelectsOptionStringObj,
 } from '$utils/data';
 import {
   GameSettingControllerType, GameSettingsOptionType, HTMLInputType,
@@ -40,10 +43,10 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
   onParameterDataChange,
   deleteParameter,
 }) => {
-  const [fullParameter, setFullParameter] = useState<IGameSettingsParameter>({
-    ...defaultFullGameSettingsParameter,
-    ...parameter,
-  });
+  const [fullParameter, setFullParameter] = useState<IGameSettingsParameter>(getFullParameter(
+    defaultFullGameSettingsParameter,
+    parameter,
+  ));
 
   const [optionsValue, setOptionsValue] = useState<{
     [key: string]: string,
@@ -89,6 +92,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
             currentTarget.dataset.parent!,
             { [currentTarget.name]: +currentTarget.value },
             parameter.items!,
+            false,
           ),
         } : {
           [currentTarget.name]: +currentTarget.value,
@@ -102,6 +106,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
             currentTarget.dataset.parent!,
             { [currentTarget.name]: generateSelectOptionsFromString(currentTarget.value) },
             parameter.items!,
+            false,
           ),
         } : {
           [currentTarget.name]: generateSelectOptionsFromString(currentTarget.value),
@@ -120,6 +125,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
             currentTarget.dataset.parent!,
             { [currentTarget.name]: currentTarget.value },
             parameter.items!,
+            false,
           ),
         } : {
           [currentTarget.name]: currentTarget.value,
