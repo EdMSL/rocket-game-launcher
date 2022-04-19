@@ -25,7 +25,6 @@ interface IProps {
   pathVariables: IPathVariables,
   validationErrors: IValidationErrors,
   description?: string,
-  parentId?: string,
   changeArguments: (newArgs: IButtonArg[], parent: string) => void,
   onValidationError: (errors: IValidationErrors) => void,
 }
@@ -37,7 +36,6 @@ export const ArgumentsBlock: React.FC<IProps> = ({
   pathVariables,
   description,
   validationErrors,
-  parentId,
   changeArguments,
   onValidationError,
 }) => {

@@ -213,12 +213,12 @@ export const DeveloperConfigScreen: React.FC = () => {
   }, [currentConfig, changeCurrentConfig]);
 
   const changeCustomBtnData = useCallback((
-    name: string,
+    btnId: string,
     newBtnData: ILauncherCustomButton,
   ) => {
     changeCurrentConfig(
       'customButtons',
-      changeConfigArrayItem(name, newBtnData, currentConfig.customButtons),
+      changeConfigArrayItem(btnId, newBtnData, currentConfig.customButtons),
     );
   }, [currentConfig, changeCurrentConfig]);
 
