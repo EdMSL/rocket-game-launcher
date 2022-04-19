@@ -3,7 +3,6 @@ import React, {
 } from 'react';
 import classNames from 'classnames';
 
-import styles from './styles.module.scss';
 import { Checkbox } from '$components/UI/Checkbox';
 import { PathSelector } from '$components/UI/PathSelector';
 import { TextField } from '$components/UI/TextField';
@@ -24,27 +23,21 @@ import { IValidationErrors } from '$types/common';
 
 interface IProps {
   item: ILauncherCustomButton,
-  position: number,
-  quantity: number,
   pathVariables: IPathVariables,
   validationErrors: IValidationErrors,
   lastItemId: string,
-  onDeleteBtnClick: (id: string) => void,
-  onChangeBtnData: (newBtnData: ILauncherCustomButton) => void,
-  onChangeBtnOrder: (position: number, isUpInOrder: boolean) => void,
+  deleteBtnItem: (id: string) => void,
+  сhangeBtnData: (btnId: string, newBtnData: ILauncherCustomButton) => void,
   onValidationError: (errors: IValidationErrors) => void,
 }
 
 export const CustomBtnItem: React.FC<IProps> = ({
   item,
-  position,
-  quantity,
   validationErrors,
   pathVariables,
   lastItemId,
-  onChangeBtnData,
-  onDeleteBtnClick,
-  onChangeBtnOrder,
+  сhangeBtnData,
+  deleteBtnItem,
   onValidationError,
 }) => {
   const detailsElementRef = useRef<HTMLDetailsElement>(null);
@@ -59,21 +52,24 @@ export const CustomBtnItem: React.FC<IProps> = ({
     const newSelectorType = target.checked ? LauncherButtonAction.RUN : LauncherButtonAction.OPEN;
     const isPathCorrect = getIsPathWithVariableCorrect(item.path, newSelectorType);
 
-    onChangeBtnData({
+    сhangeBtnData(item.id, {
       ...item,
-      action: newSelectorType,
+      [target.name]: newSelectorType,
     });
 
     onValidationError(getUniqueValidationErrors(
       validationErrors,
-      { [`item-path_${item.id}`]: ['incorrect path'] },
+      { [`path_${item.id}`]: ['incorrect path'] },
       !isPathCorrect,
     ));
-  }, [item, validationErrors, onValidationError, onChangeBtnData]);
+  }, [item, validationErrors, onValidationError, сhangeBtnData]);
 
   const OnTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    onChangeBtnData({ ...item, label: target.value });
-  }, [item, onChangeBtnData]);
+    сhangeBtnData(item.id, {
+      ...item,
+      [target.name]: target.value,
+    });
+  }, [item, сhangeBtnData]);
 
   const onPathSelectorChange = useCallback((
     value: string,
@@ -81,7 +77,10 @@ export const CustomBtnItem: React.FC<IProps> = ({
     validationData: IValidationData,
   ) => {
     if (value) {
-      onChangeBtnData({ ...item, path: value });
+      сhangeBtnData(item.id, {
+        ...item,
+        path: value,
+      });
 
       onValidationError(getUniqueValidationErrors(
         validationErrors,
@@ -89,122 +88,73 @@ export const CustomBtnItem: React.FC<IProps> = ({
         validationData.isForAdd,
       ));
     }
-  }, [item, validationErrors, onValidationError, onChangeBtnData]);
+  }, [item, validationErrors, onValidationError, сhangeBtnData]);
 
   const onChangeArguments = useCallback((
     newArgs: IButtonArg[],
   ) => {
-    onChangeBtnData({ ...item, args: newArgs });
-  }, [item, onChangeBtnData]);
+    сhangeBtnData(item.id, {
+      ...item,
+      args: newArgs,
+    });
+  }, [item, сhangeBtnData]);
 
   const onDeleteCustomBtnBtnClick = useCallback(() => {
-    onDeleteBtnClick(item.id);
-  }, [onDeleteBtnClick, item.id]);
-
-  const onChangeButtonsOrderBtnClick = useCallback((
-    { currentTarget }: React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    onChangeBtnOrder(position, currentTarget.name === 'up');
-  }, [position, onChangeBtnOrder]);
+    deleteBtnItem(item.id);
+  }, [deleteBtnItem, item.id]);
 
   return (
-    <li className={classNames('developer-screen__spoiler-item', styles['custom-btn__item'])}>
-      <details
-        className="developer-screen__spoiler-block"
-        ref={detailsElementRef}
-      >
-        <summary className={classNames(
-          'developer-screen__spoiler-title',
-          Object.keys(validationErrors).find((error) => error.includes(item.id))
-            && 'developer-screen__spoiler-title--error',
+    <React.Fragment>
+      <TextField
+        className="developer-screen__item"
+        id={`label_${item.id}`}
+        name="label"
+        value={item.label}
+        label="Заголовок кнопки"
+        description="Текст, который будет отображаться на данной кнопке запуска"
+        onChange={OnTextFieldChange}
+      />
+      <Checkbox
+        id={`action_${item.id}`}
+        className="developer-screen__item"
+        name="action"
+        label="Кнопка запуска приложения?"
+        isChecked={item.action === LauncherButtonAction.RUN}
+        description="Определяет действие по нажатию кнопки: запуск приложения\файла или открытие папки. Влияет на доступный выбор в селекторе пути ниже"//eslint-disable-line max-len
+        onChange={onCheckboxChange}
+      />
+      <PathSelector
+        className="developer-screen__item"
+        id={`path_${item.id}`}
+        name="path"
+        label="Путь до файла\папки"
+        value={item.path}
+        options={generateSelectOptions([PathVariableName.GAME_DIR])}
+        pathVariables={pathVariables}
+        selectorType={item.action}
+        description="Путь до файла для запуска или папки для открытия в проводнике"
+        validationErrors={validationErrors[`path_${item.id}`]}
+        onChange={onPathSelectorChange}
+      />
+      <ArgumentsBlock
+        args={item.args!}
+        parent="customButtons"
+        className="developer-screen__item"
+        pathVariables={pathVariables}
+        description="Дополнительные агрументы запуска"
+        validationErrors={validationErrors}
+        changeArguments={onChangeArguments}
+        onValidationError={onValidationError}
+      />
+      <Button
+        className={classNames(
+          'main-btn',
+          'developer-screen__spoiler-button',
         )}
-        >
-          <span className="developer-screen__spoiler-text">Заголовок:</span>
-          <span className="developer-screen__spoiler-text">{item.label}</span>
-          <span className="developer-screen__spoiler-text">Путь:</span>
-          <span className="developer-screen__spoiler-text">{item.path}</span>
-          <Button
-            className={classNames(
-              'developer-screen__spoiler-title-btn',
-              'developer-screen__spoiler-title-btn--up',
-            )}
-            name="up"
-            isDisabled={quantity === 1 || position === 0}
-            onClick={onChangeButtonsOrderBtnClick}
-          >
-            Вверх
-          </Button>
-          <Button
-            className={classNames(
-              'developer-screen__spoiler-title-btn',
-              'developer-screen__spoiler-title-btn--down',
-            )}
-            name="down"
-            isDisabled={quantity === 1 || position === quantity - 1}
-            onClick={onChangeButtonsOrderBtnClick}
-          >
-            Вниз
-          </Button>
-          <Button
-            className={classNames(
-              'developer-screen__spoiler-title-btn',
-              'developer-screen__spoiler-title-btn--delete',
-            )}
-            onClick={onDeleteCustomBtnBtnClick}
-          >
-            Удалить
-          </Button>
-        </summary>
-        <TextField
-          className="developer-screen__item"
-          id={`item-label_${item.id}`}
-          name="custom-btn-label"
-          value={item.label}
-          label="Заголовок кнопки"
-          description="Текст, который будет отображаться на данной кнопке запуска"
-          onChange={OnTextFieldChange}
-        />
-        <Checkbox
-          className="developer-screen__item"
-          id={`item-checkbox_${item.id}`}
-          label="Кнопка запуска приложения?"
-          isChecked={item.action === LauncherButtonAction.RUN}
-          description="Определяет действие по нажатию кнопки: запуск приложения\файла или открытие папки. Влияет на доступный выбор в селекторе пути ниже"//eslint-disable-line max-len
-          onChange={onCheckboxChange}
-        />
-        <PathSelector
-          className="developer-screen__item"
-          id={`item-path_${item.id}`}
-          label="Путь до файла\папки"
-          value={item.path}
-          options={generateSelectOptions([PathVariableName.GAME_DIR])}
-          pathVariables={pathVariables}
-          selectorType={item.action}
-          description="Путь до файла для запуска или папки для открытия в проводнике"
-          validationErrors={validationErrors[`item-path_${item.id}`]}
-          onChange={onPathSelectorChange}
-        />
-        <ArgumentsBlock
-          args={item.args!}
-          parent="customButtons"
-          parentId={item.id}
-          className="developer-screen__item"
-          pathVariables={pathVariables}
-          description="Дополнительные агрументы запуска"
-          validationErrors={validationErrors}
-          changeArguments={onChangeArguments}
-          onValidationError={onValidationError}
-        />
-        <Button
-          className={classNames(
-            'main-btn',
-            'developer-screen__spoiler-button',
-          )}
-          onClick={onDeleteCustomBtnBtnClick}
-        >
-          Удалить
-        </Button>
-      </details>
-    </li>
+        onClick={onDeleteCustomBtnBtnClick}
+      >
+        Удалить
+      </Button>
+    </React.Fragment>
   );
 };

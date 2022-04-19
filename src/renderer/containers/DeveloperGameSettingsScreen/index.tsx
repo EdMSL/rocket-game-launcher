@@ -194,7 +194,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   const onTextFieldChange = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    changeCurrentConfig(target.value, target.id);
+    changeCurrentConfig(target.value, target.name);
   }, [changeCurrentConfig]);
 
   const onAddGameSettingsFile = useCallback(async () => {
@@ -372,6 +372,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                 <TextField
                   className="developer-screen__item"
                   id="baseFilesEncoding"
+                  name="baseFilesEncoding"
                   label="Кодировка"
                   value={currentConfig.baseFilesEncoding}
                   description="Кодировка, которая будет по умолчанию применяться при чтении и записи данных файлов игровых настроек." //eslint-disable-line max-len

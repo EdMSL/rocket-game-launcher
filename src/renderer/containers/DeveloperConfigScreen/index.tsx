@@ -27,6 +27,7 @@ import {
   ILauncherCustomButton,
 } from '$types/main';
 import {
+  changeConfigArrayItem,
   clearValidationErrors,
   generateSelectOptions,
   getNewConfig,
@@ -44,6 +45,7 @@ import { DeveloperScreenController } from '$components/DeveloperScreenController
 import { IDeveloperRootState } from '$types/developer';
 import { saveLauncherConfig, updateConfig } from '$actions/developer';
 import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
+import { Spoiler } from '$components/UI/Spoiler';
 
 export const DeveloperConfigScreen: React.FC = () => {
   /* eslint-disable max-len */
@@ -182,7 +184,12 @@ export const DeveloperConfigScreen: React.FC = () => {
     changeCurrentConfig(target.name, target.value, target.dataset.parent);
   }, [changeCurrentConfig]);
 
-  const onDeleteCustomBtnBtnClick = useCallback((id: string) => {
+  const deleteCustomBtnItem = useCallback((items: ILauncherCustomButton[]) => {
+    changeCurrentConfig('customButtons', items);
+    setLastAddedBtnItemId('');
+  }, [changeCurrentConfig]);
+
+  const deleteCustomBtnById = useCallback((id: string) => {
     changeCurrentConfig('customButtons', currentConfig.customButtons
       .filter((currentBtn) => currentBtn.id !== id));
 
@@ -205,37 +212,15 @@ export const DeveloperConfigScreen: React.FC = () => {
       }]);
   }, [currentConfig, changeCurrentConfig]);
 
-  const onCustomBtnChange = useCallback((
+  const changeCustomBtnData = useCallback((
+    name: string,
     newBtnData: ILauncherCustomButton,
   ) => {
-    const newButtons = currentConfig.customButtons.map((currentBtn) => {
-      if (currentBtn.id === newBtnData.id) {
-        return newBtnData;
-      }
-
-      return currentBtn;
-    });
-
-    changeCurrentConfig('customButtons', newButtons);
+    changeCurrentConfig(
+      'customButtons',
+      changeConfigArrayItem(name, newBtnData, currentConfig.customButtons),
+    );
   }, [currentConfig, changeCurrentConfig]);
-
-  const onCustomBtnChangeOrder = useCallback((position: number, isUpInOrder: boolean) => {
-    const newButtons = [...currentConfig.customButtons];
-
-    if (isUpInOrder) {
-      [
-        newButtons[position - 1],
-        newButtons[position],
-      ] = [newButtons[position], newButtons[position - 1]];
-    } else {
-      [
-        newButtons[position],
-        newButtons[position + 1],
-      ] = [newButtons[position + 1], newButtons[position]];
-    }
-
-    changeCurrentConfig('customButtons', newButtons);
-  }, [currentConfig.customButtons, changeCurrentConfig]);
 
   const changeArguments = useCallback((
     newArgs: IButtonArg[],
@@ -376,20 +361,28 @@ export const DeveloperConfigScreen: React.FC = () => {
               </p>
               <ul className={styles['developer-screen__custom-btns-container']}>
                 {
-                currentConfig.customButtons.map((item, index) => (
-                  <CustomBtnItem
-                    key={item.id}
-                    item={item}
-                    position={index}
-                    quantity={currentConfig.customButtons.length}
-                    pathVariables={pathVariables}
-                    validationErrors={validationErrors}
+                currentConfig.customButtons.map((customBtn, index) => (
+                  <Spoiler<ILauncherCustomButton>
+                    key={customBtn.id}
+                    item={customBtn}
+                    items={currentConfig.customButtons}
                     lastItemId={lastAddedBtnItemId}
-                    onDeleteBtnClick={onDeleteCustomBtnBtnClick}
-                    onChangeBtnData={onCustomBtnChange}
-                    onChangeBtnOrder={onCustomBtnChangeOrder}
-                    onValidationError={setNewValidationErrors}
-                  />
+                    position={index}
+                    summaryText={[{ label: 'Заголовок:', text: customBtn.label }, { label: 'Путь:', text: customBtn.path }]}
+                    onDeleteItem={deleteCustomBtnItem}
+                    validationErrors={validationErrors}
+                  >
+                    <CustomBtnItem
+                      key={customBtn.id}
+                      item={customBtn}
+                      pathVariables={pathVariables}
+                      validationErrors={validationErrors}
+                      lastItemId={lastAddedBtnItemId}
+                      deleteBtnItem={deleteCustomBtnById}
+                      сhangeBtnData={changeCustomBtnData}
+                      onValidationError={setNewValidationErrors}
+                    />
+                  </Spoiler>
                 ))
               }
               </ul>
