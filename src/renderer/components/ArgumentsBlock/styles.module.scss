@@ -13,6 +13,10 @@
   flex-direction: column;
 }
 
+.developer-screen__agrs-list {
+  @include reset-list;
+}
+
 .developer-screen__agrs-item {
   display: flex;
   justify-content: space-between;

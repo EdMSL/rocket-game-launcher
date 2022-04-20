@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import classNames from 'classnames';
 
 import styles from './styles.module.scss';
@@ -41,6 +41,8 @@ export const ArgumentsBlock: React.FC<IProps> = ({
   changeArguments,
   onValidationError,
 }) => {
+  const [lastAddedStringArg, setLastAddedStringArg] = useState<string>('');
+
   const onPathSelectorChange = useCallback((
     value: string,
     id: string,
@@ -103,21 +105,27 @@ export const ArgumentsBlock: React.FC<IProps> = ({
       parent,
     );
 
+    setLastAddedStringArg('');
     onValidationError(clearValidationErrors(validationErrors, currentTarget.name));
   }, [args, parent, validationErrors, changeArguments, onValidationError]);
 
   const OnAddArgumentBtnClick = useCallback(({
     currentTarget,
   }: React.MouseEvent<HTMLButtonElement>) => {
+    const newId = getRandomId();
     const newArgs = [
       ...args,
       {
-        id: getRandomId(),
+        id: newId,
         data: currentTarget.name === 'add-arg-path'
           ? `${PathVariableName.GAME_DIR}\\example.exe`
           : 'Аргумент',
       },
     ];
+
+    if (currentTarget.name === 'add-arg-string') {
+      setLastAddedStringArg(newId);
+    }
 
     changeArguments(newArgs, parent);
   }, [args, parent, changeArguments]);
@@ -135,45 +143,50 @@ export const ArgumentsBlock: React.FC<IProps> = ({
         }
       </div>
       <div className={styles['developer-screen__agrs-block']}>
-        {
-        args.map((currentArg) => (
-          <div
-            className={styles['developer-screen__agrs-item']}
-            key={currentArg.id}
-          >
-            {
-              PathRegExp.PATH_VARIABLE.test(currentArg.data)
-                ? (
-                  <PathSelector
-                    id={currentArg.id}
-                    value={currentArg.data}
-                    options={generateSelectOptions([PathVariableName.GAME_DIR])}
-                    pathVariables={pathVariables}
-                    selectorType={LauncherButtonAction.RUN}
-                    validationErrors={validationErrors[currentArg.id]}
-                    onChange={onPathSelectorChange}
-                  />
-                  )
-                : (
-                  <TextField
-                    id={currentArg.id}
-                    value={currentArg.data}
-                    isRequied
-                    validationErrors={validationErrors[currentArg.id]}
-                    onChange={onArgumentTextFieldChange}
-                  />
-                  )
-            }
-            <Button
-              name={currentArg.id}
-              className={styles['developer-screen__args-delete-btn']}
-              onClick={onDeleteArgBtnClick}
+        <ul className={styles['developer-screen__agrs-list']}>
+          {
+          args.map((currentArg) => (
+            <li
+              key={currentArg.id}
+              className={styles['developer-screen__agrs-item']}
             >
-              Удалить
-            </Button>
-          </div>
-        ))
-        }
+              {
+                PathRegExp.PATH_VARIABLE.test(currentArg.data)
+                  ? (
+                    <PathSelector
+                      id={currentArg.id}
+                      value={currentArg.data}
+                      options={generateSelectOptions([PathVariableName.GAME_DIR])}
+                      pathVariables={pathVariables}
+                      selectorType={LauncherButtonAction.RUN}
+                      validationErrors={validationErrors[currentArg.id]}
+                      onChange={onPathSelectorChange}
+                    />
+                    )
+                  : (
+                    <TextField
+                      id={currentArg.id}
+                      isFocus={currentArg.id === lastAddedStringArg}
+                      isSelect={currentArg.id === lastAddedStringArg}
+                      value={currentArg.data}
+                      isRequied
+                      placeholder="-string"
+                      validationErrors={validationErrors[currentArg.id]}
+                      onChange={onArgumentTextFieldChange}
+                    />
+                    )
+              }
+              <Button
+                name={currentArg.id}
+                className={styles['developer-screen__args-delete-btn']}
+                onClick={onDeleteArgBtnClick}
+              >
+                Удалить
+              </Button>
+            </li>
+          ))
+          }
+        </ul>
         <div className={styles['developer-screen__agrs-btns']}>
           <Button
             name="add-arg-path"

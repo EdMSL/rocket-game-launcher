@@ -25,7 +25,7 @@ export const Range: React.FunctionComponent<IProps> = ({
   id,
   name,
   parent = '',
-  multiparameters = '',
+  multiparameters,
   defaultValue,
   min,
   max,

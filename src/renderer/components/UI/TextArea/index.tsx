@@ -1,10 +1,10 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { IUIElementProps } from '$types/common';
+import { IUIControllerTextField, IUIElementProps } from '$types/common';
 import { HintItem } from '$components/HintItem';
 
-interface IProps extends IUIElementProps<HTMLTextAreaElement> {
+interface IProps extends IUIElementProps<HTMLTextAreaElement>, IUIControllerTextField {
   wrap?: string,
 }
 

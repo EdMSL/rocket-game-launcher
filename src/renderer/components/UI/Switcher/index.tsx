@@ -14,7 +14,7 @@ export const Switcher: React.FunctionComponent<IProps> = ({
   parentClassname = '',
   description = '',
   parent = '',
-  multiparameters = '',
+  multiparameters,
   isDisabled = false,
   isChecked,
   onChange,

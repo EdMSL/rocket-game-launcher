@@ -40,6 +40,12 @@ export interface IUIControllerSelect {
   options: ISelectOption[],
 }
 
+export interface IUIControllerTextField {
+  placeholder?: string,
+  isFocus?: boolean,
+  isSelect?: boolean,
+}
+
 export interface IUIElementParams {
   id: string,
   className?: string,
@@ -50,7 +56,6 @@ export interface IUIElementParams {
   multiparameters?: string,
   isDisabled?: boolean,
   parent?: string,
-  placeholder?: string,
   description?: string,
   maxLength?: number,
   validationErrors?: string[],

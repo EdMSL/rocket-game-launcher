@@ -4,7 +4,9 @@ import React, {
 import classNames from 'classnames';
 import { ipcRenderer } from 'electron';
 
-import { ISelectOption, IUIElementParams } from '$types/common';
+import {
+  ISelectOption, IUIControllerTextField, IUIElementParams,
+} from '$types/common';
 import { HintItem } from '$components/HintItem';
 import { Button } from '../Button';
 import { getVariableAndValueFromPath } from '$utils/data';
@@ -13,7 +15,7 @@ import { checkIsPathIsNotOutsideValidFolder, replaceRootDirByPathVariable } from
 import { AppChannel, LauncherButtonAction } from '$constants/misc';
 import { getIsPathWithVariableCorrect, IValidationData } from '$utils/check';
 
-interface IProps extends IUIElementParams {
+interface IProps extends IUIElementParams, IUIControllerTextField {
   id: string,
   options: ISelectOption[],
   pathVariables: IPathVariables,

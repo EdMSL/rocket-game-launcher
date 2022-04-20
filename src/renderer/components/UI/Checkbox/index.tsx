@@ -16,7 +16,7 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
   isDisabled = false,
   className = '',
   parentClassname = '',
-  multiparameters = '',
+  multiparameters,
   onChange,
 }) => (
   <div className={classNames(
