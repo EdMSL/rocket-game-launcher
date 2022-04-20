@@ -77,7 +77,7 @@ export const Spoiler = <Item extends { id: string, },>({
         <summary
           className={classNames(
             'developer-screen__spoiler-title',
-            Object.keys(validationErrors).find((error) => error.includes(item.id))
+            Object.keys(validationErrors).some((error) => error.includes(item.id))
             && 'developer-screen__spoiler-title--error',
           )}
         >

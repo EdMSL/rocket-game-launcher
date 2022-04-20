@@ -7,6 +7,7 @@ import { TEXT_INPUT_MAX_LENGTH } from '$constants/defaultData';
 
 interface IProps extends IUIElementProps<HTMLInputElement> {
   value: string,
+  isRequied?: boolean,
 }
 
 export const TextField: React.FunctionComponent<IProps> = ({
@@ -21,6 +22,7 @@ export const TextField: React.FunctionComponent<IProps> = ({
   parent,
   multiparameters,
   isDisabled = false,
+  isRequied = false,
   validationErrors,
   onChange,
 }) => (
@@ -52,6 +54,7 @@ export const TextField: React.FunctionComponent<IProps> = ({
       data-parent={parent}
       data-multiparameters={multiparameters}
       disabled={isDisabled}
+      required={isRequied}
       onChange={onChange}
     />
   </div>

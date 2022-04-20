@@ -40,6 +40,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
   deleteBtnItem,
   onValidationError,
 }) => {
+  const pathSelectorId = `path_${item.id}`;
   const detailsElementRef = useRef<HTMLDetailsElement>(null);
 
   useEffect(() => {
@@ -59,17 +60,25 @@ export const CustomBtnItem: React.FC<IProps> = ({
 
     onValidationError(getUniqueValidationErrors(
       validationErrors,
-      { [`path_${item.id}`]: ['incorrect path'] },
+      { [pathSelectorId]: ['incorrect path'] },
       !isPathCorrect,
     ));
-  }, [item, validationErrors, onValidationError, сhangeBtnData]);
+  }, [item, validationErrors, pathSelectorId, onValidationError, сhangeBtnData]);
 
   const OnTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     сhangeBtnData(item.id, {
       ...item,
       [target.name]: target.value,
     });
-  }, [item, сhangeBtnData]);
+
+    if (target.required) {
+      onValidationError(getUniqueValidationErrors(
+        validationErrors,
+        { [target.id]: ['incorrect path'] },
+        target.value.trim() === '',
+      ));
+    }
+  }, [item, validationErrors, сhangeBtnData, onValidationError]);
 
   const onPathSelectorChange = useCallback((
     value: string,
@@ -112,6 +121,8 @@ export const CustomBtnItem: React.FC<IProps> = ({
         value={item.label}
         label="Заголовок кнопки"
         description="Текст, который будет отображаться на данной кнопке запуска"
+        isRequied
+        validationErrors={validationErrors[`label_${item.id}`]}
         onChange={OnTextFieldChange}
       />
       <Checkbox
@@ -125,7 +136,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
       />
       <PathSelector
         className="developer-screen__item"
-        id={`path_${item.id}`}
+        id={pathSelectorId}
         name="path"
         label="Путь до файла\папки"
         value={item.path}
@@ -133,12 +144,13 @@ export const CustomBtnItem: React.FC<IProps> = ({
         pathVariables={pathVariables}
         selectorType={item.action}
         description="Путь до файла для запуска или папки для открытия в проводнике"
-        validationErrors={validationErrors[`path_${item.id}`]}
+        validationErrors={validationErrors[pathSelectorId]}
         onChange={onPathSelectorChange}
       />
       <ArgumentsBlock
         args={item.args!}
         parent="customButtons"
+        parentId={item.id}
         className="developer-screen__item"
         pathVariables={pathVariables}
         description="Дополнительные агрументы запуска"

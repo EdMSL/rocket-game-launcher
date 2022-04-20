@@ -35,7 +35,6 @@ import {
   IGameSettingsFile,
   IGameSettingsGroup,
   IGameSettingsParameterBase,
-  IGameSettingsConfig,
 } from '$types/gameSettings';
 import {
   DefaultPathVariable,
@@ -828,7 +827,7 @@ export const getVariableAndValueFromPath = (pathStr: string): [string, string] =
 };
 
 /**
- * Получить ошибки валидации полей размеров экрана.
+ * Получить ошибки валидации полей с уникальными значениями.
  * @param currentErrors Текущие ошибки валидации.
  * @param newErrorsOrForClear Ошибки валидации для добавления или для очистки.
  * @param isForAdd Очищать ошибки из списка или добавлять новые ошибки в список.

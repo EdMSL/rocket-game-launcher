@@ -22,6 +22,7 @@ interface IProps {
   className?: string,
   args: IButtonArg[],
   parent: string,
+  parentId?: string,
   pathVariables: IPathVariables,
   validationErrors: IValidationErrors,
   description?: string,
@@ -33,6 +34,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
   className = '',
   args,
   parent,
+  parentId = parent,
   pathVariables,
   description,
   validationErrors,
@@ -61,11 +63,11 @@ export const ArgumentsBlock: React.FC<IProps> = ({
 
       onValidationError(getUniqueValidationErrors(
         validationErrors,
-        validationData.errors,
+        { ...validationData.errors, [parentId]: ['arguments error'] },
         validationData.isForAdd,
       ));
     }
-  }, [args, parent, validationErrors, changeArguments, onValidationError]);
+  }, [args, parent, parentId, validationErrors, changeArguments, onValidationError]);
 
   const onArgumentTextFieldChange = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
@@ -83,7 +85,15 @@ export const ArgumentsBlock: React.FC<IProps> = ({
       }),
       parent,
     );
-  }, [args, parent, changeArguments]);
+
+    if (target.required) {
+      onValidationError(getUniqueValidationErrors(
+        validationErrors,
+        { [target.id]: ['incorrect path'], [parentId]: ['arguments error'] },
+        target.value.trim() === '',
+      ));
+    }
+  }, [args, parent, parentId, validationErrors, changeArguments, onValidationError]);
 
   const onDeleteArgBtnClick = useCallback(({
     currentTarget,
@@ -93,7 +103,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
       parent,
     );
 
-    onValidationError(clearValidationErrors(validationErrors, currentTarget.id));
+    onValidationError(clearValidationErrors(validationErrors, currentTarget.name));
   }, [args, parent, validationErrors, changeArguments, onValidationError]);
 
   const OnAddArgumentBtnClick = useCallback(({
@@ -105,7 +115,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
         id: getRandomId(),
         data: currentTarget.name === 'add-arg-path'
           ? `${PathVariableName.GAME_DIR}\\example.exe`
-          : '',
+          : 'Аргумент',
       },
     ];
 
@@ -136,7 +146,6 @@ export const ArgumentsBlock: React.FC<IProps> = ({
                 ? (
                   <PathSelector
                     id={currentArg.id}
-                    name="btn-arg-input"
                     value={currentArg.data}
                     options={generateSelectOptions([PathVariableName.GAME_DIR])}
                     pathVariables={pathVariables}
@@ -148,8 +157,9 @@ export const ArgumentsBlock: React.FC<IProps> = ({
                 : (
                   <TextField
                     id={currentArg.id}
-                    name="btn-arg-input"
                     value={currentArg.data}
+                    isRequied
+                    validationErrors={validationErrors[currentArg.id]}
                     onChange={onArgumentTextFieldChange}
                   />
                   )

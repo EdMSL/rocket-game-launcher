@@ -173,8 +173,16 @@ export const DeveloperConfigScreen: React.FC = () => {
   }, [currentConfig, changeCurrentConfig, validationErrors]);
 
   const OnTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    changeCurrentConfig(target.name, target.value, target.dataset.parent);
-  }, [changeCurrentConfig]);
+    if (target.required) {
+      setValidationErrors(getUniqueValidationErrors(
+        validationErrors,
+        { [target.id]: ['empty value'] },
+        target.value.trim() === '',
+      ));
+    }
+
+    changeCurrentConfig(target.name, target.value.trim(), target.dataset.parent);
+  }, [validationErrors, changeCurrentConfig]);
 
   const onSwitcherChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     changeCurrentConfig(target.name, target.checked, target.dataset.parent);
@@ -302,6 +310,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               name="gameName"
               value={currentConfig.gameName}
               label="Заголовок окна программы"
+              validationErrors={validationErrors.gameName}
               description="Название игры или любой текст, который будет отображаться в заголовке окна программы"//eslint-disable-line max-len
               onChange={OnTextFieldChange}
             />
@@ -328,6 +337,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               label="Заголовок кнопки запуска"
               description="Текст, который будет отображаться на основной кнопке запуска игры"//eslint-disable-line max-len
               validationErrors={validationErrors.label}
+              isRequied
               onChange={OnTextFieldChange}
             />
             <PathSelector
