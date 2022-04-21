@@ -45,7 +45,9 @@ import {
 import { GameSettingsParameterItem } from '$components/GameSettingsParameterItem';
 import { Spoiler } from '$components/UI/Spoiler';
 import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
-import { defaultFullGameSettingsParameter } from '$constants/defaultData';
+import {
+  defaultFullGameSettingsParameter,
+} from '$constants/defaultData';
 
 export const DeveloperGameSettingsScreen: React.FC = () => {
   /* eslint-disable max-len */
@@ -417,6 +419,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                   label="Кодировка"
                   value={currentConfig.baseFilesEncoding}
                   description="Кодировка, которая будет по умолчанию применяться при чтении и записи данных файлов игровых настроек." //eslint-disable-line max-len
+                  placeholder={gameSettingsConfig.baseFilesEncoding}
                   onChange={onTextFieldChange}
                 />
               </div>

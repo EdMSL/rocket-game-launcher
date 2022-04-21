@@ -345,6 +345,10 @@ $checkbox-size: 20px;
     background-color: var(--disabled-color);
   }
 
+  &::placeholder {
+    color: var(--disabled-color);
+  }
+
   &--error {
     @include inputError;
   }
@@ -375,6 +379,10 @@ $checkbox-size: 20px;
 
   &:disabled {
     background-color: var(--disabled-color);
+  }
+
+  &::placeholder {
+    color: var(--disabled-color);
   }
 
   &--error {
@@ -413,6 +421,10 @@ $checkbox-size: 20px;
 
   &:disabled {
     background-color: var(--disabled-color);
+  }
+
+  &::placeholder {
+    color: var(--disabled-color);
   }
 
   &--error {

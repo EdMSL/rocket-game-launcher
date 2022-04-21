@@ -38,6 +38,7 @@ import { deepClone, updatePathVariables } from '$utils/data';
 import {
   checkObjectForEqual, getWindowSettingsFromLauncherConfig,
 } from '$utils/check';
+import { defaultGameSettingsConfig } from '$constants/defaultData';
 
 const getState = (state: IDeveloperState): IDeveloperState => state;
 
@@ -181,6 +182,10 @@ function* saveGameSettingsConfigSaga(
   yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, true);
   yield delay(2000);
   try {
+    if (!newConfig.baseFilesEncoding) {
+      newConfig.baseFilesEncoding = defaultGameSettingsConfig.baseFilesEncoding;//eslint-disable-line no-param-reassign, max-len
+    }
+
     yield call(writeJSONFile, GAME_SETTINGS_FILE_PATH, deepClone(newConfig, 'id'));
     yield put(setGameSettingsConfig(newConfig));
 
