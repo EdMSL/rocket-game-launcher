@@ -14,6 +14,7 @@ import { IPathVariables } from '$constants/paths';
 import { IValidationData } from '$utils/check';
 import { IValidationErrors } from '$types/common';
 import { Button } from '$components/UI/Button';
+import { getFileNameFromPathToFile } from '$utils/strings';
 
 interface IProps {
   file: IGameSettingsFile,
@@ -79,7 +80,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         id={`file-path_${file.id}`}
         parent="path"
         pathVariables={pathVariables}
-        validationErrors={validationErrors[`file-path_${file.id}`]}
+        validationErrors={validationErrors}
         value={file.path}
         label="Путь до файла настроек"
         description="Состоит из переменной пути и самого пути к файлу. При выборе пути через диалоговое окно, переменная определяется автоматически." //eslint-disable-line
@@ -104,6 +105,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         value={file.label}
         description="Имя файла для идентификации"
         label="Имя файла"
+        placeholder={getFileNameFromPathToFile(file.path)}
         onChange={onTextFieldChange}
       />
       <TextField

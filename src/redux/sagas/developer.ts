@@ -39,6 +39,7 @@ import {
   checkObjectForEqual, getWindowSettingsFromLauncherConfig,
 } from '$utils/check';
 import { defaultGameSettingsConfig } from '$constants/defaultData';
+import { getFileNameFromPathToFile } from '$utils/strings';
 
 const getState = (state: IDeveloperState): IDeveloperState => state;
 
@@ -183,7 +184,20 @@ function* saveGameSettingsConfigSaga(
   yield delay(2000);
   try {
     if (!newConfig.baseFilesEncoding) {
-      newConfig.baseFilesEncoding = defaultGameSettingsConfig.baseFilesEncoding;//eslint-disable-line no-param-reassign, max-len
+      newConfig.baseFilesEncoding = defaultGameSettingsConfig.baseFilesEncoding; //eslint-disable-line no-param-reassign, max-len
+    }
+
+    if (newConfig.gameSettingsFiles.some((file) => !file.label)) {
+      newConfig.gameSettingsFiles = newConfig.gameSettingsFiles.map((file) => { //eslint-disable-line no-param-reassign, max-len
+        if (!file.label) {
+          return {
+            ...file,
+            label: getFileNameFromPathToFile(file.path),
+          };
+        }
+
+        return file;
+      });
     }
 
     yield call(writeJSONFile, GAME_SETTINGS_FILE_PATH, deepClone(newConfig, 'id'));

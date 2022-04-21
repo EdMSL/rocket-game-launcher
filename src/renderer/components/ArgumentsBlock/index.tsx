@@ -119,7 +119,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
         id: newId,
         data: currentTarget.name === 'add-arg-path'
           ? `${PathVariableName.GAME_DIR}\\example.exe`
-          : 'Аргумент',
+          : '-string',
       },
     ];
 
@@ -159,7 +159,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
                       options={generateSelectOptions([PathVariableName.GAME_DIR])}
                       pathVariables={pathVariables}
                       selectorType={LauncherButtonAction.RUN}
-                      validationErrors={validationErrors[currentArg.id]}
+                      validationErrors={validationErrors}
                       onChange={onPathSelectorChange}
                     />
                     )
@@ -170,8 +170,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
                       isSelect={currentArg.id === lastAddedStringArg}
                       value={currentArg.data}
                       isRequied
-                      placeholder="-string"
-                      validationErrors={validationErrors[currentArg.id]}
+                      validationErrors={validationErrors}
                       onChange={onArgumentTextFieldChange}
                     />
                     )

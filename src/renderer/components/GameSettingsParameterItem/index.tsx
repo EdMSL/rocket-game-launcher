@@ -11,6 +11,7 @@ import {
   generateSelectOptions,
   getFullParameter,
   getSelectsOptionStringObj,
+  getUniqueValidationErrors,
 } from '$utils/data';
 import {
   GameSettingControllerType, GameSettingsOptionType, HTMLInputType,
@@ -41,6 +42,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
   gameSettingsGroups,
   validationErrors,
   onParameterDataChange,
+  onValidation,
   deleteParameter,
 }) => {
   const [fullParameter, setFullParameter] = useState<IGameSettingsParameter>(getFullParameter(
@@ -113,6 +115,14 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       };
     }
 
+    if (currentTarget.type === 'text' && currentTarget.required) {
+      onValidation(getUniqueValidationErrors(
+        validationErrors,
+        { [currentTarget.id]: ['empty value'] },
+        currentTarget.value === '',
+      ));
+    }
+
     const { newParameter, newFullParameter } = generateGameSettingsParameter(
       currentParameter,
       fullParameter,
@@ -121,7 +131,13 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
 
     onParameterDataChange(parameter.id, newParameter);
     setFullParameter(newFullParameter);
-  }, [parameter, optionsValue, parameterFile, fullParameter, onParameterDataChange]);
+  }, [parameter,
+    validationErrors,
+    optionsValue,
+    parameterFile,
+    fullParameter,
+    onParameterDataChange,
+    onValidation]);
 
   const onDeleteFileBtnClick = useCallback(() => {
     deleteParameter(parameter.id);
@@ -138,6 +154,8 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         name="label"
         label="Заголовок опции"
         value={parameter.label}
+        isRequied
+        validationErrors={validationErrors}
         onChange={onParameterInputChange}
       />
       <Select
@@ -187,6 +205,8 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
             name="name"
             label="Имя параметра из файла"
             value={parameter.name!}
+            isRequied
+            validationErrors={validationErrors}
             onChange={onParameterInputChange}
           />
         )
@@ -199,6 +219,8 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
             name="iniGroup"
             label="Группа параметра из файла"
             value={parameter.iniGroup}
+            isRequied
+            validationErrors={validationErrors}
             onChange={onParameterInputChange}
           />
         )
@@ -211,6 +233,8 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
             name="valueName"
             label="Имя атрибута параметра из файла"
             value={parameter.valueName}
+            isRequied
+            validationErrors={validationErrors}
             onChange={onParameterInputChange}
           />
         )
@@ -223,6 +247,8 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
             name="valuePath"
             label="Путь до параметра из файла"
             value={parameter.valuePath}
+            isRequied
+            validationErrors={validationErrors}
             onChange={onParameterInputChange}
           />
         )
@@ -235,6 +261,8 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
             name="separator"
             label="Разделитель"
             value={parameter.separator}
+            isRequied
+            validationErrors={validationErrors}
             onChange={onParameterInputChange}
           />
         )
@@ -264,6 +292,8 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
             value={optionsValue[parameter.id]}
             wrap="off"
             placeholder="Видит пользователь=Запишется в файл"
+            isRequied
+            validationErrors={validationErrors}
             onChange={onParameterInputChange}
           />
         )
@@ -322,6 +352,8 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     name="name"
                     label="Имя параметра из файла"
                     value={item.name}
+                    isRequied
+                    validationErrors={validationErrors}
                     onChange={onParameterInputChange}
                   />
                   {
@@ -332,6 +364,8 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                         name="iniGroup"
                         label="Группа параметра из файла"
                         value={item.iniGroup}
+                        isRequied
+                        validationErrors={validationErrors}
                         onChange={onParameterInputChange}
                       />
                     )
@@ -344,6 +378,8 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                         name="valueName"
                         label="Имя атрибута параметра из файла"
                         value={item.valueName}
+                        isRequied
+                        validationErrors={validationErrors}
                         onChange={onParameterInputChange}
                       />
                     )
@@ -356,6 +392,8 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                         name="valuePath"
                         label="Путь до параметра из файла"
                         value={item.valuePath}
+                        isRequied
+                        validationErrors={validationErrors}
                         onChange={onParameterInputChange}
                       />
                     )
@@ -385,6 +423,8 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                       value={optionsValue[item.id]}
                       wrap="off"
                       placeholder="Видит пользователь=Запишется в файл"
+                      isRequied
+                      validationErrors={validationErrors}
                       onChange={onParameterInputChange}
                     />
                     )

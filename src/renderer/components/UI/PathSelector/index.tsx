@@ -200,7 +200,7 @@ export const PathSelector: React.FC<IProps> = ({
         <input
           className={classNames(
             'path-selector__input',
-            validationErrors && validationErrors.length > 0 && 'path-selector__input--error',
+            validationErrors && validationErrors[id]?.length > 0 && 'path-selector__input--error',
           )}
           id={id}
           name={name}
@@ -208,7 +208,7 @@ export const PathSelector: React.FC<IProps> = ({
           value={currentPathValue}
           data-parent={parent}
           data-multiparameters={multiparameters}
-          disabled={isDisabled || validationErrors?.includes('not available path')}
+          disabled={isDisabled || (validationErrors && validationErrors[id]?.includes('not available path'))}
           onChange={onPatchTextFieldChange}
         />
         <Button

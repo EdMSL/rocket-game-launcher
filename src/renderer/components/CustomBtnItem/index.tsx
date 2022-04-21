@@ -122,7 +122,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         label="Заголовок кнопки"
         description="Текст, который будет отображаться на данной кнопке запуска"
         isRequied
-        validationErrors={validationErrors[`label_${item.id}`]}
+        validationErrors={validationErrors}
         onChange={OnTextFieldChange}
       />
       <Checkbox
@@ -144,7 +144,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         pathVariables={pathVariables}
         selectorType={item.action}
         description="Путь до файла для запуска или папки для открытия в проводнике"
-        validationErrors={validationErrors[pathSelectorId]}
+        validationErrors={validationErrors}
         onChange={onPathSelectorChange}
       />
       <ArgumentsBlock

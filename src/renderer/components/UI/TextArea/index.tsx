@@ -40,7 +40,7 @@ export const TextArea: React.FunctionComponent<IProps> = ({
     <textarea
       className={classNames(
         'text-area__input',
-        validationErrors && validationErrors.length > 0 && 'text-area__input--error',
+        validationErrors && validationErrors[id]?.length > 0 && 'text-area__input--error',
       )}
       id={id}
       name={name}

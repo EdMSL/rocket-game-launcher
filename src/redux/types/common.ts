@@ -44,6 +44,7 @@ export interface IUIControllerTextField {
   placeholder?: string,
   isFocus?: boolean,
   isSelect?: boolean,
+  isRequied?: boolean,
 }
 
 export interface IUIElementParams {
@@ -58,7 +59,7 @@ export interface IUIElementParams {
   parent?: string,
   description?: string,
   maxLength?: number,
-  validationErrors?: string[],
+  validationErrors?: IValidationErrors,
 }
 
 export interface IUIElementProps<E> extends IUIElementParams{

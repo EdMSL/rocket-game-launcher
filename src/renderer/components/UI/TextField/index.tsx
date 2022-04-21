@@ -7,7 +7,6 @@ import { TEXT_INPUT_MAX_LENGTH } from '$constants/defaultData';
 
 interface IProps extends IUIElementProps<HTMLInputElement>, IUIControllerTextField {
   value: string,
-  isRequied?: boolean,
 }
 
 export const TextField: React.FunctionComponent<IProps> = ({
@@ -55,7 +54,7 @@ export const TextField: React.FunctionComponent<IProps> = ({
       <input
         className={classNames(
           'text-field__input',
-          validationErrors && validationErrors.length > 0 && 'text-field__input--error',
+          validationErrors && validationErrors[id]?.length > 0 && 'text-field__input--error',
         )}
         ref={inputRef}
         type="text"

@@ -936,10 +936,10 @@ const getParameterBase = (
   file: IGameSettingsFile,
   parameterBase?: IGameSettingsParameterBase,
 ): IGameSettingsParameterBase => ({
-  id: parameterBase?.id! || getRandomId('game-settings-parameter'),
+  id: parameterBase?.id! || getRandomId(),
   optionType: parameterBase?.optionType || GameSettingsOptionType.DEFAULT,
   file: parameterBase?.file || file.name,
-  label: parameterBase?.label || 'Заголовок',
+  label: parameterBase?.label || '',
   description: parameterBase?.description || '',
   ...parameterBase?.settingGroup ? { settingGroup: parameterBase.settingGroup } : {},
 });
@@ -979,6 +979,7 @@ export const getDefaultGameSettingsParameter = (
   settingGroup?: string,
 ): IGameSettingsParameter => ({
   ...getParameterBase(file),
+  label: 'Заголовок',
   ...settingGroup ? { settingGroup } : {},
   name: '',
   ...getFieldsByFileView({} as IGameSettingsParameter, file),

@@ -293,7 +293,7 @@ export const DeveloperConfigScreen: React.FC = () => {
                 label={field.label}
                 min={getNumberFieldMinValue(field.name)}
                 isDisabled={getNumberFieldIsDisabled(field.name)}
-                validationErrors={validationErrors[field.name]}
+                validationErrors={validationErrors}
                 description={field.description}
                 onChange={onNumberInputChange}
               />
@@ -310,7 +310,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               name="gameName"
               value={currentConfig.gameName}
               label="Заголовок окна программы"
-              validationErrors={validationErrors.gameName}
+              validationErrors={validationErrors}
               description="Название игры или любой текст, который будет отображаться в заголовке окна программы"//eslint-disable-line max-len
               onChange={OnTextFieldChange}
             />
@@ -324,7 +324,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               pathVariables={pathVariables}
               isGameDocuments={false}
               description="Путь до папки игры в [User]/Documents. Укажите этот путь, если нужно управлять данными из файлов в этой папке через экран игровых настроек"//eslint-disable-line max-len
-              validationErrors={validationErrors.documentsPath}
+              validationErrors={validationErrors}
               onChange={onPathSelectorChange}
             />
             <p className="developer-screen__text">Настройки запуска игры</p>
@@ -336,7 +336,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               value={currentConfig.playButton.label}
               label="Заголовок кнопки запуска"
               description="Текст, который будет отображаться на основной кнопке запуска игры"//eslint-disable-line max-len
-              validationErrors={validationErrors.label}
+              validationErrors={validationErrors}
               isRequied
               onChange={OnTextFieldChange}
             />
@@ -352,7 +352,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               extensions={FileExtension.EXECUTABLE}
               selectorType={LauncherButtonAction.RUN}
               description="Путь до исполняемого файла игры, .exe или .lnk"//eslint-disable-line max-len
-              validationErrors={validationErrors.path}
+              validationErrors={validationErrors}
               onChange={onPathSelectorChange}
             />
             <ArgumentsBlock
@@ -442,7 +442,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               pathVariables={pathVariables}
               isDisabled={!currentConfig.modOrganizer.isUsed}
               description="Задает путь до основной папки Mod Organizer."
-              validationErrors={validationErrors.pathToMOFolder}
+              validationErrors={validationErrors}
               onChange={onPathSelectorChange}
             />
             <PathSelector
@@ -456,7 +456,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               pathVariables={pathVariables}
               isDisabled={!currentConfig.modOrganizer.isUsed}
               description="Задает путь до папки модов Mod Organizer. Если вы не меняли этот путь в МО, оставьте значение без изменений"//eslint-disable-line max-len
-              validationErrors={validationErrors.pathToMods}
+              validationErrors={validationErrors}
               onChange={onPathSelectorChange}
             />
             <PathSelector
@@ -470,7 +470,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               pathVariables={pathVariables}
               isDisabled={!currentConfig.modOrganizer.isUsed}
               description="Задает путь до папки профилей Mod Organizer. Если вы не меняли этот путь в МО, оставьте значение без изменений"//eslint-disable-line max-len
-              validationErrors={validationErrors.pathToProfiles}
+              validationErrors={validationErrors}
               onChange={onPathSelectorChange}
             />
             <PathSelector
@@ -486,7 +486,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               extensions={FileExtension.INI}
               isDisabled={!currentConfig.modOrganizer.isUsed}
               description="Задает путь до конфигурационного файла Mod Organizer (ModOrganizer.ini)"//eslint-disable-line max-len
-              validationErrors={validationErrors.pathToINI}
+              validationErrors={validationErrors}
               onChange={onPathSelectorChange}
             />
           </div>
