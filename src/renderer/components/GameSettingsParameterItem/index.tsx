@@ -9,6 +9,7 @@ import {
   changeConfigArrayItem,
   generateGameSettingsParameter,
   generateSelectOptions,
+  getFileByFileName,
   getFullParameter,
   getSelectsOptionStringObj,
   getUniqueValidationErrors,
@@ -55,7 +56,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
   }>(getSelectsOptionStringObj(parameter));
 
   const parameterFile = useMemo(
-    () => gameSettingsFiles.find((currFile) => currFile.name === parameter.file),
+    () => getFileByFileName(gameSettingsFiles, parameter.file),
     [gameSettingsFiles, parameter.file],
   );
 
@@ -126,7 +127,9 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
     const { newParameter, newFullParameter } = generateGameSettingsParameter(
       currentParameter,
       fullParameter,
-      parameterFile!,
+      currentTarget.name === 'file'
+        ? getFileByFileName(gameSettingsFiles, currentTarget.value)!
+        : parameterFile!,
     );
 
     onParameterDataChange(parameter.id, newParameter);
@@ -136,6 +139,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
     optionsValue,
     parameterFile,
     fullParameter,
+    gameSettingsFiles,
     onParameterDataChange,
     onValidation]);
 

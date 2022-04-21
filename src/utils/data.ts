@@ -167,6 +167,17 @@ export const getOptionNameAndId = (
 };
 
 /**
+ * Получить файл игровых настроек из `state` по его имени.
+ * @param gameSettingsFiles Массив файлов.
+ * @param fileName Имя файла, который ищем.
+ * @returns Объект файла.
+ */
+export const getFileByFileName = (
+  gameSettingsFiles: IGameSettingsFile[],
+  fileName: string,
+): IGameSettingsFile|undefined => gameSettingsFiles.find((currFile) => currFile.name === fileName);
+
+/**
  * Глубокое клонирование объекта.
  * @param obj Объект для клонирования.
  * @param deleteKey Ключ объекта, который нужно удалить при клонировании.
@@ -328,7 +339,7 @@ export const generateGameSettingsOptions = (
   const data = gameSettingsParameters.reduce<IGameSettingsOptions>(
     (gameSettingsOptions, currentParameter, index) => {
       const incorrectIndexes: number[] = [];
-      const currentGameSettingsFile: IGameSettingsFile = gameSettingsFiles.find((file) => file.name === currentParameter.file)!;
+      const currentGameSettingsFile: IGameSettingsFile = getFileByFileName(gameSettingsFiles, currentParameter.file)!;
       //Если опция с типом group, combined или related,
       // то генерация производится для каждого параметра в items.
       if (

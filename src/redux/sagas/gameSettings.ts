@@ -63,6 +63,7 @@ import {
 import {
   changeSectionalIniParameter,
   generateGameSettingsOptions,
+  getFileByFileName,
   getGameSettingsOptionsWithNewValues,
   isDataFromIniFile,
   setValueForObjectDeepKey,
@@ -509,7 +510,7 @@ function* changeMOProfileSaga(
  * Сохранить изменения в файлах игровых настроек.
  * @param changedGameSettingsOptions Измененные опции игровых параметров.
 */
-function* saveGameSettingsFilesSaga(
+function* writeGameSettingsFilesSaga(
   { payload: changedGameSettingsOptions }: ReturnType<typeof saveGameSettingsFiles>,
 ): SagaIterator {
   try {
@@ -526,7 +527,7 @@ function* saveGameSettingsFilesSaga(
     const changedGameSettingsFiles = Array.from(
       new Set(
         Object.values(changedGameSettingsOptions)
-          .map((option) => gameSettingsFiles.find((file) => option.file === file.name)!),
+          .map((option) => getFileByFileName(gameSettingsFiles, option.file)!),
       ),
     );
 
@@ -634,5 +635,5 @@ function* saveGameSettingsFilesSaga(
 
 export default function* gameSetingsSaga(): SagaIterator {
   yield takeLatest(GAME_SETTINGS_TYPES.CHANGE_MO_PROFILE, changeMOProfileSaga);
-  yield takeLatest(GAME_SETTINGS_TYPES.SAVE_GAME_SETTINGS_FILES, saveGameSettingsFilesSaga);
+  yield takeLatest(GAME_SETTINGS_TYPES.SAVE_GAME_SETTINGS_FILES, writeGameSettingsFilesSaga);
 }
