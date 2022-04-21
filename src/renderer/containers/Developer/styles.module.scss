@@ -31,8 +31,9 @@
   display: flex;
   flex-direction: column;
   margin-bottom: 16px;
+  padding-right: var(--indent-size);
   padding-bottom: 20px;
-  padding-left: 10px;
+  padding-left: var(--indent-size);
 
   border-bottom: 1px solid var(--text-main);
 
@@ -62,7 +63,6 @@
 }
 
 .developer-screen__item {
-  margin-right: 10px;
   margin-bottom: 10px;
 
   &:last-child {
@@ -115,9 +115,6 @@
 .developer-screen__spoiler-title {
   position: relative;
 
-  margin-right: var(--indent-size);
-  padding-right: var(--indent-size);
-
   overflow: hidden;
 
   cursor: pointer;
@@ -131,7 +128,7 @@
       content: "";
       position: absolute;
       top: calc(50% - (var(--marker-size) / 2));
-      right: 0;
+      right: var(--indent-size);
 
       width: var(--marker-size);
       height: var(--marker-size);

@@ -27,11 +27,6 @@
   flex-direction: column;
 }
 
-.developer-screen__item.select__container {
-  flex-direction: row;
-  justify-content: space-between;
-}
-
 .developer-screen__custom-btns-container {
   @include reset-list;
 }

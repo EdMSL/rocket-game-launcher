@@ -211,6 +211,7 @@ $checkbox-size: 20px;
 .select__container {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
 }
 

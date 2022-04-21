@@ -56,4 +56,8 @@
 
 .developer-screen__list {
   @include reset-list;
+
+  & li {
+    margin-bottom: 10px;
+  }
 }

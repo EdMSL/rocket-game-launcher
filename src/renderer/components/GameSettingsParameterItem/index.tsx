@@ -343,7 +343,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       }
       {
         parameter.items !== undefined && (
-          <ul>
+          <ul className="developer-screen__list">
             {
               parameter.items.map((item) => (
                 <li
@@ -351,6 +351,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                   className="developer-screen__item"
                 >
                   <TextField
+                    className="developer-screen__item"
                     id={`name_${item.id}`}
                     parent={item.id}
                     name="name"
@@ -363,6 +364,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                   {
                     item.iniGroup !== undefined && (
                       <TextField
+                        className="developer-screen__item"
                         id={`iniGroup_${item.id}`}
                         parent={item.id}
                         name="iniGroup"
@@ -377,6 +379,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                   {
                     item.valueName !== undefined && (
                       <TextField
+                        className="developer-screen__item"
                         id={`valueName_${item.id}`}
                         parent={item.id}
                         name="valueName"
@@ -391,6 +394,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                   {
                     item.valuePath !== undefined && (
                       <TextField
+                        className="developer-screen__item"
                         id={`valuePath_${item.id}`}
                         parent={item.id}
                         name="valuePath"
@@ -405,6 +409,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                   {
                     item.controllerType !== undefined && (
                     <Select
+                      className="developer-screen__item"
                       id={`controllerType_${item.id}`}
                       parent={item.id}
                       name="controllerType"
@@ -420,6 +425,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                   {
                     item.options !== undefined && (
                     <TextArea
+                      className="developer-screen__item"
                       id={`options_${item.id}`}
                       parent={item.id}
                       name="options"
@@ -436,6 +442,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                   {
                     item.min !== undefined && (
                     <NumberField
+                      className="developer-screen__item"
                       id={`min_${item.id}`}
                       parent={item.id}
                       name="min"
@@ -449,6 +456,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                   {
                     item.max !== undefined && (
                     <NumberField
+                      className="developer-screen__item"
                       id={`max_${item.id}`}
                       parent={item.id}
                       name="max"
@@ -462,6 +470,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                   {
                     item.step !== undefined && (
                     <NumberField
+                      className="developer-screen__item"
                       id={`step_${item.id}`}
                       parent={item.id}
                       name="step"

@@ -355,22 +355,21 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
         {
           isGameSettingsConfigLoaded && (
             <React.Fragment>
-              <div className={styles['developer-screen__game-settings']}>
-                <div className="developer-screen__block">
-                  <p className="developer-screen__block-title">Группы игровых настроек</p>
-                  <Button
-                    className={classNames(
-                      'main-btn',
-                      'control-panel__btn',
-                      'developer-screen__btn',
-                    )}
-                    isDisabled={!!lastAddedGroupName}
-                    onClick={createNewGroup}
-                  >
-                    Добавить
-                  </Button>
-                  <ul className={styles['developer-screen__groups-container']}>
-                    {
+              <div className="developer-screen__block">
+                <p className="developer-screen__block-title">Группы игровых настроек</p>
+                <Button
+                  className={classNames(
+                    'main-btn',
+                    'control-panel__btn',
+                    'developer-screen__btn',
+                  )}
+                  isDisabled={!!lastAddedGroupName}
+                  onClick={createNewGroup}
+                >
+                  Добавить
+                </Button>
+                <ul className={styles['developer-screen__groups-container']}>
+                  {
                   currentConfig.gameSettingsGroups.length > 0
                     && currentConfig.gameSettingsGroups.map((item) => (
                       <li
@@ -400,15 +399,14 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                       </li>
                     ))
                   }
-                    {
+                  {
                   currentConfig.gameSettingsGroups.length === 0 && (
                     <li className={styles['developer-screen__groups-item']}>
                       Нет групп игровых настроек
                     </li>
                   )
                 }
-                  </ul>
-                </div>
+                </ul>
               </div>
               <div className="developer-screen__block">
                 <p className="developer-screen__block-title">Кодировка файлов настроек</p>
@@ -428,32 +426,32 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                 <p className="developer-screen__text">Файлы игровых параметров</p>
                 <ul className={styles['developer-screen__list']}>
                   {
-                currentConfig.gameSettingsFiles.length > 0 && currentConfig.gameSettingsFiles.map((file, index) => (
-                  <Spoiler<IGameSettingsFile>
-                    key={file.name}
-                    item={file}
-                    items={currentConfig.gameSettingsFiles}
-                    position={index}
-                    lastItemId={lastAddedFileId}
-                    summaryText={[{ label: 'Имя файла:', text: file.label }, { label: 'Путь:', text: file.path }]}
-                    validationErrors={validationErrors}
-                    onDeleteItem={deleteGameSettingsFile}
-                  >
-                    <GameSettingsFileItem
-                      file={file}
-                      pathVariables={pathVariables}
+                  currentConfig.gameSettingsFiles.length > 0 && currentConfig.gameSettingsFiles.map((file, index) => (
+                    <Spoiler<IGameSettingsFile>
+                      key={file.name}
+                      item={file}
+                      items={currentConfig.gameSettingsFiles}
+                      position={index}
+                      lastItemId={lastAddedFileId}
+                      summaryText={[{ label: 'Имя файла:', text: file.label }, { label: 'Путь:', text: file.path }]}
                       validationErrors={validationErrors}
-                      onFileDataChange={changeGameSettingsFiles}
-                      onValidation={setNewValidationErrors}
-                      deleteFile={deleteGameSettingsFileById}
-                    />
-                  </Spoiler>
-                ))
-                }
+                      onDeleteItem={deleteGameSettingsFile}
+                    >
+                      <GameSettingsFileItem
+                        file={file}
+                        pathVariables={pathVariables}
+                        validationErrors={validationErrors}
+                        onFileDataChange={changeGameSettingsFiles}
+                        onValidation={setNewValidationErrors}
+                        deleteFile={deleteGameSettingsFileById}
+                      />
+                    </Spoiler>
+                  ))
+                  }
                   {
-                currentConfig.gameSettingsFiles.length === 0
-                && <li> Нет игровых файлов </li>
-                }
+                  currentConfig.gameSettingsFiles.length === 0
+                  && <li> Нет игровых файлов </li>
+                  }
                 </ul>
                 <Button
                   className={classNames(
