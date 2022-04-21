@@ -43,7 +43,7 @@ import {
   addDeveloperMessages, saveGameSettingsConfig, updateConfig,
 } from '$actions/developer';
 import { GameSettingsParameterItem } from '$components/GameSettingsParameterItem';
-import { Spoiler } from '$components/UI/Spoiler';
+import { SpoilerListItem } from '$components/SpoilerListItem';
 import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 import {
   defaultFullGameSettingsParameter,
@@ -423,11 +423,11 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
               </div>
               <div className="developer-screen__block">
                 <p className="developer-screen__block-title">Настройка игровых опций</p>
-                <p className="developer-screen__text">Файлы игровых параметров</p>
+                <p className="developer-screen__text">Файлы игровых настроек</p>
                 <ul className={styles['developer-screen__list']}>
                   {
                   currentConfig.gameSettingsFiles.length > 0 && currentConfig.gameSettingsFiles.map((file, index) => (
-                    <Spoiler<IGameSettingsFile>
+                    <SpoilerListItem<IGameSettingsFile>
                       key={file.name}
                       item={file}
                       items={currentConfig.gameSettingsFiles}
@@ -445,7 +445,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                         onValidation={setNewValidationErrors}
                         deleteFile={deleteGameSettingsFileById}
                       />
-                    </Spoiler>
+                    </SpoilerListItem>
                   ))
                   }
                   {
@@ -467,7 +467,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                 <ul className={styles['developer-screen__list']}>
                   {
                 currentConfig.gameSettingsParameters.length > 0 && currentConfig.gameSettingsParameters.map((param, index) => (
-                  <Spoiler<IGameSettingsParameter>
+                  <SpoilerListItem<IGameSettingsParameter>
                     key={param.id}
                     item={param}
                     items={currentConfig.gameSettingsParameters}
@@ -487,7 +487,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                       onValidation={setNewValidationErrors}
                       deleteParameter={deleteGameSettingsParameterById}
                     />
-                  </Spoiler>
+                  </SpoilerListItem>
                 ))
                 }
                   {

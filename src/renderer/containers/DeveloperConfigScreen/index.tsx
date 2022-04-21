@@ -45,7 +45,7 @@ import { DeveloperScreenController } from '$components/DeveloperScreenController
 import { IDeveloperRootState } from '$types/developer';
 import { saveLauncherConfig, updateConfig } from '$actions/developer';
 import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
-import { Spoiler } from '$components/UI/Spoiler';
+import { SpoilerListItem } from '$components/SpoilerListItem';
 
 export const DeveloperConfigScreen: React.FC = () => {
   /* eslint-disable max-len */
@@ -372,7 +372,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               <ul className={styles['developer-screen__custom-btns-container']}>
                 {
                 currentConfig.customButtons.map((customBtn, index) => (
-                  <Spoiler<ILauncherCustomButton>
+                  <SpoilerListItem<ILauncherCustomButton>
                     key={customBtn.id}
                     item={customBtn}
                     items={currentConfig.customButtons}
@@ -392,7 +392,7 @@ export const DeveloperConfigScreen: React.FC = () => {
                       сhangeBtnData={changeCustomBtnData}
                       onValidationError={setNewValidationErrors}
                     />
-                  </Spoiler>
+                  </SpoilerListItem>
                 ))
               }
               </ul>

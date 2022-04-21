@@ -15,16 +15,16 @@ interface IProps<Item> {
   children: ReactElement,
   item: Item,
   items: Item[],
-  position: number,
   lastItemId: string,
-  validationErrors: IValidationErrors,
+  position?: number,
+  validationErrors?: IValidationErrors,
   summaryText?: ISummaryText[]|string[],
-  onDeleteItem: (items: Item[]) => void,
+  onDeleteItem?: (items: Item[]) => void,
   onChangeOrderItem?: (items: Item[]) => void,
 }
 
 //eslint-disable-next-line @typescript-eslint/comma-dangle
-export const Spoiler = <Item extends { id: string, },>({
+export const SpoilerListItem = <Item extends { id: string, },>({
   children,
   item,
   items,
@@ -34,7 +34,7 @@ export const Spoiler = <Item extends { id: string, },>({
   summaryText = [],
   onDeleteItem,
   onChangeOrderItem,
-}: PropsWithChildren<IProps<Item>>): ReactElement => {
+}: IProps<Item>): ReactElement => {
   const detailsElementRef = useRef<HTMLDetailsElement>(null);
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export const Spoiler = <Item extends { id: string, },>({
   }, [item.id, lastItemId]);
 
   const onChangeItemOrderBtnClick = useCallback(({ currentTarget }) => {
-    if (onChangeOrderItem) {
+    if (position && onChangeOrderItem) {
       const newItems = [...items];
 
       if (currentTarget.name === 'up') {
@@ -65,7 +65,7 @@ export const Spoiler = <Item extends { id: string, },>({
   }, [items, position, onChangeOrderItem]);
 
   const onDeleteItemBtnClick = useCallback(() => {
-    onDeleteItem(items.filter((currItem) => item.id !== currItem.id));
+    if (onDeleteItem) onDeleteItem(items.filter((currItem) => item.id !== currItem.id));
   }, [item.id, items, onDeleteItem]);
 
   return (
@@ -77,7 +77,8 @@ export const Spoiler = <Item extends { id: string, },>({
         <summary
           className={classNames(
             'developer-screen__spoiler-title',
-            Object.keys(validationErrors).some((error) => error.includes(item.id))
+            validationErrors
+            && Object.keys(validationErrors).some((error) => error.includes(item.id))
             && 'developer-screen__spoiler-title--error',
           )}
         >
@@ -129,15 +130,19 @@ export const Spoiler = <Item extends { id: string, },>({
               </React.Fragment>
             )
           }
-          <Button
-            className={classNames(
-              'developer-screen__spoiler-title-btn',
-              'developer-screen__spoiler-title-btn--delete',
-            )}
-            onClick={onDeleteItemBtnClick}
-          >
-            Удалить
-          </Button>
+          {
+            onDeleteItem && (
+            <Button
+              className={classNames(
+                'developer-screen__spoiler-title-btn',
+                'developer-screen__spoiler-title-btn--delete',
+              )}
+              onClick={onDeleteItemBtnClick}
+            >
+              Удалить
+            </Button>
+            )
+          }
         </summary>
         {children}
       </details>
