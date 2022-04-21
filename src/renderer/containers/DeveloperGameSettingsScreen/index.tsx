@@ -62,8 +62,8 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   const [currentConfig, setCurrentConfig] = useState<IGameSettingsConfig>(gameSettingsConfig);
   const [validationErrors, setValidationErrors] = useState<IValidationErrors>({});
   const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
-  const [lastCreatedGroupName, setLastCreatedGroupName] = useState<string>('');
   const [isSettingsInitialized, setIsSettingsInitialized] = useState<boolean>(isGameSettingsConfigLoaded);
+  const [lastAddedGroupName, setLastAddedGroupName] = useState<string>('');
   const [lastAddedFileId, setLastAddedFileId] = useState<string>('');
   const [lastAddedParameterId, setLastAddedParameterId] = useState<string>('');
   /* eslint-enable max-len */
@@ -158,7 +158,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
       'gameSettingsGroups',
     );
 
-    setLastCreatedGroupName(newName);
+    setLastAddedGroupName(newName);
   }, [currentConfig, changeCurrentConfig]);
 
   const editGroupItem = useCallback((value: string, name: string) => {
@@ -176,10 +176,10 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
       'gameSettingsGroups',
     );
 
-    if (lastCreatedGroupName === name) {
-      setLastCreatedGroupName('');
+    if (lastAddedGroupName === name) {
+      setLastAddedGroupName('');
     }
-  }, [currentConfig, lastCreatedGroupName, changeCurrentConfig]);
+  }, [currentConfig, lastAddedGroupName, changeCurrentConfig]);
 
   const validateGroupLabel = useCallback((value: string, name: string) => {
     setValidationErrors(getUniqueValidationErrors(
@@ -207,7 +207,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
       }),
     };
 
-    setLastCreatedGroupName('');
+    setLastAddedGroupName('');
     setCurrentConfig(newConfig);
     setIsConfigChanged(!checkObjectForEqual(gameSettingsConfig, newConfig));
   }, [currentConfig, gameSettingsConfig]);
@@ -309,7 +309,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     );
   }, [currentConfig, changeCurrentConfig]);
 
-  const onAddGameSettingsParameter = useCallback(() => {
+  const addGameSettingsParameter = useCallback(() => {
     const paramerter = getDefaultGameSettingsParameter(currentConfig.gameSettingsFiles[0]);
 
     changeCurrentConfig([
@@ -364,7 +364,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                       'control-panel__btn',
                       'developer-screen__btn',
                     )}
-                    isDisabled={!!lastCreatedGroupName}
+                    isDisabled={!!lastAddedGroupName}
                     onClick={createNewGroup}
                   >
                     Добавить
@@ -377,11 +377,11 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                         key={item.name}
                         className={classNames(
                           styles['developer-screen__groups-item'],
-                          lastCreatedGroupName === item.name && styles['developer-screen__groups-item--new'],
+                          lastAddedGroupName === item.name && styles['developer-screen__groups-item--new'],
                         )}
                       >
                         {
-                        lastCreatedGroupName === item.name && (
+                        lastAddedGroupName === item.name && (
                         <p className={styles['developer-screen__group-label']}>
                           <span>Заголовок группы</span>
                           <HintItem description="Задать заголовок группы. Отображается как имя вкладки на экране игровых настроек." />
@@ -391,7 +391,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                         <EditableItem
                           id={item.name}
                           isError={!!validationErrors[item.name]}
-                          isNew={lastCreatedGroupName === item.name}
+                          isNew={lastAddedGroupName === item.name}
                           item={item.label}
                           onApply={editGroupItem}
                           onDelete={deleteGroupItem}
@@ -507,7 +507,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                     'control-panel__btn',
                     'developer-screen__btn',
                   )}
-                  onClick={onAddGameSettingsParameter}
+                  onClick={addGameSettingsParameter}
                 >
                   Добавить
                 </Button>
