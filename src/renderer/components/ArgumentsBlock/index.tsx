@@ -65,7 +65,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
 
       onValidationError(getUniqueValidationErrors(
         validationErrors,
-        { ...validationData.errors, [parentId]: ['arguments error'] },
+        { ...validationData.errors, [`${parentId}_${id}`]: ['arguments error'] },
         validationData.isForAdd,
       ));
     }
@@ -91,7 +91,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
     if (target.required) {
       onValidationError(getUniqueValidationErrors(
         validationErrors,
-        { [target.id]: ['incorrect path'], [parentId]: ['arguments error'] },
+        { [target.id]: ['incorrect path'], [`${parentId}_${target.id}`]: ['arguments error'] },
         target.value.trim() === '',
       ));
     }
