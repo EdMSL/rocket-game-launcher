@@ -931,10 +931,12 @@ export const getFullParameter = (
 ): IGameSettingsParameter => ({
   ...currentFullParam,
   ...currentParam,
-  items: currentParam.items?.map((item) => ({
-    ...currentFullParam.items![0],
-    ...item,
-  })),
+  items: currentParam.items
+    ? currentParam.items.map((item) => ({
+      ...currentFullParam.items![0],
+      ...item,
+    }))
+    : currentFullParam.items,
 });
 
 /**
@@ -1013,6 +1015,7 @@ export const generateGameSettingsParameter = (
     fullParameter,
     currentParameter,
   );
+
   let newParameter: IGameSettingsParameter = getParameterBase(file, newFullParameter);
 
   switch (currentParameter.optionType) {
