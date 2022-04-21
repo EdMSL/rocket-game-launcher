@@ -1,0 +1,11 @@
+.developer-screen__parameter-items {
+  @include reset-indents;
+  margin-bottom: 10px;
+
+  text-align: center;
+}
+
+.developer-screen__parameter-list {
+  @include reset-list;
+  padding-left: var(--indent-size);
+}

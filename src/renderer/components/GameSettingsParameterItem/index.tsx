@@ -3,6 +3,7 @@ import React, {
 } from 'react';
 import classNames from 'classnames';
 
+import styles from './styles.module.scss';
 import { Select } from '$components/UI/Select';
 import { ISelectOption, IValidationErrors } from '$types/common';
 import {
@@ -18,14 +19,15 @@ import {
   GameSettingControllerType, GameSettingsOptionType, HTMLInputType,
 } from '$constants/misc';
 import {
-  IGameSettingsFile, IGameSettingsGroup, IGameSettingsParameter,
+  IGameSettingsFile, IGameSettingsGroup, IGameSettingsItemParameter, IGameSettingsParameter,
 } from '$types/gameSettings';
 import { Button } from '$components/UI/Button';
 import { TextField } from '$components/UI/TextField';
 import { NumberField } from '$components/UI/NumberField';
 import { defaultFullGameSettingsParameter } from '$constants/defaultData';
-import { generateSelectOptionsFromString } from '$utils/strings';
+import { generateSelectOptionsFromString, getRandomId } from '$utils/strings';
 import { TextArea } from '$components/UI/TextArea';
+import { SpoilerListItem } from '$components/SpoilerListItem';
 
 interface IProps {
   parameter: IGameSettingsParameter,
@@ -50,10 +52,10 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
     defaultFullGameSettingsParameter,
     parameter,
   ));
-
   const [optionsValue, setOptionsValue] = useState<{
     [key: string]: string,
   }>(getSelectsOptionStringObj(parameter));
+  const [lastAddedItemId, setLastAddedItemId] = useState<string>('');
 
   const parameterFile = useMemo(
     () => getFileByFileName(gameSettingsFiles, parameter.file),
@@ -146,6 +148,25 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
   const onDeleteFileBtnClick = useCallback(() => {
     deleteParameter(parameter.id);
   }, [parameter.id, deleteParameter]);
+
+  const onAddParameterItemBtnClick = useCallback(() => {
+    const newId = getRandomId();
+    const { newParameter, newFullParameter } = generateGameSettingsParameter(
+      {
+        ...parameter,
+        items: [...parameter.items!, {
+          ...parameter.items![parameter.items!.length - 1],
+          id: newId,
+        }],
+      },
+      fullParameter,
+      parameterFile!,
+    );
+
+    onParameterDataChange(parameter.id, newParameter);
+    setFullParameter(newFullParameter);
+    setLastAddedItemId(newId);
+  }, [parameter, fullParameter, parameterFile, onParameterDataChange]);
 
   const gameSettingsFilesOptions = gameSettingsFiles.map((file): ISelectOption => ({ label: file.label, value: file.name }));
   const gameSettingsGroupsOptions = gameSettingsGroups.map((group): ISelectOption => ({ label: group.label, value: group.name }));
@@ -343,25 +364,30 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       }
       {
         parameter.items !== undefined && (
-          <ul className="developer-screen__list">
-            {
+          <React.Fragment>
+            <p className={styles['developer-screen__parameter-items']}>Список параметров из файла для опции</p>
+            <ul className={styles['developer-screen__parameter-list']}>
+              {
               parameter.items.map((item) => (
-                <li
-                  key={item.id}
-                  className="developer-screen__item"
+                <SpoilerListItem<IGameSettingsItemParameter>
+                  item={item}
+                  items={parameter.items!}
+                  summaryText={[item.name]}
+                  lastItemId={lastAddedItemId}
                 >
-                  <TextField
-                    className="developer-screen__item"
-                    id={`name_${item.id}`}
-                    parent={item.id}
-                    name="name"
-                    label="Имя параметра из файла"
-                    value={item.name}
-                    isRequied
-                    validationErrors={validationErrors}
-                    onChange={onParameterInputChange}
-                  />
-                  {
+                  <React.Fragment>
+                    <TextField
+                      className="developer-screen__item"
+                      id={`name_${item.id}`}
+                      parent={item.id}
+                      name="name"
+                      label="Имя параметра из файла"
+                      value={item.name}
+                      isRequied
+                      validationErrors={validationErrors}
+                      onChange={onParameterInputChange}
+                    />
+                    {
                     item.iniGroup !== undefined && (
                       <TextField
                         className="developer-screen__item"
@@ -376,7 +402,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                       />
                     )
                   }
-                  {
+                    {
                     item.valueName !== undefined && (
                       <TextField
                         className="developer-screen__item"
@@ -391,7 +417,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                       />
                     )
                   }
-                  {
+                    {
                     item.valuePath !== undefined && (
                       <TextField
                         className="developer-screen__item"
@@ -406,7 +432,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                       />
                     )
                   }
-                  {
+                    {
                     item.controllerType !== undefined && (
                     <Select
                       className="developer-screen__item"
@@ -422,7 +448,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     />
                     )
                   }
-                  {
+                    {
                     item.options !== undefined && (
                     <TextArea
                       className="developer-screen__item"
@@ -439,7 +465,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     />
                     )
                   }
-                  {
+                    {
                     item.min !== undefined && (
                     <NumberField
                       className="developer-screen__item"
@@ -453,7 +479,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     />
                     )
                   }
-                  {
+                    {
                     item.max !== undefined && (
                     <NumberField
                       className="developer-screen__item"
@@ -467,7 +493,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     />
                     )
                   }
-                  {
+                    {
                     item.step !== undefined && (
                     <NumberField
                       className="developer-screen__item"
@@ -481,10 +507,25 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     />
                     )
                   }
-                </li>
+                  </React.Fragment>
+                </SpoilerListItem>
               ))
             }
-          </ul>
+            </ul>
+            {
+              parameter.optionType !== GameSettingsOptionType.DEFAULT && (
+              <Button
+                className={classNames(
+                  'main-btn',
+                  'developer-screen__spoiler-button',
+                )}
+                onClick={onAddParameterItemBtnClick}
+              >
+                Добавить параметр
+              </Button>
+              )
+            }
+          </React.Fragment>
         )
       }
       <Button
@@ -494,7 +535,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         )}
         onClick={onDeleteFileBtnClick}
       >
-        Удалить
+        Удалить опцию
       </Button>
     </React.Fragment>
   );
