@@ -14,7 +14,7 @@ import {
 import { generateSelectOptions, getUniqueValidationErrors } from '$utils/data';
 import { Button } from '$components/UI/Button';
 import { IPathVariables } from '$constants/paths';
-import { ArgumentsBlock } from '$components/ArgumentsBlock';
+import { ArgumentsBlock } from '$components/Developer/ArgumentsBlock';
 import {
   getIsPathWithVariableCorrect,
   IValidationData,

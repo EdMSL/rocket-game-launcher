@@ -6,7 +6,7 @@ import { ipcRenderer } from 'electron';
 import classNames from 'classnames';
 
 import styles from './styles.module.scss';
-import { DeveloperScreenController } from '$components/DeveloperScreenController';
+import { DeveloperScreenController } from '$components/Developer/DeveloperScreenController';
 import { IValidationErrors } from '$types/common';
 import { useDeveloperSelector } from '$store/store';
 import {
@@ -34,16 +34,16 @@ import {
   getRandomName,
   replaceRootDirByPathVariable,
 } from '$utils/strings';
-import { EditableItem } from '$components/EditableItem';
+import { EditableItem } from '$components/Developer/EditableItem';
 import { HintItem } from '$components/HintItem';
-import { GameSettingsFileItem } from '$components/GameSettingsFileItem';
+import { GameSettingsFileItem } from '$components/Developer/GameSettingsFileItem';
 import { GAME_DIR } from '$constants/paths';
 import { CreateUserMessage } from '$utils/message';
 import {
   addDeveloperMessages, saveGameSettingsConfig, updateConfig,
 } from '$actions/developer';
-import { GameSettingsParameterItem } from '$components/GameSettingsParameterItem';
-import { SpoilerListItem } from '$components/SpoilerListItem';
+import { GameSettingsParameterItem } from '$components/Developer/GameSettingsParameterItem';
+import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 import {
   defaultFullGameSettingsParameter,

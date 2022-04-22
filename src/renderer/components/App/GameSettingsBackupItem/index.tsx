@@ -17,7 +17,7 @@ import {
   renameGameSettingsFilesBackup,
   restoreGameSettingsFilesBackup,
 } from '$actions/main';
-import { EditableItem } from '$components/EditableItem';
+import { EditableItem } from '$components/Developer/EditableItem';
 
 interface IProps {
   id: string,

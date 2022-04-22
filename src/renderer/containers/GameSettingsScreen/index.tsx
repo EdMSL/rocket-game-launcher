@@ -16,7 +16,8 @@ import {
   getChangedGameSettingsOptions,
   getGameSettingsOptionsWithNewValues,
 } from '$utils/data';
-import { GameSettingsContent } from '$components/GameSettingsContent';
+import { GameSettingsContent } from '$components/App/GameSettingsContent';
+import { GameSettingsFormControls } from '$components/App/GameSettingsFormControls';
 import { Select } from '$components/UI/Select';
 import {
   changeMoProfile,
@@ -26,14 +27,13 @@ import {
 } from '$actions/gameSettings';
 import { IGameSettingsOptions } from '$types/gameSettings';
 import { Loader } from '$components/UI/Loader';
-import { GameSettingsFormControls } from '$components/GameSettingsFormControls';
 import {
   createGameSettingsFilesBackup,
   getGameSettingsFilesBackup,
   setIsGameSettingsLoading,
 } from '$actions/main';
 import { Modal } from '$components/UI/Modal';
-import { GameSettingsBackup } from '$components/GameSettingsBackup';
+import { GameSettingsBackup } from '$components/App/GameSettingsBackup';
 import { ILocationState } from '$types/common';
 import { AppChannel } from '$constants/misc';
 

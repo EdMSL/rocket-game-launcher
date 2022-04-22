@@ -21,7 +21,7 @@ import {
 } from '$constants/misc';
 import { MinWindowSize } from '$constants/defaultData';
 import { Button } from '$components/UI/Button';
-import { CustomBtnItem } from '$components/CustomBtnItem';
+import { CustomBtnItem } from '$components/Developer/CustomBtnItem';
 import {
   IButtonArg,
   ILauncherCustomButton,
@@ -33,7 +33,7 @@ import {
   getNewConfig,
   getUniqueValidationErrors,
 } from '$utils/data';
-import { ArgumentsBlock } from '$components/ArgumentsBlock';
+import { ArgumentsBlock } from '$components/Developer/ArgumentsBlock';
 import {
   checkObjectForEqual,
   IValidationData,
@@ -41,11 +41,11 @@ import {
 } from '$utils/check';
 import { getRandomId } from '$utils/strings';
 import { IValidationErrors } from '$types/common';
-import { DeveloperScreenController } from '$components/DeveloperScreenController';
+import { DeveloperScreenController } from '$components/Developer/DeveloperScreenController';
 import { IDeveloperRootState } from '$types/developer';
 import { saveLauncherConfig, updateConfig } from '$actions/developer';
 import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
-import { SpoilerListItem } from '$components/SpoilerListItem';
+import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 
 export const DeveloperConfigScreen: React.FC = () => {
   /* eslint-disable max-len */

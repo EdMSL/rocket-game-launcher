@@ -14,7 +14,7 @@ import {
 import { CreateUserMessage } from '$utils/message';
 import { IMainRootState } from '$types/main';
 import { Loader } from '$components/UI/Loader';
-import { GameSettingsBackupItem } from '$components/GameSettingsBackupItem';
+import { GameSettingsBackupItem } from '$components/App/GameSettingsBackupItem';
 import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 
 interface IProps {

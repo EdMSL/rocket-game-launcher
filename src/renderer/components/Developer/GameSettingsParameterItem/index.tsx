@@ -27,7 +27,7 @@ import { NumberField } from '$components/UI/NumberField';
 import { defaultFullGameSettingsParameter } from '$constants/defaultData';
 import { generateSelectOptionsFromString, getRandomId } from '$utils/strings';
 import { TextArea } from '$components/UI/TextArea';
-import { SpoilerListItem } from '$components/SpoilerListItem';
+import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 
 interface IProps {
   parameter: IGameSettingsParameter,

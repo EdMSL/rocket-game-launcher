@@ -21,7 +21,7 @@ import { useAppSelector } from '$store/store';
 import { CreateUserMessage } from '$utils/message';
 import { LauncherButtonAction, AppChannel } from '$constants/misc';
 import { Modal } from '$components/UI/Modal';
-import { LauncherUserSettings } from '$components/LauncherUserSettings';
+import { LauncherUserSettings } from '$components/App/LauncherUserSettings';
 import { getPathToFile } from '$utils/strings';
 import { Loader } from '$components/UI/Loader';
 import { IButtonArg } from '$types/main';

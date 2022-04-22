@@ -17,7 +17,7 @@ import { Messages } from '$components/Messages';
 import { Header } from '$components/Header';
 import { useAppSelector } from '$store/store';
 import { Modal } from '$components/UI/Modal';
-import { AppInfo } from '$components/AppInfo';
+import { AppInfo } from '$components/App/AppInfo';
 import { Developer } from '$containers/Developer';
 import { AppChannel, userThemeStyleFile } from '$constants/misc';
 import { setMessages } from '$actions/main';
