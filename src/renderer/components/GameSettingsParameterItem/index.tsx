@@ -370,6 +370,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
               {
               parameter.items.map((item) => (
                 <SpoilerListItem<IGameSettingsItemParameter>
+                  key={item.id}
                   item={item}
                   items={parameter.items!}
                   summaryText={[item.name]}
@@ -439,7 +440,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                       id={`controllerType_${item.id}`}
                       parent={item.id}
                       name="controllerType"
-                      options={generateSelectOptions(parameter.optionType === GameSettingsOptionType.COMBINED
+                      options={generateSelectOptions(parameter.optionType === GameSettingsOptionType.RELATED
                         ? [GameSettingControllerType.SELECT.toUpperCase()]
                         : GameSettingControllerType)}
                       label="Тип контроллера"

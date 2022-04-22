@@ -936,7 +936,11 @@ export const getFullParameter = (
       ...currentFullParam.items![0],
       ...item,
     }))
-    : currentFullParam.items,
+    : currentFullParam.items!.map((item) => ({
+      ...item,
+      id: getRandomId(),
+      name: currentParam.name || item.name,
+    })),
 });
 
 /**
