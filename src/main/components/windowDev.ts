@@ -145,5 +145,6 @@ export const addDevWindowListeners = (
     mainWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false);
     devWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false, true);
     devWindow.hide();
+    mainWindow.focus();
   });
 };

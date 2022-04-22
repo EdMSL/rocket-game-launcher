@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron';
 import React, {
-  useCallback, useEffect, useState,
+  useCallback, useEffect, useRef, useState,
 } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -56,6 +56,7 @@ export const MainScreen: React.FC = () => {
           dispatch(setIsDeveloperMode(true));
         } else {
           dispatch(setIsDeveloperMode(false));
+          document.querySelector<HTMLButtonElement>('button[name=developer]')?.focus();
         }
       }
     });
@@ -196,6 +197,7 @@ export const MainScreen: React.FC = () => {
               styles['main-screen__bottom-btn'],
               styles['main-screen__bottom-btn--settings'],
             )}
+            name="user"
             onClick={onLauncherSettingsBtnClick}
           >
             <span className={styles['main-screen__bottom-btn-text']}>Настройки программы</span>
@@ -206,6 +208,7 @@ export const MainScreen: React.FC = () => {
               styles['main-screen__bottom-btn'],
               styles['main-screen__bottom-btn--developer'],
             )}
+            name="developer"
             onClick={onDeveloperScreenBtnClick}
             isDisabled={isDeveloperMode}
           >
