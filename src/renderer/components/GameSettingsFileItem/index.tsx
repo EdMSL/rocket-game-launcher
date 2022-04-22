@@ -75,6 +75,16 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
 
   return (
     <React.Fragment>
+      <TextField
+        className="developer-screen__item"
+        id={`label_${file.id}`}
+        name="label"
+        value={file.label}
+        description="Имя файла для идентификации"
+        label="Имя файла"
+        placeholder={getFileNameFromPathToFile(file.path)}
+        onChange={onTextFieldChange}
+      />
       <PathSelector
         className="developer-screen__item"
         id={`file-path_${file.id}`}
@@ -97,16 +107,6 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         options={generateSelectOptions(GameSettingsFileView)}
         value={file.view}
         onChange={onSelectChange}
-      />
-      <TextField
-        className="developer-screen__item"
-        id={`label_${file.id}`}
-        name="label"
-        value={file.label}
-        description="Имя файла для идентификации"
-        label="Имя файла"
-        placeholder={getFileNameFromPathToFile(file.path)}
-        onChange={onTextFieldChange}
       />
       <TextField
         className="developer-screen__item"

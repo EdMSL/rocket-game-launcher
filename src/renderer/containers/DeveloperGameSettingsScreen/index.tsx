@@ -482,8 +482,8 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                       parameter={param}
                       gameSettingsFiles={currentConfig.gameSettingsFiles}
                       gameSettingsGroups={currentConfig.gameSettingsGroups}
-                      onParameterDataChange={changeGameSettingsParameters}
                       validationErrors={validationErrors}
+                      onParameterDataChange={changeGameSettingsParameters}
                       onValidation={setNewValidationErrors}
                       deleteParameter={deleteGameSettingsParameterById}
                     />
