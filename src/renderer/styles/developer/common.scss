@@ -20,15 +20,15 @@
   flex-direction: column;
   max-width: var(--content-width);
   height: 100%;
-  padding: 0 var(--indent-size) var(--indent-size);
+  padding: 0 var(--space-m) var(--space-m);
   overflow: hidden;
 }
 
 .developer__block {
   display: flex;
   flex-direction: column;
-  margin-bottom: 16px;
-  padding: 0 var(--indent-size) calc(var(--indent-size) * 2);
+  margin-bottom: var(--space-l);
+  padding: 0 var(--space-m) var(--space-xl);
 
   border-bottom: 1px solid var(--text-main);
 
@@ -42,7 +42,7 @@
 
 .developer__block-title {
   @include reset-indents;
-  margin-bottom: var(--gap-size);
+  margin-bottom: var(--space-m);
 
   font-size: 18px;
   font-weight: 700;
@@ -51,14 +51,14 @@
 
 .developer__subtitle {
   @include reset-indents;
-  margin-bottom: var(--gap-size);
+  margin-bottom: var(--space-m);
 
   font-weight: 700;
   text-align: center;
 }
 
 .developer__item {
-  margin-bottom: var(--gap-size);
+  margin-bottom: var(--space-m);
 
   &:last-child {
     margin-bottom: 0;

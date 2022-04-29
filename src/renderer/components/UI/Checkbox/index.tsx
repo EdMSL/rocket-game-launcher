@@ -20,6 +20,7 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
   onChange,
 }) => (
   <div className={classNames(
+    'ui__container',
     'checkbox__container',
     parentClassname && `${parentClassname}-checkbox__container`,
     className,

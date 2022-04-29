@@ -20,6 +20,7 @@ export const Switcher: React.FunctionComponent<IProps> = ({
   onChange,
 }) => (
   <div className={classNames(
+    'ui__container',
     'switcher__container',
     parentClassname && `${parentClassname}-switcher__container`,
     className,

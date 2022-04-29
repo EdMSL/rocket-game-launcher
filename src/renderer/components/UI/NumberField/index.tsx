@@ -31,6 +31,7 @@ export const NumberField: React.FunctionComponent<IProps> = ({
 
   return (
     <div className={classNames(
+      'ui__container',
       'number-field__container',
       parentClassname && `${parentClassname}-number-field__container`,
       className,

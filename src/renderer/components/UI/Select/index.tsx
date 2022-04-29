@@ -34,6 +34,7 @@ export const Select: (React.FunctionComponent<IProps>) = ({
 
   return (
     <div className={classNames(
+      'ui__container',
       'select__container',
       parentClassname && `${parentClassname}-select__container`,
       className,

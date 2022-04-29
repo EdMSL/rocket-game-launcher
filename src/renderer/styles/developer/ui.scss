@@ -19,7 +19,7 @@ $checkbox-size: 20px;
 }
 
 .main-btn {
-  padding: 10px 14px;
+  padding: var(--space-m) var(--space-l);
 
   background-color: var(--btn-color);
 
@@ -28,20 +28,18 @@ $checkbox-size: 20px;
   }
 
   &:focus {
-    outline: 2px solid var(--focus-color);
-    outline-offset: -2px;
+    @include focus;
+    outline-style: solid;
   }
 
   &:disabled {
     color: var(--disabled-text-color);
 
     background-color: var(--disabled-color);
-
-    cursor: default;
   }
 }
 
-.select__container {
+.ui__container {
   @include ui-container;
 }
 
@@ -83,13 +81,6 @@ $checkbox-size: 20px;
       outline: none;
     }
   }
-}
-
-.switcher__container {
-  position: relative;
-
-  display: flex;
-  align-items: center;
 }
 
 .switcher__label-text {
@@ -144,12 +135,6 @@ $checkbox-size: 20px;
   }
 }
 
-.number-field__container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .number-field__input {
   padding: 12px 10px;
 
@@ -173,12 +158,6 @@ $checkbox-size: 20px;
   &--error {
     @include inputError;
   }
-}
-
-.text-field__container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .text-field__label {
@@ -209,14 +188,6 @@ $checkbox-size: 20px;
   &--error {
     @include inputError;
   }
-}
-
-.text-area__container {
-  position: relative;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .text-area__label {
@@ -251,12 +222,6 @@ $checkbox-size: 20px;
   &--error {
     @include inputError;
   }
-}
-
-.path-selector__container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .path-selector__label {

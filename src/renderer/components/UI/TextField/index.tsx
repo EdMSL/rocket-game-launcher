@@ -37,6 +37,7 @@ export const TextField: React.FunctionComponent<IProps> = ({
 
   return (
     <div className={classNames(
+      'ui__container',
       'text-field__container',
       parentClassname && `${parentClassname}-text-field__container`,
       className,

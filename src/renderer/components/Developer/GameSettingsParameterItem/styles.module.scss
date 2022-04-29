@@ -7,5 +7,5 @@
 
 .developer-screen__parameter-list {
   @include reset-list;
-  padding-left: var(--indent-size);
+  padding-left: var(--space-m);
 }

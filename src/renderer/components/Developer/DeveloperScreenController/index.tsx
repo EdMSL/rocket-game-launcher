@@ -25,12 +25,12 @@ export const DeveloperScreenController: React.FC<IProps> = ({
   onResetBtnClick,
   onUpdateBtnClick,
 }) => (
-  <div className={styles['develover-screen__controller']}>
+  <div className={styles.develover__controller}>
     <Button
       name="ok_save_config_btn"
       className={classNames(
         'main-btn',
-        'control-panel__btn',
+        styles['develover__controller-btn'],
       )}
       isDisabled={!isFirstLaunch && (!isConfigChanged || isHaveValidationErrors)}
       onClick={onSaveBtnClick}
@@ -41,7 +41,7 @@ export const DeveloperScreenController: React.FC<IProps> = ({
       name="save_config_btn"
       className={classNames(
         'main-btn',
-        'control-panel__btn',
+        styles['develover__controller-btn'],
       )}
       isDisabled={isFirstLaunch}
       onClick={onCancelBtnClick}
@@ -51,7 +51,7 @@ export const DeveloperScreenController: React.FC<IProps> = ({
     <Button
       className={classNames(
         'main-btn',
-        'control-panel__btn',
+        styles['develover__controller-btn'],
       )}
       isDisabled={!isFirstLaunch && (!isConfigChanged || isHaveValidationErrors)}
       onClick={onSaveBtnClick}
@@ -61,7 +61,7 @@ export const DeveloperScreenController: React.FC<IProps> = ({
     <Button
       className={classNames(
         'main-btn',
-        'control-panel__btn',
+        styles['develover__controller-btn'],
       )}
       isDisabled={!isConfigChanged}
       onClick={onResetBtnClick}
@@ -73,7 +73,7 @@ export const DeveloperScreenController: React.FC<IProps> = ({
       <Button
         className={classNames(
           'main-btn',
-          'control-panel__btn',
+          styles['develover__controller-btn'],
         )}
         onClick={onUpdateBtnClick}
       >

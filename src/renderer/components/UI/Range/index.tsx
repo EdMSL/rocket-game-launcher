@@ -65,6 +65,7 @@ export const Range: React.FunctionComponent<IProps> = ({
 
   return (
     <div className={classNames(
+      'ui__container',
       'range__container',
       parentClassname && `${parentClassname}-range__container`,
       className,

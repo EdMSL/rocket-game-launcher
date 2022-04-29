@@ -24,6 +24,7 @@ export const TextArea: React.FunctionComponent<IProps> = ({
   onChange,
 }) => (
   <div className={classNames(
+    'ui__container',
     'text-area__container',
     className,
   )}

@@ -1,15 +1,15 @@
-.develover-screen__controller {
+.develover__controller {
   display: flex;
   justify-content: center;
-  margin: var(--gap-size);
+  margin: var(--space-m);
+}
 
-  & .control-panel__btn {
-    flex-basis: 15%;
-    max-width: 140px;
-    margin-right: var(--gap-size);
+.develover__controller-btn {
+  flex-basis: 15%;
+  max-width: 140px;
+  margin-right: var(--space-m);
 
-    &:last-child {
-      margin-right: 0;
-    }
+  &:last-child {
+    margin-right: 0;
   }
 }

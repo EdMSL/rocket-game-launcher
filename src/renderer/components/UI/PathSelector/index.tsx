@@ -164,6 +164,7 @@ export const PathSelector: React.FC<IProps> = ({
 
   return (
     <div className={classNames(
+      'ui__container',
       'path-selector__container',
       parentClassname && `${parentClassname}-path-selector__container`,
       className,
