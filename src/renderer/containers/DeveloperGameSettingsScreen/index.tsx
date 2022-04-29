@@ -339,9 +339,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
 
   /* eslint-disable react/jsx-props-no-spreading */
   return (
-    <div
-      className="developer__form"
-    >
+    <div className="developer__form">
       <DeveloperScreenController
         isConfigChanged={isConfigChanged}
         isHaveValidationErrors={Object.keys(validationErrors).length > 0}

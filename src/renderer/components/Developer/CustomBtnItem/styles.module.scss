@@ -1,3 +1,12 @@
 .custom-btn__item {
-  color: inherit;
+  margin-bottom: var(--space-m);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.custom-btn__button {
+  align-self: center;
+  margin: auto;
 }

@@ -174,7 +174,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
   return (
     <React.Fragment>
       <TextField
-        className="developer-screen__item"
+        className={styles.parameter__item}
         id={`label_${parameter.id}`}
         name="label"
         label="Заголовок опции"
@@ -184,7 +184,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         onChange={onParameterInputChange}
       />
       <Select
-        className="developer-screen__item"
+        className={styles.parameter__item}
         id={`optionType_${parameter.id}`}
         options={generateSelectOptions(GameSettingsOptionType)}
         name="optionType"
@@ -193,7 +193,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         onChange={onParameterInputChange}
       />
       <Select
-        className="developer-screen__item"
+        className={styles.parameter__item}
         id={`file_${parameter.id}`}
         options={gameSettingsFilesOptions}
         name="file"
@@ -202,7 +202,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         onChange={onParameterInputChange}
       />
       <TextField
-        className="developer-screen__item"
+        className={styles.parameter__item}
         id={`description_${parameter.id}`}
         name="description"
         label="Описание опции"
@@ -212,7 +212,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       {
         gameSettingsGroups.length !== 0 && (
           <Select
-            className="developer-screen__item"
+            className={styles.parameter__item}
             id={`settingGroup_${parameter.id}`}
             label="Группа настроек"
             options={gameSettingsGroupsOptions}
@@ -225,7 +225,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       {
         parameter.name !== undefined && (
           <TextField
-            className="developer-screen__item"
+            className={styles.parameter__item}
             id={`name_${parameter.id}`}
             name="name"
             label="Имя параметра из файла"
@@ -239,7 +239,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       {
         parameter.iniGroup !== undefined && (
           <TextField
-            className="developer-screen__item"
+            className={styles.parameter__item}
             id={`iniGroup_${parameter.id}`}
             name="iniGroup"
             label="Группа параметра из файла"
@@ -253,7 +253,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       {
         parameter.valueName !== undefined && (
           <TextField
-            className="developer-screen__item"
+            className={styles.parameter__item}
             id={`valueName_${parameter.id}`}
             name="valueName"
             label="Имя атрибута параметра из файла"
@@ -267,7 +267,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       {
         parameter.valuePath !== undefined && (
           <TextField
-            className="developer-screen__item"
+            className={styles.parameter__item}
             id={`valuePath_${parameter.id}`}
             name="valuePath"
             label="Путь до параметра из файла"
@@ -281,7 +281,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       {
         parameter.separator !== undefined && (
           <TextField
-            className="developer-screen__item"
+            className={styles.parameter__item}
             id={`separator_${parameter.id}`}
             name="separator"
             label="Разделитель"
@@ -295,7 +295,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       {
         parameter.controllerType !== undefined && (
           <Select
-            className="developer-screen__item"
+            className={styles.parameter__item}
             id={`controllerType_${parameter.id}`}
             name="controllerType"
             options={generateSelectOptions(parameter.optionType === GameSettingsOptionType.COMBINED
@@ -310,7 +310,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       {
         parameter.options !== undefined && (
           <TextArea
-            className="developer-screen__item"
+            className={styles.parameter__item}
             id={`options_${parameter.id}`}
             name="options"
             label="Опции селектора"
@@ -326,7 +326,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       {
         parameter.min !== undefined && (
           <NumberField
-            className="developer-screen__item"
+            className={styles.parameter__item}
             id={`min_${parameter.id}`}
             name="min"
             min=""
@@ -339,7 +339,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       {
         parameter.max !== undefined && (
           <NumberField
-            className="developer-screen__item"
+            className={styles.parameter__item}
             id={`max_${parameter.id}`}
             name="max"
             min=""
@@ -352,7 +352,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       {
         parameter.step !== undefined && (
           <NumberField
-            className="developer-screen__item"
+            className={styles.parameter__item}
             id={`step_${parameter.id}`}
             name="step"
             min={0.001}
@@ -365,8 +365,8 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       {
         parameter.items !== undefined && (
           <React.Fragment>
-            <p className={styles['developer-screen__parameter-items']}>Список параметров из файла для опции</p>
-            <ul className={styles['developer-screen__parameter-list']}>
+            <p className={styles.parameter__items}>Список параметров из файла для опции</p>
+            <ul className={styles.parameter__list}>
               {
               parameter.items.map((item) => (
                 <SpoilerListItem<IGameSettingsItemParameter>
@@ -378,7 +378,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                 >
                   <React.Fragment>
                     <TextField
-                      className="developer-screen__item"
+                      className={styles.parameter__item}
                       id={`name_${item.id}`}
                       parent={item.id}
                       name="name"
@@ -391,7 +391,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     {
                     item.iniGroup !== undefined && (
                       <TextField
-                        className="developer-screen__item"
+                        className={styles.parameter__item}
                         id={`iniGroup_${item.id}`}
                         parent={item.id}
                         name="iniGroup"
@@ -406,7 +406,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     {
                     item.valueName !== undefined && (
                       <TextField
-                        className="developer-screen__item"
+                        className={styles.parameter__item}
                         id={`valueName_${item.id}`}
                         parent={item.id}
                         name="valueName"
@@ -421,7 +421,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     {
                     item.valuePath !== undefined && (
                       <TextField
-                        className="developer-screen__item"
+                        className={styles.parameter__item}
                         id={`valuePath_${item.id}`}
                         parent={item.id}
                         name="valuePath"
@@ -436,7 +436,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     {
                     item.controllerType !== undefined && (
                     <Select
-                      className="developer-screen__item"
+                      className={styles.parameter__item}
                       id={`controllerType_${item.id}`}
                       parent={item.id}
                       name="controllerType"
@@ -452,7 +452,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     {
                     item.options !== undefined && (
                     <TextArea
-                      className="developer-screen__item"
+                      className={styles.parameter__item}
                       id={`options_${item.id}`}
                       parent={item.id}
                       name="options"
@@ -469,7 +469,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     {
                     item.min !== undefined && (
                     <NumberField
-                      className="developer-screen__item"
+                      className={styles.parameter__item}
                       id={`min_${item.id}`}
                       parent={item.id}
                       name="min"
@@ -483,7 +483,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     {
                     item.max !== undefined && (
                     <NumberField
-                      className="developer-screen__item"
+                      className={styles.parameter__item}
                       id={`max_${item.id}`}
                       parent={item.id}
                       name="max"
@@ -497,7 +497,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                     {
                     item.step !== undefined && (
                     <NumberField
-                      className="developer-screen__item"
+                      className={styles.parameter__item}
                       id={`step_${item.id}`}
                       parent={item.id}
                       name="step"
@@ -518,7 +518,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
               <Button
                 className={classNames(
                   'main-btn',
-                  'developer-screen__spoiler-button',
+                  'parameter__btn',
                 )}
                 onClick={onAddParameterItemBtnClick}
               >
@@ -532,7 +532,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       <Button
         className={classNames(
           'main-btn',
-          'developer-screen__spoiler-button',
+          'parameter__btn',
         )}
         onClick={onDeleteFileBtnClick}
       >

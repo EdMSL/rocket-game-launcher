@@ -76,7 +76,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
   return (
     <React.Fragment>
       <TextField
-        className="developer-screen__item"
+        className={styles.file__item}
         id={`label_${file.id}`}
         name="label"
         value={file.label}
@@ -86,7 +86,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         onChange={onTextFieldChange}
       />
       <PathSelector
-        className="developer-screen__item"
+        className={styles.file__item}
         id={`file-path_${file.id}`}
         parent="path"
         pathVariables={pathVariables}
@@ -99,7 +99,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         onChange={onPathSelectorChange}
       />
       <Select
-        className="developer-screen__item"
+        className={styles.file__item}
         id={`view_${file.id}`}
         name="view"
         label="Тип структуры файла"
@@ -109,7 +109,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         onChange={onSelectChange}
       />
       <TextField
-        className="developer-screen__item"
+        className={styles.file__item}
         id={`encoding_${file.id}`}
         name="encoding"
         value={file.encoding}
@@ -120,7 +120,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
       <Button
         className={classNames(
           'main-btn',
-          'developer-screen__spoiler-button',
+          'file__btn',
         )}
         onClick={onDeleteFileBtnClick}
       >

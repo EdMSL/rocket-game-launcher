@@ -3,6 +3,7 @@ import React, {
 } from 'react';
 import classNames from 'classnames';
 
+import styles from './styles.module.scss';
 import { Checkbox } from '$components/UI/Checkbox';
 import { PathSelector } from '$components/UI/PathSelector';
 import { TextField } from '$components/UI/TextField';
@@ -115,7 +116,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
   return (
     <React.Fragment>
       <TextField
-        className="developer-screen__item"
+        className={styles['custom-btn__item']}
         id={`label_${item.id}`}
         name="label"
         value={item.label}
@@ -127,7 +128,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
       />
       <Checkbox
         id={`action_${item.id}`}
-        className="developer-screen__item"
+        className={styles['custom-btn__item']}
         name="action"
         label="Кнопка запуска приложения?"
         isChecked={item.action === LauncherButtonAction.RUN}
@@ -135,7 +136,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         onChange={onCheckboxChange}
       />
       <PathSelector
-        className="developer-screen__item"
+        className={styles['custom-btn__item']}
         id={pathSelectorId}
         name="path"
         label="Путь до файла\папки"
@@ -151,7 +152,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         args={item.args!}
         parent="customButtons"
         parentId={item.id}
-        className="developer-screen__item"
+        className={styles['custom-btn__item']}
         pathVariables={pathVariables}
         description="Дополнительные агрументы запуска"
         validationErrors={validationErrors}
@@ -161,7 +162,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
       <Button
         className={classNames(
           'main-btn',
-          'developer-screen__spoiler-button',
+          'custom-btn__button',
         )}
         onClick={onDeleteCustomBtnBtnClick}
       >

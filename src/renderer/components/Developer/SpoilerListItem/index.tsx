@@ -1,8 +1,9 @@
 import React, {
-  PropsWithChildren, ReactElement, useCallback, useEffect, useRef,
+  ReactElement, useCallback, useEffect, useRef,
 } from 'react';
 import classNames from 'classnames';
 
+import styles from './styles.module.scss';
 import { Button } from '$components/UI/Button';
 import { IValidationErrors } from '$types/common';
 
@@ -71,17 +72,17 @@ export const SpoilerListItem = <Item extends { id: string, },>({
   }, [item.id, items, onDeleteItem]);
 
   return (
-    <li className={classNames('developer-screen__spoiler-item')}>
+    <li className={styles.spoiler__item}>
       <details
-        className={classNames('developer-screen__spoiler-block')}
+        className={styles.spoiler__block}
         ref={detailsElementRef}
       >
         <summary
           className={classNames(
-            'developer-screen__spoiler-title',
+            styles.spoiler__title,
             validationErrors
             && Object.keys(validationErrors).some((error) => error.includes(item.id))
-            && 'developer-screen__spoiler-title--error',
+            && styles['spoiler__title--error'],
           )}
         >
           {
@@ -90,7 +91,7 @@ export const SpoilerListItem = <Item extends { id: string, },>({
                 return (
                   <span
                     key={`${textItem}`}
-                    className="developer-screen__spoiler-text"
+                    className={styles.spoiler__text}
                   >
                     {textItem}
                   </span>
@@ -98,8 +99,8 @@ export const SpoilerListItem = <Item extends { id: string, },>({
               }
               return (
                 <React.Fragment key={`${textItem.label}`}>
-                  <span className="developer-screen__spoiler-text">{textItem.label}</span>
-                  <span className="developer-screen__spoiler-text">{textItem.text}</span>
+                  <span className={styles.spoiler__text}>{textItem.label}</span>
+                  <span className={styles.spoiler__text}>{textItem.text}</span>
                 </React.Fragment>
               );
             })
@@ -109,25 +110,35 @@ export const SpoilerListItem = <Item extends { id: string, },>({
               <React.Fragment>
                 <Button
                   className={classNames(
-                    'developer-screen__spoiler-title-btn',
-                    'developer-screen__spoiler-title-btn--up',
+                    styles['spoiler__title-btn'],
+                    styles['spoiler__title-btn--up'],
                   )}
                   name="up"
                   isDisabled={items.length === 1 || position === 0}
                   onClick={onChangeItemOrderBtnClick}
                 >
-                  Вверх
+                  {/* eslint-disable */}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M0 0h24v24H0V0z" fill="none"/>
+                    <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/>
+                  </svg>
+                  {/* eslint-enable */}
                 </Button>
                 <Button
                   className={classNames(
-                    'developer-screen__spoiler-title-btn',
-                    'developer-screen__spoiler-title-btn--down',
+                    styles['spoiler__title-btn'],
+                    styles['spoiler__title-btn--down'],
                   )}
                   name="down"
                   isDisabled={items.length === 1 || position === items.length - 1}
                   onClick={onChangeItemOrderBtnClick}
                 >
-                  Вниз
+                  {/* eslint-disable */}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M0 0h24v24H0V0z" fill="none"/>
+                    <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/>
+                  </svg>
+                  {/* eslint-enable */}
                 </Button>
               </React.Fragment>
             )
@@ -136,12 +147,17 @@ export const SpoilerListItem = <Item extends { id: string, },>({
             onDeleteItem && (
             <Button
               className={classNames(
-                'developer-screen__spoiler-title-btn',
-                'developer-screen__spoiler-title-btn--delete',
+                styles['spoiler__title-btn'],
+                styles['spoiler__title-btn--delete'],
               )}
               onClick={onDeleteItemBtnClick}
             >
-              Удалить
+              {/* eslint-disable */}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M0 0h24v24H0z" fill="none" />
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+              </svg>
+              {/* eslint-enable */}
             </Button>
             )
           }

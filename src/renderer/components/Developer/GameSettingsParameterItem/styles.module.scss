@@ -1,11 +1,24 @@
-.developer-screen__parameter-items {
+.parameter__items {
   @include reset-indents;
   margin-bottom: 10px;
 
   text-align: center;
 }
 
-.developer-screen__parameter-list {
+.parameter__list {
   @include reset-list;
   padding-left: var(--space-m);
+}
+
+.parameter__item {
+  margin-bottom: var(--space-m);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.parameter__btn {
+  align-self: center;
+  margin: auto;
 }

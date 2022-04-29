@@ -364,11 +364,11 @@ export const DeveloperConfigScreen: React.FC = () => {
               changeArguments={changeArguments}
               onValidationError={setNewValidationErrors}
             />
-            <div className={styles['developer-screen__custom-btns']}>
+            <div className={styles['custom-btns__container']}>
               <p className="developer__subtitle">
                 Кнопки запуска дополнительных программ
               </p>
-              <ul className={styles['developer-screen__custom-btns-container']}>
+              <ul className={styles['custom-btns__list']}>
                 {
                 currentConfig.customButtons.map((customBtn, index) => (
                   <SpoilerListItem<ILauncherCustomButton>
@@ -377,7 +377,10 @@ export const DeveloperConfigScreen: React.FC = () => {
                     items={currentConfig.customButtons}
                     lastItemId={lastAddedBtnItemId}
                     position={index}
-                    summaryText={[{ label: 'Заголовок:', text: customBtn.label }, { label: 'Путь:', text: customBtn.path }]}
+                    summaryText={[
+                      { label: 'Заголовок:', text: customBtn.label },
+                      { label: 'Путь:', text: customBtn.path },
+                    ]}
                     onDeleteItem={deleteCustomBtnItem}
                     validationErrors={validationErrors}
                   >
