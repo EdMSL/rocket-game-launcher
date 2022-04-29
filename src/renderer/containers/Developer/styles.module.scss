@@ -1,3 +1,20 @@
+html {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+body {
+  @include reset-indents;
+}
+
+*,
+*::after,
+*::before {
+  box-sizing: inherit;
+
+  user-select: none;
+}
+
 .developer {
   @include main-text;
   display: flex;
@@ -9,11 +26,21 @@
   background-color: var(--bg-color);
 }
 
-.developer-screen__navigation {
+.developer__navigation {
   display: flex;
+}
 
-  & .control-panel__btn {
-    flex-grow: 1;
+.developer__navigation-btn {
+  flex-grow: 1;
+
+  text-align: center;
+
+  &--active {
+    background-color: var(--active-color);
+
+    &:hover {
+      background-color: var(--active-color);
+    }
   }
 }
 
