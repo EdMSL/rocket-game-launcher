@@ -1,23 +1,23 @@
-.developer-screen__args {
+.arguments__container {
   display: flex;
   justify-content: space-between;
 }
 
-.developer-screen__agrs-title {
+.arguments__title {
   @include reset-indents;
 }
 
-.developer-screen__agrs-block {
+.arguments__block {
   flex-basis: 50%;
   display: flex;
   flex-direction: column;
 }
 
-.developer-screen__agrs-list {
+.arguments__list {
   @include reset-list;
 }
 
-.developer-screen__agrs-item {
+.arguments__item {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -48,10 +48,10 @@
   }
 }
 
-.developer-screen__args-delete-btn {
+.arguments__delete {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
 
   vertical-align: sub;
 
@@ -84,22 +84,22 @@
   }
 }
 
-.developer-screen__args-delete-btn-text {
+.arguments__delete-text {
   display: none;
 }
 
-.developer-screen__agrs-btns {
+.arguments__buttons {
   align-self: stretch;
   display: flex;
   justify-content: flex-end;
 }
 
-.developer-screen__agrs-btn {
+.arguments__button {
   margin-left: 10px;
   padding: 8px 14px;
 }
 
-.developer-screen__agrs-btn-inner {
+.arguments__button-inner {
   display: flex;
   justify-content: space-around;
   align-items: center;

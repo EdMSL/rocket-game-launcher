@@ -132,23 +132,23 @@ export const ArgumentsBlock: React.FC<IProps> = ({
 
   return (
     <div className={classNames(
-      styles['developer-screen__args'],
+      styles.arguments__container,
       className,
     )}
     >
-      <div className={styles['developer-screen__agrs-title']}>
+      <div className={styles.arguments__title}>
         <span>Аргументы запуска</span>
         {
           description && <HintItem description={description} />
         }
       </div>
-      <div className={styles['developer-screen__agrs-block']}>
-        <ul className={styles['developer-screen__agrs-list']}>
+      <div className={styles.arguments__block}>
+        <ul className={styles.arguments__list}>
           {
           args.map((currentArg) => (
             <li
               key={currentArg.id}
-              className={styles['developer-screen__agrs-item']}
+              className={styles.arguments__item}
             >
               {
                 PathRegExp.PATH_VARIABLE.test(currentArg.data)
@@ -177,7 +177,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
               }
               <Button
                 name={currentArg.id}
-                className={styles['developer-screen__args-delete-btn']}
+                className={styles.arguments__delete}
                 onClick={onDeleteArgBtnClick}
               >
                 Удалить
@@ -186,42 +186,34 @@ export const ArgumentsBlock: React.FC<IProps> = ({
           ))
           }
         </ul>
-        <div className={styles['developer-screen__agrs-btns']}>
+        <div className={styles.arguments__buttons}>
           <Button
             name="add-arg-path"
-            className={classNames('main-btn', styles['developer-screen__agrs-btn'])}
+            className={classNames('main-btn', styles.arguments__button)}
             onClick={OnAddArgumentBtnClick}
           >
-            <div className={styles['developer-screen__agrs-btn-inner']}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M0 0h24v24H0z"
-                  fill="none"
-                />
+            <div className={styles['arguments__button-inner']}>
+              {/* eslint-disable */}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M0 0h24v24H0z" fill="none" />
                 <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
               </svg>
+              {/* eslint-enable */}
               <span>Путь</span>
             </div>
           </Button>
           <Button
             name="add-arg-string"
-            className={classNames('main-btn', styles['developer-screen__agrs-btn'])}
+            className={classNames('main-btn', styles.arguments__button)}
             onClick={OnAddArgumentBtnClick}
           >
-            <div className={styles['developer-screen__agrs-btn-inner']}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M0 0h24v24H0z"
-                  fill="none"
-                />
+            <div className={styles['arguments__button-inner']}>
+              {/* eslint-disable */}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M0 0h24v24H0z" fill="none" />
                 <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
               </svg>
+              {/* eslint-enable */}
               <span>Строка</span>
             </div>
           </Button>
