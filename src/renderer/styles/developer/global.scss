@@ -1,0 +1,45 @@
+html {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+body {
+  @include reset-indents;
+  @include main-text;
+}
+
+*,
+*::after,
+*::before {
+  box-sizing: inherit;
+
+  user-select: none;
+}
+
+::-webkit-scrollbar {
+  background: transparent;
+}
+
+::-webkit-scrollbar-track,
+.scrollbar__track {
+  top: 0;
+  right: 0;
+
+  height: 100%;
+
+  background-color: transparent;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb,
+.scrollbar__thumb {
+  top: 0;
+  right: 0;
+
+  min-height: 6px;
+
+  background-color: var(--text-main);
+  border-radius: 10px;
+
+  cursor: pointer;
+}

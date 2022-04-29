@@ -340,7 +340,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <div
-      className="develover-screen__form"
+      className="developer__form"
     >
       <DeveloperScreenController
         isConfigChanged={isConfigChanged}
@@ -355,36 +355,32 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
         {
           isGameSettingsConfigLoaded && (
             <React.Fragment>
-              <div className="developer-screen__block">
-                <p className="developer-screen__block-title">Группы игровых настроек</p>
+              <div className="developer__block">
+                <p className="developer__block-title">Группы игровых настроек</p>
                 <Button
-                  className={classNames(
-                    'main-btn',
-                    'control-panel__btn',
-                    'developer-screen__btn',
-                  )}
+                  className={classNames('main-btn', 'developer__btn')}
                   isDisabled={!!lastAddedGroupName}
                   onClick={createNewGroup}
                 >
                   Добавить
                 </Button>
-                <ul className={styles['developer-screen__groups-container']}>
+                <ul className={styles['developer__groups-container']}>
                   {
                   currentConfig.gameSettingsGroups.length > 0
                     && currentConfig.gameSettingsGroups.map((item) => (
                       <li
                         key={item.name}
                         className={classNames(
-                          styles['developer-screen__groups-item'],
-                          lastAddedGroupName === item.name && styles['developer-screen__groups-item--new'],
+                          styles['developer__groups-item'],
+                          lastAddedGroupName === item.name && styles['developer__groups-item--new'],
                         )}
                       >
                         {
                         lastAddedGroupName === item.name && (
-                        <p className={styles['developer-screen__group-label']}>
+                        <div className={styles['developer__group-label']}>
                           <span>Заголовок группы</span>
                           <HintItem description="Задать заголовок группы. Отображается как имя вкладки на экране игровых настроек." />
-                        </p>
+                        </div>
                         )
                       }
                         <EditableItem
@@ -401,17 +397,17 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                   }
                   {
                   currentConfig.gameSettingsGroups.length === 0 && (
-                    <li className={styles['developer-screen__groups-item']}>
+                    <li className={styles['developer__groups-item']}>
                       Нет групп игровых настроек
                     </li>
                   )
                 }
                 </ul>
               </div>
-              <div className="developer-screen__block">
-                <p className="developer-screen__block-title">Кодировка файлов настроек</p>
+              <div className="developer__block">
+                <p className="developer__block-title">Кодировка файлов настроек</p>
                 <TextField
-                  className="developer-screen__item"
+                  className="developer__item"
                   id="baseFilesEncoding"
                   name="baseFilesEncoding"
                   label="Кодировка"
@@ -421,10 +417,10 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                   onChange={onTextFieldChange}
                 />
               </div>
-              <div className="developer-screen__block">
-                <p className="developer-screen__block-title">Настройка игровых опций</p>
-                <p className="developer-screen__text">Файлы игровых настроек</p>
-                <ul className={styles['developer-screen__list']}>
+              <div className="developer__block">
+                <p className="developer__block-title">Настройка игровых опций</p>
+                <p className="developer__subtitle">Файлы игровых настроек</p>
+                <ul className={styles.developer__list}>
                   {
                   currentConfig.gameSettingsFiles.length > 0 && currentConfig.gameSettingsFiles.map((file, index) => (
                     <SpoilerListItem<IGameSettingsFile>
@@ -454,17 +450,13 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                   }
                 </ul>
                 <Button
-                  className={classNames(
-                    'main-btn',
-                    'control-panel__btn',
-                    'developer-screen__btn',
-                  )}
+                  className={classNames('main-btn', 'developer__btn')}
                   onClick={onAddGameSettingsFile}
                 >
                   Добавить
                 </Button>
-                <p className="developer-screen__text">Игровые параметры</p>
-                <ul className={styles['developer-screen__list']}>
+                <p className="developer__subtitle">Игровые параметры</p>
+                <ul className={styles.developer__list}>
                   {
                 currentConfig.gameSettingsParameters.length > 0 && currentConfig.gameSettingsParameters.map((param, index) => (
                   <SpoilerListItem<IGameSettingsParameter>
@@ -500,11 +492,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                 }
                 </ul>
                 <Button
-                  className={classNames(
-                    'main-btn',
-                    'control-panel__btn',
-                    'developer-screen__btn',
-                  )}
+                  className={classNames('main-btn', 'developer__btn')}
                   onClick={addGameSettingsParameter}
                 >
                   Добавить

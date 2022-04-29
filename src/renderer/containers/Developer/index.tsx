@@ -57,25 +57,25 @@ export const Developer: React.FC = () => {
         onClose={closeDevWindow}
         isCloseBtnDisabled={isFirstLaunch}
       />
-      <main className={classNames('main', styles['developer-screen__main'])}>
-        <nav className={styles['developer-screen__navigation']}>
+      <main className={styles.developer__main}>
+        <nav className={styles.developer__navigation}>
           <NavLink
-            className={classNames('button', 'main-btn', 'control-panel__btn')}
-            activeClassName="control-panel__btn--active"
+            className={classNames(
+              'button', 'main-btn', styles['developer__navigation-btn'],
+            )}
+            activeClassName="developer__navigation-btn--active"
             to={Routes.DEVELOPER_SCREEN_CONFIG}
           >
-            <span className="control-panel__btn-text">
-              Конфигурация
-            </span>
+            Конфигурация
           </NavLink>
           <NavLink
-            className={classNames('button', 'main-btn', 'control-panel__btn')}
-            activeClassName="control-panel__btn--active"
+            className={classNames(
+              'button', 'main-btn', styles['developer__navigation-btn'],
+            )}
+            activeClassName="developer__navigation-btn--active"
             to={Routes.DEVELOPER_SCREEN_GAME_SETTINGS}
           >
-            <span className="control-panel__btn-text">
-              Игровые настройки
-            </span>
+            Игровые настройки
           </NavLink>
         </nav>
         <Switch>

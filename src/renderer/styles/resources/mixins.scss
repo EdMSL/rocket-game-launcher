@@ -23,6 +23,15 @@
   outline-offset: -2px;
 }
 
+@mixin ui-container {
+  position: relative;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
 @mixin inputError {
   color: var(--text-main);
 

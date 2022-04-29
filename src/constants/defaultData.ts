@@ -128,3 +128,41 @@ export const defaultFullGameSettingsParameter: IGameSettingsParameter = {
   step: 0.1,
   items: [defaultGameSettingsParameterItem],
 };
+
+interface IWindowField {
+  name: string,
+  label: string,
+  description: string,
+}
+
+export const appWindowFields: IWindowField[] = [{
+  name: 'width',
+  label: 'Ширина по умолчанию',
+  description: 'Ширина окна приложения по умолчанию. Является постоянной, если размеры окна установлены как неизменяемые, и начальной, если размеры окна изменяемые.' //eslint-disable-line
+},
+{
+  name: 'height',
+  label: 'Высота по умолчанию',
+  description: 'Высота окна приложения по умолчанию. Является постоянной, если размеры окна установлены как неизменяемые, и начальной, если размеры окна изменяемые.' //eslint-disable-line
+},
+{
+  name: 'minWidth',
+  label: 'Минимальная ширина',
+  description: `Минимальная ширина, до которой пользователь может уменьшить размер окна. Минимально допустимое значение - ${MinWindowSize.WIDTH}` //eslint-disable-line
+},
+{
+  name: 'minHeight',
+  label: 'Минимальная высота',
+  description: `Минимальная высота, до которой пользователь может уменьшить размер окна. Минимально допустимое значение - ${MinWindowSize.HEIGHT}` //eslint-disable-line
+},
+{
+  name: 'maxWidth',
+  label: 'Максимальная ширина',
+  description: 'Максимальная ширина, до которой пользователь может увеличить размер окна. Значение 0 - нет ограничения.' //eslint-disable-line
+},
+{
+  name: 'maxHeight',
+  label: 'Максимальная высота',
+  description: 'Максимальная высота, до которой пользователь может увеличить размер окна. Значение 0 - нет ограничения.' //eslint-disable-line
+},
+];
