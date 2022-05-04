@@ -8,6 +8,7 @@ import {
   SagaReturnType,
   delay,
 } from 'redux-saga/effects';
+import Joi from 'joi';
 
 import { IAppState } from '$store/store';
 import {
@@ -295,7 +296,7 @@ export function* generateGameSettingsOptionsSaga(
 
     if (errors.length > 0) {
       errors.forEach((message) => {
-        writeToLogFile(message.text, message.type);
+        writeToLogFile(message.text, LogMessageType.WARNING);
       });
     }
 
@@ -335,7 +336,7 @@ export function* initGameSettingsSaga(
 
     const {
       data: settingsConfig,
-      errors,
+      errors: settingsConfigErrors,
     }: SagaReturnType<typeof getGameSettingsConfigSaga> = yield call(getGameSettingsConfigSaga);
 
     let moProfile: string = '';
@@ -357,7 +358,7 @@ export function* initGameSettingsSaga(
         moProfile,
       );
 
-      if (parametersWithError.length > 0 || errors.length > 0) {
+      if (parametersWithError.length > 0 || settingsConfigErrors.length > 0) {
         const filteredGameSettingsParameters = settingsConfig.gameSettingsParameters.filter(
           (currentParam) => !parametersWithError.includes(currentParam.id),
         );

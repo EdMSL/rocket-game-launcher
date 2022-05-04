@@ -52,10 +52,6 @@ export function* initGameSettingsDeveloperSaga(): SagaIterator {
     ipcRenderer.send,
     AppChannel.SAVE_DEV_CONFIG,
     true,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
   );
 
   try {
@@ -95,10 +91,6 @@ export function* initGameSettingsDeveloperSaga(): SagaIterator {
       ipcRenderer.send,
       AppChannel.SAVE_DEV_CONFIG,
       false,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
     );
   }
 }
