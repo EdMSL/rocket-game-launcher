@@ -48,7 +48,7 @@ export const SpoilerListItem = <Item extends { id: string, },>({
   }, [item.id, lastItemId]);
 
   const onChangeItemOrderBtnClick = useCallback(({ currentTarget }) => {
-    if (position && onChangeOrderItem) {
+    if (position !== undefined && onChangeOrderItem) {
       const newItems = [...items];
 
       if (currentTarget.name === 'up') {
