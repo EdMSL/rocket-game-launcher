@@ -229,6 +229,10 @@ export const DeveloperConfigScreen: React.FC = () => {
     );
   }, [currentConfig, changeCurrentConfig]);
 
+  const changeCustomButtonsOrder = useCallback((customButtons: ILauncherCustomButton[]) => {
+    changeCurrentConfig('customButtons', customButtons);
+  }, [changeCurrentConfig]);
+
   const changeArguments = useCallback((
     newArgs: IButtonArg[],
     parent: string,
@@ -381,8 +385,9 @@ export const DeveloperConfigScreen: React.FC = () => {
                       { label: 'Заголовок:', text: customBtn.label },
                       { label: 'Путь:', text: customBtn.path },
                     ]}
-                    onDeleteItem={deleteCustomBtnItem}
                     validationErrors={validationErrors}
+                    onDeleteItem={deleteCustomBtnItem}
+                    onChangeOrderItem={changeCustomButtonsOrder}
                   >
                     <CustomBtnItem
                       key={customBtn.id}
