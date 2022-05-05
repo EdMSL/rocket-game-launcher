@@ -30,6 +30,7 @@ import { Loader } from '$components/UI/Loader';
 import {
   createGameSettingsFilesBackup,
   getGameSettingsFilesBackup,
+  setIsDeveloperMode,
   setIsGameSettingsLoading,
 } from '$actions/main';
 import { Modal } from '$components/UI/Modal';
@@ -65,6 +66,16 @@ export const GameSettingsScreen: React.FC = () => {
   /* eslint-enable max-len */
 
   useEffect(() => {
+    ipcRenderer.on(AppChannel.CHANGE_DEV_WINDOW_STATE, (event, isOpened: boolean) => {
+      if (isOpened !== undefined) {
+        if (isOpened) {
+          dispatch(setIsDeveloperMode(true));
+        } else {
+          dispatch(setIsDeveloperMode(false));
+        }
+      }
+    });
+
     ipcRenderer.on(AppChannel.SAVE_DEV_CONFIG, (
       event,
       isGameSettingsConfigProcessing: boolean,
@@ -75,6 +86,7 @@ export const GameSettingsScreen: React.FC = () => {
     });
 
     return (): void => {
+      ipcRenderer.removeAllListeners(AppChannel.CHANGE_DEV_WINDOW_STATE);
       ipcRenderer.removeAllListeners(AppChannel.SAVE_DEV_CONFIG);
     };
   }, [dispatch]);
