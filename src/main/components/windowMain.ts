@@ -19,11 +19,9 @@ import { IPathVariables } from '$constants/paths';
 import { changeWindowSize } from '$utils/process';
 import { IAppState } from '$store/store';
 import {
-  setIsGameSettingsLoaded,
-  setIsLauncherConfigChanged, setLauncherConfig, setPathVariables,
+  setIsGameSettingsConfigChanged, setLauncherConfig, setPathVariables,
 } from '$actions/main';
 import { IGameSettingsConfig } from '$types/gameSettings';
-import { setGameSettingsConfig } from '$actions/gameSettings';
 
 /**
  * Функция для создания и показа главного окна приложения
@@ -100,17 +98,10 @@ export const createMainWindow = (
     newConfig: ILauncherConfig|IGameSettingsConfig,
     pathVariables: IPathVariables,
     isChangeWindowSize: boolean,
-    isUpdateGameSettingsOptions = true,
   ) => {
     if (newConfig !== undefined) {
       if ('baseFilesEncoding' in newConfig) {
-        appStore.dispatch(setGameSettingsConfig(newConfig));
-
-        if (isUpdateGameSettingsOptions) {
-          appStore.dispatch(setIsLauncherConfigChanged(true));
-        } else {
-          appStore.dispatch(setIsGameSettingsLoaded(true));
-        }
+        mainWindow.webContents.send(AppChannel.SAVE_DEV_CONFIG, undefined, newConfig);
       } else if ('playButton' in newConfig) {
         if (isChangeWindowSize !== undefined && isChangeWindowSize) {
           changeWindowSize(mainWindow, newConfig);
@@ -119,7 +110,7 @@ export const createMainWindow = (
         if (pathVariables !== undefined) {
           appStore.dispatch(setLauncherConfig(newConfig));
           appStore.dispatch(setPathVariables(pathVariables));
-          appStore.dispatch(setIsLauncherConfigChanged(true));
+          appStore.dispatch(setIsGameSettingsConfigChanged(true));
         }
       }
     }

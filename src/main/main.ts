@@ -72,23 +72,6 @@ ipcMain.on(AppChannel.CHANGE_DEV_WINDOW_STATE, (event, isOpen: boolean) => {
   if (!devWindow && isOpen !== undefined && isOpen) {
     devWindow = createDevWindow();
     addDevWindowListeners(devWindow, mainWindow!);
-
-    appStore.subscribe(() => {
-      if (devWindow) {
-        const state = appStore.getState();
-
-        devWindow.webContents.send(
-          AppChannel.APP_STORE_UPDATED,
-          state.main.isGameSettingsLoaded,
-          {
-            gameSettingsFiles: state.gameSettings.gameSettingsFiles,
-            gameSettingsGroups: state.gameSettings.gameSettingsGroups,
-            gameSettingsParameters: state.gameSettings.gameSettingsParameters,
-            baseFilesEncoding: state.gameSettings.baseFilesEncoding,
-          },
-        );
-      }
-    });
   }
 });
 

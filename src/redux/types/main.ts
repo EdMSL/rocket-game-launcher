@@ -92,7 +92,7 @@ export type IMainRootState = Readonly<{
   launcherVersion: string,
   pathVariables: IPathVariables,
   isLauncherInitialised: boolean,
-  isLauncherConfigChanged: boolean,
+  isGameSettingsConfigChanged: boolean,
   isDevWindowOpening: boolean,
   isGameRunning: boolean,
   isConfigLoading: boolean,

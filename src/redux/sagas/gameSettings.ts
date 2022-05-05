@@ -27,8 +27,7 @@ import {
   setIsGameSettingsLoaded,
   setIsGameSettingsLoading,
   setIsGameSettingsSaving,
-  setIsLauncherConfigChanged,
-  // setIsLauncherConfigChanged,
+  setIsGameSettingsConfigChanged,
 } from '$actions/main';
 import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import { checkGameSettingsConfigFull, ICheckResult } from '$utils/check';
@@ -37,7 +36,6 @@ import {
   IGameSettingsConfig,
   IGameSettingsFile,
   IGameSettingsOptions,
-  IGameSettingsOptionsItem,
   IGameSettingsParameter,
 } from '$types/gameSettings';
 import {
@@ -55,6 +53,7 @@ import {
   setMoProfiles,
   saveGameSettingsFiles,
   setGameSettingsParameters,
+  setInitialGameSettingsParameters,
 } from '$actions/gameSettings';
 import {
   CustomError,
@@ -314,13 +313,14 @@ export function* generateGameSettingsOptionsSaga(
 */
 export function* initGameSettingsSaga(
   isFromUpdateAction = false,
+  initialSettingsConfig?: IGameSettingsConfig,
 ): SagaIterator {
   try {
-    writeToLogFileSync('Game settings initialization started.');
+    yield put(setIsGameSettingsLoading(true));
+    yield put(setIsGameSettingsLoaded(false));
 
     if (!isFromUpdateAction) {
-      yield put(setIsGameSettingsLoading(true));
-      yield put(setIsGameSettingsLoaded(false));
+      writeToLogFileSync('Game settings initialization started.');
     }
 
     const {
@@ -330,14 +330,24 @@ export function* initGameSettingsSaga(
             isUsed: isMOUsed,
           },
         },
-        isLauncherConfigChanged,
+        isGameSettingsConfigChanged,
       },
     }: ReturnType<typeof getState> = yield select(getState);
 
-    const {
-      data: settingsConfig,
-      errors: settingsConfigErrors,
-    }: SagaReturnType<typeof getGameSettingsConfigSaga> = yield call(getGameSettingsConfigSaga);
+    let currentSettingsConfig: IGameSettingsConfig;
+    let settingsConfigErrors: Joi.ValidationError[] = [];
+
+    if (initialSettingsConfig) {
+      currentSettingsConfig = initialSettingsConfig;
+    } else {
+      const {
+        data,
+        errors,
+      }: SagaReturnType<typeof getGameSettingsConfigSaga> = yield call(getGameSettingsConfigSaga);
+
+      currentSettingsConfig = data;
+      settingsConfigErrors = [...errors];
+    }
 
     let moProfile: string = '';
 
@@ -348,42 +358,48 @@ export function* initGameSettingsSaga(
       yield put(setMoProfile(moProfile));
     }
 
-    if (settingsConfig.gameSettingsParameters.length > 0) {
+    if (currentSettingsConfig.gameSettingsParameters.length > 0) {
       const {
         gameSettingsOptions, parametersWithError,
       }: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
         generateGameSettingsOptionsSaga,
-        settingsConfig.gameSettingsFiles,
-        settingsConfig.gameSettingsParameters,
+        currentSettingsConfig.gameSettingsFiles,
+        currentSettingsConfig.gameSettingsParameters,
         moProfile,
       );
 
-      if (parametersWithError.length > 0 || settingsConfigErrors.length > 0) {
-        const filteredGameSettingsParameters = settingsConfig.gameSettingsParameters.filter(
+      if (!initialSettingsConfig && !isFromUpdateAction) {
+        yield put(setInitialGameSettingsParameters(currentSettingsConfig.gameSettingsParameters));
+      }
+
+      if (parametersWithError.length > 0 || settingsConfigErrors?.length > 0) {
+        const filteredGameSettingsParameters = currentSettingsConfig.gameSettingsParameters.filter(
           (currentParam) => !parametersWithError.includes(currentParam.id),
         );
 
         if (filteredGameSettingsParameters.length === 0) {
-          yield put(addMessages([CreateUserMessage.error('Нет доступных опций для вывода. Ни один параметр из массива "gameSettingsParameters" в файле игровых настроек settings.json не может быть обработан из-за ошибок. Подробности в файле лога.')])); //eslint-disable-line max-len
+          yield put(addMessages([CreateUserMessage.error('Нет доступных опций для вывода. Ни один параметр в файле игровых настроек settings.json не может быть обработан из-за ошибок. Подробности в файле лога.')])); //eslint-disable-line max-len
         } else {
           yield put(addMessages([CreateUserMessage.warning('Обнаружены ошибки в файле игровых настроек settings.json. Некоторые опции будут недоступны. Подробности в файле лога.')])); //eslint-disable-line max-len
         }
 
-        settingsConfig.gameSettingsParameters = [...filteredGameSettingsParameters];
+        currentSettingsConfig.gameSettingsParameters = [...filteredGameSettingsParameters];
       }
 
       yield put(setGameSettingsOptions(gameSettingsOptions));
     }
 
-    yield put(setGameSettingsConfig(settingsConfig));
+    yield put(setGameSettingsConfig(currentSettingsConfig));
     yield put(setIsGameSettingsAvailable(true));
     yield put(setIsGameSettingsLoaded(true));
 
-    if (isLauncherConfigChanged) {
-      yield put(setIsLauncherConfigChanged(false));
+    if (isGameSettingsConfigChanged) {
+      yield put(setIsGameSettingsConfigChanged(false));
     }
 
-    writeToLogFileSync('Game settings initialisation completed.');
+    if (!isFromUpdateAction) {
+      writeToLogFileSync('Game settings initialisation completed.');
+    }
   } catch (error: any) {
     let errorMessage = '';
 

@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron';
 import React, {
-  useCallback, useEffect, useRef, useState,
+  useCallback, useEffect, useState,
 } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -16,6 +16,7 @@ import {
   setIsDeveloperMode,
   setIsDevWindowOpening,
   setIsConfigLoading,
+  setIsGameSettingsConfigChanged,
 } from '$actions/main';
 import { useAppSelector } from '$store/store';
 import { CreateUserMessage } from '$utils/message';
@@ -26,6 +27,8 @@ import { getPathToFile } from '$utils/strings';
 import { Loader } from '$components/UI/Loader';
 import { IButtonArg } from '$types/main';
 import { ILocationState } from '$types/common';
+import { IGameSettingsConfig } from '$types/gameSettings';
+import { setGameSettingsConfig } from '$actions/gameSettings';
 
 export const MainScreen: React.FC = () => {
   /* eslint-disable max-len */
@@ -64,9 +67,15 @@ export const MainScreen: React.FC = () => {
     ipcRenderer.on(AppChannel.SAVE_DEV_CONFIG, (
       event: Electron.Event,
       isLauncherConfigProcessing: boolean,
+      newConfig: IGameSettingsConfig,
     ) => {
       if (isLauncherConfigProcessing !== undefined) {
         dispatch(setIsConfigLoading(isLauncherConfigProcessing));
+      }
+
+      if (newConfig !== undefined) {
+        dispatch(setGameSettingsConfig(newConfig));
+        dispatch(setIsGameSettingsConfigChanged(true));
       }
     });
 

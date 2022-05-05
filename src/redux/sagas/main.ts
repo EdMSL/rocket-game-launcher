@@ -28,16 +28,11 @@ import {
   renameGameSettingsFilesBackup,
   setIsGameSettingsLoaded,
   setIsGameSettingsAvailable,
-  setLauncherConfig,
-  setIsGameSettingsSaving,
-  setPathVariables,
   setIsGameSettingsLoading,
 } from '$actions/main';
 import {
   generateGameSettingsOptionsSaga,
   initGameSettingsSaga,
-  getGameSettingsConfigSaga,
-  // initGameSettingsDeveloperSaga,
 } from '$sagas/gameSettings';
 import {
   GAME_SETTINGS_FILE_PATH,
@@ -59,12 +54,11 @@ import {
 } from '$utils/backup';
 import { getPathToFile } from '$utils/strings';
 import { ILocationState, IUnwrap } from '$types/common';
-import { setGameSettingsConfig, setGameSettingsOptions } from '$actions/gameSettings';
 import {
-  deepClone, getGameSettingsOptionsWithNewValues, updatePathVariables,
-} from '$utils/data';
+  setGameSettingsOptions, updateGameSettingsOptions,
+} from '$actions/gameSettings';
+import { getGameSettingsOptionsWithNewValues } from '$utils/data';
 import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
-import { writeJSONFile } from '$utils/files';
 import { AppChannel } from '$constants/misc';
 
 const getState = (state: IAppState): IAppState => state;
@@ -103,14 +97,13 @@ function* initLauncherSaga(): SagaIterator {
   }
 }
 
-function* updateGameSettingsOptionsSaga(): SagaIterator {
-  yield put(setIsGameSettingsLoading(true));
-  yield put(setIsGameSettingsLoaded(false));
-
+function* updateGameSettingsOptionsSaga(
+  { payload: gameSetingsConfig }: ReturnType<typeof updateGameSettingsOptions>,
+): SagaIterator {
   try {
     yield put(setIsGameSettingsAvailable(false));
 
-    yield call(initGameSettingsSaga, true);
+    yield call(initGameSettingsSaga, true, gameSetingsConfig);
   } catch (error: any) {
     if (
       error instanceof SagaError
@@ -425,14 +418,14 @@ function* locationChangeSaga(
     if (GAME_SETTINGS_PATH_REGEXP.test(location.pathname)) {
       const {
         main: {
-          isLauncherConfigChanged,
+          isGameSettingsConfigChanged,
         },
       }: ReturnType<typeof getState> = yield select(getState);
 
       if (isLauncherInitialised) {
         if (
           (!isGameSettingsLoaded && location.state?.isFromMainPage)
-        || isLauncherConfigChanged
+        || isGameSettingsConfigChanged
         ) {
           yield call(initGameSettingsSaga, false);
 

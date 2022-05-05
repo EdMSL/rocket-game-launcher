@@ -26,11 +26,11 @@ export const setIsFirstLaunch = (
   payload: isFirstLaunch,
 });
 
-export const setIsLauncherConfigChanged = (
-  isLauncherConfigChanged: IMainRootState['isLauncherConfigChanged'],
+export const setIsGameSettingsConfigChanged = (
+  isGameSettingsConfigChanged: IMainRootState['isGameSettingsConfigChanged'],
 ) => ({
   type: MAIN_TYPES.SET_IS_LAUNCHER_CONFIG_CHANGED,
-  payload: isLauncherConfigChanged,
+  payload: isGameSettingsConfigChanged,
 });
 export const setIsGameRunning = (
   isGameRunning: IMainRootState['isGameRunning'],

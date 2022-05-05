@@ -25,7 +25,7 @@ import {
   setGameSettingsOptions,
   updateGameSettingsOptions,
 } from '$actions/gameSettings';
-import { IGameSettingsOptions } from '$types/gameSettings';
+import { IGameSettingsConfig, IGameSettingsOptions } from '$types/gameSettings';
 import { Loader } from '$components/UI/Loader';
 import {
   createGameSettingsFilesBackup,
@@ -79,9 +79,14 @@ export const GameSettingsScreen: React.FC = () => {
     ipcRenderer.on(AppChannel.SAVE_DEV_CONFIG, (
       event,
       isGameSettingsConfigProcessing: boolean,
+      newConfig: IGameSettingsConfig,
     ) => {
       if (isGameSettingsConfigProcessing !== undefined) {
         dispatch(setIsGameSettingsLoading(isGameSettingsConfigProcessing));
+      }
+
+      if (newConfig !== undefined) {
+        dispatch(updateGameSettingsOptions(newConfig));
       }
     });
 

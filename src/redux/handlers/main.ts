@@ -37,14 +37,14 @@ const setIsFirstLaunch: IMainActionHadler<
   },
 });
 
-const setIsLauncherConfigChanged: IMainActionHadler<
-  typeof MAIN_ACTIONS.setIsLauncherConfigChanged
+const setIsGameSettingsConfigChanged: IMainActionHadler<
+  typeof MAIN_ACTIONS.setIsGameSettingsConfigChanged
 > = (
   state,
-  { payload: isLauncherConfigChanged },
+  { payload: isGameSettingsConfigChanged },
 ) => ({
   ...state,
-  isLauncherConfigChanged,
+  isGameSettingsConfigChanged,
 });
 
 const setIsGameRunning: IMainActionHadler<
@@ -204,7 +204,7 @@ export const MAIN_HANDLERS = {
   [MAIN_TYPES.SET_LAUNCHER_CONFIG]: setLauncherConfig,
   [MAIN_TYPES.SET_PATH_VARIABLES]: setPathVariables,
   [MAIN_TYPES.SET_IS_FIRST_LAUNCH]: setIsFirstLaunch,
-  [MAIN_TYPES.SET_IS_LAUNCHER_CONFIG_CHANGED]: setIsLauncherConfigChanged,
+  [MAIN_TYPES.SET_IS_LAUNCHER_CONFIG_CHANGED]: setIsGameSettingsConfigChanged,
   [MAIN_TYPES.SET_IS_GAME_RUNNING]: setIsGameRunning,
   [MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED]: setIsLauncherInitialised,
   [MAIN_TYPES.SET_IS_CONFIG_LOADING]: setIsConfigLoading,
