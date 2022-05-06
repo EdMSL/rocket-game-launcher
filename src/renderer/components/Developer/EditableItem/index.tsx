@@ -54,19 +54,25 @@ export const EditableItem: React.FC<IProps> = ({
     }
   }, [isEditMode, cancelChanges]);
 
+  const onEnterKeyPress = useCallback((event: KeyboardEvent) => {
+    if (isEditMode && event.code === 'Enter') {
+      confirmChanges();
+    }
+  }, [isEditMode, confirmChanges]);
+
   useEffect(() => {
     const label = labelInput.current;
 
     label?.addEventListener('keyup', onEscKeyPress);
+    label?.addEventListener('keyup', onEnterKeyPress);
 
     return (): void => {
       label?.removeEventListener('keyup', onEscKeyPress);
+      label?.removeEventListener('keyup', onEnterKeyPress);
     };
-  }, [onEscKeyPress]);
+  }, [onEscKeyPress, onEnterKeyPress]);
 
-  const onFormSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const onSaveBtnClick = useCallback(() => {
     if (isEditMode && currentItem) {
       confirmChanges();
     }
@@ -124,14 +130,13 @@ export const EditableItem: React.FC<IProps> = ({
       }
       {
         isEditMode && (
-        <form
+        <div
           className={classNames(
             styles['editable-item'],
             styles['editable-item--editable'],
             isNew && styles['editable-item--new'],
             className,
           )}
-          onSubmit={onFormSubmit}
         >
           <input
             ref={labelInput}
@@ -150,8 +155,8 @@ export const EditableItem: React.FC<IProps> = ({
               styles['editable-item__btn'],
               styles['editable-item__btn--confirm'],
             )}
-            isSubmit
             isDisabled={isError || !currentItem}
+            onClick={onSaveBtnClick}
           >
             Подтвердить
           </Button>
@@ -164,7 +169,7 @@ export const EditableItem: React.FC<IProps> = ({
           >
             Отмена
           </Button>
-        </form>
+        </div>
         )
       }
     </React.Fragment>
