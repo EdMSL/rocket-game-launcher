@@ -64,7 +64,7 @@
     "classnames": "2.3.1",
     "cross-env": "7.0.3",
     "css-loader": "5.2.0",
-    "electron": "17.1.2",
+    "electron": "17.4.1",
     "electron-packager": "15.4.0",
     "electron-unhandled": "4.0.1",
     "eslint": "7.23.0",
