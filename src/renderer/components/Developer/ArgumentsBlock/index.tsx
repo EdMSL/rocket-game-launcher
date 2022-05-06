@@ -7,9 +7,7 @@ import {
 } from '$constants/misc';
 import { PathSelector } from '$components/UI/PathSelector';
 import { IPathVariables } from '$constants/paths';
-import {
-  clearValidationErrors, generateSelectOptions, getUniqueValidationErrors,
-} from '$utils/data';
+import { generateSelectOptions } from '$utils/data';
 import { Button } from '$components/UI/Button';
 import { TextField } from '$components/UI/TextField';
 import { HintItem } from '$components/HintItem';
@@ -17,6 +15,7 @@ import { IButtonArg } from '$types/main';
 import { getRandomId } from '$utils/strings';
 import { IValidationData } from '$utils/check';
 import { IValidationErrors } from '$types/common';
+import { clearValidationErrors, getUniqueValidationErrors } from '$utils/validation';
 
 interface IProps {
   className?: string,

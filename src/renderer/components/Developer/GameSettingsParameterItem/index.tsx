@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useEffect, useMemo, useState,
+  useCallback, useMemo, useState,
 } from 'react';
 import classNames from 'classnames';
 
@@ -13,7 +13,6 @@ import {
   getFileByFileName,
   getFullParameter,
   getSelectsOptionStringObj,
-  getUniqueValidationErrors,
 } from '$utils/data';
 import {
   GameSettingControllerType, GameSettingsOptionType, HTMLInputType,
@@ -28,6 +27,7 @@ import { defaultFullGameSettingsParameter } from '$constants/defaultData';
 import { generateSelectOptionsFromString, getRandomId } from '$utils/strings';
 import { TextArea } from '$components/UI/TextArea';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
+import { setParameterStartValidationErrors, validateParameterFields } from '$utils/validation';
 
 interface IProps {
   parameter: IGameSettingsParameter,
@@ -118,14 +118,6 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       };
     }
 
-    if (currentTarget.type === 'text' && currentTarget.required) {
-      onValidation(getUniqueValidationErrors(
-        validationErrors,
-        { [currentTarget.id]: ['empty value'] },
-        currentTarget.value === '',
-      ));
-    }
-
     const { newParameter, newFullParameter } = generateGameSettingsParameter(
       currentParameter,
       fullParameter,
@@ -133,6 +125,16 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         ? getFileByFileName(gameSettingsFiles, currentTarget.value)!
         : parameterFile!,
     );
+
+    if (currentTarget.name === 'file') {
+      onValidation(setParameterStartValidationErrors(
+        newParameter,
+        getFileByFileName(gameSettingsFiles, newParameter.file)!,
+        validationErrors,
+      ));
+    } else {
+      onValidation(validateParameterFields(currentTarget, newParameter, validationErrors));
+    }
 
     onParameterDataChange(parameter.id, newParameter);
     setFullParameter(newFullParameter);

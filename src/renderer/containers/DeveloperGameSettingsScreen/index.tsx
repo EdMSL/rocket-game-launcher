@@ -20,7 +20,6 @@ import {
   getDefaultGameSettingsParameter,
   getFullParameter,
   getNewConfig,
-  getUniqueValidationErrors,
 } from '$utils/data';
 import { checkObjectForEqual } from '$utils/check';
 import {
@@ -48,6 +47,7 @@ import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 import {
   defaultFullGameSettingsParameter,
 } from '$constants/defaultData';
+import { getUniqueValidationErrors, setParameterStartValidationErrors } from '$utils/validation';
 
 export const DeveloperGameSettingsScreen: React.FC = () => {
   /* eslint-disable max-len */
@@ -309,13 +309,22 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   const addGameSettingsParameter = useCallback(() => {
     const paramerter = getDefaultGameSettingsParameter(currentConfig.gameSettingsFiles[0]);
 
+    setNewValidationErrors(setParameterStartValidationErrors(
+      paramerter,
+      currentConfig.gameSettingsFiles[0],
+      validationErrors,
+    ));
     changeCurrentConfig([
       ...currentConfig.gameSettingsParameters,
       paramerter,
     ],
     'gameSettingsParameters');
     setLastAddedParameterId(paramerter.id);
-  }, [currentConfig.gameSettingsParameters, currentConfig.gameSettingsFiles, changeCurrentConfig]);
+  }, [currentConfig.gameSettingsParameters,
+    currentConfig.gameSettingsFiles,
+    validationErrors,
+    setNewValidationErrors,
+    changeCurrentConfig]);
 
   const deleteGameSettingsParameter = useCallback((params: IGameSettingsParameter[]) => {
     changeCurrentConfig(params, 'gameSettingsParameters');

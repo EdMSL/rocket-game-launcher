@@ -18,7 +18,7 @@ import {
   IGameSettingsRootState,
 } from '$types/gameSettings';
 import {
-  LogMessageType, writeToLogFile, writeToLogFileSync,
+  LogMessageType, writeToLogFileSync,
 } from '$utils/log';
 import {
   defaultLauncherConfig, defaultLauncherWindowSettings, MinWindowSize,
@@ -27,7 +27,7 @@ import { CustomError, ErrorName } from './errors';
 import { getRandomId } from './strings';
 import { ILauncherConfig, IWindowSettings } from '$types/main';
 import {
-  getGameSettingsFilesNames, getGameSettingsGroupsNames, getUniqueValidationErrors,
+  getGameSettingsFilesNames, getGameSettingsGroupsNames,
 } from './data';
 import { IValidationErrors } from '$types/common';
 
@@ -412,7 +412,8 @@ const relatedOptionTypeSchema = Joi.object({
 /**
  * Проверка параметров, указанных в gameSettingsParameters.
  * @param parameters Параметры для проверки.
- * @param validationOptions Опции валидатора.
+ * @param gameSettingsGroups Группы игровых настроек.
+ * @param gameSettingsFiles Файлы игровых настроек.
  * @returns Объект с массивом параметров и массивом ошибок проверки.
 */
 export const checkGameSettingsParameters = (
@@ -611,100 +612,3 @@ export const getWindowSettingsFromLauncherConfig = (
     [current]: config[current],
   }), {} as IWindowSettings,
 );
-
-/**
-  Валидация значений полей `number` в `developer screen`.
-  @param target Поле `target` объекта `event`.
-  @param currentConfig Текущие значения конфигурации лаунчера.
-  @param currentErrors Текущие ошибки валидации.
-  @returns Массив из двух массивов: ошибки для добавления и ошибки для удаления.
-*/
-export const validateNumberInputs = (
-  target: EventTarget & HTMLInputElement,
-  currentConfig: ILauncherConfig,
-  currentErrors: IValidationErrors,
-): IValidationErrors => {
-  let errors: IValidationErrors = { ...currentErrors };
-
-  errors = getUniqueValidationErrors(
-    errors,
-    { [target.id]: ['less min value'] },
-    +target.value < +target.min,
-  );
-
-  if (currentConfig.isResizable) {
-    const namesAndValues = target.name === 'width'
-      ? {
-          default: currentConfig.width,
-          min: currentConfig.minWidth,
-          max: currentConfig.maxWidth,
-          defaultName: 'width',
-          minName: 'minWidth',
-          maxName: 'maxWidth',
-        }
-      : {
-          default: currentConfig.height,
-          min: currentConfig.minHeight,
-          max: currentConfig.maxHeight,
-          defaultName: 'height',
-          minName: 'minHeight',
-          maxName: 'maxHeight',
-        };
-
-    if (target.name === 'width' || target.name === 'height') {
-      errors = getUniqueValidationErrors(
-        errors,
-        {
-          [target.id]: [`less config ${namesAndValues.minName}`],
-          [namesAndValues.minName]: [`more config ${target.id}`],
-        },
-        +target.value < namesAndValues.min,
-      );
-
-      errors = getUniqueValidationErrors(
-        errors,
-        {
-          [target.id]: [`more config ${namesAndValues.maxName}`],
-          [namesAndValues.maxName]: [`less config ${target.id}`],
-        },
-        +target.value > namesAndValues.max && namesAndValues.max > 0,
-      );
-    } else if (target.name === 'minWidth' || target.name === 'minHeight') {
-      errors = getUniqueValidationErrors(
-        errors,
-        {
-          [target.id]: [`more config ${namesAndValues.defaultName}`],
-          [namesAndValues.defaultName]: [`less config ${target.id}`],
-        },
-        +target.value > namesAndValues.default,
-      );
-
-      errors = getUniqueValidationErrors(
-        errors,
-        {
-          [target.id]: [`more config ${namesAndValues.maxName}`],
-          [namesAndValues.maxName]: [`less config ${target.id}`],
-        },
-        +target.value > namesAndValues.max && namesAndValues.max > 0,
-      );
-    } else if (target.name === 'maxWidth' || target.name === 'maxHeight') {
-      errors = getUniqueValidationErrors(
-        errors,
-        {
-          [target.id]: [`less config ${namesAndValues.defaultName}`],
-          [namesAndValues.defaultName]: [`more config ${target.id}`],
-        },
-        +target.value < namesAndValues.default && +target.value > 0,
-      );
-      errors = getUniqueValidationErrors(
-        errors,
-        {
-          [target.id]: [`less config ${namesAndValues.minName}`],
-          [namesAndValues.minName]: [`more config ${target.id}`],
-        },
-        +target.value < namesAndValues.min && +target.value > 0,
-      );
-    }
-  }
-  return errors;
-};

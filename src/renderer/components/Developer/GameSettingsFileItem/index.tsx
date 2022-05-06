@@ -5,7 +5,7 @@ import styles from './styles.module.scss';
 import { IGameSettingsFile } from '$types/gameSettings';
 import { TextField } from '$components/UI/TextField';
 import { Select } from '$components/UI/Select';
-import { generateSelectOptions, getUniqueValidationErrors } from '$utils/data';
+import { generateSelectOptions } from '$utils/data';
 import {
   gameSettingsFileAvailableVariables, GameSettingsFileView, LauncherButtonAction,
 } from '$constants/misc';
@@ -15,6 +15,7 @@ import { IValidationData } from '$utils/check';
 import { IValidationErrors } from '$types/common';
 import { Button } from '$components/UI/Button';
 import { getFileNameFromPathToFile } from '$utils/strings';
+import { getUniqueValidationErrors } from '$utils/validation';
 
 interface IProps {
   file: IGameSettingsFile,

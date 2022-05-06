@@ -27,16 +27,13 @@ import {
 } from '$types/main';
 import {
   changeConfigArrayItem,
-  clearValidationErrors,
   generateSelectOptions,
   getNewConfig,
-  getUniqueValidationErrors,
 } from '$utils/data';
 import { ArgumentsBlock } from '$components/Developer/ArgumentsBlock';
 import {
   checkObjectForEqual,
   IValidationData,
-  validateNumberInputs,
 } from '$utils/check';
 import { getRandomId } from '$utils/strings';
 import { IValidationErrors } from '$types/common';
@@ -45,6 +42,9 @@ import { IDeveloperRootState } from '$types/developer';
 import { saveLauncherConfig, updateConfig } from '$actions/developer';
 import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
+import {
+  clearValidationErrors, getUniqueValidationErrors, validateNumberInputs,
+} from '$utils/validation';
 
 export const DeveloperConfigScreen: React.FC = () => {
   /* eslint-disable max-len */

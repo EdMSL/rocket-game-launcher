@@ -12,7 +12,7 @@ import {
   PathVariableName,
   LauncherButtonAction,
 } from '$constants/misc';
-import { generateSelectOptions, getUniqueValidationErrors } from '$utils/data';
+import { generateSelectOptions } from '$utils/data';
 import { Button } from '$components/UI/Button';
 import { IPathVariables } from '$constants/paths';
 import { ArgumentsBlock } from '$components/Developer/ArgumentsBlock';
@@ -21,6 +21,7 @@ import {
   IValidationData,
 } from '$utils/check';
 import { IValidationErrors } from '$types/common';
+import { getUniqueValidationErrors } from '$utils/validation';
 
 interface IProps {
   item: ILauncherCustomButton,
