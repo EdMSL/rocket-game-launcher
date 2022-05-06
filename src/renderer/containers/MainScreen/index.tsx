@@ -154,6 +154,7 @@ export const MainScreen: React.FC = () => {
           <Button
             className={classNames('main-btn', 'control-panel__btn')}
             isDisabled={isGameRunning || !playButton.path}
+            isAutofocus
             onClick={onPlayGameBtnClick}
           >
             {playButton.label}

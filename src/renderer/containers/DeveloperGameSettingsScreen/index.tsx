@@ -95,15 +95,9 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   useEffect(() => {
     ipcRenderer.on(AppChannel.CHANGE_DEV_WINDOW_STATE, (
       event,
-      isOpen: boolean,
-      isByCloseWindowBtnClick: boolean,
+      isOpened: boolean,
     ) => {
-      if (
-        isOpen !== undefined
-        && isByCloseWindowBtnClick !== undefined
-        && !isOpen
-        && isByCloseWindowBtnClick
-      ) {
+      if (isOpened !== undefined && !isOpened) {
         resetConfigChanges();
       }
     });
@@ -123,8 +117,11 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     setIsConfigChanged(!checkObjectForEqual(gameSettingsConfig, newConfig));
   }, [gameSettingsConfig, currentConfig]);
 
-  const onSaveBtnClick = useCallback(() => {
-    saveSettingsChanges(false);
+  const onSaveBtnClick = useCallback((
+    { currentTarget }: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    saveSettingsChanges(currentTarget.name === 'ok_save_config_btn');
+    ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false);
   }, [saveSettingsChanges]);
 
   const onCancelBtnClick = useCallback(() => {

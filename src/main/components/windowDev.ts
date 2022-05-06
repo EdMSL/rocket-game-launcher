@@ -88,21 +88,13 @@ export const addDevWindowListeners = (
   ipcMain.on(AppChannel.CHANGE_DEV_WINDOW_STATE, (
     event,
     isOpen: boolean,
-    isCloseEvent = false,
   ) => {
     if (devWindow && isOpen !== undefined) {
-      if (isCloseEvent) {
-        devWindow.close();
+      if (isOpen) {
+        devWindow.show();
+        devWindow.focus();
       } else {
-        if (isOpen) {
-          devWindow.show();
-          devWindow.focus();
-        } else {
-          devWindow.hide();
-        }
-
-        devWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, isOpen);
-        mainWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, isOpen);
+        devWindow.close();
       }
     }
   });
@@ -119,8 +111,6 @@ export const addDevWindowListeners = (
       AppWindowName.DEV,
       isMax,
     );
-
-    mainWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, true);
   });
 
   devWindow.on('maximize', () => {
@@ -139,11 +129,16 @@ export const addDevWindowListeners = (
     );
   });
 
+  devWindow.on('show', (event) => {
+    mainWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, true);
+    devWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, true);
+  });
+
   devWindow.on('close', (event) => {
     // Изменено ввиду проблем с закрытием окон из панели задач системы
     event.preventDefault();
     mainWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false);
-    devWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false, true);
+    devWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false);
     devWindow.hide();
     mainWindow.focus();
   });

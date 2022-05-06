@@ -6,6 +6,7 @@ interface IButtonProps {
   name?: string,
   className?: string,
   isDisabled?: boolean,
+  isAutofocus?: boolean,
   children: string | ReactElement | [string | ReactElement, string | ReactElement],
   isSubmit?: boolean,
   tabIndex?: number,
@@ -21,6 +22,7 @@ export const Button: React.FunctionComponent<IButtonProps> = memo(({
   className = '',
   isSubmit,
   isDisabled,
+  isAutofocus,
   tabIndex = 0,
   btnPath,
   btnArgs,
@@ -44,6 +46,7 @@ export const Button: React.FunctionComponent<IButtonProps> = memo(({
       disabled={Boolean(isDisabled)}
       id={id}
       name={name}
+      autoFocus={isAutofocus}
       tabIndex={tabIndex}
       data-path={btnPath}
       data-args={btnArgs}

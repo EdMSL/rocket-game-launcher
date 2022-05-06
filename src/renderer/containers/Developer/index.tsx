@@ -27,7 +27,7 @@ export const Developer: React.FC = () => {
   /* eslint-enable max-len */
 
   const closeDevWindow = useCallback(() => {
-    ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false, true);
+    ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false);
   }, []);
 
   /* eslint-disable react/jsx-props-no-spreading */

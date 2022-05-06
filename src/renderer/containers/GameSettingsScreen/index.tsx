@@ -72,6 +72,7 @@ export const GameSettingsScreen: React.FC = () => {
           dispatch(setIsDeveloperMode(true));
         } else {
           dispatch(setIsDeveloperMode(false));
+          document.querySelector<HTMLLinkElement>('a')?.focus();
         }
       }
     });

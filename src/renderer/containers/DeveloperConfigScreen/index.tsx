@@ -83,15 +83,9 @@ export const DeveloperConfigScreen: React.FC = () => {
   useEffect(() => {
     ipcRenderer.on(AppChannel.CHANGE_DEV_WINDOW_STATE, (
       event,
-      isOpen: boolean,
-      isByCloseWindowBtnClick: boolean,
+      isOpened: boolean,
     ) => {
-      if (
-        isOpen !== undefined
-        && isByCloseWindowBtnClick !== undefined
-        && !isOpen
-        && isByCloseWindowBtnClick
-      ) {
+      if (isOpened !== undefined && !isOpened) {
         resetConfigChanges();
       }
     });
