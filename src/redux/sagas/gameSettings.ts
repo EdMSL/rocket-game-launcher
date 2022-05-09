@@ -72,6 +72,8 @@ import {
   PathRegExp,
   Encoding,
   GameSettingsFileView,
+  modOrganizerProfileSection,
+  modOrganizerProfileParam,
 } from '$constants/misc';
 import {
   getParameterRegExp,
@@ -155,8 +157,6 @@ function* getDataFromMOIniSaga(): SagaIterator<string> {
         config: {
           modOrganizer: {
             version,
-            profileSection,
-            profileParam,
           },
         },
         pathVariables,
@@ -168,10 +168,10 @@ function* getDataFromMOIniSaga(): SagaIterator<string> {
       pathVariables['%MO_INI%'],
     );
 
-    const currentMOProfileIniSection = iniData.getSection(profileSection);
+    const currentMOProfileIniSection = iniData.getSection(modOrganizerProfileSection);
 
     if (currentMOProfileIniSection) {
-      const profileName = currentMOProfileIniSection.getValue(profileParam);
+      const profileName = currentMOProfileIniSection.getValue(modOrganizerProfileParam);
 
       if (profileName) {
         if (version === 1) {
@@ -187,7 +187,7 @@ function* getDataFromMOIniSaga(): SagaIterator<string> {
 
       throw new CustomError('profileName');
     } else {
-      throw new CustomError('profileSection');
+      throw new CustomError('modOrganizerProfileSection');
     }
   } catch (error: any) {
     let errorMessage = '';
@@ -441,8 +441,6 @@ function* changeMOProfileSaga(
       main: {
         config: {
           modOrganizer: {
-            profileSection,
-            profileParam,
             version,
           },
         },
@@ -457,9 +455,8 @@ function* changeMOProfileSaga(
 
     changeSectionalIniParameter(
       iniData,
-      profileSection,
-      profileParam,
-      ///TODO Переделать на поддержку кастомного RegExp
+      modOrganizerProfileSection,
+      modOrganizerProfileParam,
       version === 1 ? newMOProfile : `@ByteArray(${newMOProfile})`,
     );
 

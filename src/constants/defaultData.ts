@@ -64,8 +64,6 @@ export const defaultModOrganizerParams: IModOrganizerParams = {
   pathToINI: '%MO_DIR%\\ModOrganizer.ini',
   pathToProfiles: '%MO_DIR%\\profiles',
   pathToMods: '%MO_DIR%\\mods',
-  profileSection: 'General',
-  profileParam: 'selected_profile',
 };
 
 export const defaultLauncherConfig: ILauncherConfig = {

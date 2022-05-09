@@ -73,8 +73,6 @@ export interface IModOrganizerParams {
   pathToINI: string,
   pathToProfiles: string,
   pathToMods: string,
-  profileSection: string,
-  profileParam: string,
 }
 
 export interface ILauncherConfig extends IWindowSettings {

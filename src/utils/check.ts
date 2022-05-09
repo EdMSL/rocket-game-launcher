@@ -125,8 +125,6 @@ const configFileDataSchema = Joi.object<ILauncherConfig>({
     pathToINI: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToINI).pattern(PathRegExp.MO_DIR, 'correct path'),
     pathToProfiles: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToProfiles).pattern(PathRegExp.MO_DIR, 'correct path'),
     pathToMods: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToMods).pattern(PathRegExp.MO_DIR, 'correct path'),
-    profileSection: Joi.string().optional(),
-    profileParam: Joi.string().optional(),
   }).optional().default(defaultLauncherConfig.modOrganizer),
   documentsPath: Joi.string().optional().allow('').default(defaultLauncherConfig.documentsPath)
     .pattern(PathRegExp.DOCUMENTS, 'correct path'),

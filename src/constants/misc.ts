@@ -118,3 +118,6 @@ export enum AppChannel {
   APP_STORE_UPDATED = 'app store updated',
   CHANGE_DEV_WINDOW_STATE = 'change dev window state',
 }
+
+export const modOrganizerProfileSection = 'General';
+export const modOrganizerProfileParam = 'selected_profile';
