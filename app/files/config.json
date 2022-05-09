@@ -1,21 +1,20 @@
 {
   "isResizable": true,
-  "width": 801,
+  "width": 800,
   "height": 800,
   "minWidth": 400,
   "minHeight": 400,
   "maxWidth": 900,
   "maxHeight": 0,
   "modOrganizer": {
-    "isUsed": true,
+    "isUsed": false,
     "version": 2,
     "pathToMOFolder": "%GAME_DIR%\\Mod Organizer",
     "pathToINI": "%MO_DIR%\\ModOrganizer.ini",
     "pathToProfiles": "%MO_DIR%\\profiles",
     "pathToMods": "%MO_DIR%\\mods",
     "profileSection": "General",
-    "profileParam": "selected_profile",
-    "profileParamValueRegExp": ""
+    "profileParam": "selected_profile"
   },
   "documentsPath": "%DOCUMENTS%\\My Games\\Oblivion_GBR-bac\\__MO_Saves",
   "isFirstLaunch": false,

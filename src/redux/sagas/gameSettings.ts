@@ -157,7 +157,6 @@ function* getDataFromMOIniSaga(): SagaIterator<string> {
             version,
             profileSection,
             profileParam,
-            profileParamValueRegExp,
           },
         },
         pathVariables,
@@ -175,18 +174,6 @@ function* getDataFromMOIniSaga(): SagaIterator<string> {
       const profileName = currentMOProfileIniSection.getValue(profileParam);
 
       if (profileName) {
-        ///TODO Обработать случай для кастомного regexp
-        if (profileParamValueRegExp) {
-          const result = profileName.match(new RegExp(profileParamValueRegExp)) || [];
-
-          if (result.length > 0) {
-            // eslint-disable-next-line prefer-destructuring
-            return result[1];
-          }
-
-          throw new CustomError('profileParamValueRegExp');
-        }
-
         if (version === 1) {
           return profileName.toString();
         }
