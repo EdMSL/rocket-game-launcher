@@ -13,8 +13,8 @@ import { Routes } from '$constants/routes';
 import { useAppSelector } from '$store/store';
 import {
   generateSelectOptions,
-  getChangedGameSettingsOptions,
-  getGameSettingsOptionsWithNewValues,
+  getChangedGameSettingsParameters,
+  getGameSettingsParametersWithNewValues,
 } from '$utils/data';
 import { GameSettingsContent } from '$components/App/GameSettingsContent';
 import { GameSettingsFormControls } from '$components/App/GameSettingsFormControls';
@@ -22,10 +22,10 @@ import { Select } from '$components/UI/Select';
 import {
   changeMoProfile,
   saveGameSettingsFiles,
-  setGameSettingsOptions,
-  updateGameSettingsOptions,
+  setGameSettingsParameters,
+  updateGameSettingsParameters,
 } from '$actions/gameSettings';
-import { IGameSettingsConfig, IGameSettingsOptions } from '$types/gameSettings';
+import { IGameSettingsConfig, IGameSettingsParameters } from '$types/gameSettings';
 import { Loader } from '$components/UI/Loader';
 import {
   createGameSettingsFilesBackup,
@@ -51,8 +51,8 @@ export const GameSettingsScreen: React.FC = () => {
   const isGameSettingsSaving = useAppSelector((state) => state.main.isGameSettingsSaving);
   const gameSettingsGroups = useAppSelector((state) => state.gameSettings.gameSettingsGroups);
   const gameSettingsFiles = useAppSelector((state) => state.gameSettings.gameSettingsFiles);
-  const gameSettingsParameters = useAppSelector((state) => state.gameSettings.gameSettingsParameters);
   const gameSettingsOptions = useAppSelector((state) => state.gameSettings.gameSettingsOptions);
+  const gameSettingsParameters = useAppSelector((state) => state.gameSettings.gameSettingsParameters);
   const moProfile = useAppSelector((state) => state.gameSettings.moProfile);
   const moProfiles = useAppSelector((state) => state.gameSettings.moProfiles);
   const isModOrganizerUsed = useAppSelector((state) => state.main.config.modOrganizer.isUsed);
@@ -60,7 +60,7 @@ export const GameSettingsScreen: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const [isGameOptionsChanged, setIsGameOptionsChanged] = useState<boolean>(false);
+  const [isGameParametersChanged, setIsGameParametersChanged] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isBackupsModalFirstOpen, setIsBackupsModalFirstOpen] = useState<boolean>(true);
   /* eslint-enable max-len */
@@ -87,7 +87,7 @@ export const GameSettingsScreen: React.FC = () => {
       }
 
       if (newConfig !== undefined) {
-        dispatch(updateGameSettingsOptions(newConfig));
+        dispatch(updateGameSettingsParameters(newConfig));
       }
     });
 
@@ -104,43 +104,43 @@ export const GameSettingsScreen: React.FC = () => {
   );
 
   const onSettingOptionChange = useCallback((
-    options: IGameSettingsOptions,
+    parameters: IGameSettingsParameters,
   ) => {
-    dispatch(setGameSettingsOptions(options));
+    dispatch(setGameSettingsParameters(parameters));
   }, [dispatch]);
 
   const onGameSettingsFormSubmit = useCallback((event) => {
     event.preventDefault();
 
-    if (isGameOptionsChanged) {
-      dispatch(saveGameSettingsFiles(getChangedGameSettingsOptions(gameSettingsOptions)));
+    if (isGameParametersChanged) {
+      dispatch(saveGameSettingsFiles(getChangedGameSettingsParameters(gameSettingsParameters)));
     }
-  }, [dispatch, gameSettingsOptions, isGameOptionsChanged]);
+  }, [dispatch, gameSettingsParameters, isGameParametersChanged]);
 
   const onRefreshSettingsBtnClick = useCallback(() => {
-    dispatch(updateGameSettingsOptions());
+    dispatch(updateGameSettingsParameters());
   }, [dispatch]);
 
   const onCancelSettingsBtnClick = useCallback(() => {
-    dispatch(setGameSettingsOptions(getGameSettingsOptionsWithNewValues(gameSettingsOptions, false)));
-    setIsGameOptionsChanged(false);
-  }, [dispatch, gameSettingsOptions]);
+    dispatch(setGameSettingsParameters(getGameSettingsParametersWithNewValues(gameSettingsParameters, false)));
+    setIsGameParametersChanged(false);
+  }, [dispatch, gameSettingsParameters]);
 
   ///TODO Пересмотреть механиз отслеживания изменения параметров для кнопок
   const getIsSaveResetSettingsButtonsDisabled = useCallback(() => {
     if (
-      Object.keys(getChangedGameSettingsOptions(gameSettingsOptions)).length > 0
+      Object.keys(getChangedGameSettingsParameters(gameSettingsParameters)).length > 0
       && !isGameSettingsFilesBackuping
     ) {
-      if (!isGameOptionsChanged) {
-        setIsGameOptionsChanged(true);
+      if (!isGameParametersChanged) {
+        setIsGameParametersChanged(true);
       }
       return false;
     }
 
     return true;
   },
-  [gameSettingsOptions, isGameOptionsChanged, isGameSettingsFilesBackuping]);
+  [gameSettingsParameters, isGameParametersChanged, isGameSettingsFilesBackuping]);
 
   const onCreateBackupBtnClick = useCallback(() => {
     setIsBackupsModalFirstOpen(true);
@@ -170,7 +170,7 @@ export const GameSettingsScreen: React.FC = () => {
               activeClassName="control-panel__btn--active"
               to={{
                 pathname: `${Routes.GAME_SETTINGS_SCREEN}/${group.name}`,
-                state: { isGameSettingsOptionsChanged: isGameOptionsChanged },
+                state: { isGameSettingsParametersChanged: isGameParametersChanged },
               }}
             >
               <span className={classNames('control-panel__btn-text')}>
@@ -193,7 +193,7 @@ export const GameSettingsScreen: React.FC = () => {
           isModOrganizerUsed
           && moProfile
           && moProfiles.length > 0
-          && (Object.keys(gameSettingsOptions).length > 0 || isGameSettingsLoaded)
+          && (Object.keys(gameSettingsParameters).length > 0 || isGameSettingsLoaded)
           && (
           <div className={styles['game-settings-screen__profiles']}>
             <Select
@@ -201,7 +201,7 @@ export const GameSettingsScreen: React.FC = () => {
               id="profiles-select"
               label="Профиль Mod Organizer"
               value={moProfile}
-              options={generateSelectOptions(moProfiles)}
+              selectOptions={generateSelectOptions(moProfiles)}
               onChange={onMOProfilesSelectChange}
             />
           </div>
@@ -221,8 +221,8 @@ export const GameSettingsScreen: React.FC = () => {
                   <React.Fragment>
                     <GameSettingsContent
                       isGameSettingsLoaded={isGameSettingsLoaded}
-                      gameSettingsOptions={gameSettingsOptions}
                       gameSettingsParameters={gameSettingsParameters}
+                      gameSettingsOptions={gameSettingsOptions}
                       gameSettingsFiles={gameSettingsFiles}
                       gameSettingsGroups={gameSettingsGroups}
                       onSettingOptionChange={onSettingOptionChange}
@@ -233,7 +233,7 @@ export const GameSettingsScreen: React.FC = () => {
             </Switch>
           </div>
           <GameSettingsFormControls
-            isGameOptionsChanged={getIsSaveResetSettingsButtonsDisabled()}
+            isGameParametersChanged={getIsSaveResetSettingsButtonsDisabled()}
             isBackuping={isGameSettingsFilesBackuping}
             isSaving={isGameSettingsSaving}
             isDeveloperMode={isDeveloperMode}

@@ -30,7 +30,7 @@ export enum GameSettingsFileView {
   TAG = 'tag',
 }
 
-export enum GameSettingControllerType {
+export enum UIControllerType {
   CHECKBOX = 'checkbox',
   RANGE = 'range',
   SELECT = 'select',

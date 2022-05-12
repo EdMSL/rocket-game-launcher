@@ -61,7 +61,7 @@ export const LauncherUserSettings: React.FC<IProps> = ({
     <div className={styles['launcher-settings__container']}>
       <Select
         className={styles['launcher-settings__item']}
-        options={generateSelectOptions(userThemes)}
+        selectOptions={generateSelectOptions(userThemes)}
         id="user-themes"
         value={userTheme}
         label="Тема"

@@ -1,3 +1,6 @@
+import { GameSettingsOptionType } from '$constants/misc';
+import { IGameSettingsOption } from './gameSettings';
+
 export type IError = 'error';
 export type ISuccess = 'success';
 
@@ -37,7 +40,7 @@ export interface IUIControllerCheckbox {
 }
 
 export interface IUIControllerSelect {
-  options: ISelectOption[],
+  selectOptions: ISelectOption[],
 }
 
 export interface IUIControllerTextField {
@@ -79,7 +82,7 @@ export interface IUserMessage extends IMessage {
 
 export interface ILocationState {
   isFromMainPage?: boolean,
-  isGameSettingsOptionsChanged?: boolean,
+  isGameSettingsParametersChanged?: boolean,
 }
 
 interface IIniLine {

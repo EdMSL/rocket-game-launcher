@@ -26,7 +26,7 @@ const initialState = {
         baseFilesEncoding: gameSettings.baseFilesEncoding,
         gameSettingsGroups: gameSettings.gameSettingsGroups,
         gameSettingsFiles: gameSettings.gameSettingsFiles,
-        gameSettingsParameters: gameSettings.initialGameSettingsParameters,
+        gameSettingsOptions: gameSettings.initialGameSettingsOptions,
       },
     } : {},
   },

@@ -1,30 +1,30 @@
 import {
-  Encoding, GameSettingControllerType, GameSettingsOptionType,
+  Encoding, UIControllerType, GameSettingsOptionType,
 } from '$constants/misc';
 
 export const GAME_SETTINGS_TYPES = {
-  SET_GAME_SETTINGS_OPTIONS: 'SET_GAME_SETTINGS_OPTIONS',
-  UPDATE_GAME_SETTINGS_OPTIONS: 'UPDATE_GAME_SETTINGS_OPTIONS',
+  SET_GAME_SETTINGS_PARAMETERS: 'SET_GAME_SETTINGS_PARAMETERS',
+  UPDATE_GAME_SETTINGS_PARAMETERS: 'UPDATE_GAME_SETTINGS_PARAMETERS',
   SET_GAME_SETTINGS_CONFIG: 'SET_GAME_SETTINGS_CONFIG',
   SET_GAME_SETTINGS_FILES: 'SET_GAME_SETTINGS_FILES',
-  SET_GAME_SETTINGS_PARAMETERS: 'SET_GAME_SETTINGS_PARAMETERS',
-  SET_INITIAL_GAME_SETTINGS_PARAMETERS: 'SET_INITIAL_GAME_SETTINGS_PARAMETERS',
+  SET_GAME_SETTINGS_OPTIONS: 'SET_GAME_SETTINGS_OPTIONS',
+  SET_INITIAL_GAME_SETTINGS_OPTIONS: 'SET_INITIAL_GAME_SETTINGS_OPTIONS',
   SAVE_GAME_SETTINGS_FILES: 'SAVE_GAME_SETTINGS_FILES',
   SET_MO_PROFILE: 'SET_MO_PROFILE',
-  CHANGE_MO_PROFILE: 'CHANGE_MO_PROFILE',
   SET_MO_PROFILES: 'SET_MO_PROFILES',
+  CHANGE_MO_PROFILE: 'CHANGE_MO_PROFILE',
 };
 
-export interface IGameSettingsOptionsItem {
+export interface IGameSettingsParameterElem {
   name: string,
   default: string,
   value: string,
-  parameter: string,
+  option: string,
   file: string,
 }
 
-export interface IGameSettingsOptions {
-  [key: string]: IGameSettingsOptionsItem,
+export interface IGameSettingsParameters {
+  [key: string]: IGameSettingsParameterElem,
 }
 
 export interface IGameSettingsGroup {
@@ -32,7 +32,7 @@ export interface IGameSettingsGroup {
   label: string,
 }
 
-export interface IGameSettingsParameterBase {
+export interface IGameSettingsOptionBase {
   id: string,
   optionType: GameSettingsOptionType,
   file: string,
@@ -41,31 +41,31 @@ export interface IGameSettingsParameterBase {
   settingGroup?: string,
 }
 
-export interface IGameSettingsItemParameter {
+export interface IGameSettingsOptionItem {
   id: string,
   name: string,
   iniGroup?: string,
   valueName?: string,
   valuePath?: string,
-  controllerType?: GameSettingControllerType,
-  options?: { [key: string]: string, },
+  controllerType?: UIControllerType,
+  selectOptions?: { [key: string]: string, },
   min?: number,
   max?: number,
   step?: number,
 }
 
-export interface IGameSettingsParameter extends IGameSettingsParameterBase {
+export interface IGameSettingsOption extends IGameSettingsOptionBase {
   name?: string,
   iniGroup?: string,
   valueName?: string,
   valuePath?: string,
-  controllerType?: GameSettingControllerType,
+  controllerType?: UIControllerType,
   separator?: string,
-  options?: { [key: string]: string, },
+  selectOptions?: { [key: string]: string, },
   min?: number,
   max?: number,
   step?: number,
-  items?: IGameSettingsItemParameter[],
+  items?: IGameSettingsOptionItem[],
 }
 
 export interface IGameSettingsFile {
@@ -78,19 +78,19 @@ export interface IGameSettingsFile {
 }
 
 export interface IGameSettingsConfig {
-  gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
   baseFilesEncoding: IGameSettingsRootState['baseFilesEncoding'],
+  gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
   gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
-  gameSettingsParameters: IGameSettingsRootState['gameSettingsParameters'],
+  gameSettingsOptions: IGameSettingsRootState['gameSettingsOptions'],
 }
 
 export type IGameSettingsRootState = Readonly<{
-  gameSettingsGroups: IGameSettingsGroup[],
   baseFilesEncoding: Encoding,
+  gameSettingsGroups: IGameSettingsGroup[],
   gameSettingsFiles: IGameSettingsFile[],
-  gameSettingsParameters: IGameSettingsParameter[],
-  initialGameSettingsParameters: IGameSettingsParameter[],
+  gameSettingsOptions: IGameSettingsOption[],
+  initialGameSettingsOptions: IGameSettingsOption[],
   moProfile: string,
   moProfiles: string[],
-  gameSettingsOptions: IGameSettingsOptions,
+  gameSettingsParameters: IGameSettingsParameters,
 }>;

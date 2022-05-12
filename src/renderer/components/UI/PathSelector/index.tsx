@@ -17,7 +17,7 @@ import { getIsPathWithVariableCorrect, IValidationData } from '$utils/check';
 
 interface IProps extends IUIElementParams, IUIControllerTextField {
   id: string,
-  options: ISelectOption[],
+  selectPathVariables: ISelectOption[],
   pathVariables: IPathVariables,
   extensions?: string[],
   isSelectDisabled?: boolean,
@@ -36,7 +36,7 @@ export const PathSelector: React.FC<IProps> = ({
   label,
   name,
   value,
-  options,
+  selectPathVariables,
   pathVariables,
   extensions,
   className = '',
@@ -46,13 +46,13 @@ export const PathSelector: React.FC<IProps> = ({
   multiparameters,
   validationErrors,
   isDisabled = false,
-  isSelectDisabled = options.length <= 1,
+  isSelectDisabled = selectPathVariables.length <= 1,
   selectorType = LauncherButtonAction.OPEN,
   isGameDocuments = true,
   onChange,
 }) => {
   const [pathVariable, pathValue] = getVariableAndValueFromPath(String(value));
-  const availablePathVariables = Object.values(options).map((option) => option.value);
+  const availablePathVariables = Object.values(selectPathVariables).map((option) => option.value);
 
   const [currentPathVariable, setCurrentPathVariable] = useState<string>(pathVariable);
   const [currentPathValue, setCurrentPathValue] = useState<string>(pathValue);
@@ -188,7 +188,7 @@ export const PathSelector: React.FC<IProps> = ({
           onChange={onPathVariableSelectChange}
         >
           {
-          options.map((option) => (
+          selectPathVariables.map((option) => (
             <option
               key={`option-${option.label}`}
               value={option.value}

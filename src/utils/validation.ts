@@ -1,6 +1,6 @@
 import { GameSettingsFileView, GameSettingsOptionType } from '$constants/misc';
 import { IValidationErrors } from '$types/common';
-import { IGameSettingsFile, IGameSettingsParameter } from '$types/gameSettings';
+import { IGameSettingsFile, IGameSettingsOption } from '$types/gameSettings';
 import { ILauncherConfig } from '$types/main';
 
 /**
@@ -164,16 +164,16 @@ export const validateNumberInputs = (
   return errors;
 };
 
-const validateParameterItemFields = (parameter: IGameSettingsParameter) => {
+const validateOptionItemFields = (option: IGameSettingsOption) => {
   let errors: IValidationErrors = {};
 
-  parameter.items?.forEach((item) => {
+  option.items?.forEach((item) => {
     if (item.name === '') {
       errors = getUniqueValidationErrors(
         errors,
         {
           [`name_${item.id}`]: ['empty value'],
-          [`${parameter.id}_name:${item.id}`]: ['item error'],
+          [`${option.id}_name:${item.id}`]: ['item error'],
         },
         item.name === '',
       );
@@ -184,7 +184,7 @@ const validateParameterItemFields = (parameter: IGameSettingsParameter) => {
         errors,
         {
           [`iniGroup_${item.id}`]: ['empty value'],
-          [`${parameter.id}_iniGroup:${item.id}`]: ['item error'],
+          [`${option.id}_iniGroup:${item.id}`]: ['item error'],
         },
         item.iniGroup === '',
       );
@@ -195,7 +195,7 @@ const validateParameterItemFields = (parameter: IGameSettingsParameter) => {
         errors,
         {
           [`valueName_${item.id}`]: ['empty value'],
-          [`${parameter.id}_valueName:${item.id}`]: ['item error'],
+          [`${option.id}_valueName:${item.id}`]: ['item error'],
         },
         item.valueName === '',
       );
@@ -206,7 +206,7 @@ const validateParameterItemFields = (parameter: IGameSettingsParameter) => {
         errors,
         {
           [`valuePath_${item.id}`]: ['empty value'],
-          [`${parameter.id}_valuePath:${item.id}`]: ['item error'],
+          [`${option.id}_valuePath:${item.id}`]: ['item error'],
         },
         item.valuePath === '',
       );
@@ -216,55 +216,55 @@ const validateParameterItemFields = (parameter: IGameSettingsParameter) => {
   return errors;
 };
 
-export const setParameterStartValidationErrors = (
-  parameter: IGameSettingsParameter,
+export const setOptionStartValidationErrors = (
+  option: IGameSettingsOption,
   file: IGameSettingsFile,
   currentErrors: IValidationErrors,
 ): IValidationErrors => {
   let errors: IValidationErrors = { ...currentErrors };
 
   if (
-    parameter.optionType === GameSettingsOptionType.DEFAULT
+    option.optionType === GameSettingsOptionType.DEFAULT
   ) {
     errors = getUniqueValidationErrors(
       errors,
-      { [`name_${parameter.id}`]: ['empty value'] },
-      parameter.name === '',
+      { [`name_${option.id}`]: ['empty value'] },
+      option.name === '',
     );
 
     if (file.view === GameSettingsFileView.SECTIONAL) {
       errors = getUniqueValidationErrors(
         errors,
-        { [`iniGroup_${parameter.id}`]: ['empty value'] },
-        parameter.iniGroup === '',
+        { [`iniGroup_${option.id}`]: ['empty value'] },
+        option.iniGroup === '',
       );
     } else if (GameSettingsFileView.TAG) {
       errors = getUniqueValidationErrors(
         errors,
         {
-          [`valueName_${parameter.id}`]: ['empty value'],
+          [`valueName_${option.id}`]: ['empty value'],
         },
-        parameter.valueName === '',
+        option.valueName === '',
       );
 
       errors = getUniqueValidationErrors(
         errors,
         {
-          [`valuePath_${parameter.id}`]: ['empty value'],
+          [`valuePath_${option.id}`]: ['empty value'],
         },
-        parameter.valuePath === '',
+        option.valuePath === '',
       );
     }
-  } else if (parameter.items!?.length > 0) {
-    errors = validateParameterItemFields(parameter);
+  } else if (option.items!?.length > 0) {
+    errors = validateOptionItemFields(option);
   }
 
   return errors;
 };
 
-export const validateParameterFields = (
+export const validateOptionFields = (
   target: EventTarget & (HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement),
-  parameter: IGameSettingsParameter,
+  option: IGameSettingsOption,
   currentErrors: IValidationErrors,
 ): IValidationErrors => {
   let errors: IValidationErrors = { ...currentErrors };
@@ -278,15 +278,15 @@ export const validateParameterFields = (
   }
 
   if (
-    parameter.optionType === GameSettingsOptionType.DEFAULT
+    option.optionType === GameSettingsOptionType.DEFAULT
   ) {
     errors = getUniqueValidationErrors(
       errors,
-      { [`name_${parameter.id}`]: ['empty value'] },
-      parameter.name === '',
+      { [`name_${option.id}`]: ['empty value'] },
+      option.name === '',
     );
-  } else if (parameter.items!?.length > 0) {
-    errors = validateParameterItemFields(parameter);
+  } else if (option.items!?.length > 0) {
+    errors = validateOptionItemFields(option);
   }
 
   return errors;

@@ -10,15 +10,15 @@ import { DeveloperScreenController } from '$components/Developer/DeveloperScreen
 import { IValidationErrors } from '$types/common';
 import { useDeveloperSelector } from '$store/store';
 import {
-  IGameSettingsConfig, IGameSettingsFile, IGameSettingsParameter,
+  IGameSettingsConfig, IGameSettingsFile, IGameSettingsOption,
 } from '$types/gameSettings';
 import {
   changeConfigArrayItem,
-  generateGameSettingsParameter,
-  getChangedParametersAfterFileDelete,
+  generateGameSettingsOption,
+  getChangedOptionsAfterFileDelete,
   getDefaultGameSettingsFile,
-  getDefaultGameSettingsParameter,
-  getFullParameter,
+  getDefaultGameSettingsOption,
+  getFullOption,
   getNewConfig,
 } from '$utils/data';
 import { checkObjectForEqual } from '$utils/check';
@@ -41,13 +41,13 @@ import { CreateUserMessage } from '$utils/message';
 import {
   addDeveloperMessages, saveGameSettingsConfig, updateConfig,
 } from '$actions/developer';
-import { GameSettingsParameterItem } from '$components/Developer/GameSettingsParameterItem';
+import { GameSettingsOptionItem } from '$components/Developer/GameSettingsOptionItem';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 import {
-  defaultFullGameSettingsParameter,
+  defaultFullGameSettingsOption,
 } from '$constants/defaultData';
-import { getUniqueValidationErrors, setParameterStartValidationErrors } from '$utils/validation';
+import { getUniqueValidationErrors, setOptionStartValidationErrors } from '$utils/validation';
 
 export const DeveloperGameSettingsScreen: React.FC = () => {
   /* eslint-disable max-len */
@@ -65,7 +65,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   const [isSettingsInitialized, setIsSettingsInitialized] = useState<boolean>(isGameSettingsConfigLoaded);
   const [lastAddedGroupName, setLastAddedGroupName] = useState<string>('');
   const [lastAddedFileId, setLastAddedFileId] = useState<string>('');
-  const [lastAddedParameterId, setLastAddedParameterId] = useState<string>('');
+  const [lastAddedOptionId, setLastAddedOptionId] = useState<string>('');
   /* eslint-enable max-len */
 
   const getPathFromPathSelector = useCallback(async (
@@ -121,7 +121,6 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     { currentTarget }: React.MouseEvent<HTMLButtonElement>,
   ) => {
     saveSettingsChanges(currentTarget.name === 'ok_save_config_btn');
-    ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false);
   }, [saveSettingsChanges]);
 
   const onCancelBtnClick = useCallback(() => {
@@ -192,7 +191,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     const newConfig = {
       ...currentConfig,
       gameSettingsGroups: newGroups,
-      gameSettingsParameters: currentConfig.gameSettingsParameters.map((param) => {
+      gameSettingsOptions: currentConfig.gameSettingsOptions.map((param) => {
         if (param.settingGroup === name) {
           return {
             ...param,
@@ -253,13 +252,13 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     fileId: string,
     fileData: IGameSettingsFile,
   ) => {
-    const changedParameters = currentConfig.gameSettingsParameters.map((param) => {
+    const changedOptions = currentConfig.gameSettingsOptions.map((param) => {
       if (param.file === fileData.name) {
-        return generateGameSettingsParameter(
+        return generateGameSettingsOption(
           param,
-          getFullParameter(defaultFullGameSettingsParameter, param),
+          getFullOption(defaultFullGameSettingsOption, param),
           fileData,
-        ).newParameter;
+        ).newOption;
       }
 
       return param;
@@ -268,7 +267,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     const newConfig = {
       ...currentConfig,
       gameSettingsFiles: changeConfigArrayItem(fileId, fileData, currentConfig.gameSettingsFiles),
-      gameSettingsParameters: changedParameters,
+      gameSettingsOptions: changedOptions,
     };
 
     setCurrentConfig(newConfig);
@@ -279,8 +278,8 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     const newConfig = {
       ...currentConfig,
       gameSettingsFiles: files,
-      gameSettingsParameters: getChangedParametersAfterFileDelete(
-        currentConfig.gameSettingsParameters,
+      gameSettingsOptions: getChangedOptionsAfterFileDelete(
+        currentConfig.gameSettingsOptions,
         files,
       ),
     };
@@ -296,51 +295,51 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     deleteGameSettingsFile(files);
   }, [currentConfig.gameSettingsFiles, deleteGameSettingsFile]);
 
-  const changeGameSettingsParameters = useCallback((
+  const changeGameSettingsOptions = useCallback((
     paramId: string,
-    paramData: IGameSettingsParameter,
+    paramData: IGameSettingsOption,
   ) => {
     changeCurrentConfig(
-      changeConfigArrayItem(paramId, paramData, currentConfig.gameSettingsParameters),
-      'gameSettingsParameters',
+      changeConfigArrayItem(paramId, paramData, currentConfig.gameSettingsOptions),
+      'gameSettingsOptions',
     );
   }, [currentConfig, changeCurrentConfig]);
 
-  const addGameSettingsParameter = useCallback(() => {
-    const paramerter = getDefaultGameSettingsParameter(currentConfig.gameSettingsFiles[0]);
+  const addGameSettingsOption = useCallback(() => {
+    const paramerter = getDefaultGameSettingsOption(currentConfig.gameSettingsFiles[0]);
 
-    setNewValidationErrors(setParameterStartValidationErrors(
+    setNewValidationErrors(setOptionStartValidationErrors(
       paramerter,
       currentConfig.gameSettingsFiles[0],
       validationErrors,
     ));
     changeCurrentConfig([
-      ...currentConfig.gameSettingsParameters,
+      ...currentConfig.gameSettingsOptions,
       paramerter,
     ],
-    'gameSettingsParameters');
-    setLastAddedParameterId(paramerter.id);
-  }, [currentConfig.gameSettingsParameters,
+    'gameSettingsOptions');
+    setLastAddedOptionId(paramerter.id);
+  }, [currentConfig.gameSettingsOptions,
     currentConfig.gameSettingsFiles,
     validationErrors,
     setNewValidationErrors,
     changeCurrentConfig]);
 
-  const deleteGameSettingsParameter = useCallback((params: IGameSettingsParameter[]) => {
-    changeCurrentConfig(params, 'gameSettingsParameters');
-    setLastAddedParameterId('');
+  const deleteGameSettingsOption = useCallback((params: IGameSettingsOption[]) => {
+    changeCurrentConfig(params, 'gameSettingsOptions');
+    setLastAddedOptionId('');
   }, [changeCurrentConfig]);
 
-  const deleteGameSettingsParameterById = useCallback((id: string) => {
+  const deleteGameSettingsOptionById = useCallback((id: string) => {
     changeCurrentConfig(
-      currentConfig.gameSettingsParameters.filter((item) => id !== item.id),
-      'gameSettingsParameters',
+      currentConfig.gameSettingsOptions.filter((item) => id !== item.id),
+      'gameSettingsOptions',
     );
-    setLastAddedParameterId('');
-  }, [currentConfig.gameSettingsParameters, changeCurrentConfig]);
+    setLastAddedOptionId('');
+  }, [currentConfig.gameSettingsOptions, changeCurrentConfig]);
 
-  const changeGameSettingsParameterOrder = useCallback((params: IGameSettingsParameter[]) => {
-    changeCurrentConfig(params, 'gameSettingsParameters');
+  const changeGameSettingsOptionOrder = useCallback((params: IGameSettingsOption[]) => {
+    changeCurrentConfig(params, 'gameSettingsOptions');
   }, [changeCurrentConfig]);
 
   /* eslint-disable react/jsx-props-no-spreading */
@@ -462,42 +461,42 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                 <p className="developer__subtitle">Игровые параметры</p>
                 <ul className={styles.developer__list}>
                   {
-                currentConfig.gameSettingsParameters.length > 0 && currentConfig.gameSettingsParameters.map((param, index) => (
-                  <SpoilerListItem<IGameSettingsParameter>
-                    key={param.id}
-                    item={param}
-                    items={currentConfig.gameSettingsParameters}
+                currentConfig.gameSettingsOptions.length > 0 && currentConfig.gameSettingsOptions.map((currentParameter, index) => (
+                  <SpoilerListItem<IGameSettingsOption>
+                    key={currentParameter.id}
+                    item={currentParameter}
+                    items={currentConfig.gameSettingsOptions}
                     position={index}
-                    summaryText={[param.label]}
-                    lastItemId={lastAddedParameterId}
+                    summaryText={[currentParameter.label]}
+                    lastItemId={lastAddedOptionId}
                     validationErrors={validationErrors}
-                    onDeleteItem={deleteGameSettingsParameter}
-                    onChangeOrderItem={changeGameSettingsParameterOrder}
+                    onDeleteItem={deleteGameSettingsOption}
+                    onChangeOrderItem={changeGameSettingsOptionOrder}
                   >
-                    <GameSettingsParameterItem
-                      parameter={param}
+                    <GameSettingsOptionItem
+                      option={currentParameter}
                       gameSettingsFiles={currentConfig.gameSettingsFiles}
                       gameSettingsGroups={currentConfig.gameSettingsGroups}
                       validationErrors={validationErrors}
-                      onParameterDataChange={changeGameSettingsParameters}
+                      onOptionDataChange={changeGameSettingsOptions}
                       onValidation={setNewValidationErrors}
-                      deleteParameter={deleteGameSettingsParameterById}
+                      deleteOption={deleteGameSettingsOptionById}
                     />
                   </SpoilerListItem>
                 ))
                 }
                   {
-                currentConfig.gameSettingsParameters.length === 0 && currentConfig.gameSettingsFiles.length !== 0
+                currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length !== 0
                 && <li> Нет игровых параметров</li>
                 }
                   {
-                currentConfig.gameSettingsParameters.length === 0 && currentConfig.gameSettingsFiles.length === 0
+                currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length === 0
                 && <li> Добавьте хотя бы один игровой файл, чтобы добавлять игровые параметры</li>
                 }
                 </ul>
                 <Button
                   className={classNames('main-btn', 'developer__btn')}
-                  onClick={addGameSettingsParameter}
+                  onClick={addGameSettingsOption}
                 >
                   Добавить
                 </Button>

@@ -19,16 +19,16 @@
       "encoding": ""
     }
   ],
-  "gameSettingsParameters": [
+  "gameSettingsOptions": [
     {
-      "file": "oudf7Xd78FdyIIvaq",
       "optionType": "combined",
-      "settingGroup": "7uED7Xd7gPyIIvlu",
+      "file": "oudf7Xd78FdyIIvaq",
       "label": "Разрешение экрана",
       "description": "Устанавливает разрешение экрана",
+      "settingGroup": "7uED7Xd7gPyIIvlu",
       "controllerType": "select",
       "separator": ":",
-      "options": {
+      "selectOptions": {
         "640:480": "640 x 480",
         "800:600": "800 x 600",
         "1024:768": "1024 x 768",
@@ -57,10 +57,11 @@
       ]
     },
     {
-      "file": "oudf7Xd78FdyIIvaq",
       "optionType": "default",
-      "settingGroup": "hgD38Xp63Pgq10lO",
+      "file": "oudf7Xd78FdyIIvaq",
       "label": "Громкость музыки",
+      "description": "Громкость музыки",
+      "settingGroup": "hgD38Xp63Pgq10lO",
       "name": "fDefaultMusicVolume",
       "iniGroup": "Audio",
       "controllerType": "range",

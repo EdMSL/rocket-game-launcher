@@ -9,11 +9,11 @@ export const INITIAL_STATE: IGameSettingsRootState = {
   gameSettingsGroups: defaultGameSettingsConfig.gameSettingsGroups,
   baseFilesEncoding: defaultGameSettingsConfig.baseFilesEncoding,
   gameSettingsFiles: defaultGameSettingsConfig.gameSettingsFiles,
-  gameSettingsParameters: defaultGameSettingsConfig.gameSettingsParameters,
-  initialGameSettingsParameters: defaultGameSettingsConfig.gameSettingsParameters,
+  gameSettingsOptions: defaultGameSettingsConfig.gameSettingsOptions,
+  initialGameSettingsOptions: defaultGameSettingsConfig.gameSettingsOptions,
   moProfile: '',
   moProfiles: [],
-  gameSettingsOptions: {},
+  gameSettingsParameters: {},
 };
 
 export const gameSettingsReducer = createReducer<IGameSettingsRootState>(

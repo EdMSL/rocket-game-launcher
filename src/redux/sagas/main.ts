@@ -31,7 +31,7 @@ import {
   setIsGameSettingsLoading,
 } from '$actions/main';
 import {
-  generateGameSettingsOptionsSaga,
+  generateGameSettingsParametersSaga,
   initGameSettingsSaga,
 } from '$sagas/gameSettings';
 import {
@@ -55,9 +55,9 @@ import {
 import { getPathToFile } from '$utils/strings';
 import { ILocationState, IUnwrap } from '$types/common';
 import {
-  setGameSettingsOptions, updateGameSettingsOptions,
+  setGameSettingsParameters, updateGameSettingsParameters,
 } from '$actions/gameSettings';
-import { getGameSettingsOptionsWithNewValues } from '$utils/data';
+import { getGameSettingsParametersWithNewValues } from '$utils/data';
 import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
 import { AppChannel } from '$constants/misc';
 
@@ -97,8 +97,8 @@ function* initLauncherSaga(): SagaIterator {
   }
 }
 
-function* updateGameSettingsOptionsSaga(
-  { payload: gameSetingsConfig }: ReturnType<typeof updateGameSettingsOptions>,
+function* updateGameSettingsParametersSaga(
+  { payload: gameSetingsConfig }: ReturnType<typeof updateGameSettingsParameters>,
 ): SagaIterator {
   try {
     yield put(setIsGameSettingsAvailable(false));
@@ -131,7 +131,7 @@ function* updateGameSettingsOptionsSaga(
       }
 
       writeToLogFileSync(
-        `An error occured during update game settings options: ${errorMessage}`,
+        `An error occured during update game settings parameters: ${errorMessage}`,
         LogMessageType.ERROR,
       );
 
@@ -354,19 +354,19 @@ function* restoreGameSettingsFilesBackupSaga({
     const {
       gameSettings: {
         gameSettingsFiles,
-        gameSettingsParameters,
+        gameSettingsOptions,
         moProfile,
       },
     }: ReturnType<typeof getState> = yield select(getState);
 
-    const { gameSettingsOptions }: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
-      generateGameSettingsOptionsSaga,
+    const { gameSettingsParameters }: SagaReturnType<typeof generateGameSettingsParametersSaga> = yield call(
+      generateGameSettingsParametersSaga,
       gameSettingsFiles,
-      gameSettingsParameters,
+      gameSettingsOptions,
       moProfile,
     );
 
-    yield put(setGameSettingsOptions(gameSettingsOptions));
+    yield put(setGameSettingsParameters(gameSettingsParameters));
   } catch (error: any) {
     let errorMessage = '';
 
@@ -444,27 +444,29 @@ function* locationChangeSaga(
           const {
             gameSettings: {
               gameSettingsFiles,
-              gameSettingsParameters,
+              gameSettingsOptions,
               moProfile,
             },
           }: ReturnType<typeof getState> = yield select(getState);
 
           const {
-            gameSettingsOptions: options,
-          }: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
-            generateGameSettingsOptionsSaga,
+            gameSettingsParameters: parameters,
+          }: SagaReturnType<typeof generateGameSettingsParametersSaga> = yield call(
+            generateGameSettingsParametersSaga,
             gameSettingsFiles,
-            gameSettingsParameters,
+            gameSettingsOptions,
             moProfile,
           );
 
-          yield put(setGameSettingsOptions(options));
-        } else if (location.state?.isGameSettingsOptionsChanged) {
+          yield put(setGameSettingsParameters(parameters));
+        } else if (location.state?.isGameSettingsParametersChanged) {
           const {
-            gameSettings: { gameSettingsOptions },
+            gameSettings: { gameSettingsParameters },
           }: ReturnType<typeof getState> = yield select(getState);
 
-          yield put(setGameSettingsOptions(getGameSettingsOptionsWithNewValues(gameSettingsOptions, false)));
+          yield put(setGameSettingsParameters(
+            getGameSettingsParametersWithNewValues(gameSettingsParameters, false),
+          ));
         }
       } else if (!isLauncherInitialised) {
         yield put(push(`${Routes.MAIN_SCREEN}`));
@@ -483,5 +485,5 @@ export default function* mainSaga(): SagaIterator {
   yield takeLatest(MAIN_TYPES.DELETE_GAME_SETTINGS_FILES_BACKUP, deleteGameSettingsFilesBackupSaga);
   yield takeLatest(MAIN_TYPES.RENAME_GAME_SETTINGS_FILES_BACKUP, renameGameSettingsFilesBackupSaga);
   yield takeLatest(MAIN_TYPES.RESTORE_GAME_SETTINGS_FILES_BACKUP, restoreGameSettingsFilesBackupSaga);
-  yield takeLatest(GAME_SETTINGS_TYPES.UPDATE_GAME_SETTINGS_OPTIONS, updateGameSettingsOptionsSaga);
+  yield takeLatest(GAME_SETTINGS_TYPES.UPDATE_GAME_SETTINGS_PARAMETERS, updateGameSettingsParametersSaga);
 }

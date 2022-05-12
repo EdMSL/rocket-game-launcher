@@ -35,12 +35,12 @@ export const iconvDecode = (str: string, encoding = Encoding.CP866): string => i
 
 /**
  * Асинхронно получить содержимое папки.
- * @param pathToDirectory Путь к папке.
+ * @param directoryPath Путь к папке.
  * @returns Массив с именами файлов\папок.
 */
 export const readDirectory = (
-  pathToDirectory: string,
-): Promise<string[]> => fsPromises.readdir(pathToDirectory)
+  directoryPath: string,
+): Promise<string[]> => fsPromises.readdir(directoryPath)
   .then((data) => data)
   .catch((error) => {
     const readWriteError = getReadWriteError(error, true);
@@ -48,34 +48,34 @@ export const readDirectory = (
     throw new ReadWriteError(
       `Can't read directory. ${readWriteError.message}`,
       readWriteError,
-      pathToDirectory,
+      directoryPath,
     );
   });
 
 /**
  * Синхронно получить содержимое папки.
- * @param pathToDirectory Путь к папке.
+ * @param directoryPath Путь к папке.
  * @returns Массив с именами файлов\папок.
 */
 export const readDirectorySync = (
-  pathToDirectory: string,
+  directoryPath: string,
 ): string[] => {
   try {
-    return fs.readdirSync(pathToDirectory);
+    return fs.readdirSync(directoryPath);
   } catch (error: any) {
     const readWriteError = getReadWriteError(error, true);
 
     throw new ReadWriteError(
       `Can't read folder. ${readWriteError.message}`,
       readWriteError,
-      pathToDirectory,
+      directoryPath,
     );
   }
 };
 
 /**
  * Синхронно создать папку.
- * @param pathToDirectory Путь к папке.
+ * @param directoryPath Путь к новой папке.
 */
 export const createFolderSync = (directoryPath: string): void => {
   try {
@@ -95,28 +95,30 @@ export const createFolderSync = (directoryPath: string): void => {
 
 /**
  * Асинхронно удалить папку.
- * @param pathToFolder Путь до удаляемой папки.
+ * @param directoryPath Путь до удаляемой папки.
 */
-export const deleteFolder = (pathToFolder: string): Promise<void> => fsPromises.rmdir(pathToFolder)
+export const deleteFolder = (
+  directoryPath: string,
+): Promise<void> => fsPromises.rmdir(directoryPath)
   .catch((error) => {
     const readWriteError = getReadWriteError(error);
 
     throw new ReadWriteError(
       `Can't delete folder. ${readWriteError.message}`,
       readWriteError,
-      pathToFolder,
+      directoryPath,
     );
   });
 
 /**
  * Синхронно скопировать файл в указанную папку.
- * @param pathToFile Путь к файлу.
+ * @param filePath Путь к файлу.
  * @param destinationPath Путь к папке, куда требуется копировать файл.
 */
-export const createCopyFileSync = (pathToFile: string, destinationPath: string): void => {
+export const createCopyFileSync = (filePath: string, destinationPath: string): void => {
   try {
     fs.copyFileSync(
-      pathToFile,
+      filePath,
       destinationPath,
     );
   } catch (error: any) {
@@ -125,58 +127,58 @@ export const createCopyFileSync = (pathToFile: string, destinationPath: string):
     throw new ReadWriteError(
       `Can't copy file. ${readWriteError.message}`,
       readWriteError,
-      pathToFile,
+      filePath,
     );
   }
 };
 
 /**
  * Асинхронно скопировать файл в указанную папку.
- * @param pathToFile Путь к файлу.
+ * @param filePath Путь к файлу.
  * @param destinationPath Путь к папке, куда требуется копировать файл.
 */
 export const createCopyFile = (
-  pathToFile: string,
+  filePath: string,
   destinationPath: string,
-): Promise<void> => fsPromises.copyFile(pathToFile, destinationPath)
+): Promise<void> => fsPromises.copyFile(filePath, destinationPath)
   .catch((error) => {
     const readWriteError = getReadWriteError(error);
 
     throw new ReadWriteError(
       `Can't copy file. ${readWriteError.message}`,
       readWriteError,
-      pathToFile,
+      filePath,
     );
   });
 
 /**
  * Асинхронно удалить файл.
- * @param pathToFile Путь до удаляемого файла.
+ * @param filePath Путь до удаляемого файла.
 */
-export const deleteFile = (pathToFile: string): Promise<void> => fsPromises.unlink(pathToFile)
+export const deleteFile = (filePath: string): Promise<void> => fsPromises.unlink(filePath)
   .catch((error) => {
     const readWriteError = getReadWriteError(error);
 
     throw new ReadWriteError(
       `Can't delete file. ${readWriteError.message}`,
       readWriteError,
-      pathToFile,
+      filePath,
     );
   });
 
 /**
- * Асинхронно переименовать файл.
- * @param pathToFile Путь до файла.
+ * Асинхронно переименовать файл/папку.
+ * @param oldPath Путь до файла/папки.
  * @param newName Новое имя файла/папки
- * @param isDir Переименование для директории или нет.
+ * @param isDir Переименование папки?.
 */
 export const renameFileOrFolder = (
-  pathToFile: string,
+  oldPath: string,
   newName: string,
   isDir = false,
 ): Promise<void> => fsPromises.rename(
-  pathToFile,
-  path.join(path.dirname(pathToFile), newName),
+  oldPath,
+  path.join(path.dirname(oldPath), newName),
 )
   .catch((error) => {
     const readWriteError = getReadWriteError(error, isDir);
@@ -184,23 +186,23 @@ export const renameFileOrFolder = (
     throw new ReadWriteError(
       `Can't rename ${isDir ? 'folder' : 'file'}. ${readWriteError.message}`,
       readWriteError,
-      pathToFile,
+      oldPath,
     );
   });
 
 /**
  * Синхронно считать данные из файла.
- * @param pathToFile Путь к файлу.
+ * @param filePath Путь к файлу.
  * @param encoding Кодировка считываемого файла. По-умолчанию `'utf8'`.
  * @returns Строка с данными из файла.
 */
 ///TODO: Добавить проверку на тип файла: текстовый или нет
 export const readFileDataSync = (
-  pathToFile: string,
+  filePath: string,
   encoding: BufferEncoding = Encoding.UTF8 as BufferEncoding,
 ): string => {
   try {
-    if (typeof pathToFile === 'number') {
+    if (typeof filePath === 'number') {
       throw new CustomError(
         ErrorMessage.ARG_TYPE,
         ErrorName.ARG_TYPE,
@@ -208,26 +210,26 @@ export const readFileDataSync = (
       );
     }
 
-    return fs.readFileSync(pathToFile, encoding);
+    return fs.readFileSync(filePath, encoding);
   } catch (error: any) {
     const readWriteError = getReadWriteError(error);
 
     throw new ReadWriteError(
       `Can't read file. ${readWriteError.message}`,
       readWriteError,
-      pathToFile,
+      filePath,
     );
   }
 };
 
 /**
  * Асинхронно получить данные из файла.
- * @param pathToFile Путь к файлу.
+ * @param filePath Путь к файлу.
  * @returns Buffer с данными из файла.
 */
 export const readFileData = (
-  pathToFile: string,
-): Promise<Buffer> => fsPromises.readFile(pathToFile)
+  filePath: string,
+): Promise<Buffer> => fsPromises.readFile(filePath)
   .then((data) => data)
   .catch((error) => {
     const readWriteError = getReadWriteError(error);
@@ -235,23 +237,23 @@ export const readFileData = (
     throw new ReadWriteError(
       `Can't read file. ${readWriteError.message}`,
       readWriteError,
-      pathToFile,
+      filePath,
     );
   });
 
 /**
  * Синхронно получить данные из JSON файла.
- * @param pathToFile Путь к файлу.
+ * @param filePath Путь к файлу.
  * @param isWriteToLog Делать ли запись об ошибке в файле лога.
  * @returns Объект с данными из файла.
 */
-export const readJSONFileSync = <T>(pathToFile: string, isWriteToLog = true): T => {
+export const readJSONFileSync = <T>(filePath: string, isWriteToLog = true): T => {
   try {
     if (
-      pathToFile !== null
-      && pathToFile !== undefined
-      && path.extname(pathToFile.toString())
-      && !mime.getType(pathToFile)?.match(/application\/json/)
+      filePath !== null
+      && filePath !== undefined
+      && path.extname(filePath.toString())
+      && !mime.getType(filePath)?.match(/application\/json/)
     ) {
       throw new CustomError(
         'The file must have the extension .json',
@@ -259,13 +261,13 @@ export const readJSONFileSync = <T>(pathToFile: string, isWriteToLog = true): T 
       );
     }
 
-    const JSONstring = readFileDataSync(pathToFile);
+    const JSONstring = readFileDataSync(filePath);
 
     return parseJSON<T>(JSONstring);
   } catch (error: any) {
     if (isWriteToLog) {
       writeToLogFileSync(
-        `Message: ${error.message}. Path: '${pathToFile}'.`,
+        `Message: ${error.message}. Path: '${filePath}'.`,
         LogMessageType.ERROR,
       );
     }
@@ -276,16 +278,16 @@ export const readJSONFileSync = <T>(pathToFile: string, isWriteToLog = true): T 
 
 /**
  * Асинхронно получить данные из JSON файла.
- * @param pathToFile Путь к файлу.
+ * @param filePath Путь к файлу.
  * @returns Объект с данными из файла.
 */
-export const readJSONFile = async <T>(pathToFile: string): Promise<T> => {
+export const readJSONFile = async <T>(filePath: string): Promise<T> => {
   try {
     if (
-      pathToFile !== null
-      && pathToFile !== undefined
-      && path.extname(pathToFile.toString())
-      && !mime.getType(pathToFile)?.match(/application\/json/)
+      filePath !== null
+      && filePath !== undefined
+      && path.extname(filePath.toString())
+      && !mime.getType(filePath)?.match(/application\/json/)
     ) {
       throw new CustomError(
         'The file must have the extension .json',
@@ -293,13 +295,13 @@ export const readJSONFile = async <T>(pathToFile: string): Promise<T> => {
       );
     }
 
-    const JSONstring = await readFileData(pathToFile)
+    const JSONstring = await readFileData(filePath)
       .then((dataBuffer) => dataBuffer.toString());
 
     return parseJSON<T>(JSONstring);
   } catch (error: any) {
     writeToLogFileSync(
-      `Message: ${error.message}. Path: '${pathToFile}'.`,
+      `Message: ${error.message}. Path: '${filePath}'.`,
       LogMessageType.ERROR,
     );
 
@@ -309,21 +311,21 @@ export const readJSONFile = async <T>(pathToFile: string): Promise<T> => {
 
 /**
  * Асинхронно получить данные из INI файла.
- * @param pathToFile Путь к файлу.
+ * @param filePath Путь к файлу.
  * @param encoding Кодировка файла. По умолчанию `win1251`.
  * @returns Объект с данными из файла.
 */
 export const readINIFile = async (
-  pathToFile: string,
+  filePath: string,
   encoding = Encoding.WIN1251,
 ): Promise<IIniObj> => {
   try {
-    const INIData = await readFileData(pathToFile);
+    const INIData = await readFileData(filePath);
 
     return new Ini(iconv.decode(INIData, encoding));
   } catch (error: any) {
     writeToLogFileSync(
-      `Message: ${error.message}. Path: '${pathToFile}'.`,
+      `Message: ${error.message}. Path: '${filePath}'.`,
       LogMessageType.ERROR,
     );
 
@@ -333,19 +335,19 @@ export const readINIFile = async (
 
 /**
  * Асинхронно получить данные из XML файла или файла со схожей структурой.
- * @param pathToFile Путь к файлу.
+ * @param filePath Путь к файлу.
  * @param isWithPrefix Добавлять ли префикс к именам атрибутов.
  * Для последующей правильной записи файла ставим `true`.
  * @param encoding Кодировка файла. По умолчанию `win1251`.
  * @returns Объект с данными из файла.
 */
 export const readXMLFile = async (
-  pathToFile: string,
+  filePath: string,
   isWithPrefix: boolean,
   encoding = Encoding.WIN1251,
 ): Promise<IXmlObj> => {
   try {
-    const XMLDataStr = await readFileData(pathToFile);
+    const XMLDataStr = await readFileData(filePath);
 
     return xmlParser.parse(iconv.decode(XMLDataStr, encoding), {
       attributeNamePrefix: isWithPrefix ? xmlAttributePrefix : '',
@@ -358,7 +360,7 @@ export const readXMLFile = async (
     });
   } catch (error: any) {
     writeToLogFileSync(
-      `Message: ${error.message}. Path: '${pathToFile}'.`,
+      `Message: ${error.message}. Path: '${filePath}'.`,
       LogMessageType.ERROR,
     );
 
@@ -373,7 +375,7 @@ export const readXMLFile = async (
  * @param moProfile Профиль МО.
  * @param isWithPrefix Нужно ли добавлять префикс к именам атрибутов.
 */
-export const readFileForGameSettingsOptions = async (
+export const readGameSettingsFile = async (
   file: IGameSettingsFile,
   pathVariables: IPathVariables,
   moProfile: string,
@@ -392,84 +394,57 @@ export const readFileForGameSettingsOptions = async (
     [file.name]: fileData,
   };
 };
-/**
- * Асинхронно получить данные из файла для последующей генерации игровых настроек.
- * @param pathToFile Путь к файлу.
- * @param fileView Структура(вид) файла. На его основе определяется метод для чтения файла.
- * @param name Имя для определения файла при генерации опций.
- * @param encoding Кодировка файла.
- * @param isWithPrefix Нужно ли добавлять префикс к именам атрибутов.
-*/
-// export const readFileForGameSettingsOptions = async (
-//   pathToFile: string,
-//   fileView: string,
-//   name: string,
-//   encoding: string,
-//   isWithPrefix: boolean,
-// ): Promise<{ [key: string]: IIniObj|IXmlObj, }> => {
-//   let fileData: IIniObj|IXmlObj = {};
-
-//   if (fileView === GameSettingsFileView.LINE || fileView === GameSettingsFileView.SECTIONAL) {
-//     fileData = await readINIFile(pathToFile, encoding);
-//   } else if (fileView === GameSettingsFileView.TAG) {
-//     fileData = await readXMLFile(pathToFile, isWithPrefix, encoding);
-//   }
-
-//   return {
-//     [name]: fileData,
-//   };
-// };
 
 /**
  * Синхронно записать файл.
- * @param pathToFile Путь к файлу.
+ * @param filePath Путь к файлу.
  * @param data Данные для записи в файл, строка или буфер.
 */
-export const writeFileDataSync = (pathToFile: string, data: string|Buffer): void => {
+export const writeFileDataSync = (filePath: string, data: string|Buffer): void => {
   try {
-    fs.writeFileSync(pathToFile, data);
+    fs.writeFileSync(filePath, data);
   } catch (error: any) {
     const readWriteError = getReadWriteError(error);
 
     throw new ReadWriteError(
       `Can't write file. ${readWriteError.message}`,
       readWriteError,
-      pathToFile,
+      filePath,
     );
   }
 };
 
 /**
  * Асинхронно записать файл.
- * @param pathToFile Путь к файлу.
+ * @param filePath Путь к файлу.
  * @param data Данные для записи в файл, строка или буфер.
 */
 export const writeFileData = (
-  pathToFile: string,
+  filePath: string,
   data: string|Buffer,
-): Promise<void> => fsPromises.writeFile(pathToFile, data)
+): Promise<void> => fsPromises.writeFile(filePath, data)
   .catch((error) => {
     const readWriteError = getReadWriteError(error);
 
     throw new ReadWriteError(
       `Can't write file. ${readWriteError.message}`,
       readWriteError,
-      pathToFile,
+      filePath,
     );
   });
 
 /**
  * Асинхронно записать JSON файл.
- * @param pathToFile Путь к файлу.
+ * @param filePath Путь к файлу.
  * @param data Данные для записи в файл, строка или буфер.
 */
 export const writeJSONFile = (
-  pathToFile: string,
+  filePath: string,
   data: { [key: string]: any, },
-): Promise<void> => writeFileData(pathToFile, JSON.stringify(data, null, 2))
+): Promise<void> => writeFileData(filePath, JSON.stringify(data, null, 2))
   .catch((error) => {
     writeToLogFile(
-      `Message: ${error.message}. Path: '${pathToFile}'`,
+      `Message: ${error.message}. Path: '${filePath}'`,
       LogMessageType.ERROR,
     );
 
@@ -478,18 +453,18 @@ export const writeJSONFile = (
 
 /**
  * Асинхронно записать INI файл.
- * @param pathToFile Путь к файлу.
+ * @param filePath Путь к файлу.
  * @param iniDataObj Данные для записи в файл.
  * @param encoding Кодировка записываемого файла.
 */
 export const writeINIFile = (
-  pathToFile: string,
+  filePath: string,
   iniDataObj: IIniObj,
   encoding: string,
-): Promise<void> => writeFileData(pathToFile, iconv.encode(iniDataObj.stringify(), encoding))
+): Promise<void> => writeFileData(filePath, iconv.encode(iniDataObj.stringify(), encoding))
   .catch((error) => {
     writeToLogFile(
-      `Message: ${error.message}. Path: '${pathToFile}'`,
+      `Message: ${error.message}. Path: '${filePath}'`,
       LogMessageType.ERROR,
     );
 
@@ -498,16 +473,16 @@ export const writeINIFile = (
 
 /**
  * Асинхронно записать XML файл.
- * @param pathToFile Путь к файлу.
+ * @param filePath Путь к файлу.
  * @param xmlDataObj Данные для записи в файл.
  * @param encoding Кодировка записываемого файла.
 */
 export const writeXMLFile = (
-  pathToFile: string,
+  filePath: string,
   xmlDataObj: IXmlObj,
   encoding: string,
 ): Promise<void> => writeFileData(
-  pathToFile,
+  filePath,
   iconv.encode(new XMLParserForWrite({
     format: true,
     ignoreAttributes: false,
@@ -519,7 +494,7 @@ export const writeXMLFile = (
 )
   .catch((error) => {
     writeToLogFile(
-      `Message: ${error.message}. Path: '${pathToFile}'`,
+      `Message: ${error.message}. Path: '${filePath}'`,
       LogMessageType.ERROR,
     );
 
@@ -527,20 +502,20 @@ export const writeXMLFile = (
   });
 
 export const writeGameSettingsFile = async (
-  pathToFile: string,
+  filePath: string,
   dataObj: IIniObj|IXmlObj,
   fileView: string,
   encoding: string,
 ): Promise<void> => {
   if (fileView === GameSettingsFileView.LINE || fileView === GameSettingsFileView.SECTIONAL) {
     await writeINIFile(
-      pathToFile,
+      filePath,
       dataObj as IIniObj,
       encoding,
     );
   } else if (fileView === GameSettingsFileView.TAG) {
     await writeXMLFile(
-      pathToFile,
+      filePath,
       dataObj,
       encoding,
     );

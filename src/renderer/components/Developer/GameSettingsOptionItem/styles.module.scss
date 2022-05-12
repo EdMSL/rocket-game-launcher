@@ -1,16 +1,16 @@
-.parameter__items {
+.option__items {
   @include reset-indents;
   margin-bottom: 10px;
 
   text-align: center;
 }
 
-.parameter__list {
+.option__list {
   @include reset-list;
   padding-left: var(--space-m);
 }
 
-.parameter__item {
+.option__item {
   margin-bottom: var(--space-m);
 
   &:last-child {
@@ -18,7 +18,7 @@
   }
 }
 
-.parameter__btn {
+.option__btn {
   align-self: center;
   margin: auto;
 }

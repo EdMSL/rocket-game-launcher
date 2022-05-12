@@ -9,7 +9,7 @@ interface IProps extends IUIElementProps<HTMLSelectElement>, IUIControllerSelect
   separator?: string,
 }
 
-const defaultOptionsArr = [{
+const defaultSelectOptionsArr = [{
   label: 'None',
   value: 'None',
 }];
@@ -25,12 +25,12 @@ export const Select: (React.FunctionComponent<IProps>) = ({
   isCombined,
   value,
   isDisabled = false,
-  options,
+  selectOptions,
   className = '',
   parentClassname = '',
   onChange,
 }) => {
-  const currentOptionsArr = options.length !== 0 ? options : defaultOptionsArr;
+  const currentOptionsArr = selectOptions.length !== 0 ? selectOptions : defaultSelectOptionsArr;
 
   return (
     <div className={classNames(
@@ -63,7 +63,7 @@ export const Select: (React.FunctionComponent<IProps>) = ({
         data-multiparameters={multiparameters}
         onChange={onChange}
         value={value}
-        disabled={isDisabled || options.length <= 1}
+        disabled={isDisabled || selectOptions.length <= 1}
       >
         {
           currentOptionsArr.map((option) => (

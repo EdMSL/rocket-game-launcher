@@ -4,16 +4,16 @@ import * as GAME_SETTINGS_ACTIONS from '$actions/gameSettings';
 
 type IGameSettingsActionHadler<P> = IActionHandler<IGameSettingsRootState, P>;
 
-const setGameSettingsOptions: IGameSettingsActionHadler<
-  typeof GAME_SETTINGS_ACTIONS.setGameSettingsOptions
+const setGameSettingsParameters: IGameSettingsActionHadler<
+  typeof GAME_SETTINGS_ACTIONS.setGameSettingsParameters
 > = (
   state,
-  { payload: newGameSettingsOptions },
+  { payload: newGameSettingsParameters },
 ) => ({
   ...state,
-  gameSettingsOptions: {
-    ...state.gameSettingsOptions,
-    ...newGameSettingsOptions,
+  gameSettingsParameters: {
+    ...state.gameSettingsParameters,
+    ...newGameSettingsParameters,
   },
 });
 
@@ -37,24 +37,24 @@ const setGameSettingsFiles: IGameSettingsActionHadler<
   gameSettingsFiles,
 });
 
-const setGameSettingsParameters: IGameSettingsActionHadler<
-  typeof GAME_SETTINGS_ACTIONS.setGameSettingsParameters
+const setGameSettingsOptions: IGameSettingsActionHadler<
+  typeof GAME_SETTINGS_ACTIONS.setGameSettingsOptions
 > = (
   state,
-  { payload: gameSettingsParameters },
+  { payload: gameSettingsOptions },
 ) => ({
   ...state,
-  gameSettingsParameters,
+  gameSettingsOptions,
 });
 
-const setInitialGameSettingsParameters: IGameSettingsActionHadler<
-  typeof GAME_SETTINGS_ACTIONS.setInitialGameSettingsParameters
+const setInitialGameSettingsOptions: IGameSettingsActionHadler<
+  typeof GAME_SETTINGS_ACTIONS.setInitialGameSettingsOptions
 > = (
   state,
-  { payload: initialGameSettingsParameters },
+  { payload: initialGameSettingsOptions },
 ) => ({
   ...state,
-  initialGameSettingsParameters,
+  initialGameSettingsOptions,
 });
 
 const setMoProfile: IGameSettingsActionHadler<
@@ -78,11 +78,11 @@ const setMoProfiles: IGameSettingsActionHadler<
 });
 
 export const GAME_SETTINGS_HANDLERS = {
-  [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_OPTIONS]: setGameSettingsOptions,
+  [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_PARAMETERS]: setGameSettingsParameters,
   [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_CONFIG]: setGameSettingsConfig,
   [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_FILES]: setGameSettingsFiles,
-  [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_PARAMETERS]: setGameSettingsParameters,
-  [GAME_SETTINGS_TYPES.SET_INITIAL_GAME_SETTINGS_PARAMETERS]: setInitialGameSettingsParameters,
+  [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_OPTIONS]: setGameSettingsOptions,
+  [GAME_SETTINGS_TYPES.SET_INITIAL_GAME_SETTINGS_OPTIONS]: setInitialGameSettingsOptions,
   [GAME_SETTINGS_TYPES.SET_MO_PROFILE]: setMoProfile,
   [GAME_SETTINGS_TYPES.SET_MO_PROFILES]: setMoProfiles,
 };

@@ -1,22 +1,22 @@
 import {
   GAME_SETTINGS_TYPES,
   IGameSettingsConfig,
-  IGameSettingsOptions,
+  IGameSettingsParameters,
   IGameSettingsRootState,
 } from '$types/gameSettings';
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-export const setGameSettingsOptions = (
-  gameSettingsOptions: IGameSettingsOptions,
+export const setGameSettingsParameters = (
+  gameSettingsParameters: IGameSettingsParameters,
 ) => ({
-  type: GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_OPTIONS,
-  payload: gameSettingsOptions,
+  type: GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_PARAMETERS,
+  payload: gameSettingsParameters,
 });
 
-export const updateGameSettingsOptions = (
+export const updateGameSettingsParameters = (
   gameSetingsConfig?: IGameSettingsConfig,
 ) => ({
-  type: GAME_SETTINGS_TYPES.UPDATE_GAME_SETTINGS_OPTIONS,
+  type: GAME_SETTINGS_TYPES.UPDATE_GAME_SETTINGS_PARAMETERS,
   payload: gameSetingsConfig,
 });
 
@@ -34,25 +34,25 @@ export const setGameSettingsFiles = (
   payload: gameSetingsFiles,
 });
 
-export const setGameSettingsParameters = (
-  gameSettingsParameters: IGameSettingsConfig['gameSettingsParameters'],
+export const setGameSettingsOptions = (
+  gameSettingsOptions: IGameSettingsConfig['gameSettingsOptions'],
 ) => ({
-  type: GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_PARAMETERS,
-  payload: gameSettingsParameters,
+  type: GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_OPTIONS,
+  payload: gameSettingsOptions,
 });
 
-export const setInitialGameSettingsParameters = (
-  initialGameSettingsParameters: IGameSettingsRootState['initialGameSettingsParameters'],
+export const setInitialGameSettingsOptions = (
+  initialGameSettingsOptions: IGameSettingsRootState['initialGameSettingsOptions'],
 ) => ({
-  type: GAME_SETTINGS_TYPES.SET_INITIAL_GAME_SETTINGS_PARAMETERS,
-  payload: initialGameSettingsParameters,
+  type: GAME_SETTINGS_TYPES.SET_INITIAL_GAME_SETTINGS_OPTIONS,
+  payload: initialGameSettingsOptions,
 });
 
 export const saveGameSettingsFiles = (
-  changedGameSettingsOptions: IGameSettingsOptions,
+  changedGameSettingsParameters: IGameSettingsParameters,
 ) => ({
   type: GAME_SETTINGS_TYPES.SAVE_GAME_SETTINGS_FILES,
-  payload: changedGameSettingsOptions,
+  payload: changedGameSettingsParameters,
 });
 
 export const changeMoProfile = (

@@ -4,7 +4,7 @@ import path from 'path';
 
 import {
   Encoding,
-  GameSettingControllerType,
+  UIControllerType,
   GameSettingsFileView,
   GameSettingsOptionType,
   PathRegExp,
@@ -14,7 +14,7 @@ import {
   IGameSettingsConfig,
   IGameSettingsFile,
   IGameSettingsGroup,
-  IGameSettingsParameter,
+  IGameSettingsOption,
   IGameSettingsRootState,
 } from '$types/gameSettings';
 import {
@@ -189,7 +189,7 @@ export const gameSettingsShallowCheckSchema = Joi.object<IGameSettingsConfig>({
   baseFilesEncoding: Joi.string().optional().default(Encoding.WIN1251),
   gameSettingsGroups: Joi.array().optional().default([]).min(1),
   gameSettingsFiles: Joi.array().required().min(1),
-  gameSettingsParameters: Joi.array().required().min(1),
+  gameSettingsOptions: Joi.array().required().min(1),
 });
 
 // Полная проверка.
@@ -201,7 +201,7 @@ export const gameSettingsDeepCheckSchema = Joi.object<IGameSettingsConfig>({
   gameSettingsFiles: Joi.array()
     .items(gameSettingsFileSchema).required().min(1)
     .unique((a, b) => a.name === b.name),
-  gameSettingsParameters: Joi.array().required().min(1),
+  gameSettingsOptions: Joi.array().required().min(1),
 });
 
 const gameSettingsFileOptionTypeSchema = Joi.string().required().valid(...Object.values(GameSettingsOptionType)).label('optionType');
@@ -236,21 +236,21 @@ const defaultOptionTypeSchema = Joi.object({
       is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
     },
   ),
-  controllerType: Joi.string().required().valid(...Object.values(GameSettingControllerType)),
-  options: Joi.object().pattern(
+  controllerType: Joi.string().required().valid(...Object.values(UIControllerType)),
+  selectOptions: Joi.object().pattern(
     Joi.string(),
     Joi.string(),
   ).when(
-    Joi.ref('controllerType'), { is: GameSettingControllerType.SELECT, then: Joi.required() },
+    Joi.ref('controllerType'), { is: UIControllerType.SELECT, then: Joi.required() },
   ),
   min: Joi.number().when(
-    Joi.ref('controllerType'), { is: GameSettingControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: UIControllerType.RANGE, then: Joi.required() },
   ),
   max: Joi.number().when(
-    Joi.ref('controllerType'), { is: GameSettingControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: UIControllerType.RANGE, then: Joi.required() },
   ),
   step: Joi.number().when(
-    Joi.ref('controllerType'), { is: GameSettingControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: UIControllerType.RANGE, then: Joi.required() },
   ),
 });
 
@@ -267,21 +267,21 @@ const groupOptionTypeSchema = Joi.object({
     },
   ).valid(Joi.in('$gameSettingsGroups'))
     .messages({ 'any.only': '"settingGroup" must be one of {$gameSettingsGroups}' }),
-  controllerType: Joi.string().required().valid(...Object.values(GameSettingControllerType)),
-  options: Joi.object().pattern(
+  controllerType: Joi.string().required().valid(...Object.values(UIControllerType)),
+  selectOptions: Joi.object().pattern(
     Joi.string(),
     Joi.string(),
   ).when(
-    Joi.ref('controllerType'), { is: GameSettingControllerType.SELECT, then: Joi.required() },
+    Joi.ref('controllerType'), { is: UIControllerType.SELECT, then: Joi.required() },
   ),
   min: Joi.number().when(
-    Joi.ref('controllerType'), { is: GameSettingControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: UIControllerType.RANGE, then: Joi.required() },
   ),
   max: Joi.number().when(
-    Joi.ref('controllerType'), { is: GameSettingControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: UIControllerType.RANGE, then: Joi.required() },
   ),
   step: Joi.number().when(
-    Joi.ref('controllerType'), { is: GameSettingControllerType.RANGE, then: Joi.required() },
+    Joi.ref('controllerType'), { is: UIControllerType.RANGE, then: Joi.required() },
   ),
   items: Joi.array()
     .items(Joi.object({
@@ -318,13 +318,13 @@ const combinedOptionTypeSchema = Joi.object({
     },
   ).valid(Joi.in('$gameSettingsGroups'))
     .messages({ 'any.only': '"settingGroup" must be one of {$gameSettingsGroups}' }),
-  controllerType: Joi.string().required().valid(GameSettingControllerType.SELECT),
+  controllerType: Joi.string().required().valid(UIControllerType.SELECT),
   separator: Joi.string().optional().default(':'),
-  options: Joi.object().pattern(
+  selectOptions: Joi.object().pattern(
     Joi.string(),
     Joi.string(),
   ).when(
-    Joi.ref('controllerType'), { is: GameSettingControllerType.SELECT, then: Joi.required() },
+    Joi.ref('controllerType'), { is: UIControllerType.SELECT, then: Joi.required() },
   ).custom((value: { [key: string]: string, }, helpers) => {
     Object.values(value).forEach((element) => {
       if (element.split(helpers.state.ancestors[0].separator).length !== helpers.state.ancestors[0].items.length) {
@@ -387,37 +387,37 @@ const relatedOptionTypeSchema = Joi.object({
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
-      controllerType: Joi.string().required().valid(GameSettingControllerType.SELECT),
-      options: Joi.object().pattern(
+      controllerType: Joi.string().required().valid(UIControllerType.SELECT),
+      selectOptions: Joi.object().pattern(
         Joi.string(),
         Joi.string(),
       ).when(
-        Joi.ref('controllerType'), { is: GameSettingControllerType.SELECT, then: Joi.required() },
+        Joi.ref('controllerType'), { is: UIControllerType.SELECT, then: Joi.required() },
       ),
       min: Joi.number().when(
-        Joi.ref('controllerType'), { is: GameSettingControllerType.RANGE, then: Joi.required() },
+        Joi.ref('controllerType'), { is: UIControllerType.RANGE, then: Joi.required() },
       ),
       max: Joi.number().when(
-        Joi.ref('controllerType'), { is: GameSettingControllerType.RANGE, then: Joi.required() },
+        Joi.ref('controllerType'), { is: UIControllerType.RANGE, then: Joi.required() },
       ),
       step: Joi.number().when(
-        Joi.ref('controllerType'), { is: GameSettingControllerType.RANGE, then: Joi.required() },
+        Joi.ref('controllerType'), { is: UIControllerType.RANGE, then: Joi.required() },
       ),
     })).required().min(2),
 });
 
 /**
- * Проверка параметров, указанных в gameSettingsParameters.
- * @param parameters Параметры для проверки.
+ * Проверка опций, указанных в gameSettingsOptions.
+ * @param gameSettingsOptions Опции для проверки.
  * @param gameSettingsGroups Группы игровых настроек.
  * @param gameSettingsFiles Файлы игровых настроек.
  * @returns Объект с массивом параметров и массивом ошибок проверки.
 */
-export const checkGameSettingsParameters = (
-  parameters: IGameSettingsRootState['gameSettingsParameters'],
+const checkGameSettingsOptions = (
+  gameSettingsOptions: IGameSettingsRootState['gameSettingsOptions'],
   gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
   gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
-): ICheckResult<IGameSettingsParameter[]> => {
+): ICheckResult<IGameSettingsOption[]> => {
   const errors: Joi.ValidationError[] = [];
   const validationOptions: Joi.ValidationOptions = {
     abortEarly: false,
@@ -432,13 +432,13 @@ export const checkGameSettingsParameters = (
     },
   };
 
-  const resultParameters = parameters.reduce<IGameSettingsParameter[]>((currentParams, currentParam) => {
-    const fileForParameter = gameSettingsFiles.find((file) => file.name === currentParam.file);
+  const resultOptions = gameSettingsOptions.reduce<IGameSettingsOption[]>((currentParams, currentParam) => {
+    const fileForOption = gameSettingsFiles.find((file) => file.name === currentParam.file);
 
     let validationResult: Joi.ValidationResult;
 
-    if (fileForParameter) {
-        validationOptions.context!.view = fileForParameter.view;
+    if (fileForOption) {
+        validationOptions.context!.view = fileForOption.view;
     }
 
     validationResult = gameSettingsFileOptionTypeSchema.validate(
@@ -486,7 +486,7 @@ export const checkGameSettingsParameters = (
   }, []);
 
   return {
-    data: resultParameters,
+    data: resultOptions,
     errors,
   };
 };
@@ -555,8 +555,8 @@ export const checkGameSettingsConfigFull = (
     };
   }
 
-  const { data: parameters, errors: paramErrors } = checkGameSettingsParameters(
-    config.gameSettingsParameters,
+  const { data: options, errors: paramErrors } = checkGameSettingsOptions(
+    config.gameSettingsOptions,
     config.gameSettingsGroups,
     config.gameSettingsFiles,
   );
@@ -571,7 +571,7 @@ export const checkGameSettingsConfigFull = (
 
   config = {
     ...config,
-    gameSettingsParameters: parameters,
+    gameSettingsOptions: options,
   };
 
   return {

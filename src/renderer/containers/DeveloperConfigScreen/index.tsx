@@ -317,7 +317,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               name="documentsPath"
               label="Папка файлов игры в Documents"
               value={currentConfig.documentsPath}
-              options={generateSelectOptions([PathVariableName.DOCUMENTS])}
+              selectPathVariables={generateSelectOptions([PathVariableName.DOCUMENTS])}
               pathVariables={pathVariables}
               isGameDocuments={false}
               description="Путь до папки игры в [User]/Documents. Укажите этот путь, если нужно управлять данными из файлов в этой папке через экран игровых настроек"//eslint-disable-line max-len
@@ -344,7 +344,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               parent="playButton"
               label="Исполняемый файл игры"
               value={currentConfig.playButton.path}
-              options={generateSelectOptions([PathVariableName.GAME_DIR])}
+              selectPathVariables={generateSelectOptions([PathVariableName.GAME_DIR])}
               pathVariables={pathVariables}
               extensions={FileExtension.EXECUTABLE}
               selectorType={LauncherButtonAction.RUN}
@@ -423,7 +423,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               name="version"
               parent="modOrganizer"
               label="Версия MO"
-              options={[
+              selectOptions={[
                 { label: 'Mod Organizer', value: '1' },
                 { label: 'Mod Organizer 2', value: '2' },
               ]}
@@ -439,7 +439,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               label="Путь до папки MO"
               parent="modOrganizer"
               value={currentConfig.modOrganizer.pathToMOFolder}
-              options={generateSelectOptions([PathVariableName.GAME_DIR])}
+              selectPathVariables={generateSelectOptions([PathVariableName.GAME_DIR])}
               pathVariables={pathVariables}
               isDisabled={!currentConfig.modOrganizer.isUsed}
               description="Задает путь до основной папки Mod Organizer."
@@ -453,7 +453,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               label="Путь до папки модов MO"
               parent="modOrganizer"
               value={currentConfig.modOrganizer.pathToMods}
-              options={generateSelectOptions([PathVariableName.MO_DIR])}
+              selectPathVariables={generateSelectOptions([PathVariableName.MO_DIR])}
               pathVariables={pathVariables}
               isDisabled={!currentConfig.modOrganizer.isUsed}
               description="Задает путь до папки модов Mod Organizer. Если вы не меняли этот путь в МО, оставьте значение без изменений"//eslint-disable-line max-len
@@ -467,7 +467,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               label="Путь до папки профилей MO"
               parent="modOrganizer"
               value={currentConfig.modOrganizer.pathToProfiles}
-              options={generateSelectOptions([PathVariableName.MO_DIR])}
+              selectPathVariables={generateSelectOptions([PathVariableName.MO_DIR])}
               pathVariables={pathVariables}
               isDisabled={!currentConfig.modOrganizer.isUsed}
               description="Задает путь до папки профилей Mod Organizer. Если вы не меняли этот путь в МО, оставьте значение без изменений"//eslint-disable-line max-len
@@ -481,7 +481,7 @@ export const DeveloperConfigScreen: React.FC = () => {
               label="Путь до конфигурационного файла MO"
               parent="modOrganizer"
               value={currentConfig.modOrganizer.pathToINI}
-              options={generateSelectOptions([PathVariableName.MO_DIR])}
+              selectPathVariables={generateSelectOptions([PathVariableName.MO_DIR])}
               pathVariables={pathVariables}
               selectorType={LauncherButtonAction.RUN}
               extensions={FileExtension.INI}

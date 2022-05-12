@@ -3,7 +3,7 @@ import {
   ISuccess,
 } from '$types/common';
 import {
-  IGameSettingsConfig, IGameSettingsItemParameter, IGameSettingsParameter,
+  IGameSettingsConfig, IGameSettingsOptionItem, IGameSettingsOption,
 } from '$types/gameSettings';
 import {
   ILauncherConfig,
@@ -12,7 +12,7 @@ import {
   IWindowSettings,
 } from '$types/main';
 import {
-  Encoding, GameSettingControllerType, GameSettingsOptionType, LauncherButtonAction,
+  Encoding, UIControllerType, GameSettingsOptionType, LauncherButtonAction,
 } from './misc';
 
 export const SUCCESS_STATUS: ISuccess = 'success';
@@ -90,23 +90,23 @@ export const defaultGameSettingsConfig: IGameSettingsConfig = {
   baseFilesEncoding: Encoding.WIN1251,
   gameSettingsGroups: [],
   gameSettingsFiles: [],
-  gameSettingsParameters: [],
+  gameSettingsOptions: [],
 };
 
-export const defaultGameSettingsParameterItem: IGameSettingsItemParameter = {
+export const defaultGameSettingsOptionItem: IGameSettingsOptionItem = {
   id: '',
   name: '',
-  controllerType: GameSettingControllerType.CHECKBOX,
+  controllerType: UIControllerType.CHECKBOX,
   iniGroup: '',
   min: 0,
   max: 1,
   step: 0.1,
-  options: {},
+  selectOptions: {},
   valueName: '',
   valuePath: '',
 };
 
-export const defaultFullGameSettingsParameter: IGameSettingsParameter = {
+export const defaultFullGameSettingsOption: IGameSettingsOption = {
   id: '',
   optionType: GameSettingsOptionType.DEFAULT,
   file: '',
@@ -117,13 +117,13 @@ export const defaultFullGameSettingsParameter: IGameSettingsParameter = {
   iniGroup: '',
   valueName: '',
   valuePath: '',
-  controllerType: GameSettingControllerType.CHECKBOX,
+  controllerType: UIControllerType.CHECKBOX,
   separator: ':',
-  options: {},
+  selectOptions: {},
   min: 0,
   max: 1,
   step: 0.1,
-  items: [defaultGameSettingsParameterItem],
+  items: [defaultGameSettingsOptionItem],
 };
 
 interface IWindowField {

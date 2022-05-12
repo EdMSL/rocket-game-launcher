@@ -5,7 +5,7 @@ import styles from './styles.module.scss';
 import { Button } from '$components/UI/Button';
 
 interface IProps {
-  isGameOptionsChanged: boolean,
+  isGameParametersChanged: boolean,
   isBackuping: boolean,
   isSaving: boolean,
   isDeveloperMode: boolean,
@@ -16,7 +16,7 @@ interface IProps {
 }
 
 export const GameSettingsFormControls: React.FunctionComponent<IProps> = ({
-  isGameOptionsChanged,
+  isGameParametersChanged,
   isBackuping,
   isSaving,
   isDeveloperMode,
@@ -29,13 +29,13 @@ export const GameSettingsFormControls: React.FunctionComponent<IProps> = ({
     <Button
       className={classNames('main-btn', styles['game-settings-form__btn'])}
       isSubmit
-      isDisabled={isGameOptionsChanged || isBackuping || isSaving}
+      isDisabled={isGameParametersChanged || isBackuping || isSaving}
     >
       Сохранить
     </Button>
     <Button
       className={classNames('main-btn', styles['game-settings-form__btn'])}
-      isDisabled={isGameOptionsChanged || isBackuping || isSaving}
+      isDisabled={isGameParametersChanged || isBackuping || isSaving}
       onClick={onCancelSettingsBtnClick}
     >
       Сбросить

@@ -155,7 +155,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
                     <PathSelector
                       id={currentArg.id}
                       value={currentArg.data}
-                      options={generateSelectOptions([PathVariableName.GAME_DIR])}
+                      selectPathVariables={generateSelectOptions([PathVariableName.GAME_DIR])}
                       pathVariables={pathVariables}
                       selectorType={LauncherButtonAction.RUN}
                       validationErrors={validationErrors}

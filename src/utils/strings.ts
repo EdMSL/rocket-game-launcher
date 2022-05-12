@@ -55,7 +55,12 @@ export const getRandomName = (): string => {
   return result;
 };
 
-export const getParameterRegExp = (
+/**
+ *
+ * @param parameterName Имя параметра.
+ * @returns Регулярное выражение для поиска строки с заданным именем параметра.
+ */
+export const getRegExpForLineIniParameter = (
   parameterName: string,
 ): RegExp => new RegExp(`set\\s+${parameterName}\\s+to\\s+(.+)$`, 'i');
 
@@ -65,7 +70,7 @@ export const getParameterRegExp = (
  * @param parameterName Имя параметра, который ищем.
  * @returns Найденная часть строки.
 */
-export const getStringPartFromIniLineParameterForReplace = (
+export const getStringPartFromLineIniParameterForReplace = (
   lineText: string,
   parameterName: string,
 ): string => lineText.match(new RegExp(`set\\s+${parameterName}\\s+to\\s+([^;]+)`, 'i'))![0].trim();
@@ -362,15 +367,15 @@ export const isValidName = (name: string): boolean => {
 
 /**
  * Генерирует строку опций для `select` из игрового параметра. Использется в `TextArea` компоненте.
- * @param options Опции для `select` из параметра.
+ * @param selectOptions Опции для `select` из параметра.
  * @returns Строка с опциями.
  */
 export const generateSelectOptionsString = (
-  options: { [key: string]: string, }|undefined,
+  selectOptions: { [key: string]: string, }|undefined,
 ): string => {
-  if (options !== undefined) {
-    return Object.keys(options).reduce(
-      (totalString, option) => `${totalString}${option}=${options![option]}\n`,
+  if (selectOptions !== undefined) {
+    return Object.keys(selectOptions).reduce(
+      (totalString, option) => `${totalString}${option}=${selectOptions![option]}\n`,
       '',
     );
   }
@@ -381,11 +386,13 @@ export const generateSelectOptionsString = (
 /**
  * Генерирует опции из строки опций для `select` из игрового параметра.
  * Строка используется в `TextArea` компоненте.
- * @param optionsStr Строка с опциями из `select` для параметра.
+ * @param selectOptionsStr Строка с опциями из `select` для параметра.
  * @returns Объект опций для `select`.
  */
-export const generateSelectOptionsFromString = (optionsStr: string): { [key: string]: string, } => {
-  const optionsArr = optionsStr.split('\n');
+export const generateSelectOptionsFromString = (
+  selectOptionsStr: string,
+): { [key: string]: string, } => {
+  const optionsArr = selectOptionsStr.split('\n');
 
   if (optionsArr.length > 0) {
     return optionsArr.reduce((options, currentStr) => {

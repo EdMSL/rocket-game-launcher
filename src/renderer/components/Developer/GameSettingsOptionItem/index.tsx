@@ -8,75 +8,75 @@ import { Select } from '$components/UI/Select';
 import { ISelectOption, IValidationErrors } from '$types/common';
 import {
   changeConfigArrayItem,
-  generateGameSettingsParameter,
+  generateGameSettingsOption,
   generateSelectOptions,
   getFileByFileName,
-  getFullParameter,
+  getFullOption,
   getSelectsOptionStringObj,
 } from '$utils/data';
 import {
-  GameSettingControllerType, GameSettingsOptionType, HTMLInputType,
+  UIControllerType, GameSettingsOptionType, HTMLInputType,
 } from '$constants/misc';
 import {
-  IGameSettingsFile, IGameSettingsGroup, IGameSettingsItemParameter, IGameSettingsParameter,
+  IGameSettingsFile, IGameSettingsGroup, IGameSettingsOption, IGameSettingsOptionItem,
 } from '$types/gameSettings';
 import { Button } from '$components/UI/Button';
 import { TextField } from '$components/UI/TextField';
 import { NumberField } from '$components/UI/NumberField';
-import { defaultFullGameSettingsParameter } from '$constants/defaultData';
+import { defaultFullGameSettingsOption } from '$constants/defaultData';
 import { generateSelectOptionsFromString, getRandomId } from '$utils/strings';
 import { TextArea } from '$components/UI/TextArea';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
-import { setParameterStartValidationErrors, validateParameterFields } from '$utils/validation';
+import { setOptionStartValidationErrors, validateOptionFields } from '$utils/validation';
 
 interface IProps {
-  parameter: IGameSettingsParameter,
+  option: IGameSettingsOption,
   gameSettingsFiles: IGameSettingsFile[],
   gameSettingsGroups: IGameSettingsGroup[],
   validationErrors: IValidationErrors,
-  onParameterDataChange: (id: string, data: IGameSettingsParameter) => void,
+  onOptionDataChange: (id: string, data: IGameSettingsOption) => void,
   onValidation: (errors: IValidationErrors) => void,
-  deleteParameter: (id: string) => void,
+  deleteOption: (id: string) => void,
 }
 
-export const GameSettingsParameterItem: React.FC<IProps> = ({
-  parameter,
+export const GameSettingsOptionItem: React.FC<IProps> = ({
+  option,
   gameSettingsFiles,
   gameSettingsGroups,
   validationErrors,
-  onParameterDataChange,
+  onOptionDataChange,
   onValidation,
-  deleteParameter,
+  deleteOption,
 }) => {
-  const [fullParameter, setFullParameter] = useState<IGameSettingsParameter>(getFullParameter(
-    defaultFullGameSettingsParameter,
-    parameter,
+  const [fullOption, setFullOption] = useState<IGameSettingsOption>(getFullOption(
+    defaultFullGameSettingsOption,
+    option,
   ));
   const [optionsValue, setOptionsValue] = useState<{
     [key: string]: string,
-  }>(getSelectsOptionStringObj(parameter));
+  }>(getSelectsOptionStringObj(option));
   const [lastAddedItemId, setLastAddedItemId] = useState<string>('');
 
-  const parameterFile = useMemo(
-    () => getFileByFileName(gameSettingsFiles, parameter.file),
-    [gameSettingsFiles, parameter.file],
+  const optionFile = useMemo(
+    () => getFileByFileName(gameSettingsFiles, option.file),
+    [gameSettingsFiles, option.file],
   );
 
-  const onParameterInputChange = useCallback((
+  const onOptionInputChange = useCallback((
     { currentTarget }: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>,
   ) => {
-    const isParameterItemChange = currentTarget.dataset.parent && currentTarget.dataset.parent !== '';
+    const isOptionItemChange = currentTarget.dataset.parent && currentTarget.dataset.parent !== '';
 
-    let currentParameter: IGameSettingsParameter;
+    let currentOption: IGameSettingsOption;
 
     if (currentTarget.type === HTMLInputType.NUMBER) {
-      currentParameter = {
-        ...parameter,
-        ...isParameterItemChange ? {
+      currentOption = {
+        ...option,
+        ...isOptionItemChange ? {
           items: changeConfigArrayItem<any>(
             currentTarget.dataset.parent!,
             { [currentTarget.name]: +currentTarget.value },
-            parameter.items!,
+            option.items!,
             false,
           ),
         } : {
@@ -84,13 +84,13 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
         },
       };
     } else if (currentTarget.tagName === 'TEXTAREA') {
-      currentParameter = {
-        ...parameter,
-        ...isParameterItemChange ? {
+      currentOption = {
+        ...option,
+        ...isOptionItemChange ? {
           items: changeConfigArrayItem<any>(
             currentTarget.dataset.parent!,
             { [currentTarget.name]: generateSelectOptionsFromString(currentTarget.value) },
-            parameter.items!,
+            option.items!,
             false,
           ),
         } : {
@@ -100,16 +100,16 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
 
       setOptionsValue({
         ...optionsValue,
-        [isParameterItemChange ? currentTarget.dataset.parent! : parameter.id]: currentTarget.value,
+        [isOptionItemChange ? currentTarget.dataset.parent! : option.id]: currentTarget.value,
       });
     } else {
-      currentParameter = {
-        ...parameter,
-        ...isParameterItemChange ? {
+      currentOption = {
+        ...option,
+        ...isOptionItemChange ? {
           items: changeConfigArrayItem<any>(
             currentTarget.dataset.parent!,
             { [currentTarget.name]: currentTarget.value },
-            parameter.items!,
+            option.items!,
             false,
           ),
         } : {
@@ -118,269 +118,275 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       };
     }
 
-    const { newParameter, newFullParameter } = generateGameSettingsParameter(
-      currentParameter,
-      fullParameter,
+    const { newOption, newFullOption } = generateGameSettingsOption(
+      currentOption,
+      fullOption,
       currentTarget.name === 'file'
         ? getFileByFileName(gameSettingsFiles, currentTarget.value)!
-        : parameterFile!,
+        : optionFile!,
     );
 
     if (currentTarget.name === 'file') {
-      onValidation(setParameterStartValidationErrors(
-        newParameter,
-        getFileByFileName(gameSettingsFiles, newParameter.file)!,
+      onValidation(setOptionStartValidationErrors(
+        newOption,
+        getFileByFileName(gameSettingsFiles, newOption.file)!,
         validationErrors,
       ));
     } else {
-      onValidation(validateParameterFields(currentTarget, newParameter, validationErrors));
+      onValidation(validateOptionFields(currentTarget, newOption, validationErrors));
     }
 
-    onParameterDataChange(parameter.id, newParameter);
-    setFullParameter(newFullParameter);
-  }, [parameter,
+    onOptionDataChange(option.id, newOption);
+    setFullOption(newFullOption);
+  }, [option,
     validationErrors,
     optionsValue,
-    parameterFile,
-    fullParameter,
+    optionFile,
+    fullOption,
     gameSettingsFiles,
-    onParameterDataChange,
+    onOptionDataChange,
     onValidation]);
 
   const onDeleteFileBtnClick = useCallback(() => {
-    deleteParameter(parameter.id);
-  }, [parameter.id, deleteParameter]);
+    deleteOption(option.id);
+  }, [option.id, deleteOption]);
 
-  const onAddParameterItemBtnClick = useCallback(() => {
+  const onAddOptionItemBtnClick = useCallback(() => {
     const newId = getRandomId();
-    const { newParameter, newFullParameter } = generateGameSettingsParameter(
+    const { newOption, newFullOption } = generateGameSettingsOption(
       {
-        ...parameter,
-        items: [...parameter.items!, {
-          ...parameter.items![parameter.items!.length - 1],
+        ...option,
+        items: [...option.items!, {
+          ...option.items![option.items!.length - 1],
           id: newId,
         }],
       },
-      fullParameter,
-      parameterFile!,
+      fullOption,
+      optionFile!,
     );
 
-    onParameterDataChange(parameter.id, newParameter);
-    setFullParameter(newFullParameter);
+    onOptionDataChange(option.id, newOption);
+    setFullOption(newFullOption);
     setLastAddedItemId(newId);
-  }, [parameter, fullParameter, parameterFile, onParameterDataChange]);
+  }, [option, fullOption, optionFile, onOptionDataChange]);
 
-  const gameSettingsFilesOptions = gameSettingsFiles.map((file): ISelectOption => ({ label: file.label, value: file.name }));
-  const gameSettingsGroupsOptions = gameSettingsGroups.map((group): ISelectOption => ({ label: group.label, value: group.name }));
+  const selectOptionsFiles = gameSettingsFiles.map((file): ISelectOption => ({
+    label: file.label,
+    value: file.name,
+  }));
+  const selectOptionsGroups = gameSettingsGroups.map((group): ISelectOption => ({
+    label: group.label,
+    value: group.name,
+  }));
 
   return (
     <React.Fragment>
       <TextField
-        className={styles.parameter__item}
-        id={`label_${parameter.id}`}
+        className={styles.option__item}
+        id={`label_${option.id}`}
         name="label"
         label="Заголовок опции"
-        value={parameter.label}
+        value={option.label}
         isRequied
         validationErrors={validationErrors}
-        onChange={onParameterInputChange}
+        onChange={onOptionInputChange}
       />
       <Select
-        className={styles.parameter__item}
-        id={`optionType_${parameter.id}`}
-        options={generateSelectOptions(GameSettingsOptionType)}
+        className={styles.option__item}
+        id={`optionType_${option.id}`}
+        selectOptions={generateSelectOptions(GameSettingsOptionType)}
         name="optionType"
         label="Тип опции"
-        value={parameter.optionType}
-        onChange={onParameterInputChange}
+        value={option.optionType}
+        onChange={onOptionInputChange}
       />
       <Select
-        className={styles.parameter__item}
-        id={`file_${parameter.id}`}
-        options={gameSettingsFilesOptions}
+        className={styles.option__item}
+        id={`file_${option.id}`}
+        selectOptions={selectOptionsFiles}
         name="file"
         label="Файл"
-        value={parameter.file}
-        onChange={onParameterInputChange}
+        value={option.file}
+        onChange={onOptionInputChange}
       />
       <TextField
-        className={styles.parameter__item}
-        id={`description_${parameter.id}`}
+        className={styles.option__item}
+        id={`description_${option.id}`}
         name="description"
         label="Описание опции"
-        value={parameter.description}
-        onChange={onParameterInputChange}
+        value={option.description}
+        onChange={onOptionInputChange}
       />
       {
         gameSettingsGroups.length !== 0 && (
           <Select
-            className={styles.parameter__item}
-            id={`settingGroup_${parameter.id}`}
+            className={styles.option__item}
+            id={`settingGroup_${option.id}`}
             label="Группа настроек"
-            options={gameSettingsGroupsOptions}
+            selectOptions={selectOptionsGroups}
             name="settingGroup"
-            value={parameter.settingGroup}
-            onChange={onParameterInputChange}
+            value={option.settingGroup}
+            onChange={onOptionInputChange}
           />
         )
       }
       {
-        parameter.name !== undefined && (
+        option.name !== undefined && (
           <TextField
-            className={styles.parameter__item}
-            id={`name_${parameter.id}`}
+            className={styles.option__item}
+            id={`name_${option.id}`}
             name="name"
             label="Имя параметра из файла"
-            value={parameter.name!}
+            value={option.name!}
             isRequied
             validationErrors={validationErrors}
-            onChange={onParameterInputChange}
+            onChange={onOptionInputChange}
           />
         )
       }
       {
-        parameter.iniGroup !== undefined && (
+        option.iniGroup !== undefined && (
           <TextField
-            className={styles.parameter__item}
-            id={`iniGroup_${parameter.id}`}
+            className={styles.option__item}
+            id={`iniGroup_${option.id}`}
             name="iniGroup"
             label="Группа параметра из файла"
-            value={parameter.iniGroup}
+            value={option.iniGroup}
             isRequied
             validationErrors={validationErrors}
-            onChange={onParameterInputChange}
+            onChange={onOptionInputChange}
           />
         )
       }
       {
-        parameter.valueName !== undefined && (
+        option.valueName !== undefined && (
           <TextField
-            className={styles.parameter__item}
-            id={`valueName_${parameter.id}`}
+            className={styles.option__item}
+            id={`valueName_${option.id}`}
             name="valueName"
             label="Имя атрибута параметра из файла"
-            value={parameter.valueName}
+            value={option.valueName}
             isRequied
             validationErrors={validationErrors}
-            onChange={onParameterInputChange}
+            onChange={onOptionInputChange}
           />
         )
       }
       {
-        parameter.valuePath !== undefined && (
+        option.valuePath !== undefined && (
           <TextField
-            className={styles.parameter__item}
-            id={`valuePath_${parameter.id}`}
+            className={styles.option__item}
+            id={`valuePath_${option.id}`}
             name="valuePath"
             label="Путь до параметра из файла"
-            value={parameter.valuePath}
+            value={option.valuePath}
             isRequied
             validationErrors={validationErrors}
-            onChange={onParameterInputChange}
+            onChange={onOptionInputChange}
           />
         )
       }
       {
-        parameter.separator !== undefined && (
+        option.separator !== undefined && (
           <TextField
-            className={styles.parameter__item}
-            id={`separator_${parameter.id}`}
+            className={styles.option__item}
+            id={`separator_${option.id}`}
             name="separator"
             label="Разделитель"
-            value={parameter.separator}
+            value={option.separator}
             isRequied
             validationErrors={validationErrors}
-            onChange={onParameterInputChange}
+            onChange={onOptionInputChange}
           />
         )
       }
       {
-        parameter.controllerType !== undefined && (
+        option.controllerType !== undefined && (
           <Select
-            className={styles.parameter__item}
-            id={`controllerType_${parameter.id}`}
+            className={styles.option__item}
+            id={`controllerType_${option.id}`}
             name="controllerType"
-            options={generateSelectOptions(parameter.optionType === GameSettingsOptionType.COMBINED
-              ? [GameSettingControllerType.SELECT.toUpperCase()]
-              : GameSettingControllerType)}
+            selectOptions={generateSelectOptions(option.optionType === GameSettingsOptionType.COMBINED
+              ? [UIControllerType.SELECT.toUpperCase()]
+              : UIControllerType)}
             label="Тип контроллера"
-            value={parameter.controllerType}
-            onChange={onParameterInputChange}
+            value={option.controllerType}
+            onChange={onOptionInputChange}
           />
         )
       }
       {
-        parameter.options !== undefined && (
+        option.selectOptions !== undefined && (
           <TextArea
-            className={styles.parameter__item}
-            id={`options_${parameter.id}`}
+            className={styles.option__item}
+            id={`options_${option.id}`}
             name="options"
             label="Опции селектора"
-            value={optionsValue[parameter.id]}
+            value={optionsValue[option.id]}
             wrap="off"
             placeholder="Видит пользователь=Запишется в файл"
             isRequied
             validationErrors={validationErrors}
-            onChange={onParameterInputChange}
+            onChange={onOptionInputChange}
           />
         )
       }
       {
-        parameter.min !== undefined && (
+        option.min !== undefined && (
           <NumberField
-            className={styles.parameter__item}
-            id={`min_${parameter.id}`}
+            className={styles.option__item}
+            id={`min_${option.id}`}
             name="min"
             min=""
             label="Минимальное значение"
-            value={parameter.min}
-            onChange={onParameterInputChange}
+            value={option.min}
+            onChange={onOptionInputChange}
           />
         )
       }
       {
-        parameter.max !== undefined && (
+        option.max !== undefined && (
           <NumberField
-            className={styles.parameter__item}
-            id={`max_${parameter.id}`}
+            className={styles.option__item}
+            id={`max_${option.id}`}
             name="max"
             min=""
             label="Максимальное значение"
-            value={parameter.max}
-            onChange={onParameterInputChange}
+            value={option.max}
+            onChange={onOptionInputChange}
           />
         )
       }
       {
-        parameter.step !== undefined && (
+        option.step !== undefined && (
           <NumberField
-            className={styles.parameter__item}
-            id={`step_${parameter.id}`}
+            className={styles.option__item}
+            id={`step_${option.id}`}
             name="step"
             min={0.001}
             label="Шаг изменения значения"
-            value={parameter.step}
-            onChange={onParameterInputChange}
+            value={option.step}
+            onChange={onOptionInputChange}
           />
         )
       }
       {
-        parameter.items !== undefined && (
+        option.items !== undefined && (
           <React.Fragment>
-            <p className={styles.parameter__items}>Список параметров из файла для опции</p>
-            <ul className={styles.parameter__list}>
+            <p className={styles.option__items}>Список параметров из файла для опции</p>
+            <ul className={styles.option__list}>
               {
-              parameter.items.map((item) => (
-                <SpoilerListItem<IGameSettingsItemParameter>
+              option.items.map((item) => (
+                <SpoilerListItem<IGameSettingsOptionItem>
                   key={item.id}
                   item={item}
-                  items={parameter.items!}
+                  items={option.items!}
                   summaryText={[item.name]}
                   lastItemId={lastAddedItemId}
                 >
                   <React.Fragment>
                     <TextField
-                      className={styles.parameter__item}
+                      className={styles.option__item}
                       id={`name_${item.id}`}
                       parent={item.id}
                       name="name"
@@ -388,12 +394,12 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                       value={item.name}
                       isRequied
                       validationErrors={validationErrors}
-                      onChange={onParameterInputChange}
+                      onChange={onOptionInputChange}
                     />
                     {
                     item.iniGroup !== undefined && (
                       <TextField
-                        className={styles.parameter__item}
+                        className={styles.option__item}
                         id={`iniGroup_${item.id}`}
                         parent={item.id}
                         name="iniGroup"
@@ -401,14 +407,14 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                         value={item.iniGroup}
                         isRequied
                         validationErrors={validationErrors}
-                        onChange={onParameterInputChange}
+                        onChange={onOptionInputChange}
                       />
                     )
-                  }
+                    }
                     {
                     item.valueName !== undefined && (
                       <TextField
-                        className={styles.parameter__item}
+                        className={styles.option__item}
                         id={`valueName_${item.id}`}
                         parent={item.id}
                         name="valueName"
@@ -416,14 +422,14 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                         value={item.valueName}
                         isRequied
                         validationErrors={validationErrors}
-                        onChange={onParameterInputChange}
+                        onChange={onOptionInputChange}
                       />
                     )
-                  }
+                    }
                     {
                     item.valuePath !== undefined && (
                       <TextField
-                        className={styles.parameter__item}
+                        className={styles.option__item}
                         id={`valuePath_${item.id}`}
                         parent={item.id}
                         name="valuePath"
@@ -431,30 +437,30 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                         value={item.valuePath}
                         isRequied
                         validationErrors={validationErrors}
-                        onChange={onParameterInputChange}
+                        onChange={onOptionInputChange}
                       />
                     )
-                  }
+                    }
                     {
                     item.controllerType !== undefined && (
                     <Select
-                      className={styles.parameter__item}
+                      className={styles.option__item}
                       id={`controllerType_${item.id}`}
                       parent={item.id}
                       name="controllerType"
-                      options={generateSelectOptions(parameter.optionType === GameSettingsOptionType.RELATED
-                        ? [GameSettingControllerType.SELECT.toUpperCase()]
-                        : GameSettingControllerType)}
+                      selectOptions={generateSelectOptions(option.optionType === GameSettingsOptionType.RELATED
+                        ? [UIControllerType.SELECT.toUpperCase()]
+                        : UIControllerType)}
                       label="Тип контроллера"
                       value={item.controllerType}
-                      onChange={onParameterInputChange}
+                      onChange={onOptionInputChange}
                     />
                     )
-                  }
+                    }
                     {
-                    item.options !== undefined && (
+                    item.selectOptions !== undefined && (
                     <TextArea
-                      className={styles.parameter__item}
+                      className={styles.option__item}
                       id={`options_${item.id}`}
                       parent={item.id}
                       name="options"
@@ -464,65 +470,65 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
                       placeholder="Видит пользователь=Запишется в файл"
                       isRequied
                       validationErrors={validationErrors}
-                      onChange={onParameterInputChange}
+                      onChange={onOptionInputChange}
                     />
                     )
-                  }
+                    }
                     {
                     item.min !== undefined && (
                     <NumberField
-                      className={styles.parameter__item}
+                      className={styles.option__item}
                       id={`min_${item.id}`}
                       parent={item.id}
                       name="min"
                       min=""
                       label="Минимальное значение"
                       value={item.min}
-                      onChange={onParameterInputChange}
+                      onChange={onOptionInputChange}
                     />
                     )
-                  }
+                    }
                     {
                     item.max !== undefined && (
                     <NumberField
-                      className={styles.parameter__item}
+                      className={styles.option__item}
                       id={`max_${item.id}`}
                       parent={item.id}
                       name="max"
                       min=""
                       label="Максимальное значение"
                       value={item.max}
-                      onChange={onParameterInputChange}
+                      onChange={onOptionInputChange}
                     />
                     )
-                  }
+                    }
                     {
                     item.step !== undefined && (
                     <NumberField
-                      className={styles.parameter__item}
+                      className={styles.option__item}
                       id={`step_${item.id}`}
                       parent={item.id}
                       name="step"
                       min={0.001}
                       label="Шаг изменения значения"
                       value={item.step}
-                      onChange={onParameterInputChange}
+                      onChange={onOptionInputChange}
                     />
                     )
-                  }
+                    }
                   </React.Fragment>
                 </SpoilerListItem>
               ))
             }
             </ul>
             {
-              parameter.optionType !== GameSettingsOptionType.DEFAULT && (
+              option.optionType !== GameSettingsOptionType.DEFAULT && (
               <Button
                 className={classNames(
                   'main-btn',
-                  'parameter__btn',
+                  'option__btn',
                 )}
-                onClick={onAddParameterItemBtnClick}
+                onClick={onAddOptionItemBtnClick}
               >
                 Добавить параметр
               </Button>
@@ -534,7 +540,7 @@ export const GameSettingsParameterItem: React.FC<IProps> = ({
       <Button
         className={classNames(
           'main-btn',
-          'parameter__btn',
+          'option__btn',
         )}
         onClick={onDeleteFileBtnClick}
       >

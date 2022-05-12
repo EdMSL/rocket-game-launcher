@@ -96,7 +96,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         label="Путь до файла настроек"
         description="Состоит из переменной пути и самого пути к файлу. При выборе пути через диалоговое окно, переменная определяется автоматически." //eslint-disable-line
         selectorType={LauncherButtonAction.RUN}
-        options={generateSelectOptions(gameSettingsFileAvailableVariables)}
+        selectPathVariables={generateSelectOptions(gameSettingsFileAvailableVariables)}
         onChange={onPathSelectorChange}
       />
       <Select
@@ -105,7 +105,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         name="view"
         label="Тип структуры файла"
         description='Определяет, какая структура содержимого у файла. Неправильно выбранная структура приведет к ошибке обработки.' //eslint-disable-line
-        options={generateSelectOptions(GameSettingsFileView)}
+        selectOptions={generateSelectOptions(GameSettingsFileView)}
         value={file.view}
         onChange={onSelectChange}
       />
