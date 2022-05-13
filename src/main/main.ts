@@ -16,7 +16,7 @@ import {
   writeToLogFileSync,
 } from '$utils/log';
 import { showErrorBox } from '$utils/errors';
-import { getSystemInfo } from '$utils/data';
+import { getDisplaysInfo, getSystemInfo } from '$utils/system';
 import { createBackupFolders } from '$utils/backup';
 import { createFolderSync, getPathFromFileInput } from '$utils/files';
 import { USER_THEMES_DIR } from '$constants/paths';
@@ -49,6 +49,7 @@ const quitApp = (): void => {
 
 const start = async (): Promise<void> => {
   createLogFile();
+  getDisplaysInfo();
   getSystemInfo();
 
   appStore = createStorage();

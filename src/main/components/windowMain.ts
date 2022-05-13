@@ -11,7 +11,6 @@ import { Store } from 'redux';
 import { createWaitForWebpackDevServer } from './waitDevServer';
 import { defaultLauncherWindowSettings } from '$constants/defaultData';
 import { ILauncherConfig } from '$types/main';
-import { getDisplaysInfo } from '$utils/data';
 import {
   AppChannel, AppWindowName, AppWindowStateAction,
 } from '$constants/misc';
@@ -71,8 +70,6 @@ export const createMainWindow = (
   if (process.env.NODE_ENV === 'development' && fs.existsSync(pathToExtension)) {
     mainWindow.webContents.session.loadExtension(pathToExtension);
   }
-
-  getDisplaysInfo();
 
   if (process.env.NODE_ENV === 'production') {
     globalShortcut.register('F11', () => {

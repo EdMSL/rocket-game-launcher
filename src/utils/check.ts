@@ -235,7 +235,7 @@ const defaultOptionTypeSchema = Joi.object({
     Joi.ref('$view'), {
       is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
     },
-  ),
+  ).allow(''),
   controllerType: Joi.string().required().valid(...Object.values(UIControllerType)),
   selectOptions: Joi.object().pattern(
     Joi.string(),
@@ -301,7 +301,7 @@ const groupOptionTypeSchema = Joi.object({
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
-      ),
+      ).allow(''),
     })).required().min(2),
 });
 
@@ -351,7 +351,7 @@ const combinedOptionTypeSchema = Joi.object({
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
-      ),
+      ).allow(''),
     })).required().min(2),
 });
 
@@ -386,7 +386,7 @@ const relatedOptionTypeSchema = Joi.object({
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
-      ),
+      ).allow(''),
       controllerType: Joi.string().required().valid(UIControllerType.SELECT),
       selectOptions: Joi.object().pattern(
         Joi.string(),

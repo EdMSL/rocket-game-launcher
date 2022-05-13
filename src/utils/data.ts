@@ -1,5 +1,3 @@
-import { screen } from 'electron';
-import si from 'systeminformation';
 import path from 'path';
 
 import {
@@ -56,65 +54,15 @@ import {
   IGetDataFromFilesResult, IIniObj, IXmlObj, ISelectOption,
 } from '$types/common';
 
-const ONE_GB = 1073741824;
 const SYMBOLS_TO_TYPE = 8;
 
 interface IParameterErrorData { text: string, field: string, }
 
-export const isDataFromIniFile = (
-  fileView: string,
-  obj: IIniObj|IXmlObj,
-): obj is IIniObj => fileView === GameSettingsFileView.LINE || fileView === GameSettingsFileView.SECTIONAL;
-
-/**
- * Получить информацию о доступных дисплеях и записать их в файл лога.
-*/
-export const getDisplaysInfo = (): void => {
-  const mainDisplay = screen.getPrimaryDisplay();
-  const displays = screen.getAllDisplays();
-
-  let result = `Main display info. Resolution: ${mainDisplay.size.width}x${mainDisplay.size.height}, Work Area: ${mainDisplay.workArea.width}x${mainDisplay.workArea.height}, Work Area Size: ${mainDisplay.workAreaSize.width}x${mainDisplay.workAreaSize.height}, Scale: ${mainDisplay.scaleFactor}`; //eslint-disable-line max-len
-
-  if (displays.length > 1) {
-    result += '\r\n  All displays:';
-
-    displays.forEach((display, index) => {
-      result += `\r\n  ${index}: Resolution: ${display.size.width}x${display.size.height}, Work Area: ${display.workArea.width}x${display.workArea.height}, Work Area Size: ${display.workAreaSize.width}x${display.workAreaSize.height}, Scale: ${mainDisplay.scaleFactor}`; //eslint-disable-line max-len
-    });
-  }
-
-  writeToLogFileSync(result);
-};
-
-/**
- * Получить ифнормацию о системе и записать в файл лога.
-*/
-export const getSystemInfo = async (): Promise<void> => {
-  try {
-    const systemData = await si.get({
-      cpu: 'manufacturer, brand, speed',
-      osInfo: 'distro, arch',
-      graphics: 'controllers',
-      mem: 'total',
-    });
-    ///TODO Неверно определяет архитектуру
-    let result = `System info.\r\n  OS: ${systemData.osInfo.distro}, ${systemData.osInfo.arch}.\r\n  CPU: ${systemData.cpu.manufacturer} ${systemData.cpu.brand}, ${systemData.cpu.speed}GHz.\r\n  Memory: ${(systemData.mem.total / ONE_GB).toFixed(2)}Gb.`; //eslint-disable-line max-len
-
-    if (systemData.graphics.controllers.length > 1) {
-      result += '\r\n  Graphic cards:';
-
-      systemData.graphics.controllers.forEach((element, index) => {
-        result += `\r\n  ${index}: ${element.vendor} ${element.model} ${element.vram}Mb.`; //eslint-disable-line max-len
-      });
-    } else {
-      result += `\r\n  Graphics: ${systemData.graphics.controllers[0].vendor} ${systemData.graphics.controllers[0].model} ${systemData.graphics.controllers[0].vram}Mb.`; //eslint-disable-line max-len
-    }
-
-    writeToLogFile(result);
-  } catch (error: any) {
-    writeToLogFile(error.message, LogMessageType.ERROR);
-  }
-};
+interface IParameterGeneratedData {
+  parameterName: string,
+  parameterValue: string,
+  parameterErrors: IParameterErrorData[],
+}
 
 /**
  * Получить тип у элемента. В отличие от `typeof` разделяет `array` и `oject`.
@@ -124,14 +72,9 @@ export const getSystemInfo = async (): Promise<void> => {
 export const getTypeOfElement = (element: unknown): string => {
   const getElementType = {}.toString;
   const elementType = getElementType.call(element).slice(SYMBOLS_TO_TYPE, -1);
+
   return elementType;
 };
-
-export interface IGameSettingsParameterGeneratedData {
-  parameterName: string,
-  parameterValue: string,
-  parameterErrors: IParameterErrorData[],
-}
 
 /**
  * Сгенерировать имя игрового параметра на основе опции, к которой привязан данный параметр.
@@ -141,7 +84,7 @@ export const getParameterName = (
   option: IGameSettingsOption|IGameSettingsOptionItem,
 ): string => {
   if (option.valueName) {
-    return `${option.valuePath ? `${option.valuePath}/` : ''}${option.name}/${option.valueName}`; //eslint-disable-line max-len
+    return `${option.valuePath || ''}${option.name}/${option.valueName}`;
   }
 
   if (option.iniGroup) {
@@ -240,7 +183,7 @@ export const getParameterData = (
   currentGameSettingOption: IGameSettingsOption|IGameSettingsOptionItem,
   currentGameSettingsFile: IGameSettingsFile,
   moProfileName = '',
-): IGameSettingsParameterGeneratedData => {
+): IParameterGeneratedData => {
   const parameterErrors: IParameterErrorData[] = [];
   const baseFileName = path.basename(currentGameSettingsFile.path);
 
@@ -289,7 +232,12 @@ export const getParameterData = (
       });
     }
   } else if (currentGameSettingsFile.view === GameSettingsFileView.TAG) {
-    const valuePathArr = [...currentGameSettingOption.valuePath!?.split('/')];
+    let valuePathArr: string[] = [];
+
+    if (currentGameSettingOption.valuePath) {
+      valuePathArr = [...currentGameSettingOption.valuePath!?.split('/')];
+    }
+
     const pathArr = [
       ...valuePathArr,
       currentGameSettingOption.name!,
@@ -297,6 +245,7 @@ export const getParameterData = (
     ];
 
     let index = 0;
+
     const getProp = (obj, key): void => {
       index += 1;
 
@@ -318,7 +267,7 @@ export const getParameterData = (
         errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingOption.valueName}" attribute in "${currentGameSettingOption.name}" parameter specified in "${currentGameSettingsFile.label}".`; //eslint-disable-line max-len
         errorField = 'valueName';
       } else if (index === pathArr.length - 1) {
-        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingOption.name}" parameter specified in "${currentGameSettingsFile.label}".`; //eslint-disable-line max-len
+        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingOption.name}" parameter${currentGameSettingOption.valuePath ? ` on the path "${currentGameSettingOption.valuePath}"` : ''} specified in "${currentGameSettingsFile.label}".`; //eslint-disable-line max-len
         errorField = 'name';
       } else {
         errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${pathArr[index - 1]}" tag specified in "valuePath" in "${currentGameSettingsFile.label}".`; //eslint-disable-line max-len
