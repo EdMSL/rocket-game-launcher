@@ -228,9 +228,9 @@ export const setValueForObjectDeepKey = (lib, keys, newValue): void => {
 
 /**
  * Генерирует объект с полями, необходимыми для создания
- * объекта игровой опции для записи в state.
+ * игрового параметра для записи в state.
  * @param currentFileData Данные из файла, которые используются в опции.
- * @param currentGameSettingOption Объект параметра, на основе которого создается опция.
+ * @param currentGameSettingOption Объект опции, на основе которой создается параметр.
  * @param currentGameSettingsFile Объект файла, используемого параметром.
  * @param moProfileName Профиль МО.
  * @returns Объект с полями имени и значения параметра, а так же ошибок генерации.
@@ -438,7 +438,7 @@ export const generateGameSettingsParameters = (
 };
 
 /**
- * Генерирует опции (`options`) для UI компонента `Select`.
+ * Генерирует опции для UI компонента `Select`.
  * @param obj Объект или массив строк, на основе которых будет сгенерирован список опций.
  * @returns Массив с опциями.
 */
@@ -477,13 +477,13 @@ export const getGameSettingsGroupsNames = (
 ): string[] => gameSettingsGroups.map((group) => group.name);
 
 /**
- * Получает список параметров для вывода в виде опций. Если есть `gameSettingsGroups`,
- * то фильтрует по текущей группе.
- * @param gameSettingsOptions Список параметров из `state`.
+ * Получить список игровых опций для вывода.
+ * Если есть `gameSettingsGroups`, то дополнительно фильтрует по текущей группе.
+ * @param gameSettingsOptions Список опций из `state`.
  * @param gameSettingsGroups Список доступных групп настроек из `state`.
  * @param gameSettingsFiles Список файлов из `state`.
  * @param currentGameSettingGroup текущая группа настроек.
- * @returns Массив с параметрами для генерации игровый опций.
+ * @returns Массив с опциями для вывода.
 */
 export const getOptionsForOutput = (
   gameSettingsOptions: IGameSettingsRootState['gameSettingsOptions'],
@@ -506,12 +506,12 @@ export const getOptionsForOutput = (
 };
 
 /**
- * Генерирует Parameter для `gameSettingsParameters` из `state` с новым значением `value`.
- * @param currentParameter Опция для изменения.
- * @param newValue Новое значение `value` для опции.
- * @returns Объект опции.
+ * Изменить текущее значение игрового параметра.
+ * @param currentParameter Параметр для изменения.
+ * @param newValue Новое значение.
+ * @returns Объект параметра с новым значением.
 */
-export const generateNewGameSettingsParameter = (
+export const changeParameterValue = (
   currentParameter: IGameSettingsParameterElem,
   newValue: string|number,
 ): IGameSettingsParameterElem => ({
@@ -520,20 +520,20 @@ export const generateNewGameSettingsParameter = (
 });
 
 /**
- * Получить Parameters, которые были изменены пользователем.
- * @param gameSettingsParameters Игровые опции из `state`.
+ * Получить игровые параметры, которые были изменены.
+ * @param gameSettingsParameters Игровые параметры из `state`.
 */
 export const getChangedGameSettingsParameters = (
   gameSettingsParameters: IGameSettingsParameters,
 ): IGameSettingsParameters => Object.keys(gameSettingsParameters)
-  .reduce<IGameSettingsParameters>((totalParameters, optionName) => {
-    const parameter = gameSettingsParameters[optionName];
+  .reduce<IGameSettingsParameters>((totalParameters, parameterName) => {
+    const parameter = gameSettingsParameters[parameterName];
 
     if (parameter.value !== parameter.default) {
       return {
         ...totalParameters,
-        [optionName]: {
-          ...gameSettingsParameters[optionName],
+        [parameterName]: {
+          ...gameSettingsParameters[parameterName],
         },
       };
     }
@@ -544,8 +544,8 @@ export const getChangedGameSettingsParameters = (
   }, {});
 
 /**
- * Получить опции игровых настроек с новыми значениями для стандартного или текущего значения.
- * @param gameSettingsParameters Игровые опции из `state`.
+ * Получить игровые параметры с новыми значениями для стандартного или текущего значения.
+ * @param gameSettingsParameters Игровые параметры из `state`.
  * @param isForDefaultValue Определяет, прописать опциям новые значения по умолчанию
  * или заменить текущие значения значениями по умолчанию.
  * @returns Объект игровых опций с новыми значениями.
@@ -1044,9 +1044,9 @@ export const changeConfigArrayItem = <P extends { id: string, }>(
 
 /**
  * Получить измененные игровые опции после удаления игрового файла.
- * @param options Массив игровых параметров.
+ * @param options Массив игровых опций.
  * @param files Массив игровых файлов.
- * @returns Массив измененных игровых параметров.
+ * @returns Массив измененных игровых опций.
  */
 export const getChangedOptionsAfterFileDelete = (
   options: IGameSettingsOption[],
@@ -1067,7 +1067,7 @@ export const getChangedOptionsAfterFileDelete = (
 });
 
 /**
- * Получить объект строк для всех `select` игрового параметра.
+ * Получить объект строк для всех `select` игровой опции.
  * @param option Объект игровой опции.
  * @returns Объект, содержащий строковое представление опций всех `select`.
  */

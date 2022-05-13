@@ -164,7 +164,7 @@ export const validateNumberInputs = (
   return errors;
 };
 
-const validateOptionItemFields = (option: IGameSettingsOption) => {
+const validateOptionItemFields = (option: IGameSettingsOption): IValidationErrors => {
   let errors: IValidationErrors = {};
 
   option.items?.forEach((item) => {

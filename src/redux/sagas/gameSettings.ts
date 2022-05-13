@@ -295,7 +295,7 @@ export function* generateGameSettingsParametersSaga(
 /**
  * Инициализация игровых настроек. Получаем данные МО,
  * проверяем на валидность параметры игровых настроек (`gameSettingsOptions`),
- * генерируем опции игровых настроек.
+ * генерируем параметры игровых настроек.
  * @param isFromUpdateAction Обновление настроек или первичная инициализация.
 */
 export function* initGameSettingsSaga(
@@ -509,7 +509,7 @@ function* changeMOProfileSaga(
 
 /**
  * Сохранить изменения в файлах игровых настроек.
- * @param changedGameSettingsParameters Измененные опции игровых параметров.
+ * @param changedGameSettingsParameters Измененные игровые параметры.
 */
 function* writeGameSettingsFilesSaga(
   { payload: changedGameSettingsParameters }: ReturnType<typeof saveGameSettingsFiles>,

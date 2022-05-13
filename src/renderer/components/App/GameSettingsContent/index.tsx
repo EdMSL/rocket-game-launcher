@@ -9,7 +9,7 @@ import {
   IGameSettingsRootState,
 } from '$types/gameSettings';
 import {
-  generateNewGameSettingsParameter,
+  changeParameterValue,
   generateSelectOptions,
   getOptionNameAndId,
   getOptionsForOutput,
@@ -41,12 +41,11 @@ interface IProps {
 /**
  * Компонент для отображения игровых опций в виде контроллеров.
  * @param isGameSettingsLoaded Загружены ли игровые настройки. Берется из `state`.
- * @param gameSettingsGroups Массив доступных групп игровых настроек из `state`.
- * @param gameSettingsFiles Массив файлов с игровыми параметрами из `state`,
- * на основе которых сгенерированы опции игровых настроек.
- * @param gameSettingsOptions Массив игровых параметров из `state`.
- * @param gameSettingsParameters Объект с обработанными опциями из `state`, готовыми для вывода.
- * @param onSettingOptionChange callback функция, вызываемая при изменении значения опции
+ * @param gameSettingsGroups Группы игровых настроек из `state`.
+ * @param gameSettingsFiles Файлы игровых настроек из `state`.
+ * @param gameSettingsOptions Опции игровых настроек из `state`.
+ * @param gameSettingsParameters Параметры игровых настроек из `state`.
+ * @param onSettingOptionChange Функция, вызываемая при изменении опции
  * через контроллер.
 */
 export const GameSettingsContent: React.FunctionComponent<IProps> = ({
@@ -76,7 +75,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
 
     onSettingOptionChange(
       {
-        [optionId]: generateNewGameSettingsParameter(
+        [optionId]: changeParameterValue(
           gameSettingsParameters[optionId],
           isParameterDefaultValueFloat
             ? getValueFromRange(value, min, max).toFixed(getNumberOfDecimalPlaces(value))
@@ -120,7 +119,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
 
           return {
             ...parameters,
-            [currentParameterName]: generateNewGameSettingsParameter(
+            [currentParameterName]: changeParameterValue(
               gameSettingsParameters[currentParameterName],
               newValue,
             ),
@@ -128,7 +127,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
         }, {});
     } else {
       newGameParameters = {
-        [target.id]: generateNewGameSettingsParameter(
+        [target.id]: changeParameterValue(
           gameSettingsParameters[target.id],
           value,
         ),
