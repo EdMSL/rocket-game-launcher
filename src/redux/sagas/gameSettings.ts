@@ -12,6 +12,7 @@ import Joi from 'joi';
 
 import { IAppState } from '$store/store';
 import {
+  isDataFromIniFile,
   readDirectory,
   readGameSettingsFile,
   readINIFile,
@@ -61,11 +62,11 @@ import {
   SagaError,
 } from '$utils/errors';
 import {
-  changeSectionalIniParameter,
+  changeLineIniParameterStr,
+  changeSectionalIniParameterStr,
   generateGameSettingsParameters,
   getFileByFileName,
   getGameSettingsParametersWithNewValues,
-  isDataFromIniFile,
   setValueForObjectDeepKey,
 } from '$utils/data';
 import {
@@ -78,7 +79,6 @@ import {
 import {
   getRegExpForLineIniParameter,
   getPathToFile,
-  getStringPartFromLineIniParameterForReplace,
 } from '$utils/strings';
 
 export interface IIncorrectGameSettingsFiles {
@@ -453,7 +453,7 @@ function* changeMOProfileSaga(
       pathVariables['%MO_INI%'],
     );
 
-    changeSectionalIniParameter(
+    changeSectionalIniParameterStr(
       iniData,
       modOrganizerProfileSection,
       modOrganizerProfileParam,
@@ -514,6 +514,7 @@ function* changeMOProfileSaga(
 function* writeGameSettingsFilesSaga(
   { payload: changedGameSettingsParameters }: ReturnType<typeof saveGameSettingsFiles>,
 ): SagaIterator {
+  // console.log(changedGameSettingsParameters);
   try {
     yield put(setIsGameSettingsSaving(true));
 
@@ -553,7 +554,7 @@ function* writeGameSettingsFilesSaga(
         ) {
           const parameterNameParts = currentParameter.name.split('/');
 
-          changeSectionalIniParameter(
+          changeSectionalIniParameterStr(
             currWriteFileContent,
             parameterNameParts[0],
             parameterNameParts[1],
@@ -565,9 +566,10 @@ function* writeGameSettingsFilesSaga(
         ) {
           currWriteFileContent.globals.lines.some((line) => {
             if (getRegExpForLineIniParameter(currentParameter.name).test(line.text)) {
-              line.text = line.text.replace(//eslint-disable-line no-param-reassign
-                getStringPartFromLineIniParameterForReplace(line.text, currentParameter.name),
-                `set ${currentParameter.name} to ${changedGameSettingsParameters[parameterId].value}`,
+              line.text = changeLineIniParameterStr( //eslint-disable-line no-param-reassign
+                line.text,
+                currentParameter.name,
+                changedGameSettingsParameters[parameterId].value,
               );
 
               return true;

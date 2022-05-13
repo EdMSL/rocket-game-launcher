@@ -79,7 +79,7 @@
       "settingGroup": "qM3joLYOXUE5qD6J",
       "items": [
         {
-          "name": "DMSMain.VolumeNormal",
+          "name": "DMSMain.VolumeNormalto",
           "controllerType": "select",
           "selectOptions": {
             "aaa": "0.1",

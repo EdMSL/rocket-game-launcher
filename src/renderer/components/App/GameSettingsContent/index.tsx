@@ -102,25 +102,25 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
     } else if (target.type === HTMLInputType.CHECKBOX) {
       value = +(target as HTMLInputElement).checked;
     }
-
+    ///FIXME
     if (target.dataset.multiparameters) {
       newGameParameters = target.dataset.multiparameters
         .split(',')
-        .reduce<IGameSettingsParameters>((parameters, currentParameterName, index) => {
+        .reduce<IGameSettingsParameters>((parameters, currentParameterId, index) => {
           let newValue: string|number = '';
 
           if (target.dataset.iscombined) {
             newValue = value.toString().split(target.dataset.separator!)[index];
           } else {
-            newValue = currentParameterName === target.id
+            newValue = currentParameterId === target.id
               ? value
-              : gameSettingsParameters[currentParameterName].value;
+              : gameSettingsParameters[currentParameterId].value;
           }
 
           return {
             ...parameters,
-            [currentParameterName]: changeParameterValue(
-              gameSettingsParameters[currentParameterName],
+            [currentParameterId]: changeParameterValue(
+              gameSettingsParameters[currentParameterId],
               newValue,
             ),
           };
@@ -133,7 +133,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
         ),
       };
     }
-
+    console.log(newGameParameters);
     if (value.toString()) {
       onSettingOptionChange(newGameParameters);
     }

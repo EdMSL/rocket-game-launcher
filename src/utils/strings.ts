@@ -76,20 +76,39 @@ export const getStringPartFromLineIniParameterForReplace = (
 ): string => lineText.match(new RegExp(`set\\s+${parameterName}\\s+to\\s+([^;]+)`, 'i'))![0].trim();
 
 /**
+ * Получить строки с пробелами после параметра и перед значением.
+ * Пробелы ставятся до и после разделителя в строке параметра.
+ * @param parameterStr Строка параметра.
+ * @returns Массив, содержащий строки с пробелами до и после разделителя.
+ */
+export const getSpacesFromParameterString = (parameterStr: string): [string, string] => {
+  const separator = parameterStr.includes('=') ? '=' : 'to';
+  const forBeforeResult = parameterStr.match(
+    new RegExp(`(\\s*)${separator}`),
+  );
+  const forAfterResult = parameterStr.match(
+    new RegExp(`(?<=${separator})\\s*(?<!\\S)`),
+  );
+
+  return [
+    forBeforeResult !== null ? forBeforeResult[0].replace(separator, '') : '',
+    forAfterResult !== null ? forAfterResult[0] : '',
+  ];
+};
+
+/**
  * Получить значение параметра из файла вида `line`.
  * @param lineText Строка, в которой осуществляется поиск.
  * @param parameterName Имя параметра, который ищем.
  * @returns Найденная значение.
 */
-export const getLineIniParameterValue = (lineText: string, parameterNameRegexp: RegExp): string => {
-  const paramResult = lineText.match(parameterNameRegexp);
+export const getLineIniParameterValue = (lineText: string, parameterName: string): string => {
+  const paramResult = lineText.match(getRegExpForLineIniParameter(parameterName.trim()));
 
-  if (paramResult!?.length > 0) {
-    // @ts-ignore
+  if (paramResult) {
     const value = paramResult[0].match(/to\s+([^;]+);?/);
 
-    if (value!?.length > 1) {
-      // @ts-ignore
+    if (value && value.length > 1) {
       return value[1].trim();
     }
   }

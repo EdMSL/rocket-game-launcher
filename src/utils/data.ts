@@ -17,11 +17,12 @@ import {
   clearPathVaribaleFromPathString,
   generateSelectOptionsString,
   getLineIniParameterValue,
-  getRegExpForLineIniParameter,
   getPathToFile,
   getRandomId,
   getRandomName,
   replacePathVariableByRootDir,
+  getSpacesFromParameterString,
+  getStringPartFromLineIniParameterForReplace,
 } from './strings';
 import {
   IGameSettingsOptionItem,
@@ -64,6 +65,12 @@ interface IParameterGeneratedData {
   parameterErrors: IParameterErrorData[],
 }
 
+interface IParametersGeneratedData {
+  data: IGameSettingsParameters,
+  errors: IParameterErrorData[],
+  optionsWithError: string[],
+}
+
 /**
  * Получить тип у элемента. В отличие от `typeof` разделяет `array` и `oject`.
  * @param element Элемент, для которого нужно определить тип.
@@ -84,7 +91,7 @@ export const getParameterName = (
   option: IGameSettingsOption|IGameSettingsOptionItem,
 ): string => {
   if (option.valueName) {
-    return `${option.valuePath || ''}${option.name}/${option.valueName}`;
+    return `${option.valuePath ? `${option.valuePath}/` : ''}${option.name}/${option.valueName}`;
   }
 
   if (option.iniGroup) {
@@ -125,7 +132,7 @@ export const getFileByFileName = (
  * @param deleteKey Ключ объекта, который нужно удалить при клонировании.
  * @returns Клон переданного объекта.
  */
-export const deepClone = (obj, deleteKey = '') => {
+export const deepClone = (obj: any, deleteKey = ''): object => {
   const clone = { ...obj };
 
   Object.keys(clone).forEach(
@@ -153,19 +160,31 @@ export const deepClone = (obj, deleteKey = '') => {
   return clone;
 };
 
-export const getValueFromObjectDeepKey = <T>(lib, keys): T => {
+export const getValueFromObjectDeepKey = <T>(lib: Record<string, any>, keys: string[]): T => {
   const key = keys.shift();
 
-  return keys.length ? getValueFromObjectDeepKey(lib[key], keys) : lib[key];
+  if (key) {
+    return keys.length > 0 ? getValueFromObjectDeepKey(lib[key], keys) : lib[key];
+  }
+
+  throw new Error('"keys" array is empty.');
 };
 
-export const setValueForObjectDeepKey = (lib, keys, newValue): void => {
+export const setValueForObjectDeepKey = <T>(
+  lib: Record<string, any>,
+  keys: string[],
+  newValue: T,
+): void => {
   const key = keys.shift();
 
-  if (keys.length) {
-    setValueForObjectDeepKey(lib[key], keys, newValue);
+  if (key) {
+    if (keys.length > 0) {
+      setValueForObjectDeepKey(lib[key], keys, newValue);
+    } else {
+      lib[key] = newValue; //eslint-disable-line no-param-reassign
+    }
   } else {
-    lib[key] = newValue; //eslint-disable-line no-param-reassign
+    throw new Error('"keys" array is empty.');
   }
 };
 
@@ -213,10 +232,11 @@ export const getParameterData = (
       }
     }
   } else if (currentGameSettingsFile.view === GameSettingsFileView.LINE) {
-    currentFileData.globals.lines.some((line) => {
-      const searchRegexp = getRegExpForLineIniParameter(currentGameSettingOption.name!.trim());
+    (currentFileData as IIniObj).globals.lines.some((line) => {
+      // const searchRegExp = getRegExpForLineIniParameter(currentGameSettingOption.name!.trim());
 
-      parameterValue = getLineIniParameterValue(line.text, searchRegexp);
+      // parameterValue = getLineIniParameterValue(line.text, searchRegExp);
+      parameterValue = getLineIniParameterValue(line.text, currentGameSettingOption.name!.trim());
 
       if (parameterValue) {
         parameterName = currentGameSettingOption.name;
@@ -246,7 +266,7 @@ export const getParameterData = (
 
     let index = 0;
 
-    const getProp = (obj, key): void => {
+    const getProp = (obj, key: string): void => {
       index += 1;
 
       if (typeof obj[key] === 'object') {
@@ -290,54 +310,80 @@ export const generateGameSettingsParameters = (
   gameSettingsFiles: IGameSettingsFile[],
   currentFilesDataObj: IGetDataFromFilesResult,
   moProfile: string,
-): { data: IGameSettingsParameters, errors: IParameterErrorData[], optionsWithError: string[], } => {
+): IParametersGeneratedData => {
   let errors: IParameterErrorData[] = [];
   let optionsWithError: string[] = [];
 
   const data = gameSettingsOptions.reduce<IGameSettingsParameters>(
     (gameSettingsParameters, currentOption) => {
-      const currentGameSettingsFile: IGameSettingsFile = getFileByFileName(gameSettingsFiles, currentOption.file)!;
+      const currentGameSettingsFile: IGameSettingsFile|undefined = getFileByFileName(
+        gameSettingsFiles,
+        currentOption.file,
+      );
 
-      if (
-        currentOption.optionType === GameSettingsOptionType.RELATED
-        || currentOption.optionType === GameSettingsOptionType.GROUP
-        || currentOption.optionType === GameSettingsOptionType.COMBINED
-      ) {
-        let specParamsErrors: IParameterErrorData[] = [];
+      if (currentGameSettingsFile !== undefined) {
+        if (
+          currentOption.optionType === GameSettingsOptionType.RELATED
+          || currentOption.optionType === GameSettingsOptionType.GROUP
+          || currentOption.optionType === GameSettingsOptionType.COMBINED
+        ) {
+          let specParamsErrors: IParameterErrorData[] = [];
 
-        const parametersFromOption = currentOption.items!.reduce<IGameSettingsParameters>(
-          (parameters, currentItem) => {
-            const {
-              parameterName, parameterValue, parameterErrors,
-            } = getParameterData(
-              currentFilesDataObj[currentOption.file],
-              currentItem,
-              currentGameSettingsFile,
-              moProfile,
-            );
+          const parametersFromOption = currentOption.items!.reduce<IGameSettingsParameters>(
+            (parameters, currentItem) => {
+              const {
+                parameterName, parameterValue, parameterErrors,
+              } = getParameterData(
+                currentFilesDataObj[currentOption.file],
+                currentItem,
+                currentGameSettingsFile,
+                moProfile,
+              );
 
-            if (parameterErrors.length > 0) {
-              specParamsErrors = [...parameterErrors];
+              if (parameterErrors.length > 0) {
+                specParamsErrors = [...parameterErrors];
 
-              return { ...parameters };
-            }
+                return { ...parameters };
+              }
 
-            return {
-              ...parameters,
-              [getOptionNameAndId(currentItem).id]: {
-                default: parameterValue,
-                value: parameterValue,
-                name: parameterName,
-                option: currentOption.id,
-                file: currentOption.file,
-              },
-            };
-          },
-          {},
+              return {
+                ...parameters,
+                [getOptionNameAndId(currentItem).id]: {
+                  default: parameterValue,
+                  value: parameterValue,
+                  name: parameterName,
+                  option: currentOption.id,
+                  file: currentOption.file,
+                },
+              };
+            },
+            {},
+          );
+
+          if (specParamsErrors.length > 0) {
+            errors = [...errors, ...specParamsErrors];
+            optionsWithError.push(currentOption.id);
+
+            return { ...gameSettingsParameters };
+          }
+
+          return {
+            ...gameSettingsParameters,
+            ...parametersFromOption,
+          };
+        }
+
+        const {
+          parameterName, parameterValue, parameterErrors,
+        } = getParameterData(
+          currentFilesDataObj[currentGameSettingsFile!.name],
+          currentOption,
+          currentGameSettingsFile,
+          moProfile,
         );
 
-        if (specParamsErrors.length > 0) {
-          errors = [...errors, ...specParamsErrors];
+        if (parameterErrors.length > 0) {
+          errors = [...errors, ...parameterErrors];
           optionsWithError.push(currentOption.id);
 
           return { ...gameSettingsParameters };
@@ -345,36 +391,26 @@ export const generateGameSettingsParameters = (
 
         return {
           ...gameSettingsParameters,
-          ...parametersFromOption,
+          [getOptionNameAndId(currentOption).id]: {
+            default: parameterValue,
+            name: parameterName,
+            value: parameterValue,
+            option: currentOption.id,
+            file: currentOption.file,
+          },
         };
       }
 
-      const {
-        parameterName, parameterValue, parameterErrors,
-      } = getParameterData(
-        currentFilesDataObj[currentGameSettingsFile!.name],
-        currentOption,
-        currentGameSettingsFile,
-        moProfile,
-      );
-
-      if (parameterErrors.length > 0) {
-        errors = [...errors, ...parameterErrors];
-        optionsWithError.push(currentOption.id);
-
-        return { ...gameSettingsParameters };
-      }
-
-      return {
-        ...gameSettingsParameters,
-        [getOptionNameAndId(currentOption).id]: {
-          default: parameterValue,
-          name: parameterName,
-          value: parameterValue,
-          option: currentOption.id,
-          file: currentOption.file,
+      errors = [
+        ...errors,
+        {
+          text: `file ${currentOption.file} does not exists on [${gameSettingsFiles.join()}]`,
+          field: 'file',
         },
-      };
+      ];
+      optionsWithError.push(currentOption.id);
+
+      return { ...gameSettingsParameters };
     },
     {},
   );
@@ -392,7 +428,7 @@ export const generateGameSettingsParameters = (
  * @returns Массив с опциями.
 */
 export const generateSelectOptions = (
-  obj: { [key: string]: string, } | string[],
+  obj: Record<string, string> | string[],
 ): ISelectOption[] => {
   if (Array.isArray(obj)) {
     return obj.map((key) => ({
@@ -408,7 +444,6 @@ export const generateSelectOptions = (
 };
 
 /**
- *
  * @param gameSettingsFiles Игровые файлы из `state`.
  * @returns Массив имен игровых файлов.
  */
@@ -417,7 +452,6 @@ export const getGameSettingsFilesNames = (
 ): string[] => gameSettingsFiles.map((file) => file.name);
 
 /**
- *
  * @param gameSettingsGroups Группы игровых настроек из `state`.
  * @returns Массив имен групп.
  */
@@ -463,10 +497,14 @@ export const getOptionsForOutput = (
 export const changeParameterValue = (
   currentParameter: IGameSettingsParameterElem,
   newValue: string|number,
-): IGameSettingsParameterElem => ({
-  ...currentParameter,
-  value: String(newValue),
-});
+): IGameSettingsParameterElem => {
+  const a = {
+    ...currentParameter,
+    value: String(newValue),
+  };
+  console.log(newValue);
+  return a;
+};
 
 /**
  * Получить игровые параметры, которые были изменены.
@@ -542,7 +580,7 @@ export const getBackupFolderName = (): string => {
  * @param parameterName Изменяемый параметр.
  * @param newValue Новое значение для параметра.
 */
-export const changeSectionalIniParameter = (
+export const changeSectionalIniParameterStr = (
   iniData: IIniObj,
   sectionName: string,
   parameterName: string,
@@ -551,8 +589,8 @@ export const changeSectionalIniParameter = (
   const defaultLineText: string = iniData
     .getSection(sectionName)
     .getLine(parameterName).text;
-  const spacesBefore = defaultLineText.match(/(\s*)=/gm)![0];
-  const spacesAfter = defaultLineText.match(/(?<==)\s*(?<!\S)/);
+
+  const [spacesBefore, spacesAfter] = getSpacesFromParameterString(defaultLineText);
 
   iniData
     .getSection(sectionName)
@@ -566,11 +604,24 @@ export const changeSectionalIniParameter = (
     .getLine(parameterName)
     .text
     .split('=')
-    .join(`${spacesBefore}${spacesAfter ? spacesAfter.join('') : []}`);
+    .join(`${spacesBefore}=${spacesAfter}`);
 
   iniData //eslint-disable-line no-param-reassign
     .getSection(sectionName)
     .getLine(parameterName).text = currLineText;
+};
+
+export const changeLineIniParameterStr = (
+  parameterStr: string,
+  parameterName: string,
+  newValue: string,
+): string => {
+  const [spacesBefore, spacesAfter] = getSpacesFromParameterString(parameterStr);
+
+  return parameterStr.replace(//eslint-disable-line no-param-reassign
+    getStringPartFromLineIniParameterForReplace(parameterStr, parameterName),
+    `set ${parameterName}${spacesBefore}to${spacesAfter}${newValue}`,
+  );
 };
 
 export const getApplicationArgs = (args: string[]): string[] => args.map((arg) => {
