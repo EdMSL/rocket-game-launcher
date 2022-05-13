@@ -104,10 +104,13 @@ export const GameSettingsScreen: React.FC = () => {
   );
 
   const onSettingOptionChange = useCallback((
-    parameters: IGameSettingsParameters,
+    changedParameters: IGameSettingsParameters,
   ) => {
-    dispatch(setGameSettingsParameters(parameters));
-  }, [dispatch]);
+    dispatch(setGameSettingsParameters({
+      ...gameSettingsParameters,
+      ...changedParameters,
+    }));
+  }, [dispatch, gameSettingsParameters]);
 
   const onGameSettingsFormSubmit = useCallback((event) => {
     event.preventDefault();
@@ -122,7 +125,9 @@ export const GameSettingsScreen: React.FC = () => {
   }, [dispatch]);
 
   const onCancelSettingsBtnClick = useCallback(() => {
-    dispatch(setGameSettingsParameters(getGameSettingsParametersWithNewValues(gameSettingsParameters, false)));
+    dispatch(setGameSettingsParameters(
+      getGameSettingsParametersWithNewValues(gameSettingsParameters, false),
+    ));
     setIsGameParametersChanged(false);
   }, [dispatch, gameSettingsParameters]);
 

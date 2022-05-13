@@ -102,6 +102,7 @@ function* updateGameSettingsParametersSaga(
 ): SagaIterator {
   try {
     yield put(setIsGameSettingsAvailable(false));
+    yield put(setGameSettingsParameters({}));
 
     yield call(initGameSettingsSaga, true, gameSetingsConfig);
   } catch (error: any) {

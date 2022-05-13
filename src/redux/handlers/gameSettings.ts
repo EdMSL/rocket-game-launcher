@@ -11,10 +11,7 @@ const setGameSettingsParameters: IGameSettingsActionHadler<
   { payload: newGameSettingsParameters },
 ) => ({
   ...state,
-  gameSettingsParameters: {
-    ...state.gameSettingsParameters,
-    ...newGameSettingsParameters,
-  },
+  gameSettingsParameters: newGameSettingsParameters,
 });
 
 const setGameSettingsConfig: IGameSettingsActionHadler<
