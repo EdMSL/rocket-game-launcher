@@ -101,10 +101,12 @@ interface IIniSection {
   getLine: (key: string) => IIniLine,
 }
 
+interface IGlobals{
+  lines: IIniLine[],
+}
+
 export interface IIniObj {
-  globals: {
-    lines: IIniLine[],
-  },
+  globals: IGlobals,
   lineBreak: string,
   sections: IIniSection[],
   stringify: () => string,

@@ -33,6 +33,12 @@ export const iconvDecode = (str: string, encoding = Encoding.CP866): string => i
   encoding,
 );
 
+export const isDataFromIniFile = (
+  fileView: string,
+  obj: IIniObj|IXmlObj,
+): obj is IIniObj => fileView === GameSettingsFileView.LINE
+  || fileView === GameSettingsFileView.SECTIONAL;
+
 /**
  * Асинхронно получить содержимое папки.
  * @param directoryPath Путь к папке.

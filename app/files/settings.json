@@ -82,18 +82,18 @@
           "name": "DMSMain.VolumeNormal",
           "controllerType": "select",
           "selectOptions": {
-            "aaa": "1",
-            "bbb": "2",
-            "ввв": "4"
+            "aaa": "0.1",
+            "bbb": "0.7",
+            "ввв": "1.4"
           }
         },
         {
           "name": "DMSMain.VolumeBattle",
           "controllerType": "select",
           "selectOptions": {
-            "eee": "4",
-            "fff": "5",
-            "ккк": "0"
+            "eee": "0.1",
+            "fff": "0.7",
+            "ккк": "1.4"
           }
         }
       ]
