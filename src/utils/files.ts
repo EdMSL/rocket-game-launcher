@@ -28,11 +28,23 @@ import { IIniObj, IXmlObj } from '$types/common';
 
 export const xmlAttributePrefix = '@_';
 
+/**
+ * Декодирует строку в указанной кодировке.
+ * @param str Строка для декодирования.
+ * @param encoding Применяемая кодировка.
+ * @returns Декодированная строка.
+ */
 export const iconvDecode = (str: string, encoding = Encoding.CP866): string => iconv.decode(
   Buffer.from(str, 'binary'),
   encoding,
 );
 
+/**
+ * Определяет, соответствует ли структура переданных данных структуре INI файла.
+ * @param fileView Требуемая структура файла.
+ * @param obj Объект с данными из файла.
+ * @returns `true`, если структура данных соотвтествует INI файлу, иначе `false`.
+ */
 export const isDataFromIniFile = (
   fileView: string,
   obj: IIniObj|IXmlObj,
@@ -40,7 +52,7 @@ export const isDataFromIniFile = (
   || fileView === GameSettingsFileView.SECTIONAL;
 
 /**
- * Асинхронно получить содержимое папки.
+ * Асинхронно получает содержимое папки по указанному пути.
  * @param directoryPath Путь к папке.
  * @returns Массив с именами файлов\папок.
 */
@@ -59,7 +71,7 @@ export const readDirectory = (
   });
 
 /**
- * Синхронно получить содержимое папки.
+ * Синхронно получает содержимое папки по указанному пути.
  * @param directoryPath Путь к папке.
  * @returns Массив с именами файлов\папок.
 */
@@ -72,7 +84,7 @@ export const readDirectorySync = (
     const readWriteError = getReadWriteError(error, true);
 
     throw new ReadWriteError(
-      `Can't read folder. ${readWriteError.message}`,
+      `Can't read directory. ${readWriteError.message}`,
       readWriteError,
       directoryPath,
     );
@@ -80,8 +92,8 @@ export const readDirectorySync = (
 };
 
 /**
- * Синхронно создать папку.
- * @param directoryPath Путь к новой папке.
+ * Синхронно создает папку по указанному пути.
+ * @param directoryPath Путь к новой папке, включая имя.
 */
 export const createFolderSync = (directoryPath: string): void => {
   try {
@@ -100,7 +112,7 @@ export const createFolderSync = (directoryPath: string): void => {
 };
 
 /**
- * Асинхронно удалить папку.
+ * Асинхронно удаляет папку по указанному пути.
  * @param directoryPath Путь до удаляемой папки.
 */
 export const deleteFolder = (
@@ -117,9 +129,9 @@ export const deleteFolder = (
   });
 
 /**
- * Синхронно скопировать файл в указанную папку.
- * @param filePath Путь к файлу.
- * @param destinationPath Путь к папке, куда требуется копировать файл.
+ * Синхронно копирует файл в указанную папку.
+ * @param filePath Путь к копируемому файлу.
+ * @param destinationPath Путь к папке, в которую требуется скопировать файл.
 */
 export const createCopyFileSync = (filePath: string, destinationPath: string): void => {
   try {
@@ -139,9 +151,9 @@ export const createCopyFileSync = (filePath: string, destinationPath: string): v
 };
 
 /**
- * Асинхронно скопировать файл в указанную папку.
- * @param filePath Путь к файлу.
- * @param destinationPath Путь к папке, куда требуется копировать файл.
+ * Асинхронно копирует файл в указанную папку.
+ * @param filePath Путь к копируемому файлу.
+ * @param destinationPath Путь к папке, в которую требуется скопировать файл.
 */
 export const createCopyFile = (
   filePath: string,
@@ -158,8 +170,8 @@ export const createCopyFile = (
   });
 
 /**
- * Асинхронно удалить файл.
- * @param filePath Путь до удаляемого файла.
+ * Асинхронно удаляет файл по указанному пути.
+ * @param filePath Путь до удаляемого файла, включая имя.
 */
 export const deleteFile = (filePath: string): Promise<void> => fsPromises.unlink(filePath)
   .catch((error) => {
@@ -173,33 +185,34 @@ export const deleteFile = (filePath: string): Promise<void> => fsPromises.unlink
   });
 
 /**
- * Асинхронно переименовать файл/папку.
+ * Асинхронно переименовывает файл/папку.
  * @param oldPath Путь до файла/папки.
- * @param newName Новое имя файла/папки
- * @param isDir Переименование папки?.
+ * @param newName Новое имя файла/папки.
+ * @param isForDirectory Если `true`, то выполняется операция для папки, иначе для файла.
+ * Влияет только на текст сообщения в случае ошибки.
 */
 export const renameFileOrFolder = (
   oldPath: string,
   newName: string,
-  isDir = false,
+  isForDirectory = false,
 ): Promise<void> => fsPromises.rename(
   oldPath,
   path.join(path.dirname(oldPath), newName),
 )
   .catch((error) => {
-    const readWriteError = getReadWriteError(error, isDir);
+    const readWriteError = getReadWriteError(error, isForDirectory);
 
     throw new ReadWriteError(
-      `Can't rename ${isDir ? 'folder' : 'file'}. ${readWriteError.message}`,
+      `Can't rename ${isForDirectory ? 'folder' : 'file'}. ${readWriteError.message}`,
       readWriteError,
       oldPath,
     );
   });
 
 /**
- * Синхронно считать данные из файла.
- * @param filePath Путь к файлу.
- * @param encoding Кодировка считываемого файла. По-умолчанию `'utf8'`.
+ * Синхронно считывает данные из файла.
+ * @param filePath Путь до считываемого файла, включая имя.
+ * @param encoding Кодировка считываемого файла.
  * @returns Строка с данными из файла.
 */
 ///TODO: Добавить проверку на тип файла: текстовый или нет
@@ -208,7 +221,7 @@ export const readFileDataSync = (
   encoding: BufferEncoding = Encoding.UTF8 as BufferEncoding,
 ): string => {
   try {
-    if (typeof filePath === 'number') {
+    if (typeof filePath !== 'string') {
       throw new CustomError(
         ErrorMessage.ARG_TYPE,
         ErrorName.ARG_TYPE,
@@ -229,8 +242,8 @@ export const readFileDataSync = (
 };
 
 /**
- * Асинхронно получить данные из файла.
- * @param filePath Путь к файлу.
+ * Асинхронно считывает данные из файла.
+ * @param filePath Путь до считываемого файла, включая имя.
  * @returns Buffer с данными из файла.
 */
 export const readFileData = (
@@ -248,9 +261,9 @@ export const readFileData = (
   });
 
 /**
- * Синхронно получить данные из JSON файла.
- * @param filePath Путь к файлу.
- * @param isWriteToLog Делать ли запись об ошибке в файле лога.
+ * Синхронно получает данные из JSON файла.
+ * @param filePath Путь до считываемого файла, включая имя.
+ * @param isWriteToLog Если `true`, то делает запись в файле лога в случае ошибки.
  * @returns Объект с данными из файла.
 */
 export const readJSONFileSync = <T>(filePath: string, isWriteToLog = true): T => {
@@ -262,7 +275,7 @@ export const readJSONFileSync = <T>(filePath: string, isWriteToLog = true): T =>
       && !mime.getType(filePath)?.match(/application\/json/)
     ) {
       throw new CustomError(
-        'The file must have the extension .json',
+        'The file must have a ".json" extension',
         ErrorName.MIME_TYPE,
       );
     }
@@ -283,8 +296,8 @@ export const readJSONFileSync = <T>(filePath: string, isWriteToLog = true): T =>
 };
 
 /**
- * Асинхронно получить данные из JSON файла.
- * @param filePath Путь к файлу.
+ * Асинхронно получает данные из JSON файла.
+ * @param filePath Путь до считываемого файла, включая имя.
  * @returns Объект с данными из файла.
 */
 export const readJSONFile = async <T>(filePath: string): Promise<T> => {
@@ -316,9 +329,9 @@ export const readJSONFile = async <T>(filePath: string): Promise<T> => {
 };
 
 /**
- * Асинхронно получить данные из INI файла.
- * @param filePath Путь к файлу.
- * @param encoding Кодировка файла. По умолчанию `win1251`.
+ * Асинхронно получает данные из INI файла.
+ * @param filePath Путь до считываемого файла, включая имя.
+ * @param encoding Кодировка считываемого файла.
  * @returns Объект с данными из файла.
 */
 export const readINIFile = async (
@@ -340,11 +353,11 @@ export const readINIFile = async (
 };
 
 /**
- * Асинхронно получить данные из XML файла или файла со схожей структурой.
- * @param filePath Путь к файлу.
- * @param isWithPrefix Добавлять ли префикс к именам атрибутов.
+ * Асинхронно получает данные из XML файла или файла со схожей структурой.
+ * @param filePath Путь до считываемого файла, включая имя.
+ * @param isWithPrefix Если `true`, то к именам атрибутов будет добавлен префикс "@_".
  * Для последующей правильной записи файла ставим `true`.
- * @param encoding Кодировка файла. По умолчанию `win1251`.
+ * @param encoding Кодировка считываемого файла.
  * @returns Объект с данными из файла.
 */
 export const readXMLFile = async (
@@ -375,11 +388,14 @@ export const readXMLFile = async (
 };
 
 /**
- * Асинхронно получить данные из файла для последующей генерации игровых настроек.
- * @param file Объект файла.
- * @param pathVariables Переменные путей.
- * @param moProfile Профиль МО.
- * @param isWithPrefix Нужно ли добавлять префикс к именам атрибутов.
+ * Асинхронно получает данные из файла для последующей генерации игровых настроек.
+ * @param file Объект файла игровых настроек из `state`.
+ * @param pathVariables Переменные путей из `state`.
+ * @param moProfile Профиль МО из `state`.
+ * @param defaultEncoding Кодировка по умолчанию для считывемых файлов.
+ * @param isWithPrefix Если `true`, то к именам атрибутов будет добавлен префикс "@_"
+ * для файла со структурой `TAG`.
+ * @returns Объект, ключом в котором является имя файла, значением - считанные данные из файла.
 */
 export const readGameSettingsFile = async (
   file: IGameSettingsFile,
@@ -409,9 +425,9 @@ export const readGameSettingsFile = async (
 };
 
 /**
- * Синхронно записать файл.
- * @param filePath Путь к файлу.
- * @param data Данные для записи в файл, строка или буфер.
+ * Синхронно записывает данные в файл.
+ * @param filePath Путь до записываемого файла, включая имя.
+ * @param data Данные для записи в файл.
 */
 export const writeFileDataSync = (filePath: string, data: string|Buffer): void => {
   try {
@@ -428,9 +444,9 @@ export const writeFileDataSync = (filePath: string, data: string|Buffer): void =
 };
 
 /**
- * Асинхронно записать файл.
- * @param filePath Путь к файлу.
- * @param data Данные для записи в файл, строка или буфер.
+ * Асинхронно записывает данные в файл.
+ * @param filePath Путь до записываемого файла, включая имя.
+ * @param data Данные для записи в файл.
 */
 export const writeFileData = (
   filePath: string,
@@ -447,13 +463,13 @@ export const writeFileData = (
   });
 
 /**
- * Асинхронно записать JSON файл.
- * @param filePath Путь к файлу.
- * @param data Данные для записи в файл, строка или буфер.
+ * Асинхронно записывает данные в JSON файл.
+ * @param filePath Путь до записываемого файла, включая имя.
+ * @param data Данные для записи в файл.
 */
 export const writeJSONFile = (
   filePath: string,
-  data: { [key: string]: any, },
+  data: Record<string, any>,
 ): Promise<void> => writeFileData(filePath, JSON.stringify(data, null, 2))
   .catch((error) => {
     writeToLogFile(
@@ -465,16 +481,16 @@ export const writeJSONFile = (
   });
 
 /**
- * Асинхронно записать INI файл.
- * @param filePath Путь к файлу.
- * @param iniDataObj Данные для записи в файл.
+ * Асинхронно записывает данные в INI файл.
+ * @param filePath Путь до записываемого файла, включая имя.
+ * @param data Данные для записи в файл.
  * @param encoding Кодировка записываемого файла.
 */
 export const writeINIFile = (
   filePath: string,
-  iniDataObj: IIniObj,
+  data: IIniObj,
   encoding: string,
-): Promise<void> => writeFileData(filePath, iconv.encode(iniDataObj.stringify(), encoding))
+): Promise<void> => writeFileData(filePath, iconv.encode(data.stringify(), encoding))
   .catch((error) => {
     writeToLogFile(
       `Message: ${error.message}. Path: '${filePath}'`,
@@ -485,14 +501,14 @@ export const writeINIFile = (
   });
 
 /**
- * Асинхронно записать XML файл.
- * @param filePath Путь к файлу.
- * @param xmlDataObj Данные для записи в файл.
+ * Асинхронно записывает данные в XML файл.
+ * @param filePath Путь до записываемого файла, включая имя.
+ * @param data Данные для записи в файл.
  * @param encoding Кодировка записываемого файла.
 */
 export const writeXMLFile = (
   filePath: string,
-  xmlDataObj: IXmlObj,
+  data: IXmlObj,
   encoding: string,
 ): Promise<void> => writeFileData(
   filePath,
@@ -503,7 +519,7 @@ export const writeXMLFile = (
     indentBy: '\t',
     textNodeName: '#text',
     supressEmptyNode: true,
-  }).parse(xmlDataObj), encoding),
+  }).parse(data), encoding),
 )
   .catch((error) => {
     writeToLogFile(
@@ -515,43 +531,43 @@ export const writeXMLFile = (
   });
 
 /**
- * Получить путь до родительской папки файла.
+ * Получает путь до родительской папки для указанного файла.
  * @param filePath Путь до файла, для которого нужно получить путь до папки.
  * @returns Строка абсолютного пути до папки.
 */
 export const getPathToParentFileFolder = (filePath: string): string => path.dirname(filePath);
 
 /**
- * Записать данные в файл игровых настроек.
- * @param filePath Путь до файла.
- * @param dataObj Данные для записи.
- * @param fileView Структура файла.
- * @param encoding Кодировка файла.
+ * Записывае данные в файл игровых настроек.
+ * @param filePath Путь до файла, включая имя.
+ * @param data Данные для записи в файл.
+ * @param fileView Структура записываемого файла.
+ * @param encoding Кодировка записываемого файла.
 */
 export const writeGameSettingsFile = async (
   filePath: string,
-  dataObj: IIniObj|IXmlObj,
-  fileView: string,
+  data: IIniObj|IXmlObj,
+  fileView: GameSettingsFileView,
   encoding: string,
 ): Promise<void> => {
   if (fileView === GameSettingsFileView.LINE || fileView === GameSettingsFileView.SECTIONAL) {
     await writeINIFile(
       filePath,
-      dataObj as IIniObj,
+      data as IIniObj,
       encoding,
     );
   } else if (fileView === GameSettingsFileView.TAG) {
     await writeXMLFile(
       filePath,
-      dataObj,
+      data,
       encoding,
     );
   }
 };
 
 /**
- * Проверить, существует ли тема оформления с заданным именем и имеется ли файл стилей для нее.
- * @param themeName Имя темы.
+ * Проверяет, существует ли тема оформления с заданным именем и имеется ли файл стилей для нее.
+ * @param themeName Имя проверяемой темы.
  * @returns `true`, если тема доступна, иначе `false`.
  */
 export const checkIsThemeExists = (
@@ -560,7 +576,7 @@ export const checkIsThemeExists = (
     && fs.existsSync(path.join(USER_THEMES_DIR, themeName, userThemeStyleFile));
 
 /**
- * Получить имена папок пользовательских тем, которые имеют корректное содержимое.
+ * Получает имена папок пользовательских тем, которые имеют корректное содержимое.
  * @returns Массив с именами папок тем.
 */
 export const getUserThemesFolders = (): string[] => {
@@ -612,22 +628,22 @@ export const getUserThemesFolders = (): string[] => {
  * отсекая путь до папки игры.
  * @param dialog Компонент `dialog` из Electron.
  * @param currentWindow Текущее окно, из которого вызывается команда выбора пути.
- * @param selectorType Тип селектора: выбира пути до файла или папки?
+ * @param isSelectFile Если `true`, будет выведено окно выбора файла, иначе окно выбора папки.
  * @param startPath Начальный путь, с которым открывается окно выбора пути.
  * @param extensions Доступные расширения файлов для выбора в селекторе файла.
- * @returns Строка пути для выбранного файла.
+ * @returns Строка пути до выбранного файла.
 */
 export const getPathFromFileInput = async (
   dialog: Electron.Dialog,
   currentWindow: Electron.BrowserWindow,
-  selectorType: string,
+  isSelectFile: boolean,
   startPath = '',
   extensions = ['*'],
 ): Promise<string> => {
   try {
     const pathObj = await dialog.showOpenDialog(currentWindow, {
       defaultPath: startPath,
-      properties: [selectorType === LauncherButtonAction.RUN ? 'openFile' : 'openDirectory'],
+      properties: [isSelectFile ? 'openFile' : 'openDirectory'],
       filters: [{ name: 'File', extensions }],
     });
 

@@ -20,7 +20,7 @@ import { getDisplaysInfo, getSystemInfo } from '$utils/system';
 import { createBackupFolders } from '$utils/backup';
 import { createFolderSync, getPathFromFileInput } from '$utils/files';
 import { USER_THEMES_DIR } from '$constants/paths';
-import { AppChannel } from '$constants/misc';
+import { AppChannel, LauncherButtonAction } from '$constants/misc';
 import { IAppState } from '$store/store';
 
 let appStore: Store<IAppState>;
@@ -86,7 +86,7 @@ ipcMain.handle(
   ) => getPathFromFileInput(
     dialog,
     BrowserWindow.getFocusedWindow()!,
-    selectorType,
+    selectorType === LauncherButtonAction.RUN,
     startPath,
     extensions,
   ),

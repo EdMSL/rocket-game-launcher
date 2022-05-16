@@ -603,7 +603,7 @@ function* writeGameSettingsFilesSaga(
         writeGameSettingsFile,
         getPathToFile(file.fileData.path, pathVariables, moProfile),
         file.fileContent,
-        file.fileData.view,
+        file.fileData.view as GameSettingsFileView,
         file.fileData.encoding || baseFilesEncoding,
       )),
     );
