@@ -497,14 +497,10 @@ export const getOptionsForOutput = (
 export const changeParameterValue = (
   currentParameter: IGameSettingsParameterElem,
   newValue: string|number,
-): IGameSettingsParameterElem => {
-  const a = {
-    ...currentParameter,
-    value: String(newValue),
-  };
-  console.log(newValue);
-  return a;
-};
+): IGameSettingsParameterElem => ({
+  ...currentParameter,
+  value: String(newValue),
+});
 
 /**
  * Получить игровые параметры, которые были изменены.

@@ -102,19 +102,21 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
     } else if (target.type === HTMLInputType.CHECKBOX) {
       value = +(target as HTMLInputElement).checked;
     }
-    ///FIXME
+
     if (target.dataset.multiparameters) {
       newGameParameters = target.dataset.multiparameters
         .split(',')
         .reduce<IGameSettingsParameters>((parameters, currentParameterId, index) => {
           let newValue: string|number = '';
 
-          if (target.dataset.iscombined) {
+          if (target.dataset.optiontype === GameSettingsOptionType.COMBINED) {
             newValue = value.toString().split(target.dataset.separator!)[index];
-          } else {
+          } else if (target.dataset.optiontype === GameSettingsOptionType.RELATED) {
             newValue = currentParameterId === target.id
               ? value
               : gameSettingsParameters[currentParameterId].value;
+          } else { //optiontype === "GROUP"
+            newValue = value;
           }
 
           return {
@@ -133,7 +135,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
         ),
       };
     }
-    console.log(newGameParameters);
+
     if (value.toString()) {
       onSettingOptionChange(newGameParameters);
     }
@@ -204,10 +206,11 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                               id={optionData.id}
                               name={optionData.name}
                               parent={option.file}
-                              description={option.description}
                               multiparameters={multiparameters}
-                              value={getValue(item.controllerType, optionData.id)}
+                              description={option.description}
+                              optionType={option.optionType}
                               selectOptions={generateSelectOptions(item.selectOptions!)}
+                              value={getValue(item.controllerType, optionData.id)}
                               onChange={onOptionInputChange}
                             />
                           );
@@ -239,8 +242,9 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     multiparameters={multiparameters}
                     label={option.label}
                     description={option.description}
-                    value={getValue(option.controllerType!, optionData.id)}
+                    optionType={option.optionType}
                     selectOptions={generateSelectOptions(option.selectOptions!)}
+                    value={getValue(option.controllerType!, optionData.id)}
                     onChange={onOptionInputChange}
                   />
                 );
@@ -257,6 +261,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     multiparameters={multiparameters}
                     label={option.label!}
                     description={option.description}
+                    optionType={option.optionType}
                     isChecked={Boolean(+getValue(option.controllerType!, optionData.id))}
                     onChange={onOptionInputChange}
                   />
@@ -275,6 +280,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     multiparameters={multiparameters}
                     label={option.label!}
                     description={option.description}
+                    optionType={option.optionType}
                     isChecked={Boolean(+getValue(option.controllerType!, optionData.id))}
                     onChange={onOptionInputChange}
                   />
@@ -293,6 +299,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     multiparameters={multiparameters}
                     label={option.label!}
                     description={option.description}
+                    optionType={option.optionType}
                     defaultValue={getValue(option.controllerType!, optionData.id)}
                     min={option.min!}
                     max={option.max!}
@@ -320,12 +327,12 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     name={optionData.name}
                     parent={option.file}
                     multiparameters={multiparameters}
-                    isCombined
-                    separator={option.separator}
                     label={option.label}
                     description={option.description}
-                    value={getCombinedValue(option)}
+                    optionType={option.optionType}
+                    separator={option.separator}
                     selectOptions={generateSelectOptions(option.selectOptions!)}
+                    value={getCombinedValue(option)}
                     onChange={onOptionInputChange}
                   />
                 );
@@ -342,12 +349,13 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     id={optionData.id}
                     name={optionData.name}
                     parent={option.file}
+                    label={option.label!}
+                    description={option.description}
+                    optionType={option.optionType}
                     defaultValue={getValue(option.controllerType!, optionData.id)}
                     min={option.min!}
                     max={option.max!}
                     step={option.step!}
-                    label={option.label!}
-                    description={option.description}
                     onChange={onOptionInputChange}
                     onChangeBtnClick={onOptionRangeButtonClick}
                   />
@@ -365,6 +373,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     parent={option.file}
                     label={option.label!}
                     description={option.description}
+                    optionType={option.optionType}
                     isChecked={Boolean(+getValue(option.controllerType!, optionData.id))}
                     onChange={onOptionInputChange}
                   />
@@ -382,6 +391,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     parent={option.file}
                     label={option.label!}
                     description={option.description}
+                    optionType={option.optionType}
                     isChecked={Boolean(+getValue(option.controllerType!, optionData.id))}
                     onChange={onOptionInputChange}
                   />
@@ -401,8 +411,9 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     parent={option.file}
                     label={option.label}
                     description={option.description}
-                    value={getValue(option.controllerType!, optionData.id)}
+                    optionType={option.optionType}
                     selectOptions={generateSelectOptions(option.selectOptions!)}
+                    value={getValue(option.controllerType!, optionData.id)}
                     onChange={onOptionInputChange}
                   />
                 );

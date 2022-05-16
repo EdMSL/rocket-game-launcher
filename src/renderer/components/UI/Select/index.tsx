@@ -5,7 +5,6 @@ import { HintItem } from '$components/HintItem';
 import { IUIControllerSelect, IUIElementProps } from '$types/common';
 
 interface IProps extends IUIElementProps<HTMLSelectElement>, IUIControllerSelect {
-  isCombined?: boolean,
   separator?: string,
 }
 
@@ -22,7 +21,7 @@ export const Select: (React.FunctionComponent<IProps>) = ({
   parent,
   separator,
   multiparameters,
-  isCombined,
+  optionType,
   value,
   isDisabled = false,
   selectOptions,
@@ -58,7 +57,7 @@ export const Select: (React.FunctionComponent<IProps>) = ({
         id={id}
         name={name}
         data-parent={parent}
-        data-iscombined={isCombined}
+        data-optiontype={optionType}
         data-separator={separator}
         data-multiparameters={multiparameters}
         onChange={onChange}

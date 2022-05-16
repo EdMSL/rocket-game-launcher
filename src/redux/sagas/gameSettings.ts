@@ -514,15 +514,15 @@ function* changeMOProfileSaga(
 function* writeGameSettingsFilesSaga(
   { payload: changedGameSettingsParameters }: ReturnType<typeof saveGameSettingsFiles>,
 ): SagaIterator {
-  // console.log(changedGameSettingsParameters);
   try {
     yield put(setIsGameSettingsSaving(true));
 
     const {
       gameSettings: {
-        moProfile,
-        gameSettingsFiles,
         baseFilesEncoding,
+        gameSettingsFiles,
+        gameSettingsParameters,
+        moProfile,
       },
       main: { pathVariables },
     }: ReturnType<typeof getState> = yield select(getState);
@@ -608,9 +608,10 @@ function* writeGameSettingsFilesSaga(
       )),
     );
 
-    yield put(setGameSettingsParameters(
-      getGameSettingsParametersWithNewValues(changedGameSettingsParameters),
-    ));
+    yield put(setGameSettingsParameters({
+      ...gameSettingsParameters,
+      ...getGameSettingsParametersWithNewValues(changedGameSettingsParameters),
+    }));
     yield put(addMessages([CreateUserMessage.success('Настройки успешно сохранены.')]));
   } catch (error: any) {
     let errorMessage = '';

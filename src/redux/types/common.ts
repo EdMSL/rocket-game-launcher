@@ -58,6 +58,7 @@ export interface IUIElementParams {
   name?: string,
   value?: string|number,
   multiparameters?: string,
+  optionType?: GameSettingsOptionType,
   isDisabled?: boolean,
   parent?: string,
   description?: string,
