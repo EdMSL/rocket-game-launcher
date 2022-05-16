@@ -391,9 +391,16 @@ export const readGameSettingsFile = async (
   let fileData: IIniObj|IXmlObj = {};
 
   if (file.view === GameSettingsFileView.LINE || file.view === GameSettingsFileView.SECTIONAL) {
-    fileData = await readINIFile(getPathToFile(file.path, pathVariables, moProfile), file.encoding as Encoding || defaultEncoding);
+    fileData = await readINIFile(
+      getPathToFile(file.path, pathVariables, moProfile),
+       file.encoding as Encoding || defaultEncoding,
+    );
   } else if (file.view === GameSettingsFileView.TAG) {
-    fileData = await readXMLFile(getPathToFile(file.path, pathVariables, moProfile), isWithPrefix, file.encoding as Encoding || defaultEncoding);
+    fileData = await readXMLFile(
+      getPathToFile(file.path, pathVariables, moProfile),
+      isWithPrefix,
+      file.encoding as Encoding || defaultEncoding,
+    );
   }
 
   return {
@@ -507,6 +514,20 @@ export const writeXMLFile = (
     throw error;
   });
 
+/**
+ * Получить путь до родительской папки файла.
+ * @param filePath Путь до файла, для которого нужно получить путь до папки.
+ * @returns Строка абсолютного пути до папки.
+*/
+export const getPathToParentFileFolder = (filePath: string): string => path.dirname(filePath);
+
+/**
+ * Записать данные в файл игровых настроек.
+ * @param filePath Путь до файла.
+ * @param dataObj Данные для записи.
+ * @param fileView Структура файла.
+ * @param encoding Кодировка файла.
+*/
 export const writeGameSettingsFile = async (
   filePath: string,
   dataObj: IIniObj|IXmlObj,
@@ -528,13 +549,19 @@ export const writeGameSettingsFile = async (
   }
 };
 
+/**
+ * Проверить, существует ли тема оформления с заданным именем и имеется ли файл стилей для нее.
+ * @param themeName Имя темы.
+ * @returns `true`, если тема доступна, иначе `false`.
+ */
 export const checkIsThemeExists = (
   themeName: string,
 ): boolean => fs.existsSync(path.join(USER_THEMES_DIR, themeName))
     && fs.existsSync(path.join(USER_THEMES_DIR, themeName, userThemeStyleFile));
 
 /**
- * Получить список папок пользовательских тем.
+ * Получить имена папок пользовательских тем, которые имеют корректное содержимое.
+ * @returns Массив с именами папок тем.
 */
 export const getUserThemesFolders = (): string[] => {
   try {
@@ -582,12 +609,13 @@ export const getUserThemesFolders = (): string[] => {
 
 /**
  * Вызывает диалоговое окно для выбора пути и возвращает путь к файлу,
- * отсекая директорию до папки игры.
+ * отсекая путь до папки игры.
  * @param dialog Компонент `dialog` из Electron.
  * @param currentWindow Текущее окно, из которого вызывается команда выбора пути.
  * @param selectorType Тип селектора: выбира пути до файла или папки?
  * @param startPath Начальный путь, с которым открывается окно выбора пути.
  * @param extensions Доступные расширения файлов для выбора в селекторе файла.
+ * @returns Строка пути для выбранного файла.
 */
 export const getPathFromFileInput = async (
   dialog: Electron.Dialog,

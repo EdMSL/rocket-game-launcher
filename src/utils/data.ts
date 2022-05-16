@@ -14,7 +14,6 @@ import {
 } from './log';
 import {
   checkIsPathIsNotOutsideValidFolder,
-  clearPathVaribaleFromPathString,
   generateSelectOptionsString,
   getLineIniParameterValue,
   getPathToFile,
@@ -827,18 +826,6 @@ export const getCustomButtons = (
 }).filter(Boolean);
 
 /**
- * Получить переменную пути и остаточный путь из строки пути.
- * @param pathStr Путь для обработки.
- * @returns Массив из строк переменной и остатка пути.
-*/
-export const getVariableAndValueFromPath = (pathStr: string): [string, string] => {
-  const pathVariable = pathStr.match(PathRegExp.PATH_VARIABLE)![0];
-  const pathValue = clearPathVaribaleFromPathString(pathStr);
-
-  return [pathVariable, pathValue];
-};
-
-/**
  * Сгенерировать новый объект файла игровых настроек.
  * @param label Загловок файла.
  * @param pathToFile Путь к файлу.
@@ -910,6 +897,7 @@ const getFieldsByFileView = (
     valuePath: fullOption.valuePath || defaultGameSettingsOptionItem.valuePath,
   } : {},
 });
+
 const getFieldsByControllerType = (
   fullOption: IGameSettingsOption|IGameSettingsOptionItem,
 ) => ({
@@ -924,9 +912,9 @@ const getFieldsByControllerType = (
 });
 
 /**
- * Сгенерировать новый объект параметра игровых настроек типа `default`.
+ * Сгенерировать новый объект опции игровых настроек типа `default`.
  * @param file Объект с данными игрового файла.
- * @returns Объект параметра из `state`.
+ * @returns Объект опции из `state`.
  */
 export const getDefaultGameSettingsOption = (
   file: IGameSettingsFile,
@@ -941,11 +929,11 @@ export const getDefaultGameSettingsOption = (
 });
 
 /**
- * Сгенерировать новый объект параметра игровых настроек типа `default`.
- * @param currentOption Объект изменяемого параметра.
- * @param fullOption Объект со всеми доступными полями параметра.
+ * Получить объект с текущей опцией и полной опции со всеми доступными полями.
+ * @param currentOption Объект изменяемой опции.
+ * @param fullOption Объект со всеми доступными полями опции.
  * @param file Объект с данными игрового файла.
- * @returns Объект параметра из `state`.
+ * @returns Объект опции из `state`.
  */
 export const generateGameSettingsOption = (
   currentOption: IGameSettingsOption,

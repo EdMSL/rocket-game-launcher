@@ -12,7 +12,6 @@ import {
 
 const HEXADECIMAL = 16;
 const HEXADECIMAL_FACTOR = 1e8;
-const MAX_PATH_LENGTH = 255;
 
 /**
  * Преобразовать JSON строку в объект.
@@ -56,6 +55,62 @@ export const getRandomName = (): string => {
 };
 
 /**
+ * Получить число знаков после запятой.
+ * @param value Число, у которого нужно определить кол-во знаков.
+ * @returns Число знаков.
+*/
+export const getNumberOfDecimalPlaces = (value: string|number): number => {
+  const valueParts = value.toString().split('.');
+
+  return valueParts.length === 2 ? valueParts[1].length : 0;
+};
+
+/**
+ * Получить значение с учетом доступного диапазона чисел.
+ * @param value Текущее значение.
+ * @param min Минимально допустимое значение.
+ * @param max Максимально допустимое значение.
+ * @returns Число из диапазона.
+*/
+export const getValueFromRange = (
+  value: string|number,
+  min: string|number,
+  max: string|number,
+): number => {
+  if (+value >= +min && +value <= +max) {
+    return +value;
+  }
+
+  if (+value < +min) {
+    return +min;
+  }
+
+  return +max;
+};
+
+/**
+ * Получить строку-список вида `ключ: значение` из объекта.
+ * @param obj Объект, для которого получаем список.
+ * @param isWithIndent Ставить ли отступ перед каждым элементом списка.
+ * @returns Строка в виде списка.
+ * ```js
+ * `a: some
+ * b: any
+ * c: new`
+ * ```
+*/
+export const getObjectAsList = (
+  obj: Record<string, any>,
+  isWithIndent = false,
+): string => Object.keys(obj)
+  .map((key) => `${key}: ${obj[key]}`)
+  .join(`\n$${isWithIndent ? '\t' : ''}`);
+
+const createRegexp = (
+  pathForRegEpx: string,
+): RegExp => new RegExp(pathForRegEpx.replaceAll('\\', '\\\\'));
+
+/**
  *
  * @param parameterName Имя параметра.
  * @returns Регулярное выражение для поиска строки с заданным именем параметра.
@@ -63,6 +118,31 @@ export const getRandomName = (): string => {
 export const getRegExpForLineIniParameter = (
   parameterName: string,
 ): RegExp => new RegExp(`set\\s+${parameterName}\\s+to\\s+(.+)$`, 'i');
+
+/**
+ * Получить путь с отсеченной переменной пути.
+ * @param currPath Путь для очистки.
+ * @returns Строка пути без переменной пути.
+*/
+const clearPathVaribaleFromPathString = (
+  currPath: string,
+): string => {
+  const newStr = currPath;
+
+  return newStr.replace(/%.*%\\?/, '').trim();
+};
+
+/**
+ * Получить переменную пути и остаточный путь из строки пути.
+ * @param pathStr Путь для обработки.
+ * @returns Массив из строк переменной и остатка пути.
+*/
+export const getVariableAndValueFromPath = (pathStr: string): [string, string] => {
+  const pathVariable = pathStr.match(PathRegExp.PATH_VARIABLE)![0];
+  const pathValue = clearPathVaribaleFromPathString(pathStr);
+
+  return [pathVariable, pathValue];
+};
 
 /**
  * Получить часть строки параметра из файла вида `line`.
@@ -117,57 +197,6 @@ export const getLineIniParameterValue = (lineText: string, parameterName: string
 };
 
 /**
- * Получить число знаков после запятой.
- * @param value Число, у которого нужно определить кол-во знаков.
- * @returns Число знаков.
-*/
-export const getNumberOfDecimalPlaces = (value: string|number): number => {
-  const valueParts = value.toString().split('.');
-
-  if (valueParts.length > 1) {
-    return valueParts[valueParts.length - 1].length;
-  }
-
-  return 0;
-};
-
-/**
- * Получить значение с учетом доступного диапазона чисел.
- * @param value Текущее значение.
- * @param min Минимально допустимое значение.
- * @param max Максимально допустимое значение.
- * @returns Число из диапазона.
-*/
-export const getValueFromRange = (
-  value: string|number,
-  min: string|number,
-  max: string|number,
-): number => {
-  if (+value >= +min && +value <= +max) {
-    return +value;
-  }
-
-  if (+value < +min) {
-    return +min;
-  }
-
-  return +max;
-};
-
-/**
- * Получить путь с отсеченной переменной пути.
- * @param currPath Путь для очистки.
- * @returns Строка пути без переменной пути.
-*/
-export const clearPathVaribaleFromPathString = (
-  currPath: string,
-): string => {
-  const newStr = currPath;
-
-  return newStr.replace(/%.*%\\?/, '').trim();
-};
-
-/**
  * Получить путь с отсеченной корневой папкой.
  * @param currPath Путь для очистки.
  * @param rootPath Корневой путь, который нужно удалить.
@@ -215,11 +244,9 @@ export const replaceRootDirByPathVariable = (
   return '';
 };
 
-const createRegexp = (pathForRegEpx: string): RegExp => new RegExp(pathForRegEpx.replaceAll('\\', '\\\\'));
-
 /**
  * Заменить корневой путь на переменную пути.
- * @param currPath Изменяемый путь.
+ * @param pathStr Изменяемый путь.
  * @param pathVariable Переменная которую меняем.
  * @param rootDirPathStr Корневая папка для замены.
  * @returns Строка пути с корневой папкой вместо переменной.
@@ -344,20 +371,6 @@ export const getPathToFile = (
 };
 
 /**
- * Получить строку-список с ключ\значение из объекта.
-*/
-export const getObjectAsList = (obj: { [key: string]: any, }): string => Object.keys(obj)
-  .map((key) => `${key}: ${obj[key]}`)
-  .join('\n  ');
-
-/**
- * Получить путь до родительской папки файла.
- * @param pathToFile Путь до файла, для которого нужно получить путь до папки.
- * @returns Строка абсолютного пути до папки.
-*/
-export const getPathToParentFileFolder = (pathToFile: string): string => path.dirname(pathToFile);
-
-/**
  * Получить имя файла из строки пути до него.
  * @param pathToFile Путь до файла.
  * @returns Имя файла.
@@ -366,23 +379,6 @@ export const getFileNameFromPathToFile = (
   pathToFile: string,
   isWithExtension = false,
 ): string => path.basename(pathToFile, isWithExtension ? '' : path.extname(pathToFile));
-
-/**
- * Проверка имени папки на корректность.
- * @param name Имя для проверки.
- * @returns Является ли имя корректным.
-*/
-export const isValidName = (name: string): boolean => {
-  if (typeof name !== 'string' || name.length > MAX_PATH_LENGTH) {
-    return false;
-  }
-
-  if (/.+\.\s*$/.test(name)) {
-    return false;
-  }
-
-  return !/[<>:"/\\|?*]/.test(name);
-};
 
 /**
  * Генерирует строку опций для `select` из игрового параметра. Использется в `TextArea` компоненте.

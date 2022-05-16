@@ -3,6 +3,25 @@ import { IValidationErrors } from '$types/common';
 import { IGameSettingsFile, IGameSettingsOption } from '$types/gameSettings';
 import { ILauncherConfig } from '$types/main';
 
+const MAX_PATH_LENGTH = 255;
+
+/**
+ * Проверка имени папки на корректность.
+ * @param name Имя для проверки.
+ * @returns Является ли имя корректным.
+*/
+export const isValidFolderName = (name: string): boolean => {
+  if (typeof name !== 'string' || name.length > MAX_PATH_LENGTH) {
+    return false;
+  }
+
+  if (/.+\.\s*$/.test(name)) {
+    return false;
+  }
+
+  return !/[<>:"/\\|?*]/.test(name);
+};
+
 /**
  *Очищает при удалении компонента все ошибки валидации, связанные этим компонентом.
  * @param validationErrors Текущие ошибки валидации.

@@ -9,9 +9,10 @@ import {
 } from '$types/common';
 import { HintItem } from '$components/HintItem';
 import { Button } from '../Button';
-import { getVariableAndValueFromPath } from '$utils/data';
 import { IPathVariables } from '$constants/paths';
-import { checkIsPathIsNotOutsideValidFolder, replaceRootDirByPathVariable } from '$utils/strings';
+import {
+  checkIsPathIsNotOutsideValidFolder, replaceRootDirByPathVariable, getVariableAndValueFromPath,
+} from '$utils/strings';
 import { AppChannel, LauncherButtonAction } from '$constants/misc';
 import { getIsPathWithVariableCorrect, IValidationData } from '$utils/check';
 

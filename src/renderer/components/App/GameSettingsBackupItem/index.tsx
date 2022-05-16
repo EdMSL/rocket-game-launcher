@@ -11,7 +11,7 @@ import {
 import { Button } from '$components/UI/Button';
 import { Checkbox } from '$components/UI/Checkbox';
 import { openFolder } from '$utils/process';
-import { isValidName } from '$utils/strings';
+import { isValidFolderName } from '$utils/validation';
 import {
   deleteGameSettingsFilesBackup,
   renameGameSettingsFilesBackup,
@@ -68,7 +68,7 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
   const changeBackupName = useCallback((value: string) => {
     if (
       (allBackups.includes(value.trim().toLowerCase()) && backupName.toLowerCase() !== value.trim().toLowerCase())
-      || !isValidName(value)
+      || !isValidFolderName(value)
       || (value.length > 0 && value.trim().length === 0)
     ) {
       setIsBackupNameError(true);
