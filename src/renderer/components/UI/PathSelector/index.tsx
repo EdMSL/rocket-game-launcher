@@ -15,6 +15,7 @@ import {
 } from '$utils/strings';
 import { AppChannel, LauncherButtonAction } from '$constants/misc';
 import { getIsPathWithVariableCorrect, IValidationData } from '$utils/check';
+import { getValidationCauses, ValidationErrorCause } from '$utils/validation';
 
 interface IProps extends IUIElementParams, IUIControllerTextField {
   id: string,
@@ -97,7 +98,10 @@ export const PathSelector: React.FC<IProps> = ({
     onChange(
       `${currentPathVariable}\\${target.value}`,
       name || id,
-      { errors: { [id]: ['incorrect path'] }, isForAdd: !isCorrectPath },
+      {
+        errors: { [id]: [{ cause: ValidationErrorCause.PATH, text: 'Указан некорректный путь' }] },
+        isForAdd: !isCorrectPath,
+      },
       parent,
     );
   }, [currentPathVariable, selectorType, name, id, parent, extensions, onChange]);
@@ -125,7 +129,14 @@ export const PathSelector: React.FC<IProps> = ({
         onChange(
           `${variablePath}\\${valuePath}`,
           name || id,
-          { errors: { [id]: ['not available path', 'incorrect path'] }, isForAdd: !isCorrectPath },
+          {
+            errors: {
+              [id]: [
+                { cause: ValidationErrorCause.NOT_AVAILABLE, text: 'Указан недопустимый путь' },
+                { cause: ValidationErrorCause.PATH, text: 'Указан некорректный путь' }],
+            },
+            isForAdd: !isCorrectPath,
+          },
           parent,
         );
       } catch (error) {
@@ -135,7 +146,13 @@ export const PathSelector: React.FC<IProps> = ({
         onChange(
           `${availablePathVariables[0]}\\${pathStr}`,
           name || id,
-          { errors: { [id]: ['not available path'] }, isForAdd: true },
+          {
+            errors: {
+              [id]: [
+                { cause: ValidationErrorCause.NOT_AVAILABLE, text: 'Указан недопустимый путь' }],
+            },
+            isForAdd: true,
+          },
           parent,
         );
       }
@@ -162,6 +179,14 @@ export const PathSelector: React.FC<IProps> = ({
       parent,
     );
   }, [currentPathValue, id, name, parent, onChange]);
+
+  const getIsDisabled = useCallback(() => isDisabled
+    || (
+      validationErrors
+      && validationErrors[id]
+      && getValidationCauses(validationErrors[id]).includes(ValidationErrorCause.NOT_AVAILABLE)
+    ),
+  [id, isDisabled, validationErrors]);
 
   return (
     <div className={classNames(
@@ -210,7 +235,7 @@ export const PathSelector: React.FC<IProps> = ({
           value={currentPathValue}
           data-parent={parent}
           data-multiparameters={multiparameters}
-          disabled={isDisabled || (validationErrors && validationErrors[id]?.includes('not available path'))}
+          disabled={getIsDisabled()}
           onChange={onPatchTextFieldChange}
         />
         <Button

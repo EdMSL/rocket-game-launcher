@@ -1,5 +1,5 @@
 import { GameSettingsOptionType } from '$constants/misc';
-import { IGameSettingsOption } from './gameSettings';
+import { IValidationErrors } from '$utils/validation';
 
 export type IError = 'error';
 export type ISuccess = 'success';
@@ -18,10 +18,6 @@ export type IUnwrapSync<T> = T extends (...args: any[]) => infer U ? U : T;
 
 export interface IActionHandler<S, T> {
   (state: S, payload: UnsafeReturnType<T>): S,
-}
-
-export interface IValidationErrors {
-  [id: string]: string[],
 }
 
 export interface ISelectOption {

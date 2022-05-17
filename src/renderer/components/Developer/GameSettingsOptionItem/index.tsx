@@ -5,7 +5,7 @@ import classNames from 'classnames';
 
 import styles from './styles.module.scss';
 import { Select } from '$components/UI/Select';
-import { ISelectOption, IValidationErrors } from '$types/common';
+import { ISelectOption } from '$types/common';
 import {
   changeConfigArrayItem,
   generateGameSettingsOption,
@@ -27,7 +27,9 @@ import { defaultFullGameSettingsOption } from '$constants/defaultData';
 import { generateSelectOptionsFromString, getRandomId } from '$utils/strings';
 import { TextArea } from '$components/UI/TextArea';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
-import { setOptionStartValidationErrors, validateOptionFields } from '$utils/validation';
+import {
+  IValidationErrors, setOptionStartValidationErrors, validateOptionFields,
+} from '$utils/validation';
 
 interface IProps {
   option: IGameSettingsOption,

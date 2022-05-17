@@ -36,14 +36,13 @@ import {
   IValidationData,
 } from '$utils/check';
 import { getRandomId } from '$utils/strings';
-import { IValidationErrors } from '$types/common';
 import { DeveloperScreenController } from '$components/Developer/DeveloperScreenController';
 import { IDeveloperRootState } from '$types/developer';
 import { saveLauncherConfig, updateConfig } from '$actions/developer';
 import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import {
-  clearValidationErrors, getUniqueValidationErrors, validateNumberInputs,
+  clearValidationErrors, getUniqueValidationErrors, IValidationErrors, validateNumberInputs, ValidationErrorCause,
 } from '$utils/validation';
 
 export const DeveloperConfigScreen: React.FC = () => {
@@ -160,6 +159,7 @@ export const DeveloperConfigScreen: React.FC = () => {
 
   const onNumberInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     const errors = validateNumberInputs(target, currentConfig, validationErrors);
+
     setValidationErrors(errors);
 
     changeCurrentConfig(target.name, Math.round(+target.value), target.dataset.parent);
@@ -169,7 +169,7 @@ export const DeveloperConfigScreen: React.FC = () => {
     if (target.required) {
       setValidationErrors(getUniqueValidationErrors(
         validationErrors,
-        { [target.id]: ['empty value'] },
+        { [target.id]: [{ cause: ValidationErrorCause.EMPTY, text: 'Поле не может быть пустым' }] },
         target.value.trim() === '',
       ));
     }

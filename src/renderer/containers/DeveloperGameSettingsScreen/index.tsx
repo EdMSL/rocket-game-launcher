@@ -7,7 +7,6 @@ import classNames from 'classnames';
 
 import styles from './styles.module.scss';
 import { DeveloperScreenController } from '$components/Developer/DeveloperScreenController';
-import { IValidationErrors } from '$types/common';
 import { useDeveloperSelector } from '$store/store';
 import {
   IGameSettingsConfig, IGameSettingsFile, IGameSettingsOption,
@@ -47,7 +46,12 @@ import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 import {
   defaultFullGameSettingsOption,
 } from '$constants/defaultData';
-import { getUniqueValidationErrors, setOptionStartValidationErrors } from '$utils/validation';
+import {
+  getUniqueValidationErrors,
+  IValidationErrors,
+  setOptionStartValidationErrors,
+  ValidationErrorCause,
+} from '$utils/validation';
 
 export const DeveloperGameSettingsScreen: React.FC = () => {
   /* eslint-disable max-len */
@@ -180,7 +184,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   const validateGroupLabel = useCallback((value: string, name: string) => {
     setValidationErrors(getUniqueValidationErrors(
       validationErrors,
-      { [name]: ['already exists'] },
+      { [name]: [{ cause: ValidationErrorCause.EXISTS }] },
       currentConfig.gameSettingsGroups.map((group) => group.label).includes(value)
       && currentConfig.gameSettingsGroups.find((group) => group.name === name)?.label !== value,
     ));

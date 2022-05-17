@@ -20,8 +20,9 @@ import {
   getIsPathWithVariableCorrect,
   IValidationData,
 } from '$utils/check';
-import { IValidationErrors } from '$types/common';
-import { getUniqueValidationErrors } from '$utils/validation';
+import {
+  getUniqueValidationErrors, IValidationErrors, ValidationErrorCause,
+} from '$utils/validation';
 
 interface IProps {
   item: ILauncherCustomButton,
@@ -62,7 +63,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
 
     onValidationError(getUniqueValidationErrors(
       validationErrors,
-      { [pathSelectorId]: ['incorrect path'] },
+      { [pathSelectorId]: [{ cause: ValidationErrorCause.PATH }] },
       !isPathCorrect,
     ));
   }, [item, validationErrors, pathSelectorId, onValidationError, сhangeBtnData]);
@@ -76,7 +77,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
     if (target.required) {
       onValidationError(getUniqueValidationErrors(
         validationErrors,
-        { [target.id]: ['incorrect path'] },
+        { [target.id]: [{ cause: ValidationErrorCause.PATH }] },
         target.value.trim() === '',
       ));
     }

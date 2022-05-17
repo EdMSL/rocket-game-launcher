@@ -14,8 +14,9 @@ import { HintItem } from '$components/HintItem';
 import { IButtonArg } from '$types/main';
 import { getRandomId } from '$utils/strings';
 import { IValidationData } from '$utils/check';
-import { IValidationErrors } from '$types/common';
-import { clearValidationErrors, getUniqueValidationErrors } from '$utils/validation';
+import {
+  clearValidationErrors, getUniqueValidationErrors, IValidationErrors, ValidationErrorCause,
+} from '$utils/validation';
 
 interface IProps {
   className?: string,
@@ -64,7 +65,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
 
       onValidationError(getUniqueValidationErrors(
         validationErrors,
-        { ...validationData.errors, [`${parentId}_${id}`]: ['arguments error'] },
+        { ...validationData.errors, [`${parentId}_${id}`]: [{ cause: ValidationErrorCause.ARG }] },
         validationData.isForAdd,
       ));
     }
@@ -90,7 +91,10 @@ export const ArgumentsBlock: React.FC<IProps> = ({
     if (target.required) {
       onValidationError(getUniqueValidationErrors(
         validationErrors,
-        { [target.id]: ['incorrect path'], [`${parentId}_${target.id}`]: ['arguments error'] },
+        {
+          [target.id]: [{ cause: ValidationErrorCause.PATH }],
+          [`${parentId}_${target.id}`]: [{ cause: ValidationErrorCause.ARG }],
+        },
         target.value.trim() === '',
       ));
     }

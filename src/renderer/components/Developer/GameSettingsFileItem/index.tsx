@@ -12,10 +12,9 @@ import {
 import { PathSelector } from '$components/UI/PathSelector';
 import { IPathVariables } from '$constants/paths';
 import { IValidationData } from '$utils/check';
-import { IValidationErrors } from '$types/common';
 import { Button } from '$components/UI/Button';
 import { getFileNameFromPathToFile } from '$utils/strings';
-import { getUniqueValidationErrors } from '$utils/validation';
+import { getUniqueValidationErrors, IValidationErrors } from '$utils/validation';
 
 interface IProps {
   file: IGameSettingsFile,

@@ -5,7 +5,7 @@ import classNames from 'classnames';
 
 import styles from './styles.module.scss';
 import { Button } from '$components/UI/Button';
-import { IValidationErrors } from '$types/common';
+import { IValidationErrors } from '$utils/validation';
 
 interface ISummaryText {
   label: string,

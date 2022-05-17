@@ -1,9 +1,27 @@
 import { GameSettingsFileView, GameSettingsOptionType } from '$constants/misc';
-import { IValidationErrors } from '$types/common';
 import { IGameSettingsFile, IGameSettingsOption } from '$types/gameSettings';
 import { ILauncherConfig } from '$types/main';
 
 const MAX_PATH_LENGTH = 255;
+
+export enum ValidationErrorCause {
+  MIN = 'less min value',
+  EMPTY = 'empty value',
+  ITEM = 'item error',
+  ARG = 'arguments error',
+  PATH = 'incorrect path',
+  NOT_AVAILABLE = 'not available path',
+  EXISTS = 'already exists',
+}
+
+interface IValidationError {
+  cause: string,
+  text?: string,
+}
+
+export interface IValidationErrors {
+  [id: string]: IValidationError[],
+}
 
 /**
  * Проверка имени папки на корректность.
@@ -23,75 +41,111 @@ export const isValidFolderName = (name: string): boolean => {
 };
 
 /**
+ * Получает список всех причин ошибок валидации для заданного поля.
+ * @param errorsArr Массив объектов ошибок поля.
+ * @returns Массив строк с причинами ошибки.
+ */
+export const getValidationCauses = (
+  errorsArr: IValidationError[],
+): string[] => errorsArr.map((error) => error.cause);
+
+/**
  *Очищает при удалении компонента все ошибки валидации, связанные этим компонентом.
  * @param validationErrors Текущие ошибки валидации.
- * @param id id удаляемого компонента.
+ * @param id Идентификатор удаляемого компонента.
  * @returns Ошибки валидации без ошибок, привязанных к текущему компоненту.
  */
 export const clearValidationErrors = (
   validationErrors: IValidationErrors,
   id: string,
-): IValidationErrors => Object.keys(validationErrors).filter((error) => !error.includes(id)).reduce((acc, current) => ({
-  ...acc,
-  [current]: validationErrors[current],
-}), {});
+): IValidationErrors => Object
+  .keys(validationErrors)
+  .filter((error) => !error.includes(id))
+  .reduce((acc, current) => ({
+    ...acc,
+    [current]: validationErrors[current],
+  }), {});
+
+const getValidationErrorWithUniqueCauses = (
+  currentErrors: IValidationError[],
+  handledErrors: IValidationError[],
+): IValidationError[] => {
+  const currentErrorsCauses = getValidationCauses(currentErrors);
+
+  const newErrors = handledErrors.reduce((totalErrors, currentError) => {
+    if (currentErrorsCauses.includes(currentError.cause)) {
+      return [...totalErrors];
+    }
+
+    currentErrorsCauses.push(currentError.cause);
+
+    return [...totalErrors, currentError];
+  }, [...currentErrors]);
+
+  return newErrors;
+};
 
 /**
- * Получить ошибки валидации полей с уникальными значениями.
+ * Получает ошибки валидации полей с уникальными значениями.
  * @param currentErrors Текущие ошибки валидации.
- * @param newErrorsOrForClear Ошибки валидации для добавления или для очистки.
- * @param isForAdd Очищать ошибки из списка или добавлять новые ошибки в список.
- * @returns Объект с ошибками валидации.
+ * @param handledErrors Обрабатываемые ошибки валидации.
+ * @param isForAdd Если `true`, добавит обрабатываемые ошибки в общий список, иначе удалит.
+ * @returns Объект с ошибками валидации после обработки.
 */
 export const getUniqueValidationErrors = (
   currentErrors: IValidationErrors,
-  newErrorsOrForClear: IValidationErrors,
+  handledErrors: IValidationErrors,
   isForAdd: boolean,
 ): IValidationErrors => {
-  const newErrors = Object.keys(newErrorsOrForClear).reduce<IValidationErrors>((acc, id) => {
+  const newErrors = Object.keys(handledErrors).reduce<IValidationErrors>((totalErrors, id) => {
     if (isForAdd) {
       return {
         ...currentErrors,
-        ...acc,
-        [id]: Array.from(new Set([...currentErrors[id] ? currentErrors[id] : [], ...newErrorsOrForClear[id]])),
+        ...totalErrors,
+        [id]: getValidationErrorWithUniqueCauses(
+          currentErrors[id] ? currentErrors[id] : [],
+          handledErrors[id],
+        ),
       };
     }
 
     if (currentErrors[id]) {
+      const currentCauses = getValidationCauses(handledErrors[id]);
+
       return {
         ...currentErrors,
-        ...acc,
-        [id]: [...currentErrors[id].filter((currError) => !newErrorsOrForClear[id].includes(currError))],
+        ...totalErrors,
+        [id]: [...currentErrors[id].filter((currError) => !currentCauses.includes(currError.cause))],
       };
     }
 
     return {
       ...currentErrors,
-      ...acc,
+      ...totalErrors,
       [id]: [],
     };
   }, {});
 
-  return Object.keys(newErrors).reduce((acc, id) => {
+  return Object.keys(newErrors).reduce((totalErrors, id) => {
     if (newErrors[id].length > 0) {
       return {
-        ...acc,
+        ...totalErrors,
         [id]: newErrors[id],
       };
     }
 
     return {
-      ...acc,
+      ...totalErrors,
     };
   }, {});
 };
 
 /**
-  Валидация значений полей `number` в `developer screen`.
+  Проверяет значения полей `number` в компоненте `developer screen` на корректность.
   @param target Поле `target` объекта `event`.
-  @param currentConfig Текущие значения конфигурации лаунчера.
+  @param currentConfig Объект конфигурации лаунчера.
   @param currentErrors Текущие ошибки валидации.
-  @returns Массив из двух массивов: ошибки для добавления и ошибки для удаления.
+  @returns Новый объект ошибок валидации.
 */
 export const validateNumberInputs = (
   target: EventTarget & HTMLInputElement,
@@ -102,12 +156,12 @@ export const validateNumberInputs = (
 
   errors = getUniqueValidationErrors(
     errors,
-    { [target.id]: ['less min value'] },
+    { [target.id]: [{ cause: ValidationErrorCause.MIN, text: 'Значение меньше допустимого' }] },
     +target.value < +target.min,
   );
 
   if (currentConfig.isResizable) {
-    const namesAndValues = target.name === 'width'
+    const namesAndValues = target.name.toLowerCase().includes('width')
       ? {
           default: currentConfig.width,
           min: currentConfig.minWidth,
@@ -129,8 +183,8 @@ export const validateNumberInputs = (
       errors = getUniqueValidationErrors(
         errors,
         {
-          [target.id]: [`less config ${namesAndValues.minName}`],
-          [namesAndValues.minName]: [`more config ${target.id}`],
+          [target.id]: [{ cause: `less config ${namesAndValues.minName}` }],
+          [namesAndValues.minName]: [{ cause: `more config ${target.id}` }],
         },
         +target.value < namesAndValues.min,
       );
@@ -138,8 +192,8 @@ export const validateNumberInputs = (
       errors = getUniqueValidationErrors(
         errors,
         {
-          [target.id]: [`more config ${namesAndValues.maxName}`],
-          [namesAndValues.maxName]: [`less config ${target.id}`],
+          [target.id]: [{ cause: `more config ${namesAndValues.maxName}` }],
+          [namesAndValues.maxName]: [{ cause: `less config ${target.id}` }],
         },
         +target.value > namesAndValues.max && namesAndValues.max > 0,
       );
@@ -147,8 +201,8 @@ export const validateNumberInputs = (
       errors = getUniqueValidationErrors(
         errors,
         {
-          [target.id]: [`more config ${namesAndValues.defaultName}`],
-          [namesAndValues.defaultName]: [`less config ${target.id}`],
+          [target.id]: [{ cause: `more config ${namesAndValues.defaultName}` }],
+          [namesAndValues.defaultName]: [{ cause: `less config ${target.id}` }],
         },
         +target.value > namesAndValues.default,
       );
@@ -156,8 +210,8 @@ export const validateNumberInputs = (
       errors = getUniqueValidationErrors(
         errors,
         {
-          [target.id]: [`more config ${namesAndValues.maxName}`],
-          [namesAndValues.maxName]: [`less config ${target.id}`],
+          [target.id]: [{ cause: `more config ${namesAndValues.maxName}` }],
+          [namesAndValues.maxName]: [{ cause: `less config ${target.id}` }],
         },
         +target.value > namesAndValues.max && namesAndValues.max > 0,
       );
@@ -165,16 +219,16 @@ export const validateNumberInputs = (
       errors = getUniqueValidationErrors(
         errors,
         {
-          [target.id]: [`less config ${namesAndValues.defaultName}`],
-          [namesAndValues.defaultName]: [`more config ${target.id}`],
+          [target.id]: [{ cause: `less config ${namesAndValues.defaultName}` }],
+          [namesAndValues.defaultName]: [{ cause: `more config ${target.id}` }],
         },
         +target.value < namesAndValues.default && +target.value > 0,
       );
       errors = getUniqueValidationErrors(
         errors,
         {
-          [target.id]: [`less config ${namesAndValues.minName}`],
-          [namesAndValues.minName]: [`more config ${target.id}`],
+          [target.id]: [{ cause: `less config ${namesAndValues.minName}` }],
+          [namesAndValues.minName]: [{ cause: `more config ${target.id}` }],
         },
         +target.value < namesAndValues.min && +target.value > 0,
       );
@@ -191,8 +245,11 @@ const validateOptionItemFields = (option: IGameSettingsOption): IValidationError
       errors = getUniqueValidationErrors(
         errors,
         {
-          [`name_${item.id}`]: ['empty value'],
-          [`${option.id}_name:${item.id}`]: ['item error'],
+          [`name_${item.id}`]: [{
+            cause: ValidationErrorCause.EMPTY,
+            text: 'Значение не может быть пустым',
+          }],
+          [`${option.id}_name:${item.id}`]: [{ cause: ValidationErrorCause.ITEM }],
         },
         item.name === '',
       );
@@ -202,8 +259,11 @@ const validateOptionItemFields = (option: IGameSettingsOption): IValidationError
       errors = getUniqueValidationErrors(
         errors,
         {
-          [`iniGroup_${item.id}`]: ['empty value'],
-          [`${option.id}_iniGroup:${item.id}`]: ['item error'],
+          [`iniGroup_${item.id}`]: [{
+            cause: ValidationErrorCause.EMPTY,
+            text: 'Значение не может быть пустым',
+          }],
+          [`${option.id}_iniGroup:${item.id}`]: [{ cause: ValidationErrorCause.ITEM }],
         },
         item.iniGroup === '',
       );
@@ -213,8 +273,11 @@ const validateOptionItemFields = (option: IGameSettingsOption): IValidationError
       errors = getUniqueValidationErrors(
         errors,
         {
-          [`valueName_${item.id}`]: ['empty value'],
-          [`${option.id}_valueName:${item.id}`]: ['item error'],
+          [`valueName_${item.id}`]: [{
+            cause: ValidationErrorCause.EMPTY,
+            text: 'Значение не может быть пустым',
+          }],
+          [`${option.id}_valueName:${item.id}`]: [{ cause: ValidationErrorCause.ITEM }],
         },
         item.valueName === '',
       );
@@ -224,8 +287,11 @@ const validateOptionItemFields = (option: IGameSettingsOption): IValidationError
       errors = getUniqueValidationErrors(
         errors,
         {
-          [`valuePath_${item.id}`]: ['empty value'],
-          [`${option.id}_valuePath:${item.id}`]: ['item error'],
+          [`valuePath_${item.id}`]: [{
+            cause: ValidationErrorCause.EMPTY,
+            text: 'Значение не может быть пустым',
+          }],
+          [`${option.id}_valuePath:${item.id}`]: [{ cause: ValidationErrorCause.ITEM }],
         },
         item.valuePath === '',
       );
@@ -247,21 +313,34 @@ export const setOptionStartValidationErrors = (
   ) {
     errors = getUniqueValidationErrors(
       errors,
-      { [`name_${option.id}`]: ['empty value'] },
+      {
+        [`name_${option.id}`]: [{
+          cause: ValidationErrorCause.EMPTY,
+          text: 'Значение не может быть пустым',
+        }],
+      },
       option.name === '',
     );
 
     if (file.view === GameSettingsFileView.SECTIONAL) {
       errors = getUniqueValidationErrors(
         errors,
-        { [`iniGroup_${option.id}`]: ['empty value'] },
+        {
+          [`iniGroup_${option.id}`]: [{
+            cause: ValidationErrorCause.EMPTY,
+            text: 'Значение не может быть пустым',
+          }],
+        },
         option.iniGroup === '',
       );
     } else if (GameSettingsFileView.TAG) {
       errors = getUniqueValidationErrors(
         errors,
         {
-          [`valueName_${option.id}`]: ['empty value'],
+          [`valueName_${option.id}`]: [{
+            cause: ValidationErrorCause.EMPTY,
+            text: 'Значение не может быть пустым',
+          }],
         },
         option.valueName === '',
       );
@@ -269,7 +348,10 @@ export const setOptionStartValidationErrors = (
       errors = getUniqueValidationErrors(
         errors,
         {
-          [`valuePath_${option.id}`]: ['empty value'],
+          [`valuePath_${option.id}`]: [{
+            cause: ValidationErrorCause.EMPTY,
+            text: 'Значение не может быть пустым',
+          }],
         },
         option.valuePath === '',
       );
@@ -291,7 +373,12 @@ export const validateOptionFields = (
   if (target.type === 'text' && target.required) {
     errors = getUniqueValidationErrors(
       errors,
-      { [target.id]: ['empty value'] },
+      {
+        [target.id]: [{
+          cause: ValidationErrorCause.EMPTY,
+          text: 'Значение не может быть пустым',
+        }],
+      },
       target.value === '',
     );
   }
@@ -301,7 +388,12 @@ export const validateOptionFields = (
   ) {
     errors = getUniqueValidationErrors(
       errors,
-      { [`name_${option.id}`]: ['empty value'] },
+      {
+        [`name_${option.id}`]: [{
+          cause: ValidationErrorCause.EMPTY,
+          text: 'Значение не может быть пустым',
+        }],
+      },
       option.name === '',
     );
   } else if (option.items!?.length > 0) {

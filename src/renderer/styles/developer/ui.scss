@@ -318,7 +318,7 @@ $checkbox-size: 20px;
 
   &--error,
   &--error:disabled {
-    background-color: var(--error-color);
+    @include inputError;
   }
 }
 
