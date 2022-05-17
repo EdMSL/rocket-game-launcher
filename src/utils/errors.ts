@@ -35,31 +35,6 @@ export const ErrorCode = {
   UNKNOWN: 'UNKNOWN',
 };
 
-/**
- * Показать модальное нативное окно Electron с ошибкой.
- * @param error Текст ошибки.
- * @param title Заголовок окна.
-*/
-export const showErrorBox = (message: string, title = ErrorMessage.DEFAULT): void => {
-  dialog.showErrorBox(title, message);
-};
-
-/**
- * Показать модальное нативное окно с выбранным типом.
- * @param error Текст ошибки.
- * @param title Заголовок окна.
- * @param type Тип окна: `info`, `warning` или `error`.
-*/
-export const showMessageBox = (
-  message: string,
-  title = ErrorMessage.DEFAULT,
-  type = 'info',
-): void => {
-  dialog.showMessageBox({
-    message, title, type,
-  });
-};
-
 export interface IReadWriteError extends Error {
   cause: Error,
 }
@@ -99,9 +74,35 @@ export class SagaError extends Error {
 }
 
 /**
- * Функция получения конечной ошибки чтения/записи (модуля `fs`) на основе кода из ошибки `NodeJS`
- * @param error Объект ошибки чтения/записи
- * @param isDirOperation Операция над директорией или нет. По умолчанию `false`
+ * Показывает модальное нативное окно Electron с ошибкой.
+ * @param message Текст ошибки.
+ * @param title Заголовок окна.
+*/
+export const showErrorBox = (message: string, title = ErrorMessage.DEFAULT): void => {
+  dialog.showErrorBox(title, message);
+};
+
+/**
+ * Показывает нативное окно выбранного типа, содержащее текстовое сообщение.
+ * @param message Текст ошибки.
+ * @param title Заголовок окна.
+ * @param type Тип окна: `info`, `warning` или `error`.
+*/
+export const showMessageBox = (
+  message: string,
+  title = ErrorMessage.DEFAULT,
+  type = 'info',
+): void => {
+  dialog.showMessageBox({
+    message, title, type,
+  });
+};
+
+/**
+ * Получает конечную ошибку чтения/записи (модуля `fs`) на основе кода из ошибки `NodeJS`
+ * @param error Объект ошибки чтения/записи.
+ * @param isDirOperation Если `true`, то выполняется операция над директорией, иначе над файлом.
+ * Влияет только на сообщение об ошибке.
  * @returns Объект Error
 */
 export const getReadWriteError = (error: NodeJS.ErrnoException, isDirOperation = false): Error => {
@@ -131,6 +132,10 @@ export const getReadWriteError = (error: NodeJS.ErrnoException, isDirOperation =
   return error;
 };
 
+/**
+ * Выполняет указанные внутри операции при нажатии кнопки 'Report' модуля `unhandled`.
+ * @param error Объект ошибки.
+ */
 export const reportError = (error) => {
   shell.openExternal(reportLink);
 };
