@@ -11,10 +11,11 @@ import {
 } from '$constants/misc';
 import { PathSelector } from '$components/UI/PathSelector';
 import { IPathVariables } from '$constants/paths';
-import { IValidationData } from '$utils/check';
 import { Button } from '$components/UI/Button';
 import { getFileNameFromPathToFile } from '$utils/strings';
-import { getUniqueValidationErrors, IValidationErrors } from '$utils/validation';
+import {
+  getUniqueValidationErrors, IValidationErrors, IValidationData,
+} from '$utils/validation';
 
 interface IProps {
   file: IGameSettingsFile,

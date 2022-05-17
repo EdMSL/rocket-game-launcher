@@ -29,12 +29,6 @@ import { ILauncherConfig, IWindowSettings } from '$types/main';
 import {
   getGameSettingsFilesNames, getGameSettingsGroupsNames,
 } from './data';
-import { IValidationErrors } from './validation';
-
-export interface IValidationData {
-  errors: IValidationErrors,
-  isForAdd: boolean,
-}
 
 export interface ICheckResult<T> {
   data: T,

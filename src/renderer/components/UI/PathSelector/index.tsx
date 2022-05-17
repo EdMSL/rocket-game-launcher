@@ -14,8 +14,10 @@ import {
   checkIsPathIsNotOutsideValidFolder, replaceRootDirByPathVariable, getVariableAndValueFromPath,
 } from '$utils/strings';
 import { AppChannel, LauncherButtonAction } from '$constants/misc';
-import { getIsPathWithVariableCorrect, IValidationData } from '$utils/check';
-import { getValidationCauses, ValidationErrorCause } from '$utils/validation';
+import { getIsPathWithVariableCorrect } from '$utils/check';
+import {
+  getValidationCauses, IValidationData, ValidationErrorCause,
+} from '$utils/validation';
 
 interface IProps extends IUIElementParams, IUIControllerTextField {
   id: string,

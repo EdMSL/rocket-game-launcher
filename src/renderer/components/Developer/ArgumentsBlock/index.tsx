@@ -13,9 +13,12 @@ import { TextField } from '$components/UI/TextField';
 import { HintItem } from '$components/HintItem';
 import { IButtonArg } from '$types/main';
 import { getRandomId } from '$utils/strings';
-import { IValidationData } from '$utils/check';
 import {
-  clearValidationErrors, getUniqueValidationErrors, IValidationErrors, ValidationErrorCause,
+  clearComponentValidationErrors,
+  getUniqueValidationErrors,
+  IValidationData,
+  IValidationErrors,
+  ValidationErrorCause,
 } from '$utils/validation';
 
 interface IProps {
@@ -109,7 +112,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
     );
 
     setLastAddedStringArg('');
-    onValidationError(clearValidationErrors(validationErrors, currentTarget.name));
+    onValidationError(clearComponentValidationErrors(validationErrors, currentTarget.name));
   }, [args, parent, validationErrors, changeArguments, onValidationError]);
 
   const OnAddArgumentBtnClick = useCallback(({

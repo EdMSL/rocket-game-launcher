@@ -28,7 +28,10 @@ import { generateSelectOptionsFromString, getRandomId } from '$utils/strings';
 import { TextArea } from '$components/UI/TextArea';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import {
-  IValidationErrors, setOptionStartValidationErrors, validateOptionFields,
+  IValidationErrors,
+  setOptionStartValidationErrors,
+  validateOptionFields,
+  clearComponentValidationErrors,
 } from '$utils/validation';
 
 interface IProps {
@@ -129,10 +132,16 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
     );
 
     if (currentTarget.name === 'file') {
+      const currentValidationErrors = clearComponentValidationErrors(
+        validationErrors,
+        ['iniGroup', 'valueName', 'valuePath'],
+      );
+
       onValidation(setOptionStartValidationErrors(
         newOption,
         getFileByFileName(gameSettingsFiles, newOption.file)!,
-        validationErrors,
+        currentValidationErrors,
+        // validationErrors,
       ));
     } else {
       onValidation(validateOptionFields(currentTarget, newOption, validationErrors));

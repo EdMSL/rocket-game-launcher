@@ -33,7 +33,6 @@ import {
 import { ArgumentsBlock } from '$components/Developer/ArgumentsBlock';
 import {
   checkObjectForEqual,
-  IValidationData,
 } from '$utils/check';
 import { getRandomId } from '$utils/strings';
 import { DeveloperScreenController } from '$components/Developer/DeveloperScreenController';
@@ -42,7 +41,12 @@ import { saveLauncherConfig, updateConfig } from '$actions/developer';
 import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import {
-  clearValidationErrors, getUniqueValidationErrors, IValidationErrors, validateNumberInputs, ValidationErrorCause,
+  clearComponentValidationErrors,
+  getUniqueValidationErrors,
+  IValidationErrors,
+  IValidationData,
+  validateNumberInputs,
+  ValidationErrorCause,
 } from '$utils/validation';
 
 export const DeveloperConfigScreen: React.FC = () => {
@@ -195,7 +199,7 @@ export const DeveloperConfigScreen: React.FC = () => {
       .filter((currentBtn) => currentBtn.id !== id));
 
     setLastAddedBtnItemId('');
-    setValidationErrors(clearValidationErrors(validationErrors, id));
+    setValidationErrors(clearComponentValidationErrors(validationErrors, id));
   }, [currentConfig, validationErrors, changeCurrentConfig]);
 
   const onAddCustomBtnBtnClick = useCallback(() => {

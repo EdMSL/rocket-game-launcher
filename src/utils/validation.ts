@@ -19,6 +19,11 @@ interface IValidationError {
   text?: string,
 }
 
+export interface IValidationData {
+  errors: IValidationErrors,
+  isForAdd: boolean,
+}
+
 export interface IValidationErrors {
   [id: string]: IValidationError[],
 }
@@ -52,18 +57,20 @@ export const getValidationCauses = (
 /**
  *Очищает при удалении компонента все ошибки валидации, связанные этим компонентом.
  * @param validationErrors Текущие ошибки валидации.
- * @param id Идентификатор удаляемого компонента.
+ * @param targetId Идентификатор или массив идентификаторов удаляемого(ых) компонента(ов).
  * @returns Ошибки валидации без ошибок, привязанных к текущему компоненту.
  */
-export const clearValidationErrors = (
+export const clearComponentValidationErrors = (
   validationErrors: IValidationErrors,
-  id: string,
+  targetId: string|string[],
 ): IValidationErrors => Object
   .keys(validationErrors)
-  .filter((error) => !error.includes(id))
-  .reduce((acc, current) => ({
-    ...acc,
-    [current]: validationErrors[current],
+  .filter((errorId) => (Array.isArray(targetId)
+    ? !targetId.some((currentId) => errorId.includes(currentId))
+    : !errorId.includes(targetId)))
+  .reduce((totalErrors, currentId) => ({
+    ...totalErrors,
+    [currentId]: validationErrors[currentId],
   }), {});
 
 const getValidationErrorWithUniqueCauses = (
@@ -195,7 +202,7 @@ export const validateNumberInputs = (
           [target.id]: [{ cause: `more config ${namesAndValues.maxName}` }],
           [namesAndValues.maxName]: [{ cause: `less config ${target.id}` }],
         },
-        +target.value > namesAndValues.max && namesAndValues.max > 0,
+        namesAndValues.max > 0 && +target.value > namesAndValues.max,
       );
     } else if (target.name === 'minWidth' || target.name === 'minHeight') {
       errors = getUniqueValidationErrors(
@@ -213,7 +220,7 @@ export const validateNumberInputs = (
           [target.id]: [{ cause: `more config ${namesAndValues.maxName}` }],
           [namesAndValues.maxName]: [{ cause: `less config ${target.id}` }],
         },
-        +target.value > namesAndValues.max && namesAndValues.max > 0,
+        namesAndValues.max > 0 && +target.value > namesAndValues.max,
       );
     } else if (target.name === 'maxWidth' || target.name === 'maxHeight') {
       errors = getUniqueValidationErrors(

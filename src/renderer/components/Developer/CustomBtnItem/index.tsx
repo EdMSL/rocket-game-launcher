@@ -18,10 +18,9 @@ import { IPathVariables } from '$constants/paths';
 import { ArgumentsBlock } from '$components/Developer/ArgumentsBlock';
 import {
   getIsPathWithVariableCorrect,
-  IValidationData,
 } from '$utils/check';
 import {
-  getUniqueValidationErrors, IValidationErrors, ValidationErrorCause,
+  getUniqueValidationErrors, IValidationData, IValidationErrors, ValidationErrorCause,
 } from '$utils/validation';
 
 interface IProps {
