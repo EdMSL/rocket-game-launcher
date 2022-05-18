@@ -244,8 +244,12 @@ export const validateNumberInputs = (
   return errors;
 };
 
-const validateOptionItemFields = (option: IGameSettingsOption): IValidationErrors => {
-  let errors: IValidationErrors = {};
+export const validateOptionItemFields = (
+  option: IGameSettingsOption,
+  file: IGameSettingsFile,
+  currentErrors: IValidationErrors,
+): IValidationErrors => {
+  let errors: IValidationErrors = { ...currentErrors };
 
   option.items?.forEach((item) => {
     if (item.name === '') {
@@ -262,7 +266,7 @@ const validateOptionItemFields = (option: IGameSettingsOption): IValidationError
       );
     }
 
-    if (item.iniGroup !== undefined) {
+    if (file.view === GameSettingsFileView.SECTIONAL) {
       errors = getUniqueValidationErrors(
         errors,
         {
@@ -276,96 +280,36 @@ const validateOptionItemFields = (option: IGameSettingsOption): IValidationError
       );
     }
 
-    if (item.valueName !== undefined) {
-      errors = getUniqueValidationErrors(
-        errors,
-        {
-          [`valueName_${item.id}`]: [{
-            cause: ValidationErrorCause.EMPTY,
-            text: 'Значение не может быть пустым',
-          }],
-          [`${option.id}_valueName:${item.id}`]: [{ cause: ValidationErrorCause.ITEM }],
-        },
-        item.valueName === '',
-      );
-    }
+    if (file.view === GameSettingsFileView.TAG) {
+      if (item.valueName !== undefined) {
+        errors = getUniqueValidationErrors(
+          errors,
+          {
+            [`valueName_${item.id}`]: [{
+              cause: ValidationErrorCause.EMPTY,
+              text: 'Значение не может быть пустым',
+            }],
+            [`${option.id}_valueName:${item.id}`]: [{ cause: ValidationErrorCause.ITEM }],
+          },
+          item.valueName === '',
+        );
+      }
 
-    if (item.valuePath !== undefined) {
-      errors = getUniqueValidationErrors(
-        errors,
-        {
-          [`valuePath_${item.id}`]: [{
-            cause: ValidationErrorCause.EMPTY,
-            text: 'Значение не может быть пустым',
-          }],
-          [`${option.id}_valuePath:${item.id}`]: [{ cause: ValidationErrorCause.ITEM }],
-        },
-        item.valuePath === '',
-      );
+      if (item.valuePath !== undefined) {
+        errors = getUniqueValidationErrors(
+          errors,
+          {
+            [`valuePath_${item.id}`]: [{
+              cause: ValidationErrorCause.EMPTY,
+              text: 'Значение не может быть пустым',
+            }],
+            [`${option.id}_valuePath:${item.id}`]: [{ cause: ValidationErrorCause.ITEM }],
+          },
+          item.valuePath === '',
+        );
+      }
     }
   });
-
-  return errors;
-};
-
-export const setOptionStartValidationErrors = (
-  option: IGameSettingsOption,
-  file: IGameSettingsFile,
-  currentErrors: IValidationErrors,
-): IValidationErrors => {
-  let errors: IValidationErrors = { ...currentErrors };
-
-  if (
-    option.optionType === GameSettingsOptionType.DEFAULT
-  ) {
-    errors = getUniqueValidationErrors(
-      errors,
-      {
-        [`name_${option.id}`]: [{
-          cause: ValidationErrorCause.EMPTY,
-          text: 'Значение не может быть пустым',
-        }],
-      },
-      option.name === '',
-    );
-
-    if (file.view === GameSettingsFileView.SECTIONAL) {
-      errors = getUniqueValidationErrors(
-        errors,
-        {
-          [`iniGroup_${option.id}`]: [{
-            cause: ValidationErrorCause.EMPTY,
-            text: 'Значение не может быть пустым',
-          }],
-        },
-        option.iniGroup === '',
-      );
-    } else if (GameSettingsFileView.TAG) {
-      errors = getUniqueValidationErrors(
-        errors,
-        {
-          [`valueName_${option.id}`]: [{
-            cause: ValidationErrorCause.EMPTY,
-            text: 'Значение не может быть пустым',
-          }],
-        },
-        option.valueName === '',
-      );
-
-      errors = getUniqueValidationErrors(
-        errors,
-        {
-          [`valuePath_${option.id}`]: [{
-            cause: ValidationErrorCause.EMPTY,
-            text: 'Значение не может быть пустым',
-          }],
-        },
-        option.valuePath === '',
-      );
-    }
-  } else if (option.items!?.length > 0) {
-    errors = validateOptionItemFields(option);
-  }
 
   return errors;
 };
@@ -373,6 +317,7 @@ export const setOptionStartValidationErrors = (
 export const validateOptionFields = (
   target: EventTarget & (HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement),
   option: IGameSettingsOption,
+  file: IGameSettingsFile,
   currentErrors: IValidationErrors,
 ): IValidationErrors => {
   let errors: IValidationErrors = { ...currentErrors };
@@ -390,22 +335,7 @@ export const validateOptionFields = (
     );
   }
 
-  if (
-    option.optionType === GameSettingsOptionType.DEFAULT
-  ) {
-    errors = getUniqueValidationErrors(
-      errors,
-      {
-        [`name_${option.id}`]: [{
-          cause: ValidationErrorCause.EMPTY,
-          text: 'Значение не может быть пустым',
-        }],
-      },
-      option.name === '',
-    );
-  } else if (option.items!?.length > 0) {
-    errors = validateOptionItemFields(option);
-  }
+  errors = validateOptionItemFields(option, file, errors);
 
   return errors;
 };

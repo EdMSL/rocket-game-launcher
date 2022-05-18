@@ -96,7 +96,7 @@ export const defaultGameSettingsConfig: IGameSettingsConfig = {
 export const defaultGameSettingsOptionItem: IGameSettingsOptionItem = {
   id: '',
   name: '',
-  controllerType: UIControllerType.CHECKBOX,
+  controllerType: undefined,
   iniGroup: '',
   min: 0,
   max: 1,
@@ -117,7 +117,7 @@ export const defaultFullGameSettingsOption: IGameSettingsOption = {
   iniGroup: '',
   valueName: '',
   valuePath: '',
-  controllerType: UIControllerType.CHECKBOX,
+  controllerType: undefined,
   separator: ':',
   selectOptions: {},
   min: 0,

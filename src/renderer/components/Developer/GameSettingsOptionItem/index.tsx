@@ -29,7 +29,7 @@ import { TextArea } from '$components/UI/TextArea';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import {
   IValidationErrors,
-  setOptionStartValidationErrors,
+  validateOptionItemFields,
   validateOptionFields,
   clearComponentValidationErrors,
 } from '$utils/validation';
@@ -137,14 +137,18 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         ['iniGroup', 'valueName', 'valuePath'],
       );
 
-      onValidation(setOptionStartValidationErrors(
+      onValidation(validateOptionItemFields(
         newOption,
         getFileByFileName(gameSettingsFiles, newOption.file)!,
         currentValidationErrors,
-        // validationErrors,
       ));
     } else {
-      onValidation(validateOptionFields(currentTarget, newOption, validationErrors));
+      onValidation(validateOptionFields(
+        currentTarget,
+        newOption,
+        getFileByFileName(gameSettingsFiles, newOption.file)!,
+        validationErrors,
+      ));
     }
 
     onOptionDataChange(option.id, newOption);
@@ -242,62 +246,6 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         )
       }
       {
-        option.name !== undefined && (
-          <TextField
-            className={styles.option__item}
-            id={`name_${option.id}`}
-            name="name"
-            label="Имя параметра из файла"
-            value={option.name!}
-            isRequied
-            validationErrors={validationErrors}
-            onChange={onOptionInputChange}
-          />
-        )
-      }
-      {
-        option.iniGroup !== undefined && (
-          <TextField
-            className={styles.option__item}
-            id={`iniGroup_${option.id}`}
-            name="iniGroup"
-            label="Группа параметра из файла"
-            value={option.iniGroup}
-            isRequied
-            validationErrors={validationErrors}
-            onChange={onOptionInputChange}
-          />
-        )
-      }
-      {
-        option.valueName !== undefined && (
-          <TextField
-            className={styles.option__item}
-            id={`valueName_${option.id}`}
-            name="valueName"
-            label="Имя атрибута параметра из файла"
-            value={option.valueName}
-            isRequied
-            validationErrors={validationErrors}
-            onChange={onOptionInputChange}
-          />
-        )
-      }
-      {
-        option.valuePath !== undefined && (
-          <TextField
-            className={styles.option__item}
-            id={`valuePath_${option.id}`}
-            name="valuePath"
-            label="Путь до параметра из файла"
-            value={option.valuePath}
-            isRequied
-            validationErrors={validationErrors}
-            onChange={onOptionInputChange}
-          />
-        )
-      }
-      {
         option.separator !== undefined && (
           <TextField
             className={styles.option__item}
@@ -381,12 +329,9 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
           />
         )
       }
-      {
-        option.items !== undefined && (
-          <React.Fragment>
-            <p className={styles.option__items}>Список параметров из файла для опции</p>
-            <ul className={styles.option__list}>
-              {
+      <p className={styles.option__items}>Параметры из файла</p>
+      <ul className={styles.option__list}>
+        {
               option.items.map((item) => (
                 <SpoilerListItem<IGameSettingsOptionItem>
                   key={item.id}
@@ -531,23 +476,21 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                 </SpoilerListItem>
               ))
             }
-            </ul>
-            {
-              option.optionType !== GameSettingsOptionType.DEFAULT && (
-              <Button
-                className={classNames(
-                  'main-btn',
-                  'option__btn',
-                )}
-                onClick={onAddOptionItemBtnClick}
-              >
-                Добавить параметр
-              </Button>
-              )
-            }
-          </React.Fragment>
-        )
-      }
+      </ul>
+      {
+          option.optionType !== GameSettingsOptionType.DEFAULT && (
+          <Button
+            className={classNames(
+              'main-btn',
+              'option__btn',
+            )}
+            onClick={onAddOptionItemBtnClick}
+          >
+            Добавить параметр
+          </Button>
+          )
+        }
+
       <Button
         className={classNames(
           'main-btn',

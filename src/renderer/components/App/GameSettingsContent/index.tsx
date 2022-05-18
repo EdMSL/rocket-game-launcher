@@ -141,7 +141,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
     }
   }, [gameSettingsParameters, onSettingOptionChange]);
 
-  const getCombinedValue = (option: IGameSettingsOption): string => option.items!
+  const getCombinedValue = (option: IGameSettingsOption): string => option.items
     .map((item) => gameSettingsParameters[getOptionNameAndId(item).id].value)
     .join(option.separator);
 
@@ -174,7 +174,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
           locationSettingGroup,
         ).map(
           (option) => {
-            let optionData = getOptionNameAndId(option);
+            let optionData = getOptionNameAndId(option.items[0]);
 
             if (option.optionType === GameSettingsOptionType.RELATED) {
               return (
@@ -191,9 +191,9 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                   </div>
                   <div className={styles['game-settings-content__subblock']}>
                     {
-                      option.items!.map((item) => {
+                      option.items.map((item) => {
                         optionData = getOptionNameAndId(item);
-                        const multiparameters = option.items!.map((item) => getOptionNameAndId(item).id).join();
+                        const multiparameters = option.items.map((item) => getOptionNameAndId(item).id).join();
 
                         if (item.controllerType === UIControllerType.SELECT) {
                           return (
@@ -225,8 +225,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
             }
 
             if (option.optionType === GameSettingsOptionType.GROUP) {
-              optionData = getOptionNameAndId(option.items![0]);
-              const multiparameters = option.items!.map((item) => getOptionNameAndId(item).id).join();
+              const multiparameters = option.items.map((item) => getOptionNameAndId(item).id).join();
 
               if (option.controllerType === UIControllerType.SELECT) {
                 return (
@@ -273,7 +272,6 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                   <Switcher
                     key={optionData.id}
                     className={styles['game-settings-content__item']}
-                    parentClassname="game-settings-content"
                     id={optionData.id}
                     name={optionData.name}
                     parent={option.file}
@@ -292,7 +290,6 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                   <Range
                     key={optionData.id}
                     className={styles['game-settings-content__item']}
-                    parentClassname="game-settings-content"
                     id={optionData.id}
                     name={optionData.name}
                     parent={option.file}
@@ -312,8 +309,7 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
             }
 
             if (option.optionType === GameSettingsOptionType.COMBINED) {
-              optionData = getOptionNameAndId(option.items![0]);
-              const multiparameters = option.items!.map((item) => getOptionNameAndId(item).id).join();
+              const multiparameters = option.items.map((item) => getOptionNameAndId(item).id).join();
 
               if (option.controllerType === UIControllerType.SELECT) {
                 return (
@@ -345,7 +341,6 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                   <Range
                     key={optionData.id}
                     className={styles['game-settings-content__item']}
-                    parentClassname="game-settings-content"
                     id={optionData.id}
                     name={optionData.name}
                     parent={option.file}
@@ -367,7 +362,6 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                   <Checkbox
                     key={optionData.id}
                     className={styles['game-settings-content__item']}
-                    parentClassname="game-settings-content"
                     id={optionData.id}
                     name={optionData.name}
                     parent={option.file}
@@ -385,7 +379,6 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                   <Switcher
                     key={optionData.id}
                     className={styles['game-settings-content__item']}
-                    parentClassname="game-settings-content"
                     id={optionData.id}
                     name={optionData.name}
                     parent={option.file}

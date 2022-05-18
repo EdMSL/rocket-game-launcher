@@ -40,12 +40,14 @@
       "label": "Полный экран",
       "description": "",
       "settingGroup": "7uED7Xd7gPyIIvlu",
-      "name": "bFull Screen",
-      "iniGroup": "Display",
       "controllerType": "range",
       "min": 0,
       "max": 10,
-      "step": 1
+      "step": 1,
+      "items": [{
+        "name": "bFull Screen",
+        "iniGroup": "Display"
+      }]
     },
     {
       "optionType": "combined",

@@ -214,22 +214,6 @@ const defaultOptionTypeSchema = Joi.object({
     },
   ).valid(Joi.in('$gameSettingsGroups'))
     .messages({ 'any.only': '"settingGroup" must be one of {$gameSettingsGroups}' }),
-  name: Joi.string().required(),
-  iniGroup: Joi.string().when(
-    Joi.ref('$view'), {
-      is: GameSettingsFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
-    },
-  ),
-  valueName: Joi.string().when(
-    Joi.ref('$view'), {
-      is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
-    },
-  ),
-  valuePath: Joi.string().when(
-    Joi.ref('$view'), {
-      is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
-    },
-  ).allow(''),
   controllerType: Joi.string().required().valid(...Object.values(UIControllerType)),
   selectOptions: Joi.object().pattern(
     Joi.string(),
@@ -246,6 +230,26 @@ const defaultOptionTypeSchema = Joi.object({
   step: Joi.number().when(
     Joi.ref('controllerType'), { is: UIControllerType.RANGE, then: Joi.required() },
   ),
+  items: Joi.array()
+    .items(Joi.object({
+      id: Joi.string().optional().default(() => getRandomId()),
+      name: Joi.string().required(),
+      iniGroup: Joi.string().when(
+        Joi.ref('$view'), {
+          is: GameSettingsFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
+        },
+      ),
+      valueName: Joi.string().when(
+        Joi.ref('$view'), {
+          is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+        },
+      ),
+      valuePath: Joi.string().when(
+        Joi.ref('$view'), {
+          is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
+        },
+      ).allow(''),
+    })).required().length(1),
 });
 
 const groupOptionTypeSchema = Joi.object({

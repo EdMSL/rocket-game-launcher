@@ -49,7 +49,7 @@ import {
 import {
   getUniqueValidationErrors,
   IValidationErrors,
-  setOptionStartValidationErrors,
+  validateOptionItemFields,
   ValidationErrorCause,
 } from '$utils/validation';
 
@@ -312,7 +312,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   const addGameSettingsOption = useCallback(() => {
     const paramerter = getDefaultGameSettingsOption(currentConfig.gameSettingsFiles[0]);
 
-    setNewValidationErrors(setOptionStartValidationErrors(
+    setNewValidationErrors(validateOptionItemFields(
       paramerter,
       currentConfig.gameSettingsFiles[0],
       validationErrors,
@@ -462,7 +462,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                 >
                   Добавить
                 </Button>
-                <p className="developer__subtitle">Игровые параметры</p>
+                <p className="developer__subtitle">Игровые опции</p>
                 <ul className={styles.developer__list}>
                   {
                 currentConfig.gameSettingsOptions.length > 0 && currentConfig.gameSettingsOptions.map((currentParameter, index) => (
@@ -491,11 +491,11 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                 }
                   {
                 currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length !== 0
-                && <li> Нет игровых параметров</li>
+                && <li> Нет игровых опций</li>
                 }
                   {
                 currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length === 0
-                && <li> Добавьте хотя бы один игровой файл, чтобы добавлять игровые параметры</li>
+                && <li> Добавьте хотя бы один игровой файл, чтобы добавлять игровые опции</li>
                 }
                 </ul>
                 <Button

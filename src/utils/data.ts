@@ -101,23 +101,23 @@ export const getParameterName = (
 };
 
 /**
- *
- * @param option Имя опции.
- * @returns Id опции.
+ * Получает имя и идентификатор для элемента опции.
+ * @param optionItem Элемент для параметра опции.
+ * @returns Идентификатор и имя элемента опции.
  */
 export const getOptionNameAndId = (
-  option: IGameSettingsOption|IGameSettingsOptionItem,
+  optionItem: IGameSettingsOptionItem,
 ): { name: string, id: string, } => {
-  const name = getParameterName(option);
-  const id = `${option.id}:${name}`;
+  const name = getParameterName(optionItem);
+  const id = `${optionItem.id}:${name}`;
 
   return { id, name };
 };
 
 /**
- * Получить файл игровых настроек из `state` по его имени.
- * @param gameSettingsFiles Массив файлов.
- * @param fileName Имя файла, который ищем.
+ * Получает файл игровых настроек из `state` по его имени.
+ * @param gameSettingsFiles Массив файлов игровых настроек.
+ * @param fileName Имя искомого файла.
  * @returns Объект файла.
  */
 export const getFileByFileName = (
@@ -126,9 +126,9 @@ export const getFileByFileName = (
 ): IGameSettingsFile|undefined => gameSettingsFiles.find((currFile) => currFile.name === fileName);
 
 /**
- * Глубокое клонирование объекта.
+ * Выполняет глубокое клонирование объекта.
  * @param obj Объект для клонирования.
- * @param deleteKey Ключ объекта, который нужно удалить при клонировании.
+ * @param deleteKey Если указан, то данный ключ\знаение будут удалены из итогового объекта.
  * @returns Клон переданного объекта.
  */
 export const deepClone = (obj: any, deleteKey = ''): object => {
@@ -321,68 +321,41 @@ export const generateGameSettingsParameters = (
       );
 
       if (currentGameSettingsFile !== undefined) {
-        if (
-          currentOption.optionType === GameSettingsOptionType.RELATED
-          || currentOption.optionType === GameSettingsOptionType.GROUP
-          || currentOption.optionType === GameSettingsOptionType.COMBINED
-        ) {
-          let specParamsErrors: IParameterErrorData[] = [];
+        let specParamsErrors: IParameterErrorData[] = [];
 
-          const parametersFromOption = currentOption.items!.reduce<IGameSettingsParameters>(
-            (parameters, currentItem) => {
-              const {
-                parameterName, parameterValue, parameterErrors,
-              } = getParameterData(
-                currentFilesDataObj[currentOption.file],
-                currentItem,
-                currentGameSettingsFile,
-                moProfile,
-              );
+        const parametersFromOption = currentOption.items!.reduce<IGameSettingsParameters>(
+          (parameters, currentItem) => {
+            const {
+              parameterName, parameterValue, parameterErrors,
+            } = getParameterData(
+              currentFilesDataObj[currentOption.file],
+              currentItem,
+              currentGameSettingsFile,
+              moProfile,
+            );
 
-              if (parameterErrors.length > 0) {
-                specParamsErrors = [...parameterErrors];
+            if (parameterErrors.length > 0) {
+              specParamsErrors = [...parameterErrors];
 
-                return { ...parameters };
-              }
+              return { ...parameters };
+            }
 
-              return {
-                ...parameters,
-                [getOptionNameAndId(currentItem).id]: {
-                  default: parameterValue,
-                  value: parameterValue,
-                  name: parameterName,
-                  option: currentOption.id,
-                  file: currentOption.file,
-                },
-              };
-            },
-            {},
-          );
-
-          if (specParamsErrors.length > 0) {
-            errors = [...errors, ...specParamsErrors];
-            optionsWithError.push(currentOption.id);
-
-            return { ...gameSettingsParameters };
-          }
-
-          return {
-            ...gameSettingsParameters,
-            ...parametersFromOption,
-          };
-        }
-
-        const {
-          parameterName, parameterValue, parameterErrors,
-        } = getParameterData(
-          currentFilesDataObj[currentGameSettingsFile!.name],
-          currentOption,
-          currentGameSettingsFile,
-          moProfile,
+            return {
+              ...parameters,
+              [getOptionNameAndId(currentItem).id]: {
+                default: parameterValue,
+                value: parameterValue,
+                name: parameterName,
+                option: currentOption.id,
+                file: currentOption.file,
+              },
+            };
+          },
+          {},
         );
 
-        if (parameterErrors.length > 0) {
-          errors = [...errors, ...parameterErrors];
+        if (specParamsErrors.length > 0) {
+          errors = [...errors, ...specParamsErrors];
           optionsWithError.push(currentOption.id);
 
           return { ...gameSettingsParameters };
@@ -390,13 +363,7 @@ export const generateGameSettingsParameters = (
 
         return {
           ...gameSettingsParameters,
-          [getOptionNameAndId(currentOption).id]: {
-            default: parameterValue,
-            name: parameterName,
-            value: parameterValue,
-            option: currentOption.id,
-            file: currentOption.file,
-          },
+          ...parametersFromOption,
         };
       }
 
@@ -844,34 +811,34 @@ export const getDefaultGameSettingsFile = (
 });
 
 /**
- * Получить полный игровой параметр со всеми полями, измененными текущим параметром.
- * @param currentFullParam Текущий полный параметр.
- * @param currentParam Текущий параметр.
- * @returns Новый полный параметр с обновленными полями.
+ * Получает объект игровой опции со всеми доступными полями, измененными текущей опцией.
+ * @param currentFullOption Текущий полный объект опции.
+ * @param currentOption Текущий объект опции.
+ * @returns Новый объект опции с обновленными полями.
  */
 export const getFullOption = (
-  currentFullParam: IGameSettingsOption,
-  currentParam: IGameSettingsOption,
+  currentFullOption: IGameSettingsOption,
+  currentOption: IGameSettingsOption,
 ): IGameSettingsOption => ({
-  ...currentFullParam,
-  ...currentParam,
-  items: currentParam.items
-    ? currentParam.items.map((item) => ({
-      ...currentFullParam.items![0],
-      ...item,
-    }))
-    : currentFullParam.items!.map((item) => ({
-      ...item,
-      id: getRandomId(),
-      name: currentParam.name || item.name,
-    })),
+  ...currentFullOption,
+  ...currentOption,
+  controllerType: currentOption.controllerType
+    ? currentOption.controllerType
+    : currentFullOption.items[0].controllerType,
+  items: currentOption.items.map((item, index) => ({
+    ...currentFullOption.items[index] ? currentFullOption.items[index] : currentFullOption.items[0],
+    ...item,
+    controllerType: currentOption.items[0].controllerType
+      ? currentOption.items[0].controllerType
+      : currentOption.controllerType,
+  })),
 });
 
 /**
- * Сгенерировать новый объект параметра игровых настроек типа `default`.
+ * Получает новый объект опции игровых настроек типа `default`.
  * @param file Объект с данными игрового файла.
  * @param optionBase Объект с базовыми полями любого типа опций.
- * @returns Объект с основными полями игрового параметра.
+ * @returns Объект с основными полями опции.
 **/
 const getOptionBase = (
   file: IGameSettingsFile,
@@ -883,6 +850,7 @@ const getOptionBase = (
   label: optionBase?.label || '',
   description: optionBase?.description || '',
   ...optionBase?.settingGroup ? { settingGroup: optionBase.settingGroup } : {},
+  items: optionBase?.items || [],
 });
 
 const getFieldsByFileView = (
@@ -912,9 +880,9 @@ const getFieldsByControllerType = (
 });
 
 /**
- * Сгенерировать новый объект опции игровых настроек типа `default`.
+ * Генерирует новый объект опции игровых настроек типа `default`.
  * @param file Объект с данными игрового файла.
- * @returns Объект опции из `state`.
+ * @returns Объект опции игровых настроек.
  */
 export const getDefaultGameSettingsOption = (
   file: IGameSettingsFile,
@@ -923,17 +891,20 @@ export const getDefaultGameSettingsOption = (
   ...getOptionBase(file),
   label: 'Заголовок',
   ...settingGroup ? { settingGroup } : {},
-  name: '',
-  ...getFieldsByFileView({} as IGameSettingsOption, file),
-  controllerType: UIControllerType.CHECKBOX,
+  items: [{
+    id: getRandomId(),
+    name: '',
+    ...getFieldsByFileView({} as IGameSettingsOption, file),
+    controllerType: UIControllerType.CHECKBOX,
+  }],
 });
 
 /**
- * Получить объект с текущей опцией и полной опции со всеми доступными полями.
+ * Получает объект с текущей опцией и полной опции со всеми доступными полями.
  * @param currentOption Объект изменяемой опции.
  * @param fullOption Объект со всеми доступными полями опции.
  * @param file Объект с данными игрового файла.
- * @returns Объект опции из `state`.
+ * @returns Объект опции.
  */
 export const generateGameSettingsOption = (
   currentOption: IGameSettingsOption,
@@ -949,13 +920,21 @@ export const generateGameSettingsOption = (
 
   switch (currentOption.optionType) {
     case GameSettingsOptionType.DEFAULT:
+    case GameSettingsOptionType.GROUP:
       newOption = {
         ...newOption,
-        name: newFullOption.name,
-        ...getFieldsByFileView(newFullOption, file),
         controllerType: newFullOption.controllerType,
         ...getFieldsByControllerType(newFullOption),
+        items: newFullOption.items.map((item, index): IGameSettingsOptionItem => ({
+          id: item.id,
+          name: item.name,
+          ...getFieldsByFileView(newFullOption.items[index], file),
+        })),
       };
+
+      if (currentOption.optionType === GameSettingsOptionType.DEFAULT) {
+        newOption.items = [newOption.items[0]];
+      }
       break;
     case GameSettingsOptionType.COMBINED:
       newOption = {
@@ -963,34 +942,22 @@ export const generateGameSettingsOption = (
         controllerType: UIControllerType.SELECT,
         separator: newFullOption.separator,
         selectOptions: newFullOption.selectOptions,
-        items: newFullOption.items?.map((item, index): IGameSettingsOptionItem => ({
+        items: newFullOption.items.map((item, index): IGameSettingsOptionItem => ({
           id: item.id,
           name: item.name,
-          ...getFieldsByFileView(newFullOption.items![index], file),
+          ...getFieldsByFileView(newFullOption.items[index], file),
         })),
       };
       break;
     case GameSettingsOptionType.RELATED:
       newOption = {
         ...newOption,
-        items: newFullOption.items?.map((item, index): IGameSettingsOptionItem => ({
+        items: newFullOption.items.map((item, index): IGameSettingsOptionItem => ({
           id: item.id,
           name: item.name,
-          ...getFieldsByFileView(newFullOption.items![index], file),
-          controllerType: newFullOption.items![index].controllerType,
-          ...getFieldsByControllerType(newFullOption.items![index]),
-        })),
-      };
-      break;
-    case GameSettingsOptionType.GROUP:
-      newOption = {
-        ...newOption,
-        controllerType: newFullOption.controllerType,
-        ...getFieldsByControllerType(newFullOption),
-        items: newFullOption.items?.map((item, index): IGameSettingsOptionItem => ({
-          id: item.id,
-          name: item.name,
-          ...getFieldsByFileView(newFullOption.items![index], file),
+          ...getFieldsByFileView(newFullOption.items[index], file),
+          controllerType: UIControllerType.SELECT,
+          selectOptions: newFullOption.selectOptions,
         })),
       };
       break;

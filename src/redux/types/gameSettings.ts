@@ -39,6 +39,7 @@ export interface IGameSettingsOptionBase {
   label: string,
   description: string,
   settingGroup?: string,
+  items: IGameSettingsOptionItem[],
 }
 
 export interface IGameSettingsOptionItem {
@@ -65,7 +66,7 @@ export interface IGameSettingsOption extends IGameSettingsOptionBase {
   min?: number,
   max?: number,
   step?: number,
-  items?: IGameSettingsOptionItem[],
+  items: IGameSettingsOptionItem[],
 }
 
 export interface IGameSettingsFile {
