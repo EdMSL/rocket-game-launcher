@@ -330,6 +330,19 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         )
       }
       <p className={styles.option__items}>Параметры из файла</p>
+      {
+        option.optionType !== GameSettingsOptionType.DEFAULT && (
+          <Button
+            className={classNames(
+              'main-btn',
+              'option__btn',
+            )}
+            onClick={onAddOptionItemBtnClick}
+          >
+            Добавить параметр
+          </Button>
+        )
+        }
       <ul className={styles.option__list}>
         {
           option.items.map((item) => (
@@ -478,20 +491,6 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
           ))
             }
       </ul>
-      {
-          option.optionType !== GameSettingsOptionType.DEFAULT && (
-          <Button
-            className={classNames(
-              'main-btn',
-              'option__btn',
-            )}
-            onClick={onAddOptionItemBtnClick}
-          >
-            Добавить параметр
-          </Button>
-          )
-        }
-
       <Button
         className={classNames(
           'main-btn',

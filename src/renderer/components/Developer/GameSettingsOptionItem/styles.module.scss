@@ -20,5 +20,8 @@
 
 .option__btn {
   align-self: center;
+  box-sizing: border-box;
+  min-width: 200px;
   margin: auto;
+  margin-bottom: var(--space-m);
 }

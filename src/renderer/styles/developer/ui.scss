@@ -226,6 +226,10 @@ $checkbox-size: 20px;
 
   &--error {
     @include inputError;
+
+    &:focus {
+      outline-color: var(--text-main);
+    }
   }
 }
 
