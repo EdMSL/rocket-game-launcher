@@ -20,6 +20,7 @@ export const TextArea: React.FunctionComponent<IProps> = ({
   wrap = 'default',
   placeholder = '',
   isDisabled = false,
+  isRequied,
   validationErrors,
   onChange,
 }) => (
@@ -51,6 +52,7 @@ export const TextArea: React.FunctionComponent<IProps> = ({
       disabled={isDisabled}
       wrap={wrap}
       placeholder={placeholder}
+      required={isRequied}
       onChange={onChange}
     />
   </div>

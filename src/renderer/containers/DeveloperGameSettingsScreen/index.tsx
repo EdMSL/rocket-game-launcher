@@ -49,7 +49,7 @@ import {
 import {
   getUniqueValidationErrors,
   IValidationErrors,
-  validateOptionItemFields,
+  validateOptionOnCreate,
   ValidationErrorCause,
 } from '$utils/validation';
 
@@ -300,11 +300,11 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   }, [currentConfig.gameSettingsFiles, deleteGameSettingsFile]);
 
   const changeGameSettingsOptions = useCallback((
-    paramId: string,
-    paramData: IGameSettingsOption,
+    optionId: string,
+    optionData: IGameSettingsOption,
   ) => {
     changeCurrentConfig(
-      changeConfigArrayItem(paramId, paramData, currentConfig.gameSettingsOptions),
+      changeConfigArrayItem(optionId, optionData, currentConfig.gameSettingsOptions),
       'gameSettingsOptions',
     );
   }, [currentConfig, changeCurrentConfig]);
@@ -312,7 +312,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   const addGameSettingsOption = useCallback(() => {
     const paramerter = getDefaultGameSettingsOption(currentConfig.gameSettingsFiles[0]);
 
-    setNewValidationErrors(validateOptionItemFields(
+    setNewValidationErrors(validateOptionOnCreate(
       paramerter,
       currentConfig.gameSettingsFiles[0],
       validationErrors,
@@ -465,38 +465,38 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                 <p className="developer__subtitle">Игровые опции</p>
                 <ul className={styles.developer__list}>
                   {
-                currentConfig.gameSettingsOptions.length > 0 && currentConfig.gameSettingsOptions.map((currentParameter, index) => (
-                  <SpoilerListItem<IGameSettingsOption>
-                    key={currentParameter.id}
-                    item={currentParameter}
-                    items={currentConfig.gameSettingsOptions}
-                    position={index}
-                    summaryText={[currentParameter.label]}
-                    lastItemId={lastAddedOptionId}
-                    validationErrors={validationErrors}
-                    onDeleteItem={deleteGameSettingsOption}
-                    onChangeOrderItem={changeGameSettingsOptionOrder}
-                  >
-                    <GameSettingsOptionItem
-                      option={currentParameter}
-                      gameSettingsFiles={currentConfig.gameSettingsFiles}
-                      gameSettingsGroups={currentConfig.gameSettingsGroups}
+                  currentConfig.gameSettingsOptions.length > 0 && currentConfig.gameSettingsOptions.map((currentOption, index) => (
+                    <SpoilerListItem<IGameSettingsOption>
+                      key={currentOption.id}
+                      item={currentOption}
+                      items={currentConfig.gameSettingsOptions}
+                      position={index}
+                      summaryText={[currentOption.label]}
+                      lastItemId={lastAddedOptionId}
                       validationErrors={validationErrors}
-                      onOptionDataChange={changeGameSettingsOptions}
-                      onValidation={setNewValidationErrors}
-                      deleteOption={deleteGameSettingsOptionById}
-                    />
-                  </SpoilerListItem>
-                ))
+                      onDeleteItem={deleteGameSettingsOption}
+                      onChangeOrderItem={changeGameSettingsOptionOrder}
+                    >
+                      <GameSettingsOptionItem
+                        option={currentOption}
+                        gameSettingsFiles={currentConfig.gameSettingsFiles}
+                        gameSettingsGroups={currentConfig.gameSettingsGroups}
+                        validationErrors={validationErrors}
+                        onOptionDataChange={changeGameSettingsOptions}
+                        onValidation={setNewValidationErrors}
+                        deleteOption={deleteGameSettingsOptionById}
+                      />
+                    </SpoilerListItem>
+                  ))
                 }
                   {
-                currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length !== 0
-                && <li> Нет игровых опций</li>
-                }
+                  currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length !== 0
+                  && <li> Нет игровых опций</li>
+                  }
                   {
-                currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length === 0
-                && <li> Добавьте хотя бы один игровой файл, чтобы добавлять игровые опции</li>
-                }
+                  currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length === 0
+                  && <li> Добавьте хотя бы один игровой файл, чтобы добавлять игровые опции</li>
+                  }
                 </ul>
                 <Button
                   className={classNames('main-btn', 'developer__btn')}

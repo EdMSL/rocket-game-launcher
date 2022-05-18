@@ -244,14 +244,14 @@ export const validateNumberInputs = (
   return errors;
 };
 
-export const validateOptionItemFields = (
+export const validateOptionOnCreate = (
   option: IGameSettingsOption,
   file: IGameSettingsFile,
   currentErrors: IValidationErrors,
 ): IValidationErrors => {
   let errors: IValidationErrors = { ...currentErrors };
 
-  option.items?.forEach((item) => {
+  option.items.forEach((item) => {
     if (item.name === '') {
       errors = getUniqueValidationErrors(
         errors,
@@ -260,7 +260,7 @@ export const validateOptionItemFields = (
             cause: ValidationErrorCause.EMPTY,
             text: 'Значение не может быть пустым',
           }],
-          [`${option.id}_name:${item.id}`]: [{ cause: ValidationErrorCause.ITEM }],
+          [`${option.id}:name_${item.id}`]: [{ cause: ValidationErrorCause.ITEM }],
         },
         item.name === '',
       );
@@ -274,7 +274,7 @@ export const validateOptionItemFields = (
             cause: ValidationErrorCause.EMPTY,
             text: 'Значение не может быть пустым',
           }],
-          [`${option.id}_iniGroup:${item.id}`]: [{ cause: ValidationErrorCause.ITEM }],
+          [`${option.id}:iniGroup_${item.id}`]: [{ cause: ValidationErrorCause.ITEM }],
         },
         item.iniGroup === '',
       );
@@ -289,7 +289,7 @@ export const validateOptionItemFields = (
               cause: ValidationErrorCause.EMPTY,
               text: 'Значение не может быть пустым',
             }],
-            [`${option.id}_valueName:${item.id}`]: [{ cause: ValidationErrorCause.ITEM }],
+            [`${option.id}:valueName_${item.id}`]: [{ cause: ValidationErrorCause.ITEM }],
           },
           item.valueName === '',
         );
@@ -303,7 +303,7 @@ export const validateOptionItemFields = (
               cause: ValidationErrorCause.EMPTY,
               text: 'Значение не может быть пустым',
             }],
-            [`${option.id}_valuePath:${item.id}`]: [{ cause: ValidationErrorCause.ITEM }],
+            [`${option.id}:valuePath_${item.id}`]: [{ cause: ValidationErrorCause.ITEM }],
           },
           item.valuePath === '',
         );
@@ -322,7 +322,7 @@ export const validateOptionFields = (
 ): IValidationErrors => {
   let errors: IValidationErrors = { ...currentErrors };
 
-  if (target.type === 'text' && target.required) {
+  if ((target.type === 'text' || target.tagName === 'TEXTAREA') && target.required) {
     errors = getUniqueValidationErrors(
       errors,
       {
@@ -330,12 +330,11 @@ export const validateOptionFields = (
           cause: ValidationErrorCause.EMPTY,
           text: 'Значение не может быть пустым',
         }],
+        [`${option.id}:${target.id}`]: [{ cause: ValidationErrorCause.ITEM }],
       },
       target.value === '',
     );
   }
-
-  errors = validateOptionItemFields(option, file, errors);
 
   return errors;
 };

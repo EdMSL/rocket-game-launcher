@@ -891,11 +891,11 @@ export const getDefaultGameSettingsOption = (
   ...getOptionBase(file),
   label: 'Заголовок',
   ...settingGroup ? { settingGroup } : {},
+  controllerType: UIControllerType.CHECKBOX,
   items: [{
     id: getRandomId(),
     name: '',
     ...getFieldsByFileView({} as IGameSettingsOption, file),
-    controllerType: UIControllerType.CHECKBOX,
   }],
 });
 

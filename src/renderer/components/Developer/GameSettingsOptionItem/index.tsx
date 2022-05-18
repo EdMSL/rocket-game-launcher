@@ -29,7 +29,7 @@ import { TextArea } from '$components/UI/TextArea';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import {
   IValidationErrors,
-  validateOptionItemFields,
+  validateOptionOnCreate,
   validateOptionFields,
   clearComponentValidationErrors,
 } from '$utils/validation';
@@ -137,7 +137,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         ['iniGroup', 'valueName', 'valuePath'],
       );
 
-      onValidation(validateOptionItemFields(
+      onValidation(validateOptionOnCreate(
         newOption,
         getFileByFileName(gameSettingsFiles, newOption.file)!,
         currentValidationErrors,
@@ -332,73 +332,74 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
       <p className={styles.option__items}>Параметры из файла</p>
       <ul className={styles.option__list}>
         {
-              option.items.map((item) => (
-                <SpoilerListItem<IGameSettingsOptionItem>
-                  key={item.id}
-                  item={item}
-                  items={option.items!}
-                  summaryText={[item.name]}
-                  lastItemId={lastAddedItemId}
-                >
-                  <React.Fragment>
-                    <TextField
-                      className={styles.option__item}
-                      id={`name_${item.id}`}
-                      parent={item.id}
-                      name="name"
-                      label="Имя параметра из файла"
-                      value={item.name}
-                      isRequied
-                      validationErrors={validationErrors}
-                      onChange={onOptionInputChange}
-                    />
-                    {
-                    item.iniGroup !== undefined && (
-                      <TextField
-                        className={styles.option__item}
-                        id={`iniGroup_${item.id}`}
-                        parent={item.id}
-                        name="iniGroup"
-                        label="Группа параметра из файла"
-                        value={item.iniGroup}
-                        isRequied
-                        validationErrors={validationErrors}
-                        onChange={onOptionInputChange}
-                      />
-                    )
+          option.items.map((item) => (
+            <SpoilerListItem<IGameSettingsOptionItem>
+              key={item.id}
+              item={item}
+              items={option.items}
+              summaryText={[item.name]}
+              lastItemId={lastAddedItemId}
+              validationErrors={validationErrors}
+            >
+              <React.Fragment>
+                <TextField
+                  className={styles.option__item}
+                  id={`name_${item.id}`}
+                  parent={item.id}
+                  name="name"
+                  label="Имя параметра из файла"
+                  value={item.name}
+                  isRequied
+                  validationErrors={validationErrors}
+                  onChange={onOptionInputChange}
+                />
+                {
+                  item.iniGroup !== undefined && (
+                  <TextField
+                    className={styles.option__item}
+                    id={`iniGroup_${item.id}`}
+                    parent={item.id}
+                    name="iniGroup"
+                    label="Группа параметра из файла"
+                    value={item.iniGroup}
+                    isRequied
+                    validationErrors={validationErrors}
+                    onChange={onOptionInputChange}
+                  />
+                  )
                     }
-                    {
-                    item.valueName !== undefined && (
-                      <TextField
-                        className={styles.option__item}
-                        id={`valueName_${item.id}`}
-                        parent={item.id}
-                        name="valueName"
-                        label="Имя атрибута параметра из файла"
-                        value={item.valueName}
-                        isRequied
-                        validationErrors={validationErrors}
-                        onChange={onOptionInputChange}
-                      />
-                    )
-                    }
-                    {
-                    item.valuePath !== undefined && (
-                      <TextField
-                        className={styles.option__item}
-                        id={`valuePath_${item.id}`}
-                        parent={item.id}
-                        name="valuePath"
-                        label="Путь до параметра из файла"
-                        value={item.valuePath}
-                        isRequied
-                        validationErrors={validationErrors}
-                        onChange={onOptionInputChange}
-                      />
-                    )
-                    }
-                    {
-                    item.controllerType !== undefined && (
+                {
+                  item.valueName !== undefined && (
+                  <TextField
+                    className={styles.option__item}
+                    id={`valueName_${item.id}`}
+                    parent={item.id}
+                    name="valueName"
+                    label="Имя атрибута параметра из файла"
+                    value={item.valueName}
+                    isRequied
+                    validationErrors={validationErrors}
+                    onChange={onOptionInputChange}
+                  />
+                  )
+                }
+                {
+                  item.valuePath !== undefined && (
+                  <TextField
+                    className={styles.option__item}
+                    id={`valuePath_${item.id}`}
+                    parent={item.id}
+                    name="valuePath"
+                    label="Путь до параметра из файла"
+                    value={item.valuePath}
+                    isRequied
+                    validationErrors={validationErrors}
+                    onChange={onOptionInputChange}
+                  />
+                  )
+                }
+                {
+                  item.controllerType !== undefined && (
                     <Select
                       className={styles.option__item}
                       id={`controllerType_${item.id}`}
@@ -411,10 +412,10 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                       value={item.controllerType}
                       onChange={onOptionInputChange}
                     />
-                    )
-                    }
-                    {
-                    item.selectOptions !== undefined && (
+                  )
+                }
+                {
+                  item.selectOptions !== undefined && (
                     <TextArea
                       className={styles.option__item}
                       id={`options_${item.id}`}
@@ -428,10 +429,10 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                       validationErrors={validationErrors}
                       onChange={onOptionInputChange}
                     />
-                    )
-                    }
-                    {
-                    item.min !== undefined && (
+                  )
+                }
+                {
+                  item.min !== undefined && (
                     <NumberField
                       className={styles.option__item}
                       id={`min_${item.id}`}
@@ -442,10 +443,10 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                       value={item.min}
                       onChange={onOptionInputChange}
                     />
-                    )
-                    }
-                    {
-                    item.max !== undefined && (
+                  )
+                }
+                {
+                  item.max !== undefined && (
                     <NumberField
                       className={styles.option__item}
                       id={`max_${item.id}`}
@@ -456,10 +457,10 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                       value={item.max}
                       onChange={onOptionInputChange}
                     />
-                    )
-                    }
-                    {
-                    item.step !== undefined && (
+                  )
+                }
+                {
+                  item.step !== undefined && (
                     <NumberField
                       className={styles.option__item}
                       id={`step_${item.id}`}
@@ -470,11 +471,11 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                       value={item.step}
                       onChange={onOptionInputChange}
                     />
-                    )
-                    }
-                  </React.Fragment>
-                </SpoilerListItem>
-              ))
+                  )
+                }
+              </React.Fragment>
+            </SpoilerListItem>
+          ))
             }
       </ul>
       {
