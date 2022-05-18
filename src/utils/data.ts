@@ -827,9 +827,9 @@ export const getFullOption = (
   controllerType: currentOption.controllerType
     ? currentOption.controllerType
     : currentFullOption.items[0].controllerType,
-  items: currentFullOption.items.map((item, index) => ({
+  items: currentOption.items.map((item, index) => ({
+    ...currentFullOption.items[index] || currentFullOption.items[0],
     ...item,
-    ...currentOption.items[index],
     controllerType: currentOption.items[0].controllerType
       ? currentOption.items[0].controllerType
       : currentOption.controllerType,

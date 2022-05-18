@@ -171,10 +171,12 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
     const { newOption, newFullOption } = generateGameSettingsOption(
       {
         ...option,
-        items: [...option.items!, {
-          ...option.items![option.items!.length - 1],
-          id: newId,
-        }],
+        items: [
+          {
+            ...option.items[option.items.length - 1],
+            id: newId,
+          },
+          ...option.items],
       },
       fullOption,
       optionFile!,
