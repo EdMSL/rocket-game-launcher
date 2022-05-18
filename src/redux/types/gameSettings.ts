@@ -32,6 +32,15 @@ export interface IGameSettingsGroup {
   label: string,
 }
 
+export interface IGameSettingsFile {
+  id: string,
+  name: string,
+  label: string,
+  path: string,
+  view: string,
+  encoding: string,
+}
+
 export interface IGameSettingsOptionBase {
   id: string,
   optionType: GameSettingsOptionType,
@@ -42,41 +51,31 @@ export interface IGameSettingsOptionBase {
   items: IGameSettingsOptionItem[],
 }
 
-export interface IGameSettingsOptionItem {
-  id: string,
-  name: string,
+export interface IGameSettingsOptionFileViewFields {
   iniGroup?: string,
   valueName?: string,
   valuePath?: string,
+}
+
+export interface IGameSettingsOptionControllerFields {
   controllerType?: UIControllerType,
   selectOptions?: { [key: string]: string, },
   min?: number,
   max?: number,
   step?: number,
-}
-
-export interface IGameSettingsOption extends IGameSettingsOptionBase {
-  name?: string,
-  iniGroup?: string,
-  valueName?: string,
-  valuePath?: string,
-  controllerType?: UIControllerType,
   separator?: string,
-  selectOptions?: { [key: string]: string, },
-  min?: number,
-  max?: number,
-  step?: number,
-  items: IGameSettingsOptionItem[],
 }
 
-export interface IGameSettingsFile {
-  id: string,
-  name: string,
-  label: string,
-  path: string,
-  view: string,
-  encoding: string,
-}
+export interface IGameSettingsOptionItem extends
+  IGameSettingsOptionControllerFields,
+  IGameSettingsOptionFileViewFields {
+    id: string,
+    name: string,
+  }
+
+export interface IGameSettingsOption extends
+  IGameSettingsOptionBase,
+  IGameSettingsOptionControllerFields {}
 
 export interface IGameSettingsConfig {
   baseFilesEncoding: IGameSettingsRootState['baseFilesEncoding'],

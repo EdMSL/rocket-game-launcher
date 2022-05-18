@@ -32,6 +32,8 @@ import {
   IGameSettingsFile,
   IGameSettingsGroup,
   IGameSettingsOptionBase,
+  IGameSettingsOptionControllerFields,
+  IGameSettingsOptionFileViewFields,
 } from '$types/gameSettings';
 import {
   DefaultPathVariable,
@@ -87,7 +89,7 @@ export const getTypeOfElement = (element: unknown): string => {
  * @param option Опция, к которой привязан параметр.
 */
 export const getParameterName = (
-  option: IGameSettingsOption|IGameSettingsOptionItem,
+  option: IGameSettingsOptionItem,
 ): string => {
   if (option.valueName) {
     return `${option.valuePath ? `${option.valuePath}/` : ''}${option.name}/${option.valueName}`;
@@ -198,7 +200,7 @@ export const setValueForObjectDeepKey = <T>(
 */
 export const getParameterData = (
   currentFileData: IIniObj|IXmlObj,
-  currentGameSettingOption: IGameSettingsOption|IGameSettingsOptionItem,
+  currentGameSettingOption: IGameSettingsOptionItem,
   currentGameSettingsFile: IGameSettingsFile,
   moProfileName = '',
 ): IParameterGeneratedData => {
@@ -854,9 +856,9 @@ const getOptionBase = (
 });
 
 const getFieldsByFileView = (
-  fullOption: IGameSettingsOption|IGameSettingsOptionItem,
+  fullOption: IGameSettingsOptionItem,
   file: IGameSettingsFile,
-) => ({
+): IGameSettingsOptionFileViewFields => ({
   ...file.view === GameSettingsFileView.SECTIONAL ? {
     iniGroup: fullOption.iniGroup || defaultGameSettingsOptionItem.iniGroup,
   } : {},
@@ -868,7 +870,7 @@ const getFieldsByFileView = (
 
 const getFieldsByControllerType = (
   fullOption: IGameSettingsOption|IGameSettingsOptionItem,
-) => ({
+): IGameSettingsOptionControllerFields => ({
   ...fullOption.controllerType === UIControllerType.SELECT ? {
     selectOptions: fullOption.selectOptions,
   } : {},
@@ -895,7 +897,7 @@ export const getDefaultGameSettingsOption = (
   items: [{
     id: getRandomId(),
     name: '',
-    ...getFieldsByFileView({} as IGameSettingsOption, file),
+    ...getFieldsByFileView({} as IGameSettingsOptionItem, file),
   }],
 });
 
