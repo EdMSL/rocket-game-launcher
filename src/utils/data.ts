@@ -959,7 +959,7 @@ export const generateGameSettingsOption = (
           name: item.name,
           ...getFieldsByFileView(newFullOption.items[index], file),
           controllerType: UIControllerType.SELECT,
-          selectOptions: newFullOption.selectOptions,
+          selectOptions: newFullOption.items[index].selectOptions,
         })),
       };
       break;
