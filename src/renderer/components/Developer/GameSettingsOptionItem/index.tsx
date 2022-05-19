@@ -70,7 +70,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
   const onOptionInputChange = useCallback((
     { currentTarget }: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>,
   ) => {
-    const isOptionItemChange = currentTarget.dataset.parent && currentTarget.dataset.parent !== '';
+    const isOptionItemChange = currentTarget.dataset.parent !== undefined && currentTarget.dataset.parent !== '';
 
     let currentOption: IGameSettingsOption;
 
@@ -81,7 +81,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
           items: changeConfigArrayItem<any>(
             currentTarget.dataset.parent!,
             { [currentTarget.name]: +currentTarget.value },
-            option.items!,
+            option.items,
             false,
           ),
         } : {
@@ -95,7 +95,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
           items: changeConfigArrayItem<any>(
             currentTarget.dataset.parent!,
             { [currentTarget.name]: generateSelectOptionsFromString(currentTarget.value) },
-            option.items!,
+            option.items,
             false,
           ),
         } : {
@@ -114,7 +114,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
           items: changeConfigArrayItem<any>(
             currentTarget.dataset.parent!,
             { [currentTarget.name]: currentTarget.value },
-            option.items!,
+            option.items,
             false,
           ),
         } : {
@@ -280,8 +280,8 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         option.selectOptions !== undefined && (
           <TextArea
             className={styles.option__item}
-            id={`options_${option.id}`}
-            name="options"
+            id={`selectOptions_${option.id}`}
+            name="selectOptions"
             label="Опции селектора"
             value={optionsValue[option.id]}
             wrap="off"
@@ -433,9 +433,9 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.selectOptions !== undefined && (
                     <TextArea
                       className={styles.option__item}
-                      id={`options_${item.id}`}
+                      id={`selectOptions_${item.id}`}
                       parent={item.id}
-                      name="options"
+                      name="selectOptions"
                       label="Опции селектора"
                       value={optionsValue[item.id]}
                       wrap="off"

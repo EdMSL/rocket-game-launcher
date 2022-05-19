@@ -872,7 +872,7 @@ const getFieldsByControllerType = (
   fullOption: IGameSettingsOption|IGameSettingsOptionItem,
 ): IGameSettingsOptionControllerFields => ({
   ...fullOption.controllerType === UIControllerType.SELECT ? {
-    selectOptions: fullOption.selectOptions,
+    selectOptions: { ...fullOption.selectOptions },
   } : {},
   ...fullOption.controllerType === UIControllerType.RANGE ? {
     min: fullOption.min,
@@ -919,7 +919,6 @@ export const generateGameSettingsOption = (
   );
 
   let newOption: IGameSettingsOption = getOptionBase(file, newFullOption);
-
   switch (currentOption.optionType) {
     case GameSettingsOptionType.DEFAULT:
     case GameSettingsOptionType.GROUP:
@@ -943,7 +942,7 @@ export const generateGameSettingsOption = (
         ...newOption,
         controllerType: UIControllerType.SELECT,
         separator: newFullOption.separator,
-        selectOptions: newFullOption.selectOptions,
+        selectOptions: { ...newFullOption.selectOptions },
         items: newFullOption.items.map((item, index): IGameSettingsOptionItem => ({
           id: item.id,
           name: item.name,
@@ -959,7 +958,7 @@ export const generateGameSettingsOption = (
           name: item.name,
           ...getFieldsByFileView(newFullOption.items[index], file),
           controllerType: UIControllerType.SELECT,
-          selectOptions: newFullOption.items[index].selectOptions,
+          selectOptions: { ...newFullOption.items[index].selectOptions },
         })),
       };
       break;
