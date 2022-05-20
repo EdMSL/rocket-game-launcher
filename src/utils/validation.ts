@@ -1,6 +1,9 @@
-import { GameSettingsFileView, GameSettingsOptionType } from '$constants/misc';
+import {
+  availableOptionSeparators, GameSettingsFileView, GameSettingsOptionType,
+} from '$constants/misc';
 import { IGameSettingsFile, IGameSettingsOption } from '$types/gameSettings';
 import { ILauncherConfig } from '$types/main';
+import { getOptionItemSelectValueRegExp } from './strings';
 
 const MAX_PATH_LENGTH = 255;
 
@@ -322,7 +325,7 @@ export const validateOptionFields = (
 ): IValidationErrors => {
   let errors: IValidationErrors = { ...currentErrors };
 
-  if ((target.type === 'text' || target.tagName === 'TEXTAREA') && target.required) {
+  if (target.required && (target.type === 'text' || target.tagName === 'TEXTAREA')) {
     errors = getUniqueValidationErrors(
       errors,
       {
@@ -334,6 +337,67 @@ export const validateOptionFields = (
       },
       target.value === '',
     );
+  }
+
+  if (target.name === 'separator') {
+    errors = getUniqueValidationErrors(
+      errors,
+      {
+        [target.id]: [{
+          cause: 'not available separator',
+          text: `Значение разделителя недопустимо. Допустимые значения: [${availableOptionSeparators}]`, //eslint-disable-line max-len
+        }],
+        [`${option.id}:${target.id}`]: [{ cause: ValidationErrorCause.ITEM }],
+      },
+      !availableOptionSeparators.includes(target.value),
+    );
+  } else if (target.tagName === 'TEXTAREA' && target.value !== '') {
+    let incorrectIndexes: number[] = [];
+    const valueArr = target.value.split('\n').filter((subStr) => subStr !== '');
+
+    valueArr.forEach((subStr, index) => {
+      if (!getOptionItemSelectValueRegExp(
+        option.optionType,
+        option.separator,
+        option.items.length - 1,
+      ).test(subStr)) {
+        incorrectIndexes.push(index + 1);
+      }
+    });
+
+    errors = getUniqueValidationErrors(
+      errors,
+      {
+        [target.id]: [{
+          cause: 'incorrect value',
+          text: `Значение не соответствует заданному шаблону ${option.optionType === GameSettingsOptionType.COMBINED ? `Заголовок=Значение первого параметра${option.separator}Значение второго параметра(и т.д.)` : 'Заголовок=Значение'}`, //eslint-disable-line max-len
+        }],
+        [`${option.id}:${target.id}`]: [{ cause: ValidationErrorCause.ITEM }],
+      },
+      incorrectIndexes.length > 0,
+    );
+
+    if (option.optionType === GameSettingsOptionType.COMBINED && incorrectIndexes.length === 0) {
+      incorrectIndexes = [];
+
+      valueArr.forEach((pairStr, index) => {
+        if (!new RegExp(`^[^${option.separator}=]+(?<=\\S)(${option.separator}[^${option.separator}=\\s][^${option.separator}=]*){${option.items.length - 1}}[^${option.separator}=]*$`, 'g').test(pairStr.split('=')[1])) { //eslint-disable-line max-len
+          incorrectIndexes.push(index + 1);
+        }
+      });
+
+      errors = getUniqueValidationErrors(
+        errors,
+        {
+          [target.id]: [{
+            cause: 'not equal values quantity',
+            text: `Количество значений в строках ${incorrectIndexes.join()} не равно количеству параметров в опции`, //eslint-disable-line max-len
+          }],
+          [`${option.id}:${target.id}`]: [{ cause: ValidationErrorCause.ITEM }],
+        },
+        incorrectIndexes.length > 0,
+      );
+    }
   }
 
   return errors;

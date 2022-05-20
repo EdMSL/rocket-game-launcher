@@ -121,3 +121,5 @@ export enum AppChannel {
 
 export const modOrganizerProfileSection = 'General';
 export const modOrganizerProfileParam = 'selected_profile';
+
+export const availableOptionSeparators = ['!', '@', '#', '%', ':', '&', '*', '-', '+', '|'];

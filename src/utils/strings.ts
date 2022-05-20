@@ -2,6 +2,7 @@ import path from 'path';
 
 import { CustomError } from './errors';
 import {
+  GameSettingsOptionType,
   PathRegExp,
   PathVariableName,
   pathVariablesCheckOrderArr,
@@ -425,4 +426,24 @@ export const generateSelectOptionsFromString = (
   }
 
   return {};
+};
+
+/**
+ * Получает регулярное выражение для проверки корректности значения в TextArea
+ * для игрового параметра из игровой опции.
+ * @param optionType Тип игровой опции.
+ * @param separator Разделитель между значениями параметров в подстроке значения опции.
+ * @param itemsLength Количество параметров, используемых в опции.
+ * @returns Регулярное выражение для проверки.
+ */
+export const getOptionItemSelectValueRegExp = (
+  optionType: GameSettingsOptionType,
+  separator?: string|undefined,
+  itemsLength?: number|undefined,
+): RegExp => {
+  if (optionType === GameSettingsOptionType.COMBINED) {
+    return new RegExp(`^[^=]+(?<=\\S)=[^${separator}=\\s]+(?<=\\S)(${separator}[^${separator}=\\s][^${separator}=]*){${itemsLength}}[^${separator}=]*$`); //eslint-disable-line max-len
+  }
+
+  return /^[^=][^=]*(?<=\S)=[^\s=][^=]*$/;
 };

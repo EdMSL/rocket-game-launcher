@@ -15,7 +15,7 @@ import {
   getSelectsOptionStringObj,
 } from '$utils/data';
 import {
-  UIControllerType, GameSettingsOptionType, HTMLInputType,
+  UIControllerType, GameSettingsOptionType, HTMLInputType, availableOptionSeparators,
 } from '$constants/misc';
 import {
   IGameSettingsFile, IGameSettingsGroup, IGameSettingsOption, IGameSettingsOptionItem,
@@ -142,11 +142,22 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         getFileByFileName(gameSettingsFiles, newOption.file)!,
         currentValidationErrors,
       ));
+    } else if (currentTarget.name === 'controllerType') {
+      const currentValidationErrors = clearComponentValidationErrors(
+        validationErrors,
+        'selectOptions',
+      );
+
+      onValidation(validateOptionOnCreate(
+        newOption,
+        optionFile!,
+        currentValidationErrors,
+      ));
     } else {
       onValidation(validateOptionFields(
         currentTarget,
         newOption,
-        getFileByFileName(gameSettingsFiles, newOption.file)!,
+        optionFile!,
         validationErrors,
       ));
     }
@@ -255,6 +266,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
             name="separator"
             label="Разделитель"
             value={option.separator}
+            placeholder={availableOptionSeparators.join()}
             isRequied
             validationErrors={validationErrors}
             onChange={onOptionInputChange}
@@ -285,7 +297,9 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
             label="Опции селектора"
             value={optionsValue[option.id]}
             wrap="off"
-            placeholder="Видит пользователь=Запишется в файл"
+            placeholder={option.optionType === GameSettingsOptionType.COMBINED
+              ? `Видит пользователь=Значение первого параметра${option.separator}Значение второго параметра(и т.д.)`//eslint-disable-line max-len
+              : 'Видит пользователь=Значение параметра'}
             isRequied
             validationErrors={validationErrors}
             onChange={onOptionInputChange}
@@ -420,9 +434,11 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                       id={`controllerType_${item.id}`}
                       parent={item.id}
                       name="controllerType"
-                      selectOptions={generateSelectOptions(option.optionType === GameSettingsOptionType.RELATED
-                        ? [UIControllerType.SELECT.toUpperCase()]
-                        : UIControllerType)}
+                      selectOptions={generateSelectOptions(
+                        option.optionType === GameSettingsOptionType.RELATED
+                          ? [UIControllerType.SELECT.toUpperCase()]
+                          : UIControllerType,
+                      )}
                       label="Тип контроллера"
                       value={item.controllerType}
                       onChange={onOptionInputChange}
