@@ -1,5 +1,5 @@
 import {
-  availableOptionSeparators, GameSettingsFileView, GameSettingsOptionType,
+  availableOptionSeparators, GameSettingsFileView, GameSettingsOptionType, UIControllerType,
 } from '$constants/misc';
 import { IGameSettingsFile, IGameSettingsOption } from '$types/gameSettings';
 import { ILauncherConfig } from '$types/main';
@@ -247,12 +247,137 @@ export const validateNumberInputs = (
   return errors;
 };
 
+const validateTextArea = (
+  value: string,
+  id: string,
+  option: IGameSettingsOption,
+  currentErrors: IValidationErrors,
+): IValidationErrors => {
+  let errors: IValidationErrors = { ...currentErrors };
+  let incorrectIndexes: number[] = [];
+  const valueArr = value.split('\n').filter((subStr) => subStr !== '');
+
+  valueArr.forEach((subStr, index) => {
+    if (!getOptionItemSelectValueRegExp(
+      option.optionType,
+      option.separator,
+      option.items.length - 1,
+    ).test(subStr)) {
+      incorrectIndexes.push(index + 1);
+    }
+  });
+
+  errors = getUniqueValidationErrors(
+    errors,
+    {
+      [id]: [{
+        cause: ValidationErrorCause.EMPTY,
+        text: 'Значение не может быть пустым',
+      }],
+      [`${option.id}:${id}`]: [{ cause: ValidationErrorCause.ITEM }],
+    },
+    value === '',
+  );
+
+  errors = getUniqueValidationErrors(
+    errors,
+    {
+      [id]: [{
+        cause: 'less min quantity',
+        text: 'Должно быть минимум две опции',
+      }],
+      [`${option.id}:${id}`]: [{ cause: ValidationErrorCause.ITEM }],
+    },
+    valueArr.length < 2,
+  );
+
+  errors = getUniqueValidationErrors(
+    errors,
+    {
+      [id]: [{
+        cause: 'incorrect value',
+        text: `Значение не соответствует заданному шаблону ${option.optionType === GameSettingsOptionType.COMBINED ? `Заголовок=Значение первого параметра${option.separator}Значение второго параметра(и т.д.)` : 'Заголовок=Значение'}`, //eslint-disable-line max-len
+      }],
+      [`${option.id}:${id}`]: [{ cause: ValidationErrorCause.ITEM }],
+    },
+    incorrectIndexes.length > 0,
+  );
+
+  if (option.optionType === GameSettingsOptionType.COMBINED && incorrectIndexes.length === 0) {
+    incorrectIndexes = [];
+
+    valueArr.forEach((pairStr, index) => {
+      if (!new RegExp(`^[^${option.separator}=]+(?<=\\S)(${option.separator}[^${option.separator}=\\s][^${option.separator}=]*){${option.items.length - 1}}[^${option.separator}=]*$`, 'g').test(pairStr.split('=')[1])) { //eslint-disable-line max-len
+        incorrectIndexes.push(index + 1);
+      }
+    });
+
+    errors = getUniqueValidationErrors(
+      errors,
+      {
+        [id]: [{
+          cause: 'not equal values quantity',
+          text: `Количество значений в строках ${incorrectIndexes.join()} не равно количеству параметров в опции`, //eslint-disable-line max-len
+        }],
+        [`${option.id}:${id}`]: [{ cause: ValidationErrorCause.ITEM }],
+      },
+      incorrectIndexes.length > 0,
+    );
+  }
+
+  return errors;
+};
+
+export const validateOptionFields = (
+  target: EventTarget & (HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement),
+  option: IGameSettingsOption,
+  currentErrors: IValidationErrors,
+): IValidationErrors => {
+  let errors: IValidationErrors = { ...currentErrors };
+
+  if (target.required && (target.type === 'text' || target.tagName === 'TEXTAREA')) {
+    errors = getUniqueValidationErrors(
+      errors,
+      {
+        [target.id]: [{
+          cause: ValidationErrorCause.EMPTY,
+          text: 'Значение не может быть пустым',
+        }],
+        [`${option.id}:${target.id}`]: [{ cause: ValidationErrorCause.ITEM }],
+      },
+      target.value === '',
+    );
+  }
+
+  if (target.name === 'separator') {
+    errors = getUniqueValidationErrors(
+      errors,
+      {
+        [target.id]: [{
+          cause: 'not available separator',
+          text: `Значение разделителя недопустимо. Допустимые значения: [${availableOptionSeparators}]`, //eslint-disable-line max-len
+        }],
+        [`${option.id}:${target.id}`]: [{ cause: ValidationErrorCause.ITEM }],
+      },
+      !availableOptionSeparators.includes(target.value),
+    );
+  } else if (target.tagName === 'TEXTAREA' && target.value !== '') {
+    errors = { ...validateTextArea(target.value, target.id, option, errors) };
+  }
+
+  return errors;
+};
+
 export const validateOptionOnCreate = (
   option: IGameSettingsOption,
   file: IGameSettingsFile,
   currentErrors: IValidationErrors,
 ): IValidationErrors => {
   let errors: IValidationErrors = { ...currentErrors };
+
+  if (option.controllerType && option.controllerType === UIControllerType.SELECT) {
+    errors = { ...validateTextArea(option.selectOptionsValueString!, `selectOptionsValueString_${option.id}`, option, errors) };
+  }
 
   option.items.forEach((item) => {
     if (item.name === '') {
@@ -267,6 +392,10 @@ export const validateOptionOnCreate = (
         },
         item.name === '',
       );
+    }
+
+    if (item.controllerType && item.controllerType === UIControllerType.SELECT) {
+      errors = { ...validateTextArea(item.selectOptionsValueString!, `selectOptionsValueString_${item.id}`, option, errors) };
     }
 
     if (file.view === GameSettingsFileView.SECTIONAL) {
@@ -313,92 +442,6 @@ export const validateOptionOnCreate = (
       }
     }
   });
-
-  return errors;
-};
-
-export const validateOptionFields = (
-  target: EventTarget & (HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement),
-  option: IGameSettingsOption,
-  file: IGameSettingsFile,
-  currentErrors: IValidationErrors,
-): IValidationErrors => {
-  let errors: IValidationErrors = { ...currentErrors };
-
-  if (target.required && (target.type === 'text' || target.tagName === 'TEXTAREA')) {
-    errors = getUniqueValidationErrors(
-      errors,
-      {
-        [target.id]: [{
-          cause: ValidationErrorCause.EMPTY,
-          text: 'Значение не может быть пустым',
-        }],
-        [`${option.id}:${target.id}`]: [{ cause: ValidationErrorCause.ITEM }],
-      },
-      target.value === '',
-    );
-  }
-
-  if (target.name === 'separator') {
-    errors = getUniqueValidationErrors(
-      errors,
-      {
-        [target.id]: [{
-          cause: 'not available separator',
-          text: `Значение разделителя недопустимо. Допустимые значения: [${availableOptionSeparators}]`, //eslint-disable-line max-len
-        }],
-        [`${option.id}:${target.id}`]: [{ cause: ValidationErrorCause.ITEM }],
-      },
-      !availableOptionSeparators.includes(target.value),
-    );
-  } else if (target.tagName === 'TEXTAREA' && target.value !== '') {
-    let incorrectIndexes: number[] = [];
-    const valueArr = target.value.split('\n').filter((subStr) => subStr !== '');
-
-    valueArr.forEach((subStr, index) => {
-      if (!getOptionItemSelectValueRegExp(
-        option.optionType,
-        option.separator,
-        option.items.length - 1,
-      ).test(subStr)) {
-        incorrectIndexes.push(index + 1);
-      }
-    });
-
-    errors = getUniqueValidationErrors(
-      errors,
-      {
-        [target.id]: [{
-          cause: 'incorrect value',
-          text: `Значение не соответствует заданному шаблону ${option.optionType === GameSettingsOptionType.COMBINED ? `Заголовок=Значение первого параметра${option.separator}Значение второго параметра(и т.д.)` : 'Заголовок=Значение'}`, //eslint-disable-line max-len
-        }],
-        [`${option.id}:${target.id}`]: [{ cause: ValidationErrorCause.ITEM }],
-      },
-      incorrectIndexes.length > 0,
-    );
-
-    if (option.optionType === GameSettingsOptionType.COMBINED && incorrectIndexes.length === 0) {
-      incorrectIndexes = [];
-
-      valueArr.forEach((pairStr, index) => {
-        if (!new RegExp(`^[^${option.separator}=]+(?<=\\S)(${option.separator}[^${option.separator}=\\s][^${option.separator}=]*){${option.items.length - 1}}[^${option.separator}=]*$`, 'g').test(pairStr.split('=')[1])) { //eslint-disable-line max-len
-          incorrectIndexes.push(index + 1);
-        }
-      });
-
-      errors = getUniqueValidationErrors(
-        errors,
-        {
-          [target.id]: [{
-            cause: 'not equal values quantity',
-            text: `Количество значений в строках ${incorrectIndexes.join()} не равно количеству параметров в опции`, //eslint-disable-line max-len
-          }],
-          [`${option.id}:${target.id}`]: [{ cause: ValidationErrorCause.ITEM }],
-        },
-        incorrectIndexes.length > 0,
-      );
-    }
-  }
 
   return errors;
 };

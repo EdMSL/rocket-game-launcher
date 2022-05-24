@@ -138,11 +138,19 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         getFileByFileName(gameSettingsFiles, newOption.file)!,
         currentValidationErrors,
       ));
-    } else if (currentTarget.name === 'controllerType') {
-      const currentValidationErrors = clearComponentValidationErrors(
+    } else if (currentTarget.name === 'controllerType' || currentTarget.name === 'separator') {
+      let currentValidationErrors = clearComponentValidationErrors(
         validationErrors,
-        'selectOptions',
+        'selectOptionsValueString',
       );
+
+      if (currentTarget.name === 'separator') {
+        currentValidationErrors = validateOptionFields(
+          currentTarget,
+          newOption,
+          currentValidationErrors,
+        );
+      }
 
       onValidation(validateOptionOnCreate(
         newOption,
@@ -154,7 +162,6 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         currentTarget,
         newOption,
         validationErrors,
-        optionFile!,
       ));
     }
 
