@@ -57,9 +57,6 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
     defaultFullGameSettingsOption,
     option,
   ));
-  const [optionsValue, setOptionsValue] = useState<{
-    [key: string]: string,
-  }>(getSelectsOptionStringObj(option));
   const [lastAddedItemId, setLastAddedItemId] = useState<string>('');
 
   const optionFile = useMemo(
@@ -94,19 +91,18 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         ...isOptionItemChange ? {
           items: changeConfigArrayItem<any>(
             currentTarget.dataset.parent!,
-            { [currentTarget.name]: generateSelectOptionsFromString(currentTarget.value) },
+            {
+              [currentTarget.name]: currentTarget.value,
+              selectOptions: generateSelectOptionsFromString(currentTarget.value),
+            },
             option.items,
             false,
           ),
         } : {
-          [currentTarget.name]: generateSelectOptionsFromString(currentTarget.value),
+          [currentTarget.name]: currentTarget.value,
+          selectOptions: generateSelectOptionsFromString(currentTarget.value),
         },
       };
-
-      setOptionsValue({
-        ...optionsValue,
-        [isOptionItemChange ? currentTarget.dataset.parent! : option.id]: currentTarget.value,
-      });
     } else {
       currentOption = {
         ...option,
@@ -157,8 +153,8 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
       onValidation(validateOptionFields(
         currentTarget,
         newOption,
-        optionFile!,
         validationErrors,
+        optionFile!,
       ));
     }
 
@@ -166,7 +162,6 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
     setFullOption(newFullOption);
   }, [option,
     validationErrors,
-    optionsValue,
     optionFile,
     fullOption,
     gameSettingsFiles,
@@ -289,13 +284,13 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         )
       }
       {
-        option.selectOptions !== undefined && (
+        option.selectOptionsValueString !== undefined && (
           <TextArea
             className={styles.option__item}
-            id={`selectOptions_${option.id}`}
-            name="selectOptions"
+            id={`selectOptionsValueString_${option.id}`}
+            name="selectOptionsValueString"
             label="Опции селектора"
-            value={optionsValue[option.id]}
+            value={option.selectOptionsValueString}
             wrap="off"
             placeholder={option.optionType === GameSettingsOptionType.COMBINED
               ? `Видит пользователь=Значение первого параметра${option.separator}Значение второго параметра(и т.д.)`//eslint-disable-line max-len
@@ -446,14 +441,14 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   )
                 }
                 {
-                  item.selectOptions !== undefined && (
+                  item.selectOptionsValueString !== undefined && (
                     <TextArea
                       className={styles.option__item}
-                      id={`selectOptions_${item.id}`}
+                      id={`selectOptionsValueString_${item.id}`}
                       parent={item.id}
-                      name="selectOptions"
+                      name="selectOptionsValueString"
                       label="Опции селектора"
-                      value={optionsValue[item.id]}
+                      value={item.selectOptionsValueString}
                       wrap="off"
                       placeholder="Видит пользователь=Запишется в файл"
                       isRequied

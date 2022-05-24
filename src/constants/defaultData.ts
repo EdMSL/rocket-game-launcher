@@ -102,6 +102,7 @@ export const defaultGameSettingsOptionItem: IGameSettingsOptionItem = {
   max: 1,
   step: 0.1,
   selectOptions: {},
+  selectOptionsValueString: '',
   valueName: '',
   valuePath: '',
 };
@@ -116,6 +117,7 @@ export const defaultFullGameSettingsOption: IGameSettingsOption = {
   controllerType: undefined,
   separator: ':',
   selectOptions: {},
+  selectOptionsValueString: '',
   min: 0,
   max: 1,
   step: 0.1,

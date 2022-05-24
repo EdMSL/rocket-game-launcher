@@ -24,7 +24,7 @@ import {
   defaultLauncherConfig, defaultLauncherWindowSettings, MinWindowSize,
 } from '$constants/defaultData';
 import { CustomError, ErrorName } from './errors';
-import { getRandomId } from './strings';
+import { generateSelectOptionsString, getRandomId } from './strings';
 import { ILauncherConfig, IWindowSettings } from '$types/main';
 import {
   getGameSettingsFilesNames, getGameSettingsGroupsNames,
@@ -221,6 +221,13 @@ const defaultOptionTypeSchema = Joi.object({
   ).when(
     Joi.ref('controllerType'), { is: UIControllerType.SELECT, then: Joi.required() },
   ),
+  selectOptionsValueString: Joi.string().when(
+    Joi.ref('controllerType'), {
+      is: UIControllerType.SELECT,
+      then: Joi.optional().default((parent) => (parent.selectOptions !== undefined ? generateSelectOptionsString(parent.selectOptions) : '')),
+      otherwise: Joi.forbidden(),
+    },
+  ),
   min: Joi.number().when(
     Joi.ref('controllerType'), { is: UIControllerType.RANGE, then: Joi.required() },
   ),
@@ -271,6 +278,13 @@ const groupOptionTypeSchema = Joi.object({
     Joi.string(),
   ).when(
     Joi.ref('controllerType'), { is: UIControllerType.SELECT, then: Joi.required() },
+  ),
+  selectOptionsValueString: Joi.string().when(
+    Joi.ref('controllerType'), {
+      is: UIControllerType.SELECT,
+      then: Joi.optional().default((parent) => (parent.selectOptions !== undefined ? generateSelectOptionsString(parent.selectOptions) : '')),
+      otherwise: Joi.forbidden(),
+    },
   ),
   min: Joi.number().when(
     Joi.ref('controllerType'), { is: UIControllerType.RANGE, then: Joi.required() },
@@ -331,6 +345,13 @@ const combinedOptionTypeSchema = Joi.object({
     });
     return value;
   }),
+  selectOptionsValueString: Joi.string().when(
+    Joi.ref('controllerType'), {
+      is: UIControllerType.SELECT,
+      then: Joi.optional().default((parent) => (parent.selectOptions !== undefined ? generateSelectOptionsString(parent.selectOptions) : '')),
+      otherwise: Joi.forbidden(),
+    },
+  ),
   items: Joi.array()
     .items(Joi.object({
       id: Joi.string().optional().default(() => getRandomId()),
@@ -391,6 +412,13 @@ const relatedOptionTypeSchema = Joi.object({
         Joi.string(),
       ).when(
         Joi.ref('controllerType'), { is: UIControllerType.SELECT, then: Joi.required() },
+      ),
+      selectOptionsValueString: Joi.string().when(
+        Joi.ref('controllerType'), {
+          is: UIControllerType.SELECT,
+          then: Joi.optional().default((parent) => (parent.selectOptions !== undefined ? generateSelectOptionsString(parent.selectOptions) : '')),
+          otherwise: Joi.forbidden(),
+        },
       ),
       min: Joi.number().when(
         Joi.ref('controllerType'), { is: UIControllerType.RANGE, then: Joi.required() },

@@ -130,18 +130,18 @@ export const getFileByFileName = (
 /**
  * Выполняет глубокое клонирование объекта.
  * @param obj Объект для клонирования.
- * @param deleteKey Если указан, то данный ключ\знаение будут удалены из итогового объекта.
+ * @param ignoreKeys Ключи, которые будут проигнорированы, и не войдут в итоговый объект.
  * @returns Клон переданного объекта.
  */
-export const deepClone = (obj: any, deleteKey = ''): object => {
+export const deepClone = (obj: any, ignoreKeys: string[] = []): object => {
   const clone = { ...obj };
 
   Object.keys(clone).forEach(
     (key) => {
       if (typeof obj[key] === 'object') {
-        clone[key] = deepClone(obj[key], deleteKey);
-      } else if (key === deleteKey) {
-        delete clone[deleteKey];
+        clone[key] = deepClone(obj[key], ignoreKeys);
+      } else if (ignoreKeys.includes(key)) {
+        delete clone[key];
       } else {
         clone[key] = obj[key];
       }
@@ -873,6 +873,7 @@ const getFieldsByControllerType = (
 ): IGameSettingsOptionControllerFields => ({
   ...fullOption.controllerType === UIControllerType.SELECT ? {
     selectOptions: { ...fullOption.selectOptions },
+    selectOptionsValueString: fullOption.selectOptionsValueString,
   } : {},
   ...fullOption.controllerType === UIControllerType.RANGE ? {
     min: fullOption.min,
@@ -943,6 +944,7 @@ export const generateGameSettingsOption = (
         controllerType: UIControllerType.SELECT,
         separator: newFullOption.separator,
         selectOptions: { ...newFullOption.selectOptions },
+        selectOptionsValueString: newFullOption.selectOptionsValueString,
         items: newFullOption.items.map((item, index): IGameSettingsOptionItem => ({
           id: item.id,
           name: item.name,
@@ -959,6 +961,7 @@ export const generateGameSettingsOption = (
           ...getFieldsByFileView(newFullOption.items[index], file),
           controllerType: UIControllerType.SELECT,
           selectOptions: { ...newFullOption.items[index].selectOptions },
+          selectOptionsValueString: newFullOption.items[index].selectOptionsValueString,
         })),
       };
       break;

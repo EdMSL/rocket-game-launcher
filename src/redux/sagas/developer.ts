@@ -110,7 +110,7 @@ function* saveLauncherConfigSaga(
   yield delay(2000);
 
   try {
-    yield call(writeJSONFile, CONFIG_FILE_PATH, deepClone(newConfig, 'id'));
+    yield call(writeJSONFile, CONFIG_FILE_PATH, deepClone(newConfig, ['id']));
 
     const {
       developer: { pathVariables },
@@ -192,7 +192,11 @@ function* saveGameSettingsConfigSaga(
       });
     }
 
-    yield call(writeJSONFile, GAME_SETTINGS_FILE_PATH, deepClone(newConfig, 'id'));
+    yield call(
+      writeJSONFile,
+      GAME_SETTINGS_FILE_PATH,
+      deepClone(newConfig, ['id', 'selectOptionsValueString']),
+    );
     yield put(setGameSettingsConfig(newConfig));
 
     yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, false, newConfig);

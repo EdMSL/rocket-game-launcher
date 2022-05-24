@@ -60,6 +60,7 @@ export interface IGameSettingsOptionFileViewFields {
 export interface IGameSettingsOptionControllerFields {
   controllerType?: UIControllerType,
   selectOptions?: { [key: string]: string, },
+  selectOptionsValueString?: string,
   min?: number,
   max?: number,
   step?: number,
