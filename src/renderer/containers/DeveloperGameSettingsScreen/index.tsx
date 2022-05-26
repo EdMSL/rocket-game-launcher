@@ -326,6 +326,21 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
           dispatch(addDeveloperMessages([CreateUserMessage.info(`Для опций ${changedOptionsNames.join()} используемый файл был изменен на "${newFiles[0].label}"`)])); //eslint-disable-line max-len
         }
 
+        let currentValidationErrors = { ...validationErrors };
+
+        newConfig.gameSettingsOptions.forEach((currentOption) => {
+          currentValidationErrors = {
+            ...currentValidationErrors,
+            ...validateFileRelatedFields(
+              currentOption,
+              newFiles[0],
+              validationErrors,
+            ),
+          };
+
+          setNewValidationErrors(currentValidationErrors);
+        });
+
         setCurrentConfig(newConfig);
         setLastAddedFileId('');
         setIsConfigChanged(!checkObjectForEqual(gameSettingsConfig, newConfig));
@@ -340,7 +355,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
       setLastAddedFileId('');
       setIsConfigChanged(!checkObjectForEqual(gameSettingsConfig, newConfig));
     }
-  }, [currentConfig, gameSettingsConfig, dispatch]);
+  }, [currentConfig, gameSettingsConfig, validationErrors, setNewValidationErrors, dispatch]);
 
   const deleteGameSettingsFileById = useCallback((id: string) => {
     let deletedFile: IGameSettingsFile|undefined;
@@ -368,19 +383,19 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   }, [currentConfig, changeCurrentConfig]);
 
   const addGameSettingsOption = useCallback(() => {
-    const paramerter = getDefaultGameSettingsOption(currentConfig.gameSettingsFiles[0]);
+    const newOption = getDefaultGameSettingsOption(currentConfig.gameSettingsFiles[0]);
 
     setNewValidationErrors(validateFileRelatedFields(
-      paramerter,
+      newOption,
       currentConfig.gameSettingsFiles[0],
       validationErrors,
     ));
     changeCurrentConfig([
       ...currentConfig.gameSettingsOptions,
-      paramerter,
+      newOption,
     ],
     'gameSettingsOptions');
-    setLastAddedOptionId(paramerter.id);
+    setLastAddedOptionId(newOption.id);
   }, [currentConfig.gameSettingsOptions,
     currentConfig.gameSettingsFiles,
     validationErrors,
