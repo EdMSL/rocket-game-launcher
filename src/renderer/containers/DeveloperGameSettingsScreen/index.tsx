@@ -191,27 +191,36 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     ));
   }, [currentConfig.gameSettingsGroups, validationErrors]);
 
-  const deleteGroupItem = useCallback((name: string) => {
-    const newGroups = currentConfig.gameSettingsGroups.filter((group) => group.name !== name);
+  const deleteGroupItem = useCallback((deletedGroupName: string) => {
+    const changedOptions: string[] = [];
+    const newGroups = currentConfig.gameSettingsGroups.filter(
+      (group) => group.name !== deletedGroupName,
+    );
     const newConfig = {
       ...currentConfig,
       gameSettingsGroups: newGroups,
-      gameSettingsOptions: currentConfig.gameSettingsOptions.map((param) => {
-        if (param.settingGroup === name) {
+      gameSettingsOptions: currentConfig.gameSettingsOptions.map((option) => {
+        if (option.settingGroup === deletedGroupName) {
+          changedOptions.push(option.label);
+
           return {
-            ...param,
+            ...option,
             settingGroup: newGroups[0].name,
           };
         }
 
-        return param;
+        return option;
       }),
     };
+
+    if (changedOptions.length > 0) {
+      dispatch(addDeveloperMessages([CreateUserMessage.info(`Для опций ${changedOptions.join()} была установлена группа настроек "${newGroups[0].label}"`)])); //eslint-disable-line max-len
+    }
 
     setLastAddedGroupName('');
     setCurrentConfig(newConfig);
     setIsConfigChanged(!checkObjectForEqual(gameSettingsConfig, newConfig));
-  }, [currentConfig, gameSettingsConfig]);
+  }, [currentConfig, gameSettingsConfig, dispatch]);
 
   const setNewValidationErrors = useCallback((errors: IValidationErrors) => {
     setValidationErrors(errors);
@@ -476,7 +485,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                       item={currentOption}
                       items={currentConfig.gameSettingsOptions}
                       position={index}
-                      summaryText={[currentOption.label]}
+                      summaryText={[{ label: '', text: currentOption.label }]}
                       lastItemId={lastAddedOptionId}
                       validationErrors={validationErrors}
                       onDeleteItem={deleteGameSettingsOption}
