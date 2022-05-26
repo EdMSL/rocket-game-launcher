@@ -47,6 +47,7 @@ import {
   defaultFullGameSettingsOption,
 } from '$constants/defaultData';
 import {
+  clearComponentValidationErrors,
   getUniqueValidationErrors,
   IValidationErrors,
   validateFileRelatedFields,
@@ -329,10 +330,14 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     setNewValidationErrors,
     changeCurrentConfig]);
 
-  const deleteGameSettingsOption = useCallback((params: IGameSettingsOption[]) => {
+  const deleteGameSettingsOption = useCallback((
+    params: IGameSettingsOption[],
+    deletedItemId: string,
+  ) => {
     changeCurrentConfig(params, 'gameSettingsOptions');
+    setValidationErrors(clearComponentValidationErrors(validationErrors, deletedItemId));
     setLastAddedOptionId('');
-  }, [changeCurrentConfig]);
+  }, [validationErrors, changeCurrentConfig]);
 
   const deleteGameSettingsOptionById = useCallback((id: string) => {
     changeCurrentConfig(

@@ -20,7 +20,7 @@ interface IProps<Item> {
   position?: number,
   validationErrors?: IValidationErrors,
   summaryText?: ISummaryText[]|string[],
-  onDeleteItem?: (items: Item[]) => void,
+  onDeleteItem?: (items: Item[], deletedItemId: string) => void,
   onChangeOrderItem?: (items: Item[]) => void,
 }
 
@@ -68,7 +68,7 @@ export const SpoilerListItem = <Item extends { id: string, },>({
   }, [items, position, onChangeOrderItem]);
 
   const onDeleteItemBtnClick = useCallback(() => {
-    if (onDeleteItem) onDeleteItem(items.filter((currItem) => item.id !== currItem.id));
+    if (onDeleteItem) onDeleteItem(items.filter((currItem) => item.id !== currItem.id), item.id);
   }, [item.id, items, onDeleteItem]);
 
   return (

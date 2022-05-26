@@ -26,7 +26,9 @@ import { defaultFullGameSettingsOption } from '$constants/defaultData';
 import { generateSelectOptionsFromString, getRandomId } from '$utils/strings';
 import { TextArea } from '$components/UI/TextArea';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
-import { IValidationErrors, validateGameSettingsOptions } from '$utils/validation';
+import {
+  clearComponentValidationErrors, IValidationErrors, validateGameSettingsOptions,
+} from '$utils/validation';
 
 interface IProps {
   option: IGameSettingsOption,
@@ -138,9 +140,10 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
     onOptionDataChange,
     onValidation]);
 
-  const onDeleteFileBtnClick = useCallback(() => {
+  const onDeleteOptionBtnClick = useCallback(() => {
     deleteOption(option.id);
-  }, [option.id, deleteOption]);
+    onValidation(clearComponentValidationErrors(validationErrors, option.id));
+  }, [option.id, validationErrors, onValidation, deleteOption]);
 
   const onAddOptionItemBtnClick = useCallback(() => {
     const newId = getRandomId();
@@ -479,7 +482,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
           'main-btn',
           'option__btn',
         )}
-        onClick={onDeleteFileBtnClick}
+        onClick={onDeleteOptionBtnClick}
       >
         Удалить опцию
       </Button>

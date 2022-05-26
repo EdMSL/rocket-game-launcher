@@ -109,6 +109,16 @@
   &--down {
     transform: rotate(180deg);
   }
+
+  .spoiler__block[open] & {
+    &:hover {
+      fill: var(--focus-color);
+    }
+
+    &:disabled:hover {
+      fill: rgb(230, 230, 230);
+    }
+  }
 }
 
 .spoiler__title-btn > span {
