@@ -49,7 +49,7 @@ import {
 import {
   getUniqueValidationErrors,
   IValidationErrors,
-  validateOptionOnCreate,
+  validateFileRelatedFields,
   ValidationErrorCause,
 } from '$utils/validation';
 
@@ -312,7 +312,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   const addGameSettingsOption = useCallback(() => {
     const paramerter = getDefaultGameSettingsOption(currentConfig.gameSettingsFiles[0]);
 
-    setNewValidationErrors(validateOptionOnCreate(
+    setNewValidationErrors(validateFileRelatedFields(
       paramerter,
       currentConfig.gameSettingsFiles[0],
       validationErrors,

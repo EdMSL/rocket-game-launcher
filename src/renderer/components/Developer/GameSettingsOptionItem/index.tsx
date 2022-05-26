@@ -12,7 +12,6 @@ import {
   generateSelectOptions,
   getFileByFileName,
   getFullOption,
-  getSelectsOptionStringObj,
 } from '$utils/data';
 import {
   UIControllerType, GameSettingsOptionType, HTMLInputType, availableOptionSeparators,
@@ -27,12 +26,7 @@ import { defaultFullGameSettingsOption } from '$constants/defaultData';
 import { generateSelectOptionsFromString, getRandomId } from '$utils/strings';
 import { TextArea } from '$components/UI/TextArea';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
-import {
-  IValidationErrors,
-  validateOptionOnCreate,
-  validateOptionFields,
-  clearComponentValidationErrors,
-} from '$utils/validation';
+import { IValidationErrors, validateGameSettingsOptions } from '$utils/validation';
 
 interface IProps {
   option: IGameSettingsOption,
@@ -127,43 +121,12 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         : optionFile!,
     );
 
-    if (currentTarget.name === 'file') {
-      const currentValidationErrors = clearComponentValidationErrors(
-        validationErrors,
-        ['iniGroup', 'valueName', 'valuePath'],
-      );
-
-      onValidation(validateOptionOnCreate(
-        newOption,
-        getFileByFileName(gameSettingsFiles, newOption.file)!,
-        currentValidationErrors,
-      ));
-    } else if (currentTarget.name === 'controllerType' || currentTarget.name === 'separator') {
-      let currentValidationErrors = clearComponentValidationErrors(
-        validationErrors,
-        'selectOptionsValueString',
-      );
-
-      if (currentTarget.name === 'separator') {
-        currentValidationErrors = validateOptionFields(
-          currentTarget,
-          newOption,
-          currentValidationErrors,
-        );
-      }
-
-      onValidation(validateOptionOnCreate(
-        newOption,
-        optionFile!,
-        currentValidationErrors,
-      ));
-    } else {
-      onValidation(validateOptionFields(
-        currentTarget,
-        newOption,
-        validationErrors,
-      ));
-    }
+    onValidation(validateGameSettingsOptions(
+      currentTarget,
+      newOption,
+      getFileByFileName(gameSettingsFiles, newOption.file)!,
+      validationErrors,
+    ));
 
     onOptionDataChange(option.id, newOption);
     setFullOption(newFullOption);

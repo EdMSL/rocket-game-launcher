@@ -247,7 +247,7 @@ export const validateNumberInputs = (
   return errors;
 };
 
-const validateTextArea = (
+const validateSelectOptions = (
   value: string,
   id: string,
   option: IGameSettingsOption,
@@ -328,56 +328,15 @@ const validateTextArea = (
   return errors;
 };
 
-export const validateOptionFields = (
-  target: EventTarget & (HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement),
-  option: IGameSettingsOption,
-  currentErrors: IValidationErrors,
-): IValidationErrors => {
-  let errors: IValidationErrors = { ...currentErrors };
-
-  if (target.required && (target.type === 'text' || target.tagName === 'TEXTAREA')) {
-    errors = getUniqueValidationErrors(
-      errors,
-      {
-        [target.id]: [{
-          cause: ValidationErrorCause.EMPTY,
-          text: 'Значение не может быть пустым',
-        }],
-        [`${option.id}:${target.id}`]: [{ cause: ValidationErrorCause.ITEM }],
-      },
-      target.value === '',
-    );
-  }
-
-  if (target.name === 'separator') {
-    errors = getUniqueValidationErrors(
-      errors,
-      {
-        [target.id]: [{
-          cause: 'not available separator',
-          text: `Значение разделителя недопустимо. Допустимые значения: [${availableOptionSeparators}]`, //eslint-disable-line max-len
-        }],
-        [`${option.id}:${target.id}`]: [{ cause: ValidationErrorCause.ITEM }],
-      },
-      !availableOptionSeparators.includes(target.value),
-    );
-  } else if (target.tagName === 'TEXTAREA' && target.value !== '') {
-    errors = { ...validateTextArea(target.value, target.id, option, errors) };
-  }
-
-  return errors;
-};
-
-export const validateOptionOnCreate = (
+export const validateFileRelatedFields = (
   option: IGameSettingsOption,
   file: IGameSettingsFile,
   currentErrors: IValidationErrors,
 ): IValidationErrors => {
-  let errors: IValidationErrors = { ...currentErrors };
-
-  if (option.controllerType && option.controllerType === UIControllerType.SELECT) {
-    errors = { ...validateTextArea(option.selectOptionsValueString!, `selectOptionsValueString_${option.id}`, option, errors) };
-  }
+  let errors = clearComponentValidationErrors(
+    { ...currentErrors },
+    ['iniGroup', 'valueName', 'valuePath'],
+  );
 
   option.items.forEach((item) => {
     if (item.name === '') {
@@ -392,10 +351,6 @@ export const validateOptionOnCreate = (
         },
         item.name === '',
       );
-    }
-
-    if (item.controllerType && item.controllerType === UIControllerType.SELECT) {
-      errors = { ...validateTextArea(item.selectOptionsValueString!, `selectOptionsValueString_${item.id}`, option, errors) };
     }
 
     if (file.view === GameSettingsFileView.SECTIONAL) {
@@ -442,6 +397,100 @@ export const validateOptionOnCreate = (
       }
     }
   });
+
+  return errors;
+};
+
+const validateControllerTypeRelatedFields = (
+  option: IGameSettingsOption,
+  currentErrors: IValidationErrors,
+): IValidationErrors => {
+  let errors = clearComponentValidationErrors(
+    { ...currentErrors },
+    'selectOptionsValueString',
+  );
+
+  if (option.controllerType && option.controllerType === UIControllerType.SELECT) {
+    errors = {
+      ...validateSelectOptions(
+      option.selectOptionsValueString!,
+      `selectOptionsValueString_${option.id}`,
+      option,
+      errors,
+      ),
+    };
+  }
+
+  option.items.forEach((item) => {
+    if (item.controllerType && item.controllerType === UIControllerType.SELECT) {
+      errors = {
+        ...validateSelectOptions(
+        item.selectOptionsValueString!,
+        `selectOptionsValueString_${item.id}`,
+        option,
+        errors,
+        ),
+      };
+    }
+  });
+
+  return errors;
+};
+
+export const validateGameSettingsOptions = (
+  target: EventTarget & (HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement),
+  option: IGameSettingsOption,
+  file: IGameSettingsFile,
+  currentErrors: IValidationErrors,
+): IValidationErrors => {
+  let errors: IValidationErrors = { ...currentErrors };
+
+  if (target.required && (target.type === 'text' || target.tagName === 'TEXTAREA')) {
+    errors = getUniqueValidationErrors(
+      errors,
+      {
+        [target.id]: [{
+          cause: ValidationErrorCause.EMPTY,
+          text: 'Значение не может быть пустым',
+        }],
+        [`${option.id}:${target.id}`]: [{ cause: ValidationErrorCause.ITEM }],
+      },
+      target.value === '',
+    );
+  }
+
+  if (target.name === 'file') {
+    errors = validateFileRelatedFields(
+      option,
+      file,
+      errors,
+    );
+  }
+
+  if (target.name === 'controllerType' || target.name === 'separator') {
+    if (target.name === 'separator') {
+      errors = getUniqueValidationErrors(
+        errors,
+        {
+          [target.id]: [{
+            cause: 'not available separator',
+            text: `Значение разделителя недопустимо. Допустимые значения: [${availableOptionSeparators}]`, //eslint-disable-line max-len
+          }],
+          [`${option.id}:${target.id}`]: [{ cause: ValidationErrorCause.ITEM }],
+        },
+        !availableOptionSeparators.includes(target.value),
+      );
+    }
+
+    errors = validateControllerTypeRelatedFields(
+      option,
+      errors,
+    );
+  }
+
+  if (target.name === 'selectOptionsValueString') {
+    errors = validateSelectOptions(target.value, target.id, option, errors);
+  }
 
   return errors;
 };
