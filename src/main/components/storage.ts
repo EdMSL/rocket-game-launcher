@@ -1,15 +1,14 @@
 import Storage from 'electron-store';
 import { Store } from 'redux';
 import path from 'path';
-import { app, ipcMain } from 'electron';
+import {
+  app, ipcMain, dialog,
+} from 'electron';
 import fs from 'fs';
 
 import { configureAppStore, IAppState } from '$store/store';
 import { IUserSettingsRootState } from '$types/userSettings';
-import {
-  defaultGameSettingsConfig,
-  defaultLauncherConfig,
-} from '$constants/defaultData';
+import { defaultLauncherConfig } from '$constants/defaultData';
 import {
   LogMessageType,
   writeToLogFile,
@@ -29,7 +28,6 @@ import {
   CustomError,
   ErrorName,
   ReadWriteError,
-  showMessageBox,
 } from '$utils/errors';
 import { checkLauncherConfigFileData, checkObjectForEqual } from '$utils/check';
 import { getObjectAsList } from '$utils/strings';
@@ -42,7 +40,7 @@ import {
 import { INITIAL_STATE as mainInitialState } from '$reducers/main';
 import { INITIAL_STATE as userSettingsInitialState } from '$reducers/userSettings';
 import { ILauncherConfig } from '$types/main';
-import { CreateUserMessage } from '$utils/message';
+import { CreateUserMessage, showMessageBox } from '$utils/message';
 import { AppChannel, Scope } from '$constants/misc';
 import { IUserMessage } from '$types/common';
 
@@ -68,6 +66,7 @@ const getConfigurationData = (): ILauncherConfig => {
         );
 
         showMessageBox(
+          dialog,
           'Will be loaded default values. A new config file will be created',
           'Launcher config file not found',
           'warning',

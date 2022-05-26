@@ -83,22 +83,6 @@ export const showErrorBox = (message: string, title = ErrorMessage.DEFAULT): voi
 };
 
 /**
- * Показывает нативное окно выбранного типа, содержащее текстовое сообщение.
- * @param message Текст ошибки.
- * @param title Заголовок окна.
- * @param type Тип окна: `info`, `warning` или `error`.
-*/
-export const showMessageBox = (
-  message: string,
-  title = ErrorMessage.DEFAULT,
-  type = 'info',
-): void => {
-  dialog.showMessageBox({
-    message, title, type,
-  });
-};
-
-/**
  * Получает конечную ошибку чтения/записи (модуля `fs`) на основе кода из ошибки `NodeJS`
  * @param error Объект ошибки чтения/записи.
  * @param isDirOperation Если `true`, то выполняется операция над директорией, иначе над файлом.
