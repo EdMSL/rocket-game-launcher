@@ -17,6 +17,8 @@ import { Header } from '$components/Header';
 import { DeveloperConfigScreen } from '$containers/DeveloperConfigScreen';
 import { Routes } from '$constants/routes';
 import { DeveloperGameSettingsScreen } from '$containers/DeveloperGameSettingsScreen';
+import { Messages } from '$components/Messages';
+import { deleteDeveloperMessages, setDeveloperMessages } from '$actions/developer';
 
 export const Developer: React.FC = () => {
   /* eslint-disable max-len */
@@ -24,6 +26,7 @@ export const Developer: React.FC = () => {
   const isLauncherConfigProcessing = useDeveloperSelector((state) => state.developer.isLauncherConfigProcessing);
   const isFirstLaunch = useDeveloperSelector((state) => state.developer.launcherConfig.isFirstLaunch);
   const gameName = useDeveloperSelector((state) => state.developer.launcherConfig.gameName);
+  const messages = useDeveloperSelector((state) => state.developer.messages);
   /* eslint-enable max-len */
 
   const closeDevWindow = useCallback(() => {
@@ -73,6 +76,11 @@ export const Developer: React.FC = () => {
           />
           <Redirect to={Routes.DEVELOPER_SCREEN_CONFIG} />
         </Switch>
+        <Messages
+          messages={messages}
+          setMessages={setDeveloperMessages}
+          deleteMessages={deleteDeveloperMessages}
+        />
         {
           (isLauncherConfigProcessing || isGameSettingsConfigProcessing) && <Loader />
         }

@@ -1,28 +1,25 @@
 import React, { useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import classNames from 'classnames';
 
 import styles from './styles.module.scss';
 import { Button } from '$components/UI/Button';
-import { deleteMessages } from '$actions/main';
 import { IUserMessage } from '$types/common';
 
 interface IProps {
   message: IUserMessage,
+  deleteMessage: (messageID: string) => void,
 }
 
-export const Message: React.FC<IProps> = ({ message }) => {
+export const Message: React.FC<IProps> = ({ message, deleteMessage }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-
-  const dispatch = useDispatch();
 
   const onExpandBtnClick = useCallback(() => {
     setIsExpanded(!isExpanded);
   }, [isExpanded]);
 
   const onCloseBtnClick = useCallback(() => {
-    dispatch(deleteMessages([message.id]));
-  }, [dispatch, message]);
+    deleteMessage(message.id);
+  }, [message, deleteMessage]);
 
   return (
     <li

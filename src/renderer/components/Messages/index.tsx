@@ -9,13 +9,19 @@ import { IUserMessage } from '$types/common';
 interface IProps {
   messages: IUserMessage[],
   setMessages,
+  deleteMessages,
 }
 
 export const Messages: React.FC<IProps> = ({
   messages,
   setMessages,
+  deleteMessages,
 }) => {
   const dispatch = useDispatch();
+
+  const deleteMessage = useCallback((messageID: string) => {
+    dispatch(deleteMessages([messageID]));
+  }, [dispatch, deleteMessages]);
 
   const onDeleteAllMessagesBtnClick = useCallback(() => {
     dispatch(setMessages([]));
@@ -41,6 +47,7 @@ export const Messages: React.FC<IProps> = ({
                 <Message
                   key={currentMessage.id}
                   message={currentMessage}
+                  deleteMessage={deleteMessage}
                 />
               ))}
             </ul>

@@ -20,7 +20,7 @@ import { Modal } from '$components/UI/Modal';
 import { AppInfo } from '$components/App/AppInfo';
 import { Developer } from '$containers/Developer';
 import { AppChannel, userThemeStyleFile } from '$constants/misc';
-import { setMessages } from '$actions/main';
+import { deleteMessages, setMessages } from '$actions/main';
 
 export const App = (): JSX.Element => {
   const userTheme = useAppSelector((state) => state.userSettings.theme);
@@ -101,6 +101,7 @@ export const App = (): JSX.Element => {
       <Messages
         messages={messages}
         setMessages={setMessages}
+        deleteMessages={deleteMessages}
       />
       {
         isOpenAppInfo && (
