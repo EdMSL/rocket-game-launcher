@@ -20,8 +20,11 @@ import { getDisplaysInfo, getSystemInfo } from '$utils/system';
 import { createBackupFolders } from '$utils/backup';
 import { createFolderSync, getPathFromFileInput } from '$utils/files';
 import { USER_THEMES_DIR } from '$constants/paths';
-import { AppChannel, LauncherButtonAction } from '$constants/misc';
+import {
+  AppChannel, AppWindowName, LauncherButtonAction,
+} from '$constants/misc';
 import { IAppState } from '$store/store';
+import { showMessageBox } from '$utils/message';
 
 let appStore: Store<IAppState>;
 let mainWindow: BrowserWindow|null = null;
@@ -89,6 +92,25 @@ ipcMain.handle(
     selectorType === LauncherButtonAction.RUN,
     startPath,
     extensions,
+  ),
+);
+
+ipcMain.handle(
+  AppChannel.GET_MESSAGE_BOX_RESPONSE,
+  (
+    event,
+    message: string,
+    title: string,
+    messageBoxType: string,
+    buttons: string[]|undefined,
+    windowName: AppWindowName|undefined,
+  ) => showMessageBox(
+    dialog,
+    message,
+    title,
+    messageBoxType,
+    buttons,
+    windowName ? windowName === AppWindowName.DEV ? devWindow! : mainWindow! : undefined, // eslint-disable-line no-nested-ternary, max-len
   ),
 );
 

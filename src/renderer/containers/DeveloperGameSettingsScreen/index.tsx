@@ -22,7 +22,7 @@ import {
 } from '$utils/data';
 import { checkObjectForEqual } from '$utils/check';
 import {
-  AppChannel, gameSettingsFileAvailableVariables, LauncherButtonAction,
+  AppChannel, AppWindowName, gameSettingsFileAvailableVariables, LauncherButtonAction,
 } from '$constants/misc';
 import { TextField } from '$components/UI/TextField';
 import { Button } from '$components/UI/Button';
@@ -288,25 +288,73 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     setIsConfigChanged(!checkObjectForEqual(gameSettingsConfig, newConfig));
   }, [currentConfig, gameSettingsConfig]);
 
-  const deleteGameSettingsFile = useCallback((files: IGameSettingsFile[]) => {
-    const newConfig = {
-      ...currentConfig,
-      gameSettingsFiles: files,
-      gameSettingsOptions: getChangedOptionsAfterFileDelete(
-        currentConfig.gameSettingsOptions,
-        files,
-      ),
-    };
+  const deleteGameSettingsFile = useCallback(async (
+    newFiles: IGameSettingsFile[],
+    deletedItem: IGameSettingsFile|undefined,
+  ) => {
+    if (currentConfig.gameSettingsFiles.length === 1) {
+      await ipcRenderer.invoke(
+        AppChannel.GET_MESSAGE_BOX_RESPONSE,
+        'Невозможно удалить единственный файл, если присутствует хотя бы одна игровая опция.', //eslint-disable-line max-len
+        'Нельзя удалить единственный файл',
+        undefined,
+        undefined,
+        AppWindowName.DEV,
+      );
+    } else if (currentConfig.gameSettingsOptions.some((currentOption) => currentOption.file === deletedItem?.name)) {
+      const messageBoxResponse = await ipcRenderer.invoke(
+        AppChannel.GET_MESSAGE_BOX_RESPONSE,
+        'Одна или несколько игровых опций имеют данный файл в зависимостях. Нажмите "Отмена", чтобы вручную изменить используемый опциями файл, или "Игнорировать", чтобы автоматически выбрать для опции один из доступных файлов.', //eslint-disable-line max-len
+        'Файл имеет зависимости',
+        undefined,
+        ['Отмена', 'Игнорировать'],
+        AppWindowName.DEV,
+      );
 
-    setCurrentConfig(newConfig);
-    setLastAddedFileId('');
-    setIsConfigChanged(!checkObjectForEqual(gameSettingsConfig, newConfig));
-  }, [currentConfig, gameSettingsConfig]);
+      if (messageBoxResponse.response === 1) {
+        const [newOptions, changedOptionsNames] = getChangedOptionsAfterFileDelete(
+          currentConfig.gameSettingsOptions,
+          newFiles,
+        );
+        const newConfig = {
+          ...currentConfig,
+          gameSettingsFiles: newFiles,
+          gameSettingsOptions: newOptions,
+        };
+
+        if (changedOptionsNames.length > 0) {
+          dispatch(addDeveloperMessages([CreateUserMessage.info(`Для опций ${changedOptionsNames.join()} используемый файл был изменен на "${newFiles[0].label}"`)])); //eslint-disable-line max-len
+        }
+
+        setCurrentConfig(newConfig);
+        setLastAddedFileId('');
+        setIsConfigChanged(!checkObjectForEqual(gameSettingsConfig, newConfig));
+      }
+    } else {
+      const newConfig = {
+        ...currentConfig,
+        gameSettingsFiles: newFiles,
+      };
+
+      setCurrentConfig(newConfig);
+      setLastAddedFileId('');
+      setIsConfigChanged(!checkObjectForEqual(gameSettingsConfig, newConfig));
+    }
+  }, [currentConfig, gameSettingsConfig, dispatch]);
 
   const deleteGameSettingsFileById = useCallback((id: string) => {
-    const files = currentConfig.gameSettingsFiles.filter((item) => id !== item.id);
+    let deletedFile: IGameSettingsFile|undefined;
+    const files = currentConfig.gameSettingsFiles.filter((item) => {
+      if (id !== item.id) {
+        deletedFile = item;
 
-    deleteGameSettingsFile(files);
+        return true;
+      }
+
+      return false;
+    });
+
+    deleteGameSettingsFile(files, deletedFile);
   }, [currentConfig.gameSettingsFiles, deleteGameSettingsFile]);
 
   const changeGameSettingsOptions = useCallback((
@@ -341,10 +389,10 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
 
   const deleteGameSettingsOption = useCallback((
     params: IGameSettingsOption[],
-    deletedItemId: string,
+    deletedItem: IGameSettingsOption,
   ) => {
     changeCurrentConfig(params, 'gameSettingsOptions');
-    setValidationErrors(clearComponentValidationErrors(validationErrors, deletedItemId));
+    setValidationErrors(clearComponentValidationErrors(validationErrors, deletedItem.id));
     setLastAddedOptionId('');
   }, [validationErrors, changeCurrentConfig]);
 

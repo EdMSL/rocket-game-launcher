@@ -117,6 +117,7 @@ export enum AppChannel {
   GET_APP_STATE = 'get app state',
   APP_STORE_UPDATED = 'app store updated',
   CHANGE_DEV_WINDOW_STATE = 'change dev window state',
+  GET_MESSAGE_BOX_RESPONSE = 'get message box response',
 }
 
 export const modOrganizerProfileSection = 'General';

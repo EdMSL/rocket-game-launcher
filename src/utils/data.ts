@@ -1006,20 +1006,27 @@ export const changeConfigArrayItem = <P extends { id: string, }>(
 export const getChangedOptionsAfterFileDelete = (
   options: IGameSettingsOption[],
   files: IGameSettingsFile[],
-): IGameSettingsOption[] => options.map((param) => {
-  if (!getGameSettingsFilesNames(files).includes(param.file)) {
-    return generateGameSettingsOption(
-      {
-        ...param,
-        file: files[0].name,
-      },
-      getFullOption(defaultFullGameSettingsOption, param),
-      files[0],
-    ).newOption;
-  }
+): [IGameSettingsOption[], string[]] => {
+  const changedOptionsNames: string[] = [];
+  const newOptions = options.map((currentOption) => {
+    if (!getGameSettingsFilesNames(files).includes(currentOption.file)) {
+      changedOptionsNames.push(currentOption.label);
 
-  return param;
-});
+      return generateGameSettingsOption(
+        {
+          ...currentOption,
+          file: files[0].name,
+        },
+        getFullOption(defaultFullGameSettingsOption, currentOption),
+        files[0],
+      ).newOption;
+    }
+
+    return currentOption;
+  });
+
+  return [newOptions, changedOptionsNames];
+};
 
 /**
  * Получить объект строк для всех `select` игровой опции.
