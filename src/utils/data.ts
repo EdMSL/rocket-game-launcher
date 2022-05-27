@@ -783,10 +783,8 @@ export const getCustomButtons = (
 
     return btn;
   } catch (error: any) {
-    const err = getReadWriteError(error);
-
     writeToLogFileSync(
-      `Can't create custom button. "${btn.label}". ${err.message}. Path: ${btn.path}`,
+      `Can't create custom button. "${btn.label}". ${error.message}. Path: ${btn.path}`,
       LogMessageType.WARNING,
     );
 

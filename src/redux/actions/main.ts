@@ -26,6 +26,13 @@ export const setIsFirstLaunch = (
   payload: isFirstLaunch,
 });
 
+export const setIsGameSettingsFileExists = (
+  isGameSettingsFileExists: IMainRootState['isGameSettingsFileExists'],
+) => ({
+  type: MAIN_TYPES.SET_IS_FIRST_LAUNCH,
+  payload: isGameSettingsFileExists,
+});
+
 export const setIsGameSettingsConfigChanged = (
   isGameSettingsConfigChanged: IMainRootState['isGameSettingsConfigChanged'],
 ) => ({

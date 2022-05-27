@@ -59,7 +59,7 @@ const getConfigurationData = (): ILauncherConfig => {
     return configData;
   } catch (error: any) {
     if (error instanceof ReadWriteError) {
-      if (error.cause.name === ErrorName.NOT_FOUND) {
+      if (error.causeName === ErrorName.NOT_FOUND) {
         writeToLogFileSync(
           'Launcher config file not found. Load default values. A new config file will be created', //eslint-disable-line max-len
           LogMessageType.WARNING,

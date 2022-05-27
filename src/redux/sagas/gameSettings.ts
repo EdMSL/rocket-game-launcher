@@ -29,6 +29,7 @@ import {
   setIsGameSettingsLoading,
   setIsGameSettingsSaving,
   setIsGameSettingsConfigChanged,
+  setIsGameSettingsFileExists,
 } from '$actions/main';
 import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import { checkGameSettingsConfigFull, ICheckResult } from '$utils/check';
@@ -58,6 +59,7 @@ import {
 } from '$actions/gameSettings';
 import {
   CustomError,
+  ErrorName,
   ReadWriteError,
   SagaError,
 } from '$utils/errors';
@@ -94,8 +96,10 @@ const getState = (state: IAppState): IAppState => state;
 */
 export function* getGameSettingsConfigSaga(): SagaIterator<ICheckResult<IGameSettingsConfig>> {
   try {
-    const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_FILE_PATH);
+    const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_FILE_PATH, false);
     yield delay(2000);
+    yield put(setIsGameSettingsFileExists(true));
+
     return checkGameSettingsConfigFull(gameSettingsObj);
   } catch (error: any) {
     let errorMessage = '';
@@ -104,6 +108,10 @@ export function* getGameSettingsConfigSaga(): SagaIterator<ICheckResult<IGameSet
       errorMessage = error.message;
     } else if (error instanceof ReadWriteError) {
       errorMessage = `${error.message}. Path: '${error.path}'.`;
+
+      if (error.causeName === ErrorName.NOT_FOUND) {
+        yield put(setIsGameSettingsFileExists(false));
+      }
     } else {
       errorMessage = `Unknown error. Message: ${error.message}`;
     }
@@ -142,7 +150,7 @@ function* getMOProfilesSaga(): SagaIterator {
       errorMessage = `Unknown error. Message: ${error.message}`;
     }
 
-    throw new SagaError('Get Mod Organizer profiles', errorMessage);
+    throw new SagaError('Get Mod Organizer profiles', errorMessage, error);
   }
 }
 
@@ -206,7 +214,7 @@ function* getDataFromMOIniSaga(): SagaIterator<string> {
       'Не удалось получить текущий профиль Mod Organizer. Настройки из файлов, привязанных к профилю, будут недоступны. Подробности в файле лога.', //eslint-disable-line max-len
     )]));
 
-    throw new SagaError('Get data from Mod Organizer INI file', errorMessage);
+    throw new SagaError('Get data from Mod Organizer INI file', errorMessage, error);
   }
 }
 
@@ -245,7 +253,7 @@ function* getDataFromGameSettingsFilesSaga(
       {},
     );
   } catch (error: any) {
-    throw new SagaError('Get data from game settings files', error.message);
+    throw new SagaError('Get data from game settings files', error.message, error);
   }
 }
 
@@ -288,7 +296,7 @@ export function* generateGameSettingsParametersSaga(
 
     return { gameSettingsParameters: totalGameSettingsParameters, optionsWithError };
   } catch (error: any) {
-    throw new SagaError('Generate game settings parameters', error.message);
+    throw new SagaError('Generate game settings parameters', error.message, error);
   }
 }
 
@@ -415,7 +423,7 @@ export function* initGameSettingsSaga(
     yield put(setIsGameSettingsLoaded(false));
 
     if (isFromUpdateAction) {
-      throw new SagaError('Init game settings', errorMessage);
+      throw new SagaError('Init game settings', errorMessage, error);
     }
   } finally {
     if (!isFromUpdateAction) {

@@ -109,7 +109,7 @@ function* updateGameSettingsParametersSaga(
     if (
       error instanceof SagaError
       && error.reason instanceof ReadWriteError
-      && error.reason.cause.name === ErrorName.NOT_FOUND
+      && error.reason.causeName === ErrorName.NOT_FOUND
     ) {
       writeToLogFile('Game settings file settings.json not found.', LogMessageType.ERROR);
 
@@ -156,7 +156,7 @@ function* getGameSettingsFilesBackupSaga(isExternalCall = true): SagaIterator {
     yield put(setGameSettingsFilesBackup(result));
   } catch (error: any) {
     if (isExternalCall) {
-      throw new SagaError('Get game settings files backup', error.message);
+      throw new SagaError('Get game settings files backup', error.message, error);
     } else {
       let errorMessage = '';
 
@@ -244,7 +244,7 @@ function* deleteGameSettingsFilesBackupSaga({
 
     yield call(getGameSettingsFilesBackupSaga, false);
   } catch (error: any) {
-    if (error instanceof ReadWriteError && error.cause.name === ErrorName.NOT_FOUND) {
+    if (error instanceof ReadWriteError && error.causeName === ErrorName.NOT_FOUND) {
       yield put(addMessages([CreateUserMessage.warning(
         'Не удалось удалить файлы бэкапа. Папка была удалена, перемещена или переименована.',
       )]));
@@ -309,7 +309,7 @@ function* renameGameSettingsFilesBackupSaga({
 
     yield put(setGameSettingsFilesBackup(backupData));
   } catch (error: any) {
-    if (error instanceof ReadWriteError && error.cause.name === ErrorName.NOT_FOUND) {
+    if (error instanceof ReadWriteError && error.causeName === ErrorName.NOT_FOUND) {
       yield put(addMessages([CreateUserMessage.warning(
         'Не удалось переименовать папку бэкапа. Папка была удалена, перемещена или переименована.',
       )]));
