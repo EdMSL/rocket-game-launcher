@@ -24,6 +24,16 @@ const setIsLauncherConfigProcessing: IDeveloperActionHadler<
   isLauncherConfigProcessing,
 });
 
+const setIsGameSettingsConfigFileExists: IDeveloperActionHadler<
+  typeof DEVELOPER_ACTIONS.setIsGameSettingsConfigFileExists
+> = (
+  state,
+  { payload: isGameSettingsConfigFileExists },
+) => ({
+  ...state,
+  isGameSettingsConfigFileExists,
+});
+
 const setGameSettingsConfig: IDeveloperActionHadler<
   typeof DEVELOPER_ACTIONS.setGameSettingsConfig
 > = (
@@ -99,6 +109,7 @@ const deleteDeveloperMessages: IDeveloperActionHadler<
 
 export const DEVELOPER_HANDLERS = {
   [DEVELOPER_TYPES.SET_LAUNCHER_CONFIG]: setLauncherConfig,
+  [DEVELOPER_TYPES.SET_IS_GAME_SETTINGS_CONFIG_FILE_EXISTS]: setIsGameSettingsConfigFileExists,
   [DEVELOPER_TYPES.SET_GAME_SETTINGS_CONFIG]: setGameSettingsConfig,
   [DEVELOPER_TYPES.SET_IS_LAUNCHER_CONFIG_PROCESSING]: setIsLauncherConfigProcessing,
   [DEVELOPER_TYPES.SET_IS_GAME_SETTINGS_CONFIG_PROCESSING]: setIsGameSettingsConfigProcessing,

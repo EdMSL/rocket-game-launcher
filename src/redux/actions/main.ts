@@ -1,4 +1,3 @@
-import { IGameSettingsConfig } from '$types/gameSettings';
 import {
   MAIN_TYPES, IMainRootState, IGameSettingsBackup,
 } from '$types/main';
@@ -29,7 +28,7 @@ export const setIsFirstLaunch = (
 export const setIsGameSettingsFileExists = (
   isGameSettingsFileExists: IMainRootState['isGameSettingsFileExists'],
 ) => ({
-  type: MAIN_TYPES.SET_IS_FIRST_LAUNCH,
+  type: MAIN_TYPES.SET_IS_GAME_SETTINGS_FILE_EXISTS,
   payload: isGameSettingsFileExists,
 });
 

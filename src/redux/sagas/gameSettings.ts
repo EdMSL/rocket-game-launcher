@@ -82,6 +82,7 @@ import {
   getRegExpForLineIniParameter,
   getPathToFile,
 } from '$utils/strings';
+import { setIsGameSettingsConfigFileExists } from '$actions/developer';
 
 export interface IIncorrectGameSettingsFiles {
   [key: string]: number[],
@@ -98,6 +99,7 @@ export function* getGameSettingsConfigSaga(): SagaIterator<ICheckResult<IGameSet
   try {
     const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_FILE_PATH, false);
     yield delay(2000);
+    yield put(setIsGameSettingsConfigFileExists(true));
     yield put(setIsGameSettingsFileExists(true));
 
     return checkGameSettingsConfigFull(gameSettingsObj);
@@ -110,6 +112,7 @@ export function* getGameSettingsConfigSaga(): SagaIterator<ICheckResult<IGameSet
       errorMessage = `${error.message}. Path: '${error.path}'.`;
 
       if (error.causeName === ErrorName.NOT_FOUND) {
+        yield put(setIsGameSettingsConfigFileExists(false));
         yield put(setIsGameSettingsFileExists(false));
       }
     } else {

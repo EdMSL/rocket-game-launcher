@@ -12,6 +12,7 @@ export const INITIAL_STATE: IDeveloperRootState = {
   isGameSettingsConfigProcessing: false,
   isGameSettingsConfigLoaded: false,
   isGameSettingsConfigChanged: false,
+  isGameSettingsConfigFileExists: true,
   pathVariables: DefaultPathVariable,
   messages: [],
 };

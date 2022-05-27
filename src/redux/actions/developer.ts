@@ -27,6 +27,13 @@ export const setIsLauncherConfigProcessing = (
   payload: isProcessing,
 });
 
+export const setIsGameSettingsConfigFileExists = (
+  isGameSettingsConfigFileExists: IDeveloperRootState['isGameSettingsConfigFileExists'],
+) => ({
+  type: DEVELOPER_TYPES.SET_IS_GAME_SETTINGS_CONFIG_FILE_EXISTS,
+  payload: isGameSettingsConfigFileExists,
+});
+
 export const setGameSettingsConfig = (
   gameSetingsConfig: IGameSettingsConfig,
 ) => ({

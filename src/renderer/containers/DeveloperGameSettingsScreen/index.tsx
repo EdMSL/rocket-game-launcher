@@ -56,6 +56,7 @@ import {
 
 export const DeveloperGameSettingsScreen: React.FC = () => {
   /* eslint-disable max-len */
+  const isGameSettingsConfigFileExists = useDeveloperSelector((state) => state.developer.isGameSettingsConfigFileExists);
   const gameSettingsConfig = useDeveloperSelector((state) => state.developer.gameSettingsConfig);
   const isGameSettingsConfigProcessing = useDeveloperSelector((state) => state.developer.isGameSettingsConfigProcessing);
   const isGameSettingsConfigLoaded = useDeveloperSelector((state) => state.developer.isGameSettingsConfigLoaded);
@@ -426,166 +427,180 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <div className="developer__form">
-      <DeveloperScreenController
-        isConfigChanged={isConfigChanged}
-        isHaveValidationErrors={Object.keys(validationErrors).length > 0}
-        isFirstLaunch={isFirstLaunch}
-        onSaveBtnClick={onSaveBtnClick}
-        onCancelBtnClick={onCancelBtnClick}
-        onResetBtnClick={onResetBtnClick}
-        onUpdateBtnClick={onUpdateBtnClick}
-      />
-      <ScrollbarsBlock>
-        {
-          isGameSettingsConfigLoaded && (
-            <React.Fragment>
-              <div className="developer__block">
-                <p className="developer__block-title">Группы игровых настроек</p>
-                <Button
-                  className={classNames('main-btn', 'developer__btn')}
-                  isDisabled={!!lastAddedGroupName}
-                  onClick={createNewGroup}
-                >
-                  Добавить
-                </Button>
-                <ul className={styles['developer__groups-container']}>
-                  {
-                  currentConfig.gameSettingsGroups.length > 0
-                    && currentConfig.gameSettingsGroups.map((item) => (
-                      <li
-                        key={item.name}
-                        className={classNames(
-                          styles['developer__groups-item'],
-                          lastAddedGroupName === item.name && styles['developer__groups-item--new'],
-                        )}
+      {
+        isGameSettingsConfigFileExists && (
+          <React.Fragment>
+            <DeveloperScreenController
+              isConfigChanged={isConfigChanged}
+              isHaveValidationErrors={Object.keys(validationErrors).length > 0}
+              isFirstLaunch={isFirstLaunch}
+              onSaveBtnClick={onSaveBtnClick}
+              onCancelBtnClick={onCancelBtnClick}
+              onResetBtnClick={onResetBtnClick}
+              onUpdateBtnClick={onUpdateBtnClick}
+            />
+            <ScrollbarsBlock>
+              {
+                isGameSettingsConfigLoaded && (
+                  <React.Fragment>
+                    <div className="developer__block">
+                      <p className="developer__block-title">Группы игровых настроек</p>
+                      <Button
+                        className={classNames('main-btn', 'developer__btn')}
+                        isDisabled={!!lastAddedGroupName}
+                        onClick={createNewGroup}
                       >
+                        Добавить
+                      </Button>
+                      <ul className={styles['developer__groups-container']}>
                         {
-                        lastAddedGroupName === item.name && (
-                        <div className={styles['developer__group-label']}>
-                          <span>Заголовок группы</span>
-                          <HintItem description="Задать заголовок группы. Отображается как имя вкладки на экране игровых настроек." />
-                        </div>
+                        currentConfig.gameSettingsGroups.length > 0
+                          && currentConfig.gameSettingsGroups.map((item) => (
+                            <li
+                              key={item.name}
+                              className={classNames(
+                                styles['developer__groups-item'],
+                                lastAddedGroupName === item.name && styles['developer__groups-item--new'],
+                              )}
+                            >
+                              {
+                              lastAddedGroupName === item.name && (
+                              <div className={styles['developer__group-label']}>
+                                <span>Заголовок группы</span>
+                                <HintItem description="Задать заголовок группы. Отображается как имя вкладки на экране игровых настроек." />
+                              </div>
+                              )
+                            }
+                              <EditableItem
+                                id={item.name}
+                                isError={!!validationErrors[item.name]}
+                                isNew={lastAddedGroupName === item.name}
+                                item={item.label}
+                                onApply={editGroupItem}
+                                onDelete={deleteGroupItem}
+                                onChange={validateGroupLabel}
+                              />
+                            </li>
+                          ))
+                        }
+                        {
+                        currentConfig.gameSettingsGroups.length === 0 && (
+                          <li className={styles['developer__groups-item']}>
+                            Нет групп игровых настроек
+                          </li>
                         )
                       }
-                        <EditableItem
-                          id={item.name}
-                          isError={!!validationErrors[item.name]}
-                          isNew={lastAddedGroupName === item.name}
-                          item={item.label}
-                          onApply={editGroupItem}
-                          onDelete={deleteGroupItem}
-                          onChange={validateGroupLabel}
-                        />
-                      </li>
-                    ))
-                  }
-                  {
-                  currentConfig.gameSettingsGroups.length === 0 && (
-                    <li className={styles['developer__groups-item']}>
-                      Нет групп игровых настроек
-                    </li>
-                  )
-                }
-                </ul>
-              </div>
-              <div className="developer__block">
-                <p className="developer__block-title">Кодировка файлов настроек</p>
-                <TextField
-                  className="developer__item"
-                  id="baseFilesEncoding"
-                  name="baseFilesEncoding"
-                  label="Кодировка"
-                  value={currentConfig.baseFilesEncoding}
-                  description="Кодировка, которая будет по умолчанию применяться при чтении и записи данных файлов игровых настроек." //eslint-disable-line max-len
-                  placeholder={gameSettingsConfig.baseFilesEncoding}
-                  onChange={onTextFieldChange}
-                />
-              </div>
-              <div className="developer__block">
-                <p className="developer__block-title">Настройка игровых опций</p>
-                <p className="developer__subtitle">Файлы игровых настроек</p>
-                <ul className={styles.developer__list}>
-                  {
-                  currentConfig.gameSettingsFiles.length > 0 && currentConfig.gameSettingsFiles.map((file, index) => (
-                    <SpoilerListItem<IGameSettingsFile>
-                      key={file.name}
-                      item={file}
-                      items={currentConfig.gameSettingsFiles}
-                      position={index}
-                      lastItemId={lastAddedFileId}
-                      summaryText={[{ label: 'Имя файла:', text: file.label }, { label: 'Путь:', text: file.path }]}
-                      validationErrors={validationErrors}
-                      onDeleteItem={deleteGameSettingsFile}
-                    >
-                      <GameSettingsFileItem
-                        file={file}
-                        pathVariables={pathVariables}
-                        validationErrors={validationErrors}
-                        onFileDataChange={changeGameSettingsFiles}
-                        onValidation={setNewValidationErrors}
-                        deleteFile={deleteGameSettingsFileById}
+                      </ul>
+                    </div>
+                    <div className="developer__block">
+                      <p className="developer__block-title">Кодировка файлов настроек</p>
+                      <TextField
+                        className="developer__item"
+                        id="baseFilesEncoding"
+                        name="baseFilesEncoding"
+                        label="Кодировка"
+                        value={currentConfig.baseFilesEncoding}
+                        description="Кодировка, которая будет по умолчанию применяться при чтении и записи данных файлов игровых настроек." //eslint-disable-line max-len
+                        placeholder={gameSettingsConfig.baseFilesEncoding}
+                        onChange={onTextFieldChange}
                       />
-                    </SpoilerListItem>
-                  ))
-                  }
-                  {
-                  currentConfig.gameSettingsFiles.length === 0
-                  && <li> Нет игровых файлов </li>
-                  }
-                </ul>
-                <Button
-                  className={classNames('main-btn', 'developer__btn')}
-                  onClick={onAddGameSettingsFile}
-                >
-                  Добавить
-                </Button>
-                <p className="developer__subtitle">Игровые опции</p>
-                <ul className={styles.developer__list}>
-                  {
-                  currentConfig.gameSettingsOptions.length > 0 && currentConfig.gameSettingsOptions.map((currentOption, index) => (
-                    <SpoilerListItem<IGameSettingsOption>
-                      key={currentOption.id}
-                      item={currentOption}
-                      items={currentConfig.gameSettingsOptions}
-                      position={index}
-                      summaryText={[{ label: '', text: currentOption.label }]}
-                      lastItemId={lastAddedOptionId}
-                      validationErrors={validationErrors}
-                      onDeleteItem={deleteGameSettingsOption}
-                      onChangeOrderItem={changeGameSettingsOptionOrder}
-                    >
-                      <GameSettingsOptionItem
-                        option={currentOption}
-                        gameSettingsFiles={currentConfig.gameSettingsFiles}
-                        gameSettingsGroups={currentConfig.gameSettingsGroups}
-                        validationErrors={validationErrors}
-                        onOptionDataChange={changeGameSettingsOptions}
-                        onValidation={setNewValidationErrors}
-                        deleteOption={deleteGameSettingsOptionById}
-                      />
-                    </SpoilerListItem>
-                  ))
-                }
-                  {
-                  currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length !== 0
-                  && <li> Нет игровых опций</li>
-                  }
-                  {
-                  currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length === 0
-                  && <li> Добавьте хотя бы один игровой файл, чтобы добавлять игровые опции</li>
-                  }
-                </ul>
-                <Button
-                  className={classNames('main-btn', 'developer__btn')}
-                  onClick={addGameSettingsOption}
-                >
-                  Добавить
-                </Button>
-              </div>
-            </React.Fragment>
-          )
-        }
-      </ScrollbarsBlock>
+                    </div>
+                    <div className="developer__block">
+                      <p className="developer__block-title">Настройка игровых опций</p>
+                      <p className="developer__subtitle">Файлы игровых настроек</p>
+                      <ul className={styles.developer__list}>
+                        {
+                        currentConfig.gameSettingsFiles.length > 0 && currentConfig.gameSettingsFiles.map((file, index) => (
+                          <SpoilerListItem<IGameSettingsFile>
+                            key={file.name}
+                            item={file}
+                            items={currentConfig.gameSettingsFiles}
+                            position={index}
+                            lastItemId={lastAddedFileId}
+                            summaryText={[{ label: 'Имя файла:', text: file.label }, { label: 'Путь:', text: file.path }]}
+                            validationErrors={validationErrors}
+                            onDeleteItem={deleteGameSettingsFile}
+                          >
+                            <GameSettingsFileItem
+                              file={file}
+                              pathVariables={pathVariables}
+                              validationErrors={validationErrors}
+                              onFileDataChange={changeGameSettingsFiles}
+                              onValidation={setNewValidationErrors}
+                              deleteFile={deleteGameSettingsFileById}
+                            />
+                          </SpoilerListItem>
+                        ))
+                        }
+                        {
+                        currentConfig.gameSettingsFiles.length === 0
+                        && <li> Нет игровых файлов </li>
+                        }
+                      </ul>
+                      <Button
+                        className={classNames('main-btn', 'developer__btn')}
+                        onClick={onAddGameSettingsFile}
+                      >
+                        Добавить
+                      </Button>
+                      <p className="developer__subtitle">Игровые опции</p>
+                      <ul className={styles.developer__list}>
+                        {
+                        currentConfig.gameSettingsOptions.length > 0 && currentConfig.gameSettingsOptions.map((currentOption, index) => (
+                          <SpoilerListItem<IGameSettingsOption>
+                            key={currentOption.id}
+                            item={currentOption}
+                            items={currentConfig.gameSettingsOptions}
+                            position={index}
+                            summaryText={[{ label: '', text: currentOption.label }]}
+                            lastItemId={lastAddedOptionId}
+                            validationErrors={validationErrors}
+                            onDeleteItem={deleteGameSettingsOption}
+                            onChangeOrderItem={changeGameSettingsOptionOrder}
+                          >
+                            <GameSettingsOptionItem
+                              option={currentOption}
+                              gameSettingsFiles={currentConfig.gameSettingsFiles}
+                              gameSettingsGroups={currentConfig.gameSettingsGroups}
+                              validationErrors={validationErrors}
+                              onOptionDataChange={changeGameSettingsOptions}
+                              onValidation={setNewValidationErrors}
+                              deleteOption={deleteGameSettingsOptionById}
+                            />
+                          </SpoilerListItem>
+                        ))
+                      }
+                        {
+                        currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length !== 0
+                        && <li> Нет игровых опций</li>
+                        }
+                        {
+                        currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length === 0
+                        && <li> Добавьте хотя бы один игровой файл, чтобы добавлять игровые опции</li>
+                        }
+                      </ul>
+                      <Button
+                        className={classNames('main-btn', 'developer__btn')}
+                        onClick={addGameSettingsOption}
+                      >
+                        Добавить
+                      </Button>
+                    </div>
+                  </React.Fragment>
+                )
+              }
+            </ScrollbarsBlock>
+          </React.Fragment>
+        )
+      }
+      {
+        !isGameSettingsConfigFileExists && (
+          <React.Fragment>
+            <p>Отсутствует файл игровых настроек</p>
+            <Button>Создать</Button>
+          </React.Fragment>
+        )
+      }
     </div>
   );
 };

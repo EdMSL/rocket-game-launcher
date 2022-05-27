@@ -37,6 +37,19 @@ const setIsFirstLaunch: IMainActionHadler<
   },
 });
 
+const setIsGameSettingsFileExists: IMainActionHadler<
+  typeof MAIN_ACTIONS.setIsGameSettingsFileExists
+> = (
+  state,
+  { payload: isGameSettingsConfigFileExists },
+) => ({
+  ...state,
+  config: {
+    ...state.config,
+    isGameSettingsConfigFileExists,
+  },
+});
+
 const setIsGameSettingsConfigChanged: IMainActionHadler<
   typeof MAIN_ACTIONS.setIsGameSettingsConfigChanged
 > = (
@@ -207,6 +220,7 @@ export const MAIN_HANDLERS = {
   [MAIN_TYPES.SET_IS_LAUNCHER_CONFIG_CHANGED]: setIsGameSettingsConfigChanged,
   [MAIN_TYPES.SET_IS_GAME_RUNNING]: setIsGameRunning,
   [MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED]: setIsLauncherInitialised,
+  [MAIN_TYPES.SET_IS_GAME_SETTINGS_FILE_EXISTS]: setIsGameSettingsFileExists,
   [MAIN_TYPES.SET_IS_CONFIG_LOADING]: setIsConfigLoading,
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_LOADING]: setIsGameSettingsLoading,
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_LOADED]: setIsGameSettingsLoaded,

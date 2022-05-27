@@ -24,7 +24,7 @@ import {
 import { Routes } from '$constants/routes';
 import { CreateUserMessage } from '$utils/message';
 import {
-  CustomError, ReadWriteError, SagaError,
+  CustomError, ErrorName, ReadWriteError, SagaError,
 } from '$utils/errors';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
@@ -71,8 +71,12 @@ export function* initGameSettingsDeveloperSaga(): SagaIterator {
     yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, undefined, settingsConfig);
   } catch (error: any) {
     let errorMessage = '';
+    let isWarning = false;
 
-    if (error instanceof SagaError) {
+    if (error instanceof SagaError && error.reason instanceof ReadWriteError && error.reason.causeName === ErrorName.NOT_FOUND) {
+      isWarning = true;
+      errorMessage = 'Game settings file "settings.json" not found.';
+    } else if (error instanceof SagaError) {
       errorMessage = `Error in "${error.sagaName}". ${error.message}`;
     } else if (error instanceof CustomError) {
       errorMessage = `${error.message}`;
@@ -82,7 +86,7 @@ export function* initGameSettingsDeveloperSaga(): SagaIterator {
       errorMessage = `Unknown error. Message: ${error.message}`;
     }
 
-    writeToLogFile(errorMessage);
+    writeToLogFile(errorMessage, isWarning ? LogMessageType.WARNING : LogMessageType.ERROR);
 
     yield put(setIsGameSettingsConfigLoaded(false));
   } finally {
