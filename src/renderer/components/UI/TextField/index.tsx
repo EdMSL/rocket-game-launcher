@@ -49,8 +49,8 @@ export const TextField: React.FunctionComponent<IProps> = ({
       >
         <span>{label}</span>
         {
-        description && <HintItem description={description} />
-      }
+          description && <HintItem description={description} />
+        }
       </label>
       <input
         className={classNames(

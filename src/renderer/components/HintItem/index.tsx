@@ -9,7 +9,7 @@ interface IProps {
 export const HintItem: React.FunctionComponent<IProps> = ({
   description,
 }) => {
-  const [isVisivle, setIsVisible] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   const onHintIconHover = useCallback(() => {
     setIsVisible(true);
@@ -26,7 +26,7 @@ export const HintItem: React.FunctionComponent<IProps> = ({
       onMouseLeave={onHintIconLeave}
     >
       {
-        isVisivle && (
+        isVisible && (
           <div
             className={styles.hint__block}
           >

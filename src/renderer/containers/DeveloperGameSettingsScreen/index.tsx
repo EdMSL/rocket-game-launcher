@@ -293,7 +293,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     newFiles: IGameSettingsFile[],
     deletedItem: IGameSettingsFile|undefined,
   ) => {
-    if (currentConfig.gameSettingsFiles.length === 1) {
+    if (currentConfig.gameSettingsFiles.length === 1 && currentConfig.gameSettingsOptions.length > 0) {
       await ipcRenderer.invoke(
         AppChannel.GET_MESSAGE_BOX_RESPONSE,
         'Невозможно удалить единственный файл, если присутствует хотя бы одна игровая опция.', //eslint-disable-line max-len
@@ -448,6 +448,18 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                 isGameSettingsConfigLoaded && (
                   <React.Fragment>
                     <div className="developer__block">
+                      <TextField
+                        className="developer__item"
+                        id="baseFilesEncoding"
+                        name="baseFilesEncoding"
+                        label="Кодировка файлов настроек"
+                        value={currentConfig.baseFilesEncoding}
+                        description="Кодировка, которая будет по умолчанию применяться при чтении и записи данных файлов игровых настроек." //eslint-disable-line max-len
+                        placeholder={gameSettingsConfig.baseFilesEncoding}
+                        onChange={onTextFieldChange}
+                      />
+                    </div>
+                    <div className="developer__block">
                       <p className="developer__block-title">Группы игровых настроек</p>
                       <Button
                         className={classNames('main-btn', 'developer__btn')}
@@ -495,19 +507,6 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                         )
                       }
                       </ul>
-                    </div>
-                    <div className="developer__block">
-                      <p className="developer__block-title">Кодировка файлов настроек</p>
-                      <TextField
-                        className="developer__item"
-                        id="baseFilesEncoding"
-                        name="baseFilesEncoding"
-                        label="Кодировка"
-                        value={currentConfig.baseFilesEncoding}
-                        description="Кодировка, которая будет по умолчанию применяться при чтении и записи данных файлов игровых настроек." //eslint-disable-line max-len
-                        placeholder={gameSettingsConfig.baseFilesEncoding}
-                        onChange={onTextFieldChange}
-                      />
                     </div>
                     <div className="developer__block">
                       <p className="developer__block-title">Настройка игровых опций</p>
