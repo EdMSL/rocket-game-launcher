@@ -178,9 +178,9 @@ const gameSettingsFileSchema = Joi.object<IGameSettingsFile>({
 // Схема для поверхностной проверки. Нужна для записи в state во время генерации storage.
 export const gameSettingsShallowCheckSchema = Joi.object<IGameSettingsConfig>({
   baseFilesEncoding: Joi.string().optional().default(Encoding.WIN1251),
-  gameSettingsGroups: Joi.array().optional().default([]).min(1),
-  gameSettingsFiles: Joi.array().required().min(1),
-  gameSettingsOptions: Joi.array().required().min(1),
+  gameSettingsGroups: Joi.array().optional().default([]),
+  gameSettingsFiles: Joi.array().required(),
+  gameSettingsOptions: Joi.array().required(),
 });
 
 // Полная проверка.

@@ -5,6 +5,10 @@ import { IGameSettingsConfig } from '$types/gameSettings';
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
+export const createGameSettingsConfigFile = () => ({
+  type: DEVELOPER_TYPES.CREATE_GAME_SETTINGS_CONFIG_FILE,
+});
+
 export const setLauncherConfig = (
   newConfig: IDeveloperRootState['launcherConfig'],
 ) => ({

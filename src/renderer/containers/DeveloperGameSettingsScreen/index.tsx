@@ -38,7 +38,7 @@ import { GameSettingsFileItem } from '$components/Developer/GameSettingsFileItem
 import { GAME_DIR } from '$constants/paths';
 import { CreateUserMessage } from '$utils/message';
 import {
-  addDeveloperMessages, saveGameSettingsConfig, updateConfig,
+  addDeveloperMessages, createGameSettingsConfigFile, saveGameSettingsConfig, updateConfig,
 } from '$actions/developer';
 import { GameSettingsOptionItem } from '$components/Developer/GameSettingsOptionItem';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
@@ -424,6 +424,10 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     changeCurrentConfig(params, 'gameSettingsOptions');
   }, [changeCurrentConfig]);
 
+  const addGameSettingsConfigFile = useCallback(() => {
+    dispatch(createGameSettingsConfigFile());
+  }, [dispatch]);
+
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <div className="developer__form">
@@ -569,22 +573,26 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                             />
                           </SpoilerListItem>
                         ))
-                      }
-                        {
-                        currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length !== 0
-                        && <li> Нет игровых опций</li>
-                        }
-                        {
-                        currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length === 0
-                        && <li> Добавьте хотя бы один игровой файл, чтобы добавлять игровые опции</li>
                         }
                       </ul>
-                      <Button
-                        className={classNames('main-btn', 'developer__btn')}
-                        onClick={addGameSettingsOption}
-                      >
-                        Добавить
-                      </Button>
+                      {
+                        currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length !== 0
+                        && <p> Нет игровых опций</p>
+                      }
+                      {
+                        currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length === 0
+                        && <p> Добавьте хотя бы один игровой файл, чтобы добавлять игровые опции</p>
+                      }
+                      {
+                        currentConfig.gameSettingsFiles.length > 0 && (
+                        <Button
+                          className={classNames('main-btn', 'developer__btn')}
+                          onClick={addGameSettingsOption}
+                        >
+                          Добавить
+                        </Button>
+                        )
+                      }
                     </div>
                   </React.Fragment>
                 )
@@ -595,10 +603,15 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
       }
       {
         !isGameSettingsConfigFileExists && (
-          <React.Fragment>
-            <p>Отсутствует файл игровых настроек</p>
-            <Button>Создать</Button>
-          </React.Fragment>
+          <div className="developer__block">
+            <p className="developer__block-title">Отсутствует файл игровых настроек</p>
+            <Button
+              className={classNames('main-btn', 'developer__btn')}
+              onClick={addGameSettingsConfigFile}
+            >
+              Создать
+            </Button>
+          </div>
         )
       }
     </div>

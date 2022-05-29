@@ -14,6 +14,7 @@ import {
   saveGameSettingsConfig,
   saveLauncherConfig,
   setGameSettingsConfig,
+  setIsGameSettingsConfigFileExists,
   setIsGameSettingsConfigLoaded,
   setIsGameSettingsConfigProcessing,
   setIsLauncherConfigProcessing,
@@ -40,6 +41,7 @@ import {
 } from '$utils/check';
 import { defaultGameSettingsConfig } from '$constants/defaultData';
 import { getFileNameFromPathToFile } from '$utils/strings';
+import { setIsGameSettingsFileExists } from '$actions/main';
 
 const getState = (state: IDeveloperState): IDeveloperState => state;
 
@@ -232,6 +234,42 @@ function* saveGameSettingsConfigSaga(
   }
 }
 
+function* createGameSettingsConfigFileSaga(): SagaIterator {
+  yield put(setIsGameSettingsConfigProcessing(true));
+
+  try {
+    yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, true);
+
+    yield call(writeJSONFile, GAME_SETTINGS_FILE_PATH, defaultGameSettingsConfig);
+    yield put(setGameSettingsConfig(defaultGameSettingsConfig));
+    yield put(setIsGameSettingsConfigLoaded(true));
+    yield put(setIsGameSettingsConfigFileExists(true));
+    yield put(setIsGameSettingsFileExists(true));
+
+    yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, undefined, defaultGameSettingsConfig);
+  } catch (error: any) {
+    let errorMessage = '';
+
+    if (error instanceof CustomError) {
+      errorMessage = `${error.message}`;
+    } else if (error instanceof ReadWriteError) {
+      errorMessage = `${error.message}. Path '${error.path}'.`;
+    } else {
+      errorMessage = `Unknown error. Message: ${error.message}`;
+    }
+
+    writeToLogFileSync(
+      `Failed to create game settings file. Reason: ${errorMessage}`,
+      LogMessageType.ERROR,
+    );
+
+    yield put(addDeveloperMessages([CreateUserMessage.error('Произошла ошибка при создании файла игровых настроек. Подробности в файле лога.')])); //eslint-disable-line max-len
+  } finally {
+    yield put(setIsGameSettingsConfigProcessing(false));
+    yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, false);
+  }
+}
+
 function* locationChangeSaga(
   { payload: { location } }: LocationChangeAction<ILocationState>,
 ): SagaIterator {
@@ -252,4 +290,5 @@ export default function* developerSaga(): SagaIterator {
   yield takeLatest(DEVELOPER_TYPES.UPDATE_CONFIG, updateConfigSaga);
   yield takeLatest(DEVELOPER_TYPES.SAVE_LAUNCHER_CONFIG, saveLauncherConfigSaga);
   yield takeLatest(DEVELOPER_TYPES.SAVE_GAME_SETTINGS_CONFIG, saveGameSettingsConfigSaga);
+  yield takeLatest(DEVELOPER_TYPES.CREATE_GAME_SETTINGS_CONFIG_FILE, createGameSettingsConfigFileSaga);
 }
