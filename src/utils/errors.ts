@@ -25,6 +25,7 @@ export const ErrorName = {
   SAGA_ERROR: 'SagaError',
   MIME_TYPE: 'IncorrectFileTypeError',
   VALIDATION: 'ValidationTypeError',
+  INVALID_DIRECTORY: 'InvalidDirectoryError',
   UNKNOWN: 'UnknownError',
 };
 

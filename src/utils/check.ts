@@ -116,9 +116,6 @@ const configFileDataSchema = Joi.object<ILauncherConfig>({
     isUsed: Joi.bool().optional().default(false),
     version: Joi.number().valid(1, 2).when(Joi.ref('isUsed'), { is: true, then: Joi.required() }),
     pathToMOFolder: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToMOFolder).pattern(PathRegExp.GAME_DIR, 'correct path'),
-    pathToINI: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToINI).pattern(PathRegExp.MO_DIR, 'correct path'),
-    pathToProfiles: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToProfiles).pattern(PathRegExp.MO_DIR, 'correct path'),
-    pathToMods: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToMods).pattern(PathRegExp.MO_DIR, 'correct path'),
   }).optional().default(defaultLauncherConfig.modOrganizer),
   documentsPath: Joi.string().optional().allow('').default(defaultLauncherConfig.documentsPath)
     .pattern(PathRegExp.DOCUMENTS, 'correct path'),

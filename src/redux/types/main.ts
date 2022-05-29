@@ -71,9 +71,6 @@ export interface IModOrganizerParams {
   isUsed: boolean,
   version: number,
   pathToMOFolder: string,
-  pathToINI: string,
-  pathToProfiles: string,
-  pathToMods: string,
 }
 
 export interface ILauncherConfig extends IWindowSettings {

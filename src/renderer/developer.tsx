@@ -20,6 +20,7 @@ const initialState = {
   developer: {
     ...developerInitialState,
     launcherConfig: main.config,
+    pathVariables: main.pathVariables,
     isGameSettingsConfigFileExists: main.isGameSettingsFileExists,
     ...main.isGameSettingsLoaded ? {
       isGameSettingsConfigLoaded: main.isGameSettingsLoaded,

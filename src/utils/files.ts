@@ -296,6 +296,30 @@ export const readINIFile = async (
 };
 
 /**
+ * Синхронно получает данные из INI файла.
+ * @param filePath Путь до считываемого файла, включая имя.
+ * @param encoding Кодировка считываемого файла.
+ * @returns Объект с данными из файла.
+*/
+export const readINIFileSync = (
+  filePath: string,
+  encoding = Encoding.UTF8,
+): IIniObj => {
+  try {
+    const INIData = readFileDataSync(filePath, encoding as BufferEncoding);
+
+    return new Ini(INIData);
+  } catch (error: any) {
+    writeToLogFileSync(
+      `Message: ${error.message}. Path: '${filePath}'.`,
+      LogMessageType.ERROR,
+    );
+
+    throw error;
+  }
+};
+
+/**
  * Асинхронно получает данные из XML файла или файла со схожей структурой.
  * @param filePath Путь до считываемого файла, включая имя.
  * @param isWithPrefix Если `true`, то к именам атрибутов будет добавлен префикс "@_".

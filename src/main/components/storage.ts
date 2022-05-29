@@ -8,7 +8,7 @@ import fs from 'fs';
 
 import { configureAppStore, IAppState } from '$store/store';
 import { IUserSettingsRootState } from '$types/userSettings';
-import { defaultLauncherConfig } from '$constants/defaultData';
+import { defaultLauncherConfig, defaultModOrganizerParams } from '$constants/defaultData';
 import {
   LogMessageType,
   writeToLogFile,
@@ -34,7 +34,6 @@ import { getObjectAsList } from '$utils/strings';
 import {
   createPathVariables,
   getCustomButtons,
-  getNewModOrganizerParams,
   getUserThemes,
 } from '$utils/data';
 import { INITIAL_STATE as mainInitialState } from '$reducers/main';
@@ -136,7 +135,10 @@ export const createStorage = (): Store<IAppState> => {
   // Обработка данных Mod Organizer
   if (configurationData.modOrganizer?.isUsed) {
     //@ts-ignore
-    configurationData.modOrganizer = getNewModOrganizerParams(configurationData.modOrganizer);
+    configurationData.modOrganizer = {
+      ...defaultModOrganizerParams,
+      ...configurationData.modOrganizer,
+    };
   }
 
   // Переменные путей и настройка кнопок

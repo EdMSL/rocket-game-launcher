@@ -44,17 +44,17 @@ import {
 import {
   ILauncherConfig,
   ILauncherCustomButton,
-  IModOrganizerParams,
 } from '$types/main';
 import {
   defaultFullGameSettingsOption,
   defaultGameSettingsOptionItem,
-  defaultModOrganizerParams,
+  defaultModOrganizerPaths,
 } from '$constants/defaultData';
-import { getReadWriteError } from './errors';
 import {
   IGetDataFromFilesResult, IIniObj, IXmlObj, ISelectOption,
 } from '$types/common';
+import { readINIFileSync } from './files';
+import { CustomError, ErrorName } from './errors';
 
 const SYMBOLS_TO_TYPE = 8;
 
@@ -654,62 +654,34 @@ export const getNewConfig = <U, T>(
   };
 };
 
-/**
- * Получить параметры Mod Organizer c учетом данных из config.json.
- * @param data Данные из секции modOrganizer файла config.json.
- * @returns Объект с данными Mod Organizer.
-*/
-export const getNewModOrganizerParams = (data: IModOrganizerParams): IModOrganizerParams => {
-  if (data.pathToMOFolder) {
-    return {
-      ...defaultModOrganizerParams,
-      ...data,
-      pathToMOFolder: data.pathToMOFolder,
-      pathToINI:
-        data.pathToINI
-        || defaultModOrganizerParams.pathToINI.replace(defaultModOrganizerParams.pathToMOFolder, data.pathToMOFolder),
-      pathToProfiles:
-        data.pathToProfiles
-        || defaultModOrganizerParams.pathToProfiles.replace(defaultModOrganizerParams.pathToMOFolder, data.pathToMOFolder),
-      pathToMods:
-        data.pathToMods
-        || defaultModOrganizerParams.pathToMods.replace(defaultModOrganizerParams.pathToMOFolder, data.pathToMOFolder),
-    };
-  }
-
-  return {
-    ...defaultModOrganizerParams,
-    ...data,
-  };
-};
-
-const updateModOrganizerPathVariables = (
-  configData: ILauncherConfig,
+const getUpdatedModOrganizerPathVariables = (
+  pathToMOFolder: string,
+  pathVariables: IPathVariables,
 ): IModOrganizerPathVariables => {
-  const MO_DIR_BASE = configData.modOrganizer.pathToMOFolder.replace(
+  const MO_DIR_BASE = pathToMOFolder.replace(
     PathVariableName.GAME_DIR,
     GAME_DIR,
   );
 
   return {
     '%MO_DIR%': MO_DIR_BASE,
-    '%MO_INI%': configData.modOrganizer.pathToINI.replace(
-      PathVariableName.MO_DIR,
+    '%MO_INI%': pathVariables['%MO_INI%'].replace(
+      pathVariables['%MO_DIR%'],
       MO_DIR_BASE,
     ),
-    '%MO_MODS%': configData.modOrganizer.pathToMods.replace(
-      PathVariableName.MO_DIR,
+    '%MO_MODS%': pathVariables['%MO_MODS%'].replace(
+      pathVariables['%MO_DIR%'],
       MO_DIR_BASE,
     ),
-    '%MO_PROFILE%': configData.modOrganizer.pathToProfiles.replace(
-      PathVariableName.MO_DIR,
+    '%MO_PROFILE%': pathVariables['%MO_PROFILE%'].replace(
+      pathVariables['%MO_DIR%'],
       MO_DIR_BASE,
     ),
   };
 };
 
 /**
- * Генерация переменных путей.
+ * Генерирует переменные путей.
  * @param configData Данные из файла config.json.
  * @param app Объект Electron.app.
  * @returns Объект с переменными путей.
@@ -734,19 +706,69 @@ export const createPathVariables = (
   }
 
   if (configData.modOrganizer.isUsed) {
-    pathVariables = {
-      ...pathVariables,
-      ...updateModOrganizerPathVariables(configData),
-    };
+    try {
+      const MO_DIR_BASE = replacePathVariableByRootDir(configData.modOrganizer.pathToMOFolder);
+      let modOrganizerModsPath = defaultModOrganizerPaths.pathToMods.replace(
+        PathVariableName.MO_DIR,
+        MO_DIR_BASE,
+      );
+      let modOrganizerProfilesPath = defaultModOrganizerPaths.pathToProfiles.replace(
+        PathVariableName.MO_DIR,
+        MO_DIR_BASE,
+      );
+
+      const MOIniData = readINIFileSync(path.join(MO_DIR_BASE, 'ModOrganizer.ini'));
+      const MoModsSection = MOIniData.getSection('Settings');
+
+      if (MoModsSection) {
+        const modOrganizerModsPathTemp = MoModsSection.getValue('mod_directory');
+        const modOrganizerProfilesPathTemp = MoModsSection.getValue('profiles_directory');
+
+        if (modOrganizerModsPathTemp) {
+          if (modOrganizerModsPathTemp.includes('%BASE_DIR%')) {
+            modOrganizerModsPath = modOrganizerModsPathTemp.replace('%BASE_DIR%', MO_DIR_BASE);
+          } else {
+            checkIsPathIsNotOutsideValidFolder(modOrganizerModsPathTemp, pathVariables);
+            modOrganizerModsPath = modOrganizerModsPathTemp;
+          }
+        }
+
+        if (modOrganizerProfilesPathTemp) {
+          if (modOrganizerProfilesPathTemp.includes('%BASE_DIR%')) {
+            modOrganizerProfilesPath = modOrganizerProfilesPathTemp.replace('%BASE_DIR%', MO_DIR_BASE);
+          } else {
+            checkIsPathIsNotOutsideValidFolder(modOrganizerProfilesPathTemp, pathVariables);
+            modOrganizerProfilesPath = modOrganizerProfilesPathTemp;
+          }
+        }
+      }
+
+      pathVariables = {
+        ...pathVariables,
+        '%MO_DIR%': MO_DIR_BASE,
+        '%MO_INI%': defaultModOrganizerPaths.pathToINI.replace(
+          PathVariableName.MO_DIR,
+          MO_DIR_BASE,
+        ),
+        '%MO_MODS%': modOrganizerModsPath,
+        '%MO_PROFILE%': modOrganizerProfilesPath,
+      };
+    } catch (error: any) {
+      if (error.name === ErrorName.INVALID_DIRECTORY) {
+        throw new CustomError('Invalid path detected in Mod Organizer paths.'); //eslint-disable-line max-len
+      }
+
+      throw error;
+    }
   }
 
   return pathVariables;
 };
 
 /**
- * Обновить переменные путей.
+ * Обновляет переменные путей.
  * @param pathVariables Текущие переменные путей.
- * @param launcherConfig Данные о конфигурации из state.
+ * @param launcherConfig Конфигурационные данные лаунчера из `state`.
  * @returns Объект с переменными путей.
 */
 export const updatePathVariables = (
@@ -758,12 +780,17 @@ export const updatePathVariables = (
     PathVariableName.DOCUMENTS,
     pathVariables['%DOCUMENTS%'],
   ),
-  ...launcherConfig.modOrganizer.isUsed ? updateModOrganizerPathVariables(launcherConfig) : {},
+  ...launcherConfig.modOrganizer.isUsed
+    ? getUpdatedModOrganizerPathVariables(
+      launcherConfig.modOrganizer.pathToMOFolder,
+      pathVariables,
+    )
+    : {},
 });
 
 /**
- * Получить данные для генерации пользовательских кнопок.
- * @param buttonsData Данные о кнопках из config.json.
+ * Получает данные для генерации пользовательских кнопок.
+ * @param buttonsData Данные о кнопках из `config.json`.
  * @param pathVariables Объект с переменными путей.
  * @returns Массив объектов пользовательских кнопок.
 */

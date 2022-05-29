@@ -1,6 +1,6 @@
 import path from 'path';
 
-import { CustomError } from './errors';
+import { CustomError, ErrorName } from './errors';
 import {
   GameSettingsOptionType,
   PathRegExp,
@@ -246,11 +246,12 @@ export const replaceRootDirByPathVariable = (
 };
 
 /**
- * Заменить корневой путь на переменную пути.
+ * Заменяет переменную пути в переданной строке на заданный путь.
  * @param pathStr Изменяемый путь.
- * @param pathVariable Переменная которую меняем.
- * @param rootDirPathStr Корневая папка для замены.
- * @returns Строка пути с корневой папкой вместо переменной.
+ * @param pathVariable Переменная пути, которую меняем.
+ * Необходимо указать, если отличается от GAME_DIR.
+ * @param rootDirPathStr Путь для замены. Необходимо указать, если отличается от GAME_DIR.
+ * @returns Строка пути с путем к корневой папкой вместо переменной.
 */
 export const replacePathVariableByRootDir = (
   pathStr: string,
@@ -285,7 +286,8 @@ export const getPathWithoutRootDir = (
 };
 
 /**
- * Получить путь до файла без учета корневой папки-переменной пути.
+ * Проверяет, является ли путь допустимым. На данный момент разрешены пути,
+ * которые находятся в пределах корневой папки игры и папки файлов игры в папке пользователя.
  * @param pathForCheck Путь до файла.
  * @param pathVariables Переменные путей.
  * @param isGameDocuments Проверять путь до папки документов пользователя или
@@ -304,7 +306,10 @@ export const checkIsPathIsNotOutsideValidFolder = (
       : PathVariableName.DOCUMENTS])
       .test(pathForCheck)
   ) {
-    throw new CustomError(`The path is outside of a valid folder. Path: ${pathForCheck}`);
+    throw new CustomError(
+      `The path is outside of a valid folder. Path: ${pathForCheck}`,
+      ErrorName.INVALID_DIRECTORY,
+    );
   }
 };
 

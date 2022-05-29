@@ -9,10 +9,7 @@
   "modOrganizer": {
     "isUsed": false,
     "version": 2,
-    "pathToMOFolder": "%GAME_DIR%\\Mod Organizer",
-    "pathToINI": "%MO_DIR%\\ModOrganizer.ini",
-    "pathToProfiles": "%MO_DIR%\\profiles",
-    "pathToMods": "%MO_DIR%\\mods"
+    "pathToMOFolder": "%GAME_DIR%\\Mod Organizer"
   },
   "documentsPath": "%DOCUMENTS%\\My Games\\Oblivion_GBR-bac\\__MO_Saves",
   "isFirstLaunch": false,

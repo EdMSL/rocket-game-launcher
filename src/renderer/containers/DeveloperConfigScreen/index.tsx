@@ -450,50 +450,6 @@ export const DeveloperConfigScreen: React.FC = () => {
               validationErrors={validationErrors}
               onChange={onPathSelectorChange}
             />
-            <PathSelector
-              className="developer__item"
-              id="pathToMods"
-              name="pathToMods"
-              label="Путь до папки модов MO"
-              parent="modOrganizer"
-              value={currentConfig.modOrganizer.pathToMods}
-              selectPathVariables={generateSelectOptions([PathVariableName.MO_DIR])}
-              pathVariables={pathVariables}
-              isDisabled={!currentConfig.modOrganizer.isUsed}
-              description="Задает путь до папки модов Mod Organizer. Если вы не меняли этот путь в МО, оставьте значение без изменений"//eslint-disable-line max-len
-              validationErrors={validationErrors}
-              onChange={onPathSelectorChange}
-            />
-            <PathSelector
-              className="developer__item"
-              id="pathToProfiles"
-              name="pathToProfiles"
-              label="Путь до папки профилей MO"
-              parent="modOrganizer"
-              value={currentConfig.modOrganizer.pathToProfiles}
-              selectPathVariables={generateSelectOptions([PathVariableName.MO_DIR])}
-              pathVariables={pathVariables}
-              isDisabled={!currentConfig.modOrganizer.isUsed}
-              description="Задает путь до папки профилей Mod Organizer. Если вы не меняли этот путь в МО, оставьте значение без изменений"//eslint-disable-line max-len
-              validationErrors={validationErrors}
-              onChange={onPathSelectorChange}
-            />
-            <PathSelector
-              className="developer__item"
-              id="pathToINI"
-              name="pathToINI"
-              label="Путь до конфигурационного файла MO"
-              parent="modOrganizer"
-              value={currentConfig.modOrganizer.pathToINI}
-              selectPathVariables={generateSelectOptions([PathVariableName.MO_DIR])}
-              pathVariables={pathVariables}
-              selectorType={LauncherButtonAction.RUN}
-              extensions={FileExtension.INI}
-              isDisabled={!currentConfig.modOrganizer.isUsed}
-              description="Задает путь до конфигурационного файла Mod Organizer (ModOrganizer.ini)"//eslint-disable-line max-len
-              validationErrors={validationErrors}
-              onChange={onPathSelectorChange}
-            />
           </div>
         </React.Fragment>
       </ScrollbarsBlock>
