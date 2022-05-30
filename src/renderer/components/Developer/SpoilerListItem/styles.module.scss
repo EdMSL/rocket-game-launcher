@@ -21,6 +21,10 @@
     background-color: var(--text-main);
   }
 
+  &[open] {
+    margin-bottom: var(--space-xl);
+  }
+
   &[open]::after {
     display: block;
   }
@@ -71,7 +75,7 @@
     }
   }
 
-  .spoiler__block[open] &:first-child {
+  .spoiler__block[open] > &:first-child {
     margin-bottom: var(--space-m);
 
     background-color: var(--btn-color);
