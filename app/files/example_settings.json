@@ -1,186 +1,126 @@
 {
+  "baseFilesEncoding": "win1251",
   "gameSettingsGroups": [
     {
-      "name": "Graphic",
-      "label": "Графика"
+      "name": "qM3joLYOXUE5qD6J",
+      "label": "Audio"
     },
     {
-      "name": "Audio",
-      "label": "Аудио"
-    },
-    {
-      "name": "Control",
-      "label": "Управление"
+      "name": "7uED7Xd7gPyIIvlu",
+      "label": "Graphic"
     }
   ],
-  "baseFilesEncoding": "win1251",
-  "gameSettingsFiles": {
-    "OblivionIni": {
+  "gameSettingsFiles": [
+    {
+      "name": "oudf7Xd78FdyIIvaq",
+      "label": "OblivionIni",
       "path": "%MO_PROFILE%\\oblivion.ini",
       "view": "sectional",
-      "optionsList": [
-        {
-          "optionType": "combined",
-          "settingGroup": "Graphic",
-          "label": "Разрешение экрана",
-          "description": "Устанавливает разрешение экрана",
-          "controllerType": "select",
-          "separator": ":",
-          "options": {
-            "1024:768": "1024 на 768",
-            "1366:768": "1366 на 768",
-            "1920:1080": "1920 на 1080"
-          },
-          "items": [
-            {
-              "name": "iSize W",
-              "iniGroup": "Display"
-            },
-            {
-              "name": "iSize H",
-              "iniGroup": "Display"
-            }
-          ]
-        },
-        {
-          "optionType": "default",
-          "settingGroup": "Graphic",
-          "label": "Полный экран",
-          "name": "bFull Screen",
-          "iniGroup": "Display",
-          "controllerType": "range",
-          "min": 0,
-          "max": 10,
-          "step": 1
-        }
-      ]
+      "encoding": ""
     },
-    "BlockheadIni": {
-      "path": "%CUSTOM%\\Blockhead.ini",
-      "view": "sectional",
-      "optionsList": [
-        {
-          "optionType": "default",
-          "settingGroup": "Graphic",
-          "label": "Параметр для чего-то",
-          "name": "CheckOverrideSourceType",
-          "iniGroup": "EquipmentOverride",
-          "controllerType": "checkbox"
-        },
-        {
-          "optionType": "default",
-          "settingGroup": "Graphic",
-          "label": "Скорость поворота",
-          "description": "Изменяет скорость поворота чего-то",
-          "name": "RotationSpeed",
-          "iniGroup": "RaceMenuPoser",
-          "controllerType": "range",
-          "min": "0.1",
-          "max": "2",
-          "step": "0.005"
-        }
-      ]
-    },
-    "MenuIni": {
-      "path": "Data\\Ini\\DMS\\Menu.ini",
+    {
+      "name": "qM3jeQhgXUE505GJ",
+      "label": "FormIDFinder",
+      "path": "%GAME_DIR%\\Data\\ini\\formID Finder.ini",
       "view": "line",
-      "encoding": "utf-8",
-      "optionsList": [
+      "encoding": "win1251"
+    },
+    {
+      "name": "h5TjeQhgXpv605HQ",
+      "label": "OblivionReloaded",
+      "path": "%GAME_DIR%\\Data\\OBSE\\Plugins\\OblivionReloaded.dll.config",
+      "view": "tag",
+      "encoding": ""
+    }
+  ],
+  "gameSettingsOptions": [
+    {
+      "optionType": "default",
+      "file": "oudf7Xd78FdyIIvaq",
+      "label": "Полный экран",
+      "description": "",
+      "settingGroup": "7uED7Xd7gPyIIvlu",
+      "controllerType": "checkbox",
+      "items": [
         {
-          "optionType": "default",
-          "settingGroup": "Graphic",
-          "label": "Неизвестный параметр",
-          "name": "DMSMain.Name",
+          "name": "bFull Screen",
+          "iniGroup": "Display"
+        }
+      ]
+    },
+    {
+      "optionType": "combined",
+      "file": "oudf7Xd78FdyIIvaq",
+      "label": "Разрешение экрана",
+      "description": "Устанавливает разрешение экрана",
+      "settingGroup": "7uED7Xd7gPyIIvlu",
+      "controllerType": "select",
+      "separator": ":",
+      "selectOptions": {
+        "1024 на 768": "1024:768",
+        "1366 на 768": "1366:768",
+        "1920 на 1080": "1920:1080"
+      },
+      "items": [
+        {
+          "name": "iSize W",
+          "iniGroup": "Display"
+        },
+        {
+          "name": "iSize H",
+          "iniGroup": "Display"
+        }
+      ]
+    },
+    {
+      "optionType": "related",
+      "file": "qM3jeQhgXUE505GJ",
+      "label": "Комбинация клавиш",
+      "description": "Укажите комбинацию клавиш для действия",
+      "settingGroup": "qM3joLYOXUE5qD6J",
+      "items": [
+        {
+          "name": "FormIDFinderQuest.KeyPressed1",
           "controllerType": "select",
-          "options": {
-            "sv_Construct\t\"Dialog & Pause\"": "sv_Construct\t\"Dialog & Pause\"",
-            "sv_Construct\t\"Some Value\"": "sv_Construct\t\"Some Value\"",
-            "sv_Construct\t\"Other text value\"": "sv_Construct\t\"Other text value\""
+          "selectOptions": {
+            "Num -": "56",
+            "Num +": "57",
+            "Num 0": "58"
+          }
+        },
+        {
+          "name": "FormIDFinderQuest.KeyPressed2",
+          "controllerType": "select",
+          "selectOptions": {
+            "E": "16",
+            "R": "17",
+            "T": "18"
           }
         }
       ]
     },
-    "OblivionReloaded": {
-      "path": "%CUSTOM%\\OblivionReloaded.dll.config",
-      "view": "tag",
-      "optionsList": [
+    {
+      "optionType": "group",
+      "file": "h5TjeQhgXpv605HQ",
+      "label": "Глубина резкости",
+      "description": "",
+      "settingGroup": "qM3joLYOXUE5qD6J",
+      "controllerType": "range",
+      "min": -10,
+      "max": 10,
+      "step": 0.5,
+      "items": [
         {
-          "optionType": "default",
-          "settingGroup": "Audio",
-          "label": "Фильтрация",
-          "name": "AnisotropicFilter",
+          "name": "Radius",
           "valueName": "Value",
-          "valuePath": "_Main/Main/Misc",
-          "controllerType": "range",
-          "min": "1",
-          "max": "5",
-          "step": "0.125"
-        }
-      ]
-    },
-    "TQPIni": {
-      "path": "Data\\Ini\\TQP.ini",
-      "view": "line",
-      "optionsList": [
+          "valuePath": "_Shaders/DepthOfField/FirstPersonView"
+        },
         {
-          "optionType": "group",
-          "settingGroup": "Control",
-          "label": "Удалить предмет/заклинание",
-          "description": "Изменить клавишу удаления предметов/заклинаний",
-          "controllerType": "select",
-          "options": {
-            "2": "1",
-            "3": "2",
-            "4": "3"
-          },
-          "items": [
-            {
-              "name": "aveTQP.dxInvLeftSingleKey"
-            },
-            {
-              "name": "aveTQP.dxInvRightSingleKey"
-            },
-            {
-              "name": "aveTQP.dxInvLeftStackKey"
-            },
-            {
-              "name": "aveTQP.dxInvRightStackKey"
-            }
-          ]
-        }
-      ]
-    },
-    "FormIDFinderIni": {
-      "path": "Data\\Ini\\formID Finder.ini",
-      "view": "line",
-      "optionsList": [
-        {
-          "optionType": "related",
-          "settingGroup": "Control",
-          "label": "Показать информацию об объекте",
-          "description": "Изменить комбинацию",
-          "items": [
-            {
-              "name": "FormIDFinderQuest.KeyModifier1",
-              "controllerType": "select",
-              "options": {
-                "0": "Нет",
-                "2": "1",
-                "3": "2"
-              }
-            },
-            {
-              "name": "FormIDFinderQuest.KeyPressed1",
-              "controllerType": "select",
-              "options": {
-                "2": "1",
-                "3": "2",
-                "4": "3"
-              }
-            }
-          ]
+          "name": "Radius",
+          "valueName": "Value",
+          "valuePath": "_Shaders/DepthOfField/ThirdPersonView"
         }
       ]
     }
-  }
+  ]
 }
