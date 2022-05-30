@@ -250,7 +250,7 @@ export const readJSONFile = async <T>(filePath: string, isWriteToLog = true): Pr
       && !mime.getType(filePath)?.match(/application\/json/)
     ) {
       throw new CustomError(
-        'The file must have the extension .json',
+        'The file must have a ".json" extension',
         ErrorName.MIME_TYPE,
       );
     }

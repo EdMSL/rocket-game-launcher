@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { checkGameSettingsConfigFull } from '$utils/check';
+import { checkGameSettingsConfigFull, checkGameSettingsOptions } from '$utils/check';
 import { createMockFilesForCheck } from './fixtures/getFiles';
 import { readJSONFileSync } from '$utils/files';
 import { IGameSettingsConfig } from '$types/gameSettings';
@@ -13,16 +13,24 @@ describe('#Check', () => {
   describe('#Check game settings config', () => {
     it('Should return correct result object', () => {
       let result = checkGameSettingsConfigFull(readJSONFileSync(`${process.cwd()}/settings.json`));
-
-      assert.hasAllKeys(result, ['baseFilesEncoding', 'gameSettingsGroups', 'gameSettingsFiles']);
+      assert.hasAllKeys(result.data, ['baseFilesEncoding', 'gameSettingsGroups', 'gameSettingsFiles', 'gameSettingsOptions']);
 
       // @ts-ignore
-      delete result.gameSettingsGroups;
+      delete result.data.gameSettingsGroups;
       // @ts-ignore
-      delete result.baseFilesEncoding;
+      delete result.data.baseFilesEncoding;
 
       result = checkGameSettingsConfigFull(result.data);
-      assert.hasAllKeys(result, ['gameSettingsGroups', 'baseFilesEncoding', 'gameSettingsFiles']);
+      assert.hasAllKeys(result.data, ['gameSettingsGroups', 'baseFilesEncoding', 'gameSettingsFiles', 'gameSettingsOptions']);
+    });
+
+    it('Should return object with correct types of fields', () => {
+      const result = checkGameSettingsConfigFull(readJSONFileSync(`${process.cwd()}/settings.json`));
+
+      assert.isString(result.data.baseFilesEncoding);
+      assert.isArray(result.data.gameSettingsGroups);
+      assert.isArray(result.data.gameSettingsFiles);
+      assert.isArray(result.data.gameSettingsOptions);
     });
 
     it('Should return object with default values', () => {
@@ -37,7 +45,7 @@ describe('#Check', () => {
       const result = checkGameSettingsConfigFull(obj);
 
       assert.equal(result.data.baseFilesEncoding, Encoding.WIN1251);
-      assert.equal(result.data.gameSettingsGroups![0].label, 'new');
+      assert.equal(result.data.gameSettingsGroups![0].label, 'Graphic');
     });
 
     it('Should return no errors', () => {
@@ -45,125 +53,143 @@ describe('#Check', () => {
 
       // @ts-ignore
       delete obj.baseFilesEncoding;
-      assert.containsAllKeys(checkGameSettingsConfigFull(obj), ['baseFilesEncoding']);
+      assert.containsAllKeys(checkGameSettingsConfigFull(obj).data, ['baseFilesEncoding']);
 
       // @ts-ignore
       delete obj.gameSettingsGroups[0].label;
       // @ts-ignore
-      assert.equal(checkGameSettingsConfigFull(obj).gameSettingsGroups[0].label, 'Graphic');
+      assert.equal(checkGameSettingsConfigFull(obj).data.gameSettingsGroups[0].label, 'qM3joLYOXUE5qD6J');
 
       // @ts-ignore
       delete obj.gameSettingsGroups;
       // @ts-ignore
-      assert.equal(checkGameSettingsConfigFull(obj).gameSettingsGroups.length, 0);
+      assert.equal(checkGameSettingsConfigFull(obj).data.gameSettingsGroups.length, 0);
 
       // @ts-ignore
       obj.new = '111';
-      assert.doesNotHaveAnyKeys(checkGameSettingsConfigFull(obj), ['new']);
-    });
-
-    describe('All tests should throw error', () => {
-      // Чтобы не считывать постоянно данные из реального файла после изменения полей, это делается один раз в before хуке, а затем клонируем объект данных из мокового файла.
-      it('Should return error about missed required gameSettingsFiles field', () => {
-        const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
-
-        // @ts-ignore
-        delete obj.gameSettingsFiles;
-        assert.throw(() => { checkGameSettingsConfigFull(obj); }, /"gameSettingsFiles" is required/);
-      });
-      it('Should return error about incorrect data in game settings groups field', () => {
-        const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
-
-        // @ts-ignore
-        obj.gameSettingsGroups = '';
-        assert.throw(() => { checkGameSettingsConfigFull(obj); }, /"gameSettingsGroups" must be an array/);
-      });
-      it('Should return error about missed required name field in game settings groups item', () => {
-        const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
-
-        // @ts-ignore
-        delete obj.gameSettingsGroups[0].name;
-        assert.throw(() => { checkGameSettingsConfigFull(obj); }, /"gameSettingsGroups\[0\].name" is required/);
-      });
-
-      it('Should return error about not unique item in game settings groups', () => {
-        const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
-
-        // @ts-ignore
-        obj.gameSettingsGroups[0].name = 'Any';
-        // @ts-ignore
-        obj.gameSettingsGroups[1].name = 'Any';
-        assert.throw(() => { checkGameSettingsConfigFull(obj); }, /"gameSettingsGroups\[1\]" contains a duplicate value/);
-      });
+      assert.doesNotHaveAnyKeys(checkGameSettingsConfigFull(obj).data, ['new']);
     });
   });
 
   describe('#Check game settings files', () => {
-    // it('Should return correct result object', () => {
-    //   const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
-    //   //@ts-ignore
-    //   const result = checkGameSettingsFiles(obj.gameSettingsFiles, Encoding.WIN1251, obj.gameSettingsGroups);
+    it('Should return correct result objects for game settings files', () => {
+      const result = checkGameSettingsConfigFull(readJSONFileSync(`${process.cwd()}/settings.json`));
 
-    //   assert.hasAllKeys(result.data, ['anyFile', 'relatedFile', 'groupFile', 'newFile', 'someFile', 'tagFile']);
-    // });
+      result.data.gameSettingsFiles.forEach((file) => {
+        assert.hasAllKeys(file, ['id', 'name', 'label', 'path', 'view', 'encoding']);
+        assert.match(file.name, /[A-Za-z]/);
+      });
+    });
 
-    // it('Should return correct default data for game settings files main fields', () => {
-    //   const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
-    //   //@ts-ignore
-    //   const result = checkGameSettingsFiles(obj.gameSettingsFiles, Encoding.WIN1251, obj.gameSettingsGroups);
-    //   assert.equal(result.files.anyFile.encoding, Encoding.WIN1251);
-    // });
+    it('Should return game settings files array without first file', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      obj.gameSettingsFiles[0].path = './ini/someFileName';
+      const result = checkGameSettingsConfigFull(obj);
+      assert.equal(result.data.gameSettingsFiles.length, 4);
+    });
 
-    // it('Should return correct data from default parameter', () => {
-    //   const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
-    //   //@ts-ignore
-    //   const result = checkGameSettingsFiles(obj.gameSettingsFiles, Encoding.WIN1251, obj.gameSettingsGroups);
+    it('Should return error for game settings files', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
 
-    //   assert.hasAllKeys(result.files.anyFile.optionsList[0], ['id', 'description', 'name', 'iniGroup', 'settingGroup', 'controllerType', 'optionType', 'label', 'max', 'min', 'step']);
-    //   assert.hasAllKeys(result.files.anyFile.optionsList[1], ['id', 'description', 'name', 'iniGroup', 'settingGroup', 'controllerType', 'optionType', 'label']);
-    //   assert.hasAllKeys(result.files.someFile.optionsList[0], ['id', 'description', 'name', 'settingGroup', 'controllerType', 'optionType', 'label', 'options']);
-    //   assert.equal(result.files.anyFile.optionsList[0].optionType, 'default');
-    //   assert.equal(result.files.anyFile.optionsList[1].label, 'Any new name');
-    //   assert.isNumber(result.files.anyFile.optionsList[0].max);
-    // });
+      obj.gameSettingsFiles[0].path = './ini/someFileName';
+      let result = checkGameSettingsConfigFull(obj);
+      assert.notEqual(result.data.gameSettingsFiles[0].name, 'someFileName');
+      assert.match(result.errors[0].message, /because path variable is not correct or not available/);
 
-    // it('Should return correct data from group parameter', () => {
-    //   const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
-    //   //@ts-ignore
-    //   const result = checkGameSettingsFiles(obj.gameSettingsFiles, Encoding.WIN1251, obj.gameSettingsGroups);
+      obj.gameSettingsFiles[1].view = 'some';
+      result = checkGameSettingsConfigFull(obj);
+      assert.match(result.errors[0].message, /"gameSettingsFiles\[1\].view" must be one of \[sectional, line, tag\]/);
+    });
+  });
 
-    //   assert.hasAllKeys(result.files.groupFile.optionsList[0], ['id', 'description', 'settingGroup', 'controllerType', 'optionType', 'label', 'options', 'items']);
-    //   //@ts-ignore
-    //   assert.hasAllKeys(result.files.groupFile.optionsList[0].items[0], ['id', 'name']);
-    // });
+  describe('#Check game settings options', () => {
+    it('Should return correct result object', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      const result = checkGameSettingsOptions(obj.gameSettingsOptions, obj.gameSettingsGroups, obj.gameSettingsFiles);
 
-    // it('Should return correct data from related parameter', () => {
-    //   const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
-    //   //@ts-ignore
-    //   const result = checkGameSettingsFiles(obj.gameSettingsFiles, Encoding.WIN1251, obj.gameSettingsGroups);
+      result.data.forEach((option) => {
+        assert.containsAllKeys(option, ['id', 'optionType', 'file', 'label', 'description', 'settingGroup', 'items']);
+      });
+    });
 
-    //   assert.hasAllKeys(result.files.relatedFile.optionsList[0], ['id', 'description', 'settingGroup', 'optionType', 'label', 'items']);
-    //   //@ts-ignore
-    //   assert.hasAllKeys(result.files.relatedFile.optionsList[0].items[0], ['id', 'name', 'controllerType', 'options']);
-    // });
+    it('Should return correct data from default option', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      const result = checkGameSettingsOptions(obj.gameSettingsOptions, obj.gameSettingsGroups, obj.gameSettingsFiles);
 
-    // it('Should return correct data from tag file parameter', () => {
-    //   const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
-    //   //@ts-ignore
-    //   const result = checkGameSettingsFiles(obj.gameSettingsFiles, Encoding.WIN1251, obj.gameSettingsGroups);
+      assert.hasAllKeys(result.data[0], ['id', 'optionType', 'file', 'label', 'description', 'settingGroup', 'items', 'controllerType', 'max', 'min', 'step']);
+      assert.hasAllKeys(result.data[1], ['id', 'optionType', 'file', 'label', 'description', 'settingGroup', 'items', 'controllerType', 'selectOptions', 'selectOptionsValueString']);
+      assert.hasAllKeys(result.data[2], ['id', 'optionType', 'file', 'label', 'description', 'settingGroup', 'items', 'controllerType']);
+      assert.equal(result.data[0].optionType, 'default');
+      assert.equal(result.data[1].label, 'Any new label');
+      assert.isNumber(result.data[0].max);
+    });
 
-    //   assert.hasAllKeys(result.files.tagFile.optionsList[0], ['id', 'description', 'name', 'settingGroup', 'optionType', 'controllerType', 'label', 'valueName', 'valuePath']);
-    // });
+    it('Should return correct data from default option item', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      const result = checkGameSettingsOptions(obj.gameSettingsOptions, obj.gameSettingsGroups, obj.gameSettingsFiles);
 
-    // Пока отключен, т.к. система обработкки изменилась
-    // describe('All tests should throw error', () => {
-    //   it('Should return error about no options to show', () => {
-    //     const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
-    //     const gameSettingsFiles = { ...obj.gameSettingsFiles };
+      assert.equal(result.data[0].items.length, 1);
+      assert.hasAllKeys(result.data[0].items[0], ['id', 'name']);
+      assert.hasAllKeys(result.data[1].items[0], ['id', 'name', 'iniGroup']);
+      assert.hasAllKeys(result.data[2].items[0], ['id', 'name', 'valueName', 'valuePath']);
+    });
 
-    //     delete obj.gameSettingsGroups;
-    //     assert.throw(() => { checkGameSettingsFiles(gameSettingsFiles, Encoding.WIN1251, []); }, /No options available after game settings validation/);
-    //   });
-    // });
+    it('Should return correct data from group option', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      const result = checkGameSettingsOptions(obj.gameSettingsOptions, obj.gameSettingsGroups, obj.gameSettingsFiles);
+
+      assert.equal(result.data[5].optionType, 'group');
+      assert.hasAllKeys(result.data[5], ['id', 'optionType', 'file', 'label', 'description', 'settingGroup', 'items', 'controllerType', 'max', 'min', 'step']);
+      assert.isNumber(result.data[5].max);
+    });
+
+    it('Should return correct data from group option item', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      const result = checkGameSettingsOptions(obj.gameSettingsOptions, obj.gameSettingsGroups, obj.gameSettingsFiles);
+
+      assert.equal(result.data[5].items.length, 2);
+
+      result.data[5].items.forEach((item) => {
+        assert.hasAllKeys(item, ['id', 'name', 'valueName', 'valuePath']);
+      });
+    });
+
+    it('Should return correct data from related option', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      const result = checkGameSettingsOptions(obj.gameSettingsOptions, obj.gameSettingsGroups, obj.gameSettingsFiles);
+
+      assert.equal(result.data[4].optionType, 'related');
+      assert.hasAllKeys(result.data[4], ['id', 'optionType', 'file', 'label', 'description', 'settingGroup', 'items']);
+    });
+
+    it('Should return correct data from related option item', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      const result = checkGameSettingsOptions(obj.gameSettingsOptions, obj.gameSettingsGroups, obj.gameSettingsFiles);
+
+      assert.equal(result.data[4].items.length, 2);
+
+      result.data[4].items.forEach((item) => {
+        assert.hasAllKeys(item, ['id', 'name', 'controllerType', 'selectOptions', 'selectOptionsValueString']);
+      });
+    });
+
+    it('Should return correct data from combined option', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      const result = checkGameSettingsOptions(obj.gameSettingsOptions, obj.gameSettingsGroups, obj.gameSettingsFiles);
+
+      assert.equal(result.data[3].optionType, 'combined');
+      assert.hasAllKeys(result.data[3], ['id', 'optionType', 'file', 'label', 'description', 'settingGroup', 'items', 'controllerType', 'selectOptions', 'selectOptionsValueString', 'separator']);
+    });
+
+    it('Should return correct data from combined option item', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      const result = checkGameSettingsOptions(obj.gameSettingsOptions, obj.gameSettingsGroups, obj.gameSettingsFiles);
+
+      assert.equal(result.data[3].items.length, 2);
+
+      result.data[3].items.forEach((item) => {
+        assert.hasAllKeys(item, ['id', 'name', 'iniGroup']);
+      });
+    });
   });
 });

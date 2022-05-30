@@ -436,7 +436,7 @@ const relatedOptionTypeSchema = Joi.object({
  * @param gameSettingsFiles Файлы игровых настроек.
  * @returns Объект с массивом параметров и массивом ошибок проверки.
 */
-const checkGameSettingsOptions = (
+export const checkGameSettingsOptions = (
   gameSettingsOptions: IGameSettingsRootState['gameSettingsOptions'],
   gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
   gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],

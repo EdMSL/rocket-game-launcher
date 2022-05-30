@@ -200,14 +200,14 @@ describe('#Files', () => {
 
     it('Should return wrong extension error', async () => {
       assert.throw(() => { readJSONFileSync(`${process.cwd()}/folderName/index.md`); }, Error);
-      assert.throw(() => { readJSONFileSync(`${process.cwd()}/folderName/index.md`); }, /file must have the extension .json/);
+      assert.throw(() => { readJSONFileSync(`${process.cwd()}/folderName/index.md`); }, /The file must have a ".json" extension/);
 
       let errorMsg = '';
       await readJSONFile(`${process.cwd()}/folderName/index.md`)
         .catch((error) => {
           errorMsg = error.message;
         });
-      assert.match(errorMsg, /file must have the extension .json/);
+      assert.match(errorMsg, /The file must have a ".json" extension/);
     });
 
     it('Should return path to file error', async () => {
