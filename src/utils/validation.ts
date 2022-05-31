@@ -401,7 +401,7 @@ export const validateFileRelatedFields = (
   return errors;
 };
 
-const validateControllerTypeRelatedFields = (
+export const validateControllerTypeRelatedFields = (
   option: IGameSettingsOption,
   currentErrors: IValidationErrors,
 ): IValidationErrors => {

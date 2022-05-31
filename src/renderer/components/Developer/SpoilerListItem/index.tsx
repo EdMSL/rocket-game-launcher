@@ -19,6 +19,7 @@ interface IProps<Item> {
   lastItemId: string,
   position?: number,
   validationErrors?: IValidationErrors,
+  isDeleteBtnDisabled?: boolean,
   summaryText?: ISummaryText[]|string[],
   onDeleteItem?: (items: Item[], deletedItem: Item) => void,
   onChangeOrderItem?: (items: Item[]) => void,
@@ -32,6 +33,7 @@ export const SpoilerListItem = <Item extends { id: string, },>({
   position,
   lastItemId,
   validationErrors,
+  isDeleteBtnDisabled = false,
   summaryText = [],
   onDeleteItem,
   onChangeOrderItem,
@@ -150,6 +152,7 @@ export const SpoilerListItem = <Item extends { id: string, },>({
                 styles['spoiler__title-btn'],
                 styles['spoiler__title-btn--delete'],
               )}
+              isDisabled={isDeleteBtnDisabled}
               onClick={onDeleteItemBtnClick}
             >
               {/* eslint-disable */}

@@ -27,7 +27,10 @@ import { generateSelectOptionsFromString, getRandomId } from '$utils/strings';
 import { TextArea } from '$components/UI/TextArea';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import {
-  clearComponentValidationErrors, IValidationErrors, validateGameSettingsOptions,
+  clearComponentValidationErrors,
+  IValidationErrors,
+  validateControllerTypeRelatedFields,
+  validateGameSettingsOptions,
 } from '$utils/validation';
 
 interface IProps {
@@ -161,10 +164,52 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
       optionFile!,
     );
 
+    if (option.optionType === GameSettingsOptionType.COMBINED) {
+      onValidation(validateControllerTypeRelatedFields(
+        newOption,
+        validationErrors,
+      ));
+    }
+
     onOptionDataChange(option.id, newOption);
     setFullOption(newFullOption);
     setLastAddedItemId(newId);
-  }, [option, fullOption, optionFile, onOptionDataChange]);
+  }, [option, fullOption, optionFile, validationErrors, onValidation, onOptionDataChange]);
+
+  const deleteOptionItem = useCallback((
+    newItems: IGameSettingsOptionItem[],
+  ) => {
+    // const newItems = option.items.filter((item) => item.id !== currentTarget.id.split(':')[1]);
+    const newOption = { ...option, items: newItems };
+
+    if (option.optionType === GameSettingsOptionType.COMBINED) {
+      onValidation(validateControllerTypeRelatedFields(
+        newOption,
+        validationErrors,
+      ));
+    }
+
+    onOptionDataChange(option.id, newOption);
+    setFullOption({ ...fullOption, items: newItems });
+  }, [option, fullOption, validationErrors, onValidation, onOptionDataChange]);
+
+  const onDeleteOptionItemBtnClick = useCallback((
+    { currentTarget }: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    deleteOptionItem(option.items.filter((item) => item.id !== currentTarget.id.split(':')[1]));
+    // const newItems = option.items.filter((item) => item.id !== currentTarget.id.split(':')[1]);
+    // const newOption = { ...option, items: newItems };
+
+    // if (option.optionType === GameSettingsOptionType.COMBINED) {
+    //   onValidation(validateControllerTypeRelatedFields(
+    //     newOption,
+    //     validationErrors,
+    //   ));
+    // }
+
+    // onOptionDataChange(option.id, newOption);
+    // setFullOption({ ...fullOption, items: newItems });
+  }, [option.items, deleteOptionItem]);
 
   const selectOptionsFiles = gameSettingsFiles.map((file): ISelectOption => ({
     label: file.label,
@@ -337,6 +382,10 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
               summaryText={[item.name]}
               lastItemId={lastAddedItemId}
               validationErrors={validationErrors}
+              isDeleteBtnDisabled={option.items.length <= 2}
+              onDeleteItem={option.optionType !== GameSettingsOptionType.DEFAULT
+                ? deleteOptionItem
+                : undefined}
             >
               <React.Fragment>
                 <TextField
@@ -470,6 +519,19 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                       value={item.step}
                       onChange={onOptionInputChange}
                     />
+                  )
+                }
+                {
+                  option.optionType !== GameSettingsOptionType.DEFAULT && (
+                  <Button
+                    className={classNames('main-btn', 'option__btn')}
+                    id={`delete:${item.id}`}
+                    name={option.items.length.toString()}
+                    isDisabled={option.items.length <= 2}
+                    onClick={onDeleteOptionItemBtnClick}
+                  >
+                    Удалить параметр
+                  </Button>
                   )
                 }
               </React.Fragment>
