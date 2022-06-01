@@ -445,9 +445,6 @@ export const checkGameSettingsOptions = (
   const validationOptions: Joi.ValidationOptions = {
     abortEarly: false,
     stripUnknown: true,
-    messages: {
-
-    },
     context: {
       isGameSettingsGroupsExists: gameSettingsGroups.length > 0,
       gameSettingsGroups: getGameSettingsGroupsNames(gameSettingsGroups),
@@ -455,8 +452,9 @@ export const checkGameSettingsOptions = (
     },
   };
 
-  const resultOptions = gameSettingsOptions.reduce<IGameSettingsOption[]>((currentParams, currentParam) => {
+  const resultOptions = gameSettingsOptions.reduce<IGameSettingsOption[]>((currentParams, currentParam, index) => {
     const fileForOption = gameSettingsFiles.find((file) => file.name === currentParam.file);
+    validationOptions.context!.index = index;
 
     let validationResult: Joi.ValidationResult;
 
@@ -470,6 +468,10 @@ export const checkGameSettingsOptions = (
     );
 
     if (validationResult.error) {
+      validationResult.error.details.forEach((item) => {
+        //eslint-disable-next-line no-param-reassign
+        item.message = `gameSettingsOptions[${index}] ${item.message}`;
+      });
       errors.push(validationResult.error);
 
       return [...currentParams];
@@ -491,6 +493,10 @@ export const checkGameSettingsOptions = (
     }
 
     if (validationResult.error) {
+      validationResult.error.details.forEach((item) => {
+        //eslint-disable-next-line no-param-reassign
+        item.message = `gameSettingsOptions[${index}] ${item.message}`;
+      });
       errors.push(validationResult.error);
 
       return [...currentParams];

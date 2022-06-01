@@ -24,7 +24,7 @@ export const ErrorName = {
   READ_WRITE: 'ReadWriteError',
   SAGA_ERROR: 'SagaError',
   MIME_TYPE: 'IncorrectFileTypeError',
-  VALIDATION: 'ValidationTypeError',
+  VALIDATION: 'ValidationError',
   INVALID_DIRECTORY: 'InvalidDirectoryError',
   UNKNOWN: 'UnknownError',
 };

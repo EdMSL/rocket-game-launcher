@@ -5,6 +5,7 @@ import { createMockFilesForCheck } from './fixtures/getFiles';
 import { readJSONFileSync } from '$utils/files';
 import { IGameSettingsConfig } from '$types/gameSettings';
 import { Encoding } from '$constants/misc';
+import { ErrorName } from '$utils/errors';
 
 /* eslint-disable max-len, @typescript-eslint/ban-ts-comment */
 describe('#Check', () => {
@@ -68,6 +69,17 @@ describe('#Check', () => {
       // @ts-ignore
       obj.new = '111';
       assert.doesNotHaveAnyKeys(checkGameSettingsConfigFull(obj).data, ['new']);
+    });
+
+    it('Should return an array with just the right options', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      //@ts-ignore
+      obj.gameSettingsOptions[0].controllerType = 'some';
+      //@ts-ignore
+      obj.gameSettingsOptions[1].controllerType = 'some';
+
+      const result = checkGameSettingsOptions(obj.gameSettingsOptions, obj.gameSettingsGroups, obj.gameSettingsFiles);
+      assert.equal(result.data.length, 4);
     });
   });
 
@@ -190,6 +202,38 @@ describe('#Check', () => {
       result.data[3].items.forEach((item) => {
         assert.hasAllKeys(item, ['id', 'name', 'iniGroup']);
       });
+    });
+
+    it('Should return option type validation error for option', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      //@ts-ignore
+      obj.gameSettingsOptions[0].optionType = 'some';
+
+      let result = checkGameSettingsOptions(obj.gameSettingsOptions, obj.gameSettingsGroups, obj.gameSettingsFiles);
+      assert.equal(result.errors[0].name, ErrorName.VALIDATION);
+      assert.match(result.errors[0].details[0].message, /gameSettingsOptions\[0\]/);
+      assert.match(result.errors[0].details[0].message, /\[default, group, related, combined\]/);
+
+      //@ts-ignore
+      obj.gameSettingsOptions[0].optionType = 5;
+      result = checkGameSettingsOptions(obj.gameSettingsOptions, obj.gameSettingsGroups, obj.gameSettingsFiles);
+      assert.match(result.errors[0].details[1].message, /must be a string/);
+
+      //@ts-ignore
+      obj.gameSettingsOptions[0].optionType = undefined;
+      result = checkGameSettingsOptions(obj.gameSettingsOptions, obj.gameSettingsGroups, obj.gameSettingsFiles);
+      assert.match(result.errors[0].details[0].message, /is required/);
+    });
+
+    it('Should return controller type validation error for option', () => {
+      const obj = { ...readJSONFileSync<IGameSettingsConfig>(`${process.cwd()}/settings.json`) };
+      //@ts-ignore
+      obj.gameSettingsOptions[0].controllerType = 'some';
+
+      const result = checkGameSettingsOptions(obj.gameSettingsOptions, obj.gameSettingsGroups, obj.gameSettingsFiles);
+      assert.equal(result.errors[0].name, ErrorName.VALIDATION);
+      assert.match(result.errors[0].details[0].message, /gameSettingsOptions\[0\]/);
+      assert.match(result.errors[0].details[0].message, /\[checkbox, range, select, switcher\]/);
     });
   });
 });
