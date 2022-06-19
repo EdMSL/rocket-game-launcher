@@ -5,8 +5,7 @@ import fs from 'fs';
 import mime from 'mime';
 
 import { LogMessageType, writeToLogFile } from '$utils/log';
-import { iconvDecode } from '$utils/files';
-import { GAME_DIR } from '$constants/paths';
+import { getPathToParentFileFolder, iconvDecode } from '$utils/files';
 import { ErrorCode, ErrorMessage } from '$utils/errors';
 import { getApplicationArgs } from './data';
 import { ILauncherConfig } from '$types/main';
@@ -27,6 +26,7 @@ export const runApplication = (
 ): void => {
   let execTarget = pathToApp;
   let execArgs: string[] = [];
+  let execCwd = getPathToParentFileFolder(pathToApp);
 
   if (fs.existsSync(pathToApp)) {
     if (fs.statSync(pathToApp).isDirectory()) {
@@ -52,6 +52,10 @@ export const runApplication = (
       }
 
       execTarget = parsed.target;
+
+      if (parsed.cwd) {
+        execCwd = parsed.cwd;
+      }
     }
 
     if (pathToAppExtname === '.exe' && args.length > 0) {
@@ -93,7 +97,7 @@ export const runApplication = (
       execArgs,
       {
         encoding: 'binary',
-        cwd: GAME_DIR,
+        cwd: execCwd,
         shell: true,
       },
       (error): void => {
