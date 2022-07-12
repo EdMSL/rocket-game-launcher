@@ -17,6 +17,7 @@ node_modules/
 data/
 /npm-debug.log
 *.pdf
+package-lock.json
 
 # Папка с собранными файлами проекта
 build/
