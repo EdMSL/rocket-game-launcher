@@ -45,7 +45,7 @@ export const SpoilerListItem = <Item extends { id: string, },>({
       detailsElementRef.current?.setAttribute('open', 'open');
       detailsElementRef.current?.querySelector('input')?.focus();
       detailsElementRef.current?.querySelector('input')?.select();
-      detailsElementRef.current?.scrollIntoView();
+      detailsElementRef.current?.scrollIntoView({ block: 'nearest' });
     }
   }, [item.id, lastItemId]);
 
