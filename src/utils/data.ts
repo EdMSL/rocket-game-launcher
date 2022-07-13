@@ -1026,29 +1026,45 @@ export const changeConfigArrayItem = <P extends { id: string, }>(
  * Получить измененные игровые опции после удаления игрового файла.
  * @param options Массив игровых опций.
  * @param files Массив игровых файлов.
+ * @param isDelete Если true, то опции будут удалены, а не изменены.
  * @returns Массив измененных игровых опций.
  */
 export const getChangedOptionsAfterFileDelete = (
   options: IGameSettingsOption[],
   files: IGameSettingsFile[],
+  isDelete = false,
 ): [IGameSettingsOption[], string[]] => {
   const changedOptionsNames: string[] = [];
-  const newOptions = options.map((currentOption) => {
-    if (!getGameSettingsFilesNames(files).includes(currentOption.file)) {
-      changedOptionsNames.push(currentOption.label);
+  let newOptions: IGameSettingsOption[] = [...options];
 
-      return generateGameSettingsOption(
-        {
-          ...currentOption,
-          file: files[0].name,
-        },
-        getFullOption(defaultFullGameSettingsOption, currentOption),
-        files[0],
-      ).newOption;
-    }
+  if (isDelete) {
+    newOptions = newOptions.filter((currentOption) => {
+      if (!getGameSettingsFilesNames(files).includes(currentOption.file)) {
+        changedOptionsNames.push(currentOption.label);
 
-    return currentOption;
-  });
+        return false;
+      }
+
+      return true;
+    });
+  } else {
+    newOptions = newOptions.map((currentOption) => {
+      if (!getGameSettingsFilesNames(files).includes(currentOption.file)) {
+        changedOptionsNames.push(currentOption.label);
+
+        return generateGameSettingsOption(
+          {
+            ...currentOption,
+            file: files[0].name,
+          },
+          getFullOption(defaultFullGameSettingsOption, currentOption),
+          files[0],
+        ).newOption;
+      }
+
+      return currentOption;
+    });
+  }
 
   return [newOptions, changedOptionsNames];
 };

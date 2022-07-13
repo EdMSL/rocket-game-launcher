@@ -306,18 +306,20 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     } else if (currentConfig.gameSettingsOptions.some((currentOption) => currentOption.file === deletedItem?.name)) {
       const messageBoxResponse = await ipcRenderer.invoke(
         AppChannel.GET_MESSAGE_BOX_RESPONSE,
-        'Одна или несколько игровых опций имеют данный файл в зависимостях. Нажмите "Отмена", чтобы вручную изменить используемый опциями файл, или "Игнорировать", чтобы автоматически выбрать для опции один из доступных файлов.', //eslint-disable-line max-len
+        'Одна или несколько игровых опций имеют данный файл в зависимостях. Нажмите "Отмена", чтобы вручную изменить используемый опциями файл, "Игнорировать", чтобы автоматически выбрать для опции один из доступных файлов, или "Удалить", чтобы удалить связанные с файлом опции.', //eslint-disable-line max-len
         'Файл имеет зависимости',
         undefined,
-        ['Отмена', 'Игнорировать'],
+        ['Отмена', 'Игнорировать', 'Удалить'],
         AppWindowName.DEV,
       );
 
-      if (messageBoxResponse.response === 1) {
+      if (messageBoxResponse.response > 0) {
         const [newOptions, changedOptionsNames] = getChangedOptionsAfterFileDelete(
           currentConfig.gameSettingsOptions,
           newFiles,
+          messageBoxResponse.response === 2,
         );
+
         const newConfig = {
           ...currentConfig,
           gameSettingsFiles: newFiles,
@@ -325,7 +327,11 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
         };
 
         if (changedOptionsNames.length > 0) {
-          dispatch(addDeveloperMessages([CreateUserMessage.info(`Для опций ${changedOptionsNames.join()} используемый файл был изменен на "${newFiles[0].label}"`)])); //eslint-disable-line max-len
+          if (messageBoxResponse.response === 1) {
+            dispatch(addDeveloperMessages([CreateUserMessage.info(`Для опций [${changedOptionsNames.join()}] используемый файл был изменен на "${newFiles[0].label}"`)])); //eslint-disable-line max-len
+          } else {
+            dispatch(addDeveloperMessages([CreateUserMessage.info(`Опции [${changedOptionsNames.join()}] удалены`)])); //eslint-disable-line max-len
+          }
         }
 
         let currentValidationErrors = { ...validationErrors };
