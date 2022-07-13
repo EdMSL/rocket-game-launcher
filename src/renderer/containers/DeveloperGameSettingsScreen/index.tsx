@@ -22,7 +22,7 @@ import {
 } from '$utils/data';
 import { checkObjectForEqual } from '$utils/check';
 import {
-  AppChannel, AppWindowName, gameSettingsFileAvailableVariables, LauncherButtonAction,
+  AppChannel, AppWindowName, gameSettingsFileAvailableVariablesAll, LauncherButtonAction,
 } from '$constants/misc';
 import { TextField } from '$components/UI/TextField';
 import { Button } from '$components/UI/Button';
@@ -62,6 +62,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   const isGameSettingsConfigLoaded = useDeveloperSelector((state) => state.developer.isGameSettingsConfigLoaded);
   const isFirstLaunch = useDeveloperSelector((state) => state.developer.launcherConfig.isFirstLaunch);
   const pathVariables = useDeveloperSelector((state) => state.developer.pathVariables);
+  const isModOrganizerUsed = useDeveloperSelector((state) => state.developer.launcherConfig.modOrganizer.isUsed);
 
   const dispatch = useDispatch();
 
@@ -236,7 +237,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
 
         const pathWithVariable = replaceRootDirByPathVariable(
           pathStr,
-          gameSettingsFileAvailableVariables,
+          gameSettingsFileAvailableVariablesAll,
           pathVariables,
         );
 
@@ -297,7 +298,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
       await ipcRenderer.invoke(
         AppChannel.GET_MESSAGE_BOX_RESPONSE,
         'Невозможно удалить единственный файл, если присутствует хотя бы одна игровая опция.', //eslint-disable-line max-len
-        'Нельзя удалить единственный файл',
+        'Выберите действие',
         undefined,
         undefined,
         AppWindowName.DEV,
@@ -528,6 +529,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                               file={file}
                               pathVariables={pathVariables}
                               validationErrors={validationErrors}
+                              isModOrganizerUsed={isModOrganizerUsed}
                               onFileDataChange={changeGameSettingsFiles}
                               onValidation={setNewValidationErrors}
                               deleteFile={deleteGameSettingsFileById}

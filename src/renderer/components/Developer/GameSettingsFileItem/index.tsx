@@ -7,7 +7,10 @@ import { TextField } from '$components/UI/TextField';
 import { Select } from '$components/UI/Select';
 import { generateSelectOptions } from '$utils/data';
 import {
-  gameSettingsFileAvailableVariables, GameSettingsFileView, LauncherButtonAction,
+  gameSettingsFileAvailableVariablesAll,
+  gameSettingsFileAvailableVariablesBase,
+  GameSettingsFileView,
+  LauncherButtonAction,
 } from '$constants/misc';
 import { PathSelector } from '$components/UI/PathSelector';
 import { IPathVariables } from '$constants/paths';
@@ -21,6 +24,7 @@ interface IProps {
   file: IGameSettingsFile,
   pathVariables: IPathVariables,
   validationErrors: IValidationErrors,
+  isModOrganizerUsed: boolean,
   onFileDataChange: (fileName: string, fileData: IGameSettingsFile) => void,
   onValidation: (errors: IValidationErrors) => void,
   deleteFile: (id: string) => void,
@@ -30,6 +34,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
   file,
   pathVariables,
   validationErrors,
+  isModOrganizerUsed,
   onFileDataChange,
   onValidation,
   deleteFile,
@@ -96,7 +101,9 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         label="Путь до файла настроек"
         description="Состоит из переменной пути и самого пути к файлу. При выборе пути через диалоговое окно, переменная определяется автоматически." //eslint-disable-line
         selectorType={LauncherButtonAction.RUN}
-        selectPathVariables={generateSelectOptions(gameSettingsFileAvailableVariables)}
+        selectPathVariables={generateSelectOptions(isModOrganizerUsed
+          ? gameSettingsFileAvailableVariablesAll
+          : gameSettingsFileAvailableVariablesBase)}
         onChange={onPathSelectorChange}
       />
       <Select

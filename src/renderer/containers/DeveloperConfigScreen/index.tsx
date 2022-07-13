@@ -17,6 +17,8 @@ import {
   LauncherButtonAction,
   PathVariableName,
   AppChannel,
+  AppWindowName,
+  PathRegExp,
 } from '$constants/misc';
 import { MinWindowSize, appWindowFields } from '$constants/defaultData';
 import { Button } from '$components/UI/Button';
@@ -28,6 +30,7 @@ import {
 import {
   changeConfigArrayItem,
   generateSelectOptions,
+  getGameSettingsFilesNames,
   getNewConfig,
 } from '$utils/data';
 import { ArgumentsBlock } from '$components/Developer/ArgumentsBlock';
@@ -37,7 +40,11 @@ import {
 import { getRandomId } from '$utils/strings';
 import { DeveloperScreenController } from '$components/Developer/DeveloperScreenController';
 import { IDeveloperRootState } from '$types/developer';
-import { saveLauncherConfig, updateConfig } from '$actions/developer';
+import {
+  saveGameSettingsConfig,
+  saveLauncherConfig,
+  updateConfig,
+} from '$actions/developer';
 import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import {
@@ -48,11 +55,13 @@ import {
   validateNumberInputs,
   ValidationErrorCause,
 } from '$utils/validation';
+import { IGameSettingsFile, IGameSettingsOption } from '$types/gameSettings';
 
 export const DeveloperConfigScreen: React.FC = () => {
   /* eslint-disable max-len */
   const pathVariables = useDeveloperSelector((state) => state.developer.pathVariables);
   const launcherConfig = useDeveloperSelector((state) => state.developer.launcherConfig);
+  const gameSettingsConfig = useDeveloperSelector((state) => state.developer.gameSettingsConfig);
   const isLauncherConfigProcessing = useDeveloperSelector((state) => state.developer.isLauncherConfigProcessing);
 
   const dispatch = useDispatch();
@@ -62,6 +71,8 @@ export const DeveloperConfigScreen: React.FC = () => {
   const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
   const [lastAddedBtnItemId, setLastAddedBtnItemId] = useState<string>('');
   const [isSettingsInitialized, setIsSettingsInitialized] = useState<boolean>(true);
+  const [tempGameSettingsFiles, setTempGameSettingsFiles] = useState<IGameSettingsFile[]>([]);
+  const [tempGameSettingsOptions, setTempGameSettingsOptions] = useState<IGameSettingsOption[]>([]);
   /* eslint-enable max-len */
 
   const saveConfigChanges = useCallback((
@@ -74,8 +85,26 @@ export const DeveloperConfigScreen: React.FC = () => {
       isGoToMainScreen,
     ));
 
+    if (tempGameSettingsFiles.length > 0) {
+      let newGameSettingsConfig = { ...gameSettingsConfig };
+
+      newGameSettingsConfig = {
+        ...newGameSettingsConfig,
+        gameSettingsFiles: tempGameSettingsFiles,
+      };
+
+      if (tempGameSettingsOptions.length > 0) {
+        newGameSettingsConfig = {
+          ...newGameSettingsConfig,
+          gameSettingsOptions: tempGameSettingsOptions,
+        };
+      }
+
+      dispatch(saveGameSettingsConfig(newGameSettingsConfig));
+    }
+
     setIsConfigChanged(false);
-  }, [dispatch, currentConfig]);
+  }, [currentConfig, gameSettingsConfig, tempGameSettingsFiles, tempGameSettingsOptions, dispatch]);
 
   const resetConfigChanges = useCallback(() => {
     setIsConfigChanged(false);
@@ -181,9 +210,54 @@ export const DeveloperConfigScreen: React.FC = () => {
     changeCurrentConfig(target.name, target.value.trim(), target.dataset.parent);
   }, [validationErrors, changeCurrentConfig]);
 
-  const onSwitcherChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    changeCurrentConfig(target.name, target.checked, target.dataset.parent);
-  }, [changeCurrentConfig]);
+  const onSwitcherChange = useCallback(async ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    if (
+      target.id === 'isUsed'
+      && !target.checked
+      && gameSettingsConfig.gameSettingsFiles.length > 0
+      && gameSettingsConfig.gameSettingsFiles.some((currentFile) => PathRegExp.MO.test(currentFile.path))
+    ) {
+      const messageBoxResponse = await ipcRenderer.invoke(
+        AppChannel.GET_MESSAGE_BOX_RESPONSE,
+        `В путях к некоторым файлам игровых настроек пристуствуют переменные Mod Organizer.\nНажмите "Отмена", чтобы вручную изменить пути к файлам, "Игнорировать", чтобы изменить переменную на ${PathVariableName.GAME_DIR}, или "Удалить", чтобы удалить файлы и связанные с ними игровые опции.\nИзменения будут приняты только при сохранении текущей конфигурации.`, //eslint-disable-line max-len
+        'Выберите действие',
+        undefined,
+        ['Отмена', 'Игнорировать', 'Удалить'],
+        AppWindowName.DEV,
+      );
+
+      if (messageBoxResponse.response === 1) {
+        const newFiles = gameSettingsConfig.gameSettingsFiles.map((currentFile) => {
+          if (PathRegExp.MO.test(currentFile.path)) {
+            return {
+              ...currentFile,
+              path: currentFile.path.replace(PathRegExp.MO, PathVariableName.GAME_DIR),
+            };
+          }
+
+          return currentFile;
+        });
+
+        setTempGameSettingsFiles(newFiles);
+
+        changeCurrentConfig(target.name, false, target.dataset.parent);
+      } else if (messageBoxResponse.response === 2) {
+        const newFiles = gameSettingsConfig.gameSettingsFiles.filter(
+          (currentFile) => !PathRegExp.MO.test(currentFile.path),
+        );
+        const filesNames = getGameSettingsFilesNames(newFiles);
+
+        setTempGameSettingsFiles(newFiles);
+        setTempGameSettingsOptions(gameSettingsConfig.gameSettingsOptions.filter(
+          (currentOption) => filesNames.includes(currentOption.file),
+        ));
+
+        changeCurrentConfig(target.name, false, target.dataset.parent);
+      }
+    } else {
+      changeCurrentConfig(target.name, target.checked, target.dataset.parent);
+    }
+  }, [gameSettingsConfig, changeCurrentConfig]);
 
   const onSelectChange = useCallback(({ target }: React.ChangeEvent<HTMLSelectElement>) => {
     changeCurrentConfig(target.name, target.value, target.dataset.parent);

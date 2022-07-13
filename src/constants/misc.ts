@@ -67,9 +67,13 @@ export enum PathVariableName {
   MO_PROFILE = '%MO_PROFILE%',
 }
 
-export const gameSettingsFileAvailableVariables = [
+export const gameSettingsFileAvailableVariablesBase = [
   PathVariableName.GAME_DIR,
   PathVariableName.DOCS_GAME,
+];
+
+export const gameSettingsFileAvailableVariablesAll = [
+  ...gameSettingsFileAvailableVariablesBase,
   PathVariableName.MO_PROFILE,
   PathVariableName.MO_MODS,
   PathVariableName.MO_DIR,
@@ -88,6 +92,7 @@ export const PathRegExp = {
   GAME_DIR: new RegExp('^%GAME_DIR%'),
   DOCUMENTS: new RegExp('^%DOCUMENTS%'),
   DOCS_GAME: new RegExp('^%DOCS_GAME%'),
+  MO: new RegExp(/^%MO.+%/),
   MO_DIR: new RegExp('^%MO_DIR%'),
   MO_MODS: new RegExp('^%MO_MODS%'),
   MO_PROFILE: new RegExp('^%MO_PROFILE%'),
