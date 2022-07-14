@@ -759,11 +759,11 @@ export const createPathVariables = (
     } catch (error: any) {
       if (error.name === ErrorName.INVALID_DIRECTORY) {
         errorText = 'Указан недопустимый путь до папки профилей(profiles) или модов(mods) в настройках программы Mod Organizer. Папки должны находится в корне игры. Игровые настройки будут недоступны.'; //eslint-disable-line max-len
+
+        writeToLogFile(error.message, LogMessageType.ERROR);
       } else if (error.name === ErrorName.READ_WRITE) {
         errorText = `Файл ${MOIniFileName} не найден. Проверьте правильность пути к папке Mod Organizer. Игровые настройки будут недоступны.`; //eslint-disable-line max-len
       }
-
-      writeToLogFile(error.message, LogMessageType.ERROR);
     }
   }
 

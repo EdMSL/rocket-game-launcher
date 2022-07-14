@@ -17,6 +17,7 @@ import {
   setIsDevWindowOpening,
   setIsConfigLoading,
   setIsGameSettingsConfigChanged,
+  setIsGameSettingsFileExists,
 } from '$actions/main';
 import { useAppSelector } from '$store/store';
 import { CreateUserMessage } from '$utils/message';
@@ -76,6 +77,10 @@ export const MainScreen: React.FC = () => {
       if (newConfig !== undefined) {
         dispatch(setGameSettingsConfig(newConfig));
         dispatch(setIsGameSettingsConfigChanged(true));
+
+        if (!isGameSettingsFileExists) {
+          dispatch(setIsGameSettingsFileExists(true));
+        }
       }
     });
 
@@ -83,7 +88,7 @@ export const MainScreen: React.FC = () => {
       ipcRenderer.removeAllListeners(AppChannel.CHANGE_DEV_WINDOW_STATE);
       ipcRenderer.removeAllListeners(AppChannel.SAVE_DEV_CONFIG);
     };
-  }, [dispatch]);
+  }, [isGameSettingsFileExists, dispatch]);
 
   const changeGameState = useCallback((errorMessage: string, isRunning: boolean, close = false) => {
     dispatch(setIsGameRunning(isRunning));

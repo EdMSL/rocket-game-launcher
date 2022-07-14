@@ -244,7 +244,6 @@ function* createGameSettingsConfigFileSaga(): SagaIterator {
     yield put(setGameSettingsConfig(defaultGameSettingsConfig));
     yield put(setIsGameSettingsConfigLoaded(true));
     yield put(setIsGameSettingsConfigFileExists(true));
-    yield put(setIsGameSettingsFileExists(true));
 
     yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, undefined, defaultGameSettingsConfig);
   } catch (error: any) {

@@ -41,13 +41,11 @@ const setIsGameSettingsFileExists: IMainActionHadler<
   typeof MAIN_ACTIONS.setIsGameSettingsFileExists
 > = (
   state,
-  { payload: isGameSettingsConfigFileExists },
+  { payload: isGameSettingsFileExists },
 ) => ({
   ...state,
-  config: {
-    ...state.config,
-    isGameSettingsConfigFileExists,
-  },
+  ...state.config,
+  isGameSettingsFileExists,
 });
 
 const setIsGameSettingsConfigChanged: IMainActionHadler<
