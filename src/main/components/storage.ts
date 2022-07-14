@@ -233,10 +233,10 @@ export const createStorage = (): Store<IAppState> => {
   ipcMain.handle(AppChannel.GET_APP_STATE, () => appStore.getState());
 
   writeToLogFileSync(`Working directory: ${GAME_DIR}`);
-  writeToLogFileSync(`Paths variables: \n  ${getObjectAsList(pathVariables, true)}`);
+  writeToLogFileSync(`Paths variables:\n  ${getObjectAsList(pathVariables, true)}`);
 
   if (configurationFileData.modOrganizer) {
-    writeToLogFileSync(`MO information: \n  ${getObjectAsList(configurationFileData.modOrganizer!, true)}`); //eslint-disable-line max-len
+    writeToLogFileSync(`MO information:\n  ${getObjectAsList(configurationFileData.modOrganizer!, true)}`); //eslint-disable-line max-len
   }
 
   return appStore;

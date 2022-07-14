@@ -105,7 +105,7 @@ export const getObjectAsList = (
   isWithIndent = false,
 ): string => Object.keys(obj)
   .map((key) => `${key}: ${obj[key]}`)
-  .join(`\n$${isWithIndent ? '\t' : ''}`);
+  .join(`\n${isWithIndent ? '\t' : ''}`);
 
 const createRegexp = (
   pathForRegEpx: string,
