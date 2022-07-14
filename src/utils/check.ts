@@ -452,18 +452,18 @@ export const checkGameSettingsOptions = (
     },
   };
 
-  const resultOptions = gameSettingsOptions.reduce<IGameSettingsOption[]>((currentParams, currentParam, index) => {
-    const fileForOption = gameSettingsFiles.find((file) => file.name === currentParam.file);
+  const resultOptions = gameSettingsOptions.reduce<IGameSettingsOption[]>((totalOptions, currentOption, index) => {
+    const fileForOption = gameSettingsFiles.find((file) => file.name === currentOption.file);
     validationOptions.context!.index = index;
 
-    let validationResult: Joi.ValidationResult;
+    let validationResult: Joi.ValidationResult<IGameSettingsOption>;
 
     if (fileForOption) {
         validationOptions.context!.view = fileForOption.view;
     }
 
     validationResult = gameSettingsFileOptionTypeSchema.validate(
-      currentParam.optionType,
+      currentOption.optionType,
       validationOptions,
     );
 
@@ -474,21 +474,21 @@ export const checkGameSettingsOptions = (
       });
       errors.push(validationResult.error);
 
-      return [...currentParams];
+      return [...totalOptions];
     }
 
-    switch (currentParam.optionType) {
+    switch (currentOption.optionType) {
       case GameSettingsOptionType.COMBINED:
-        validationResult = combinedOptionTypeSchema.validate(currentParam, validationOptions);
+        validationResult = combinedOptionTypeSchema.validate(currentOption, validationOptions);
         break;
       case GameSettingsOptionType.RELATED:
-        validationResult = relatedOptionTypeSchema.validate(currentParam, validationOptions);
+        validationResult = relatedOptionTypeSchema.validate(currentOption, validationOptions);
         break;
       case GameSettingsOptionType.GROUP:
-        validationResult = groupOptionTypeSchema.validate(currentParam, validationOptions);
+        validationResult = groupOptionTypeSchema.validate(currentOption, validationOptions);
         break;
       default:
-        validationResult = defaultOptionTypeSchema.validate(currentParam, validationOptions);
+        validationResult = defaultOptionTypeSchema.validate(currentOption, validationOptions);
         break;
     }
 
@@ -499,19 +499,10 @@ export const checkGameSettingsOptions = (
       });
       errors.push(validationResult.error);
 
-      return [...currentParams];
+      return [...totalOptions];
     }
 
-    // Т.к. id опциональный ключ и гененрируется автоматически, он добавляется в самый низ объекта.
-    // Поэтому для сохранения порядка ключей перегенерируем объект и id прописываем первым.
-    const newParam = { id: validationResult.value.id, ...validationResult.value };
-
-    if (newParam.items) {
-      const newItems = newParam.items.map((item) => ({ id: item.id, ...item }));
-      newParam.items = newItems;
-    }
-
-    return [...currentParams, newParam];
+    return [...totalOptions, validationResult.value];
   }, []);
 
   return {

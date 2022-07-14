@@ -49,6 +49,7 @@ import {
   defaultFullGameSettingsOption,
   defaultGameSettingsOptionItem,
   defaultModOrganizerPaths,
+  MOIniFileName,
 } from '$constants/defaultData';
 import {
   IGetDataFromFilesResult, IIniObj, IXmlObj, ISelectOption,
@@ -719,7 +720,7 @@ export const createPathVariables = (
         MO_DIR_BASE,
       );
 
-      const MOIniData = readINIFileSync(path.join(MO_DIR_BASE, 'ModOrganizer.ini'));
+      const MOIniData = readINIFileSync(path.join(MO_DIR_BASE, MOIniFileName));
       const MoModsSection = MOIniData.getSection('Settings');
 
       if (MoModsSection) {
@@ -759,7 +760,7 @@ export const createPathVariables = (
       if (error.name === ErrorName.INVALID_DIRECTORY) {
         errorText = 'Указан недопустимый путь до папки профилей(profiles) или модов(mods) в настройках программы Mod Organizer. Папки должны находится в корне игры. Игровые настройки будут недоступны.'; //eslint-disable-line max-len
       } else if (error.name === ErrorName.READ_WRITE) {
-        errorText = 'Файл ModOrganizer.ini не найден. Проверьте правильность пути к папке Mod Organizer. Игровые настройки будут недоступны.'; //eslint-disable-line max-len
+        errorText = `Файл ${MOIniFileName} не найден. Проверьте правильность пути к папке Mod Organizer. Игровые настройки будут недоступны.`; //eslint-disable-line max-len
       }
 
       writeToLogFile(error.message, LogMessageType.ERROR);

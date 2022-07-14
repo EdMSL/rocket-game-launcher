@@ -307,7 +307,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
       const messageBoxResponse = await ipcRenderer.invoke(
         AppChannel.GET_MESSAGE_BOX_RESPONSE,
         'Одна или несколько игровых опций имеют данный файл в зависимостях. Нажмите "Отмена", чтобы вручную изменить используемый опциями файл, "Игнорировать", чтобы автоматически выбрать для опции один из доступных файлов, или "Удалить", чтобы удалить связанные с файлом опции.', //eslint-disable-line max-len
-        'Файл имеет зависимости',
+        'Выберите действие',
         undefined,
         ['Отмена', 'Игнорировать', 'Удалить'],
         AppWindowName.DEV,
@@ -328,9 +328,9 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
 
         if (changedOptionsNames.length > 0) {
           if (messageBoxResponse.response === 1) {
-            dispatch(addDeveloperMessages([CreateUserMessage.info(`Для опций [${changedOptionsNames.join()}] используемый файл был изменен на "${newFiles[0].label}"`)])); //eslint-disable-line max-len
+            dispatch(addDeveloperMessages([CreateUserMessage.info(`При сохранении настроек для опций [${changedOptionsNames.join()}] используемый файл будет изменен на "${newFiles[0].label}"`)])); //eslint-disable-line max-len
           } else {
-            dispatch(addDeveloperMessages([CreateUserMessage.info(`Опции [${changedOptionsNames.join()}] удалены`)])); //eslint-disable-line max-len
+            dispatch(addDeveloperMessages([CreateUserMessage.info(`При сохранении настроек опции [${changedOptionsNames.join()}] будут удалены`)])); //eslint-disable-line max-len
           }
         }
 
