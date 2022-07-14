@@ -110,6 +110,8 @@ export const DeveloperConfigScreen: React.FC = () => {
     setIsConfigChanged(false);
     setValidationErrors({});
     setCurrentConfig(launcherConfig);
+    setTempGameSettingsFiles([]);
+    setTempGameSettingsOptions([]);
   }, [launcherConfig, setValidationErrors]);
 
   useEffect(() => {
