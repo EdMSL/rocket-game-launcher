@@ -689,7 +689,8 @@ const getUpdatedModOrganizerPathVariables = (
 export const createPathVariables = (
   configData: ILauncherConfig,
   app: Electron.App,
-): IPathVariables => {
+): [IPathVariables, string] => {
+  let errorText = '';
   let pathVariables: IPathVariables = {
     ...DefaultPathVariable,
     '%DOCUMENTS%': app.getPath('documents'),
@@ -706,8 +707,9 @@ export const createPathVariables = (
   }
 
   if (configData.modOrganizer.isUsed) {
+    const MO_DIR_BASE = replacePathVariableByRootDir(configData.modOrganizer.pathToMOFolder);
+
     try {
-      const MO_DIR_BASE = replacePathVariableByRootDir(configData.modOrganizer.pathToMOFolder);
       let modOrganizerModsPath = defaultModOrganizerPaths.pathToMods.replace(
         PathVariableName.MO_DIR,
         MO_DIR_BASE,
@@ -755,14 +757,16 @@ export const createPathVariables = (
       };
     } catch (error: any) {
       if (error.name === ErrorName.INVALID_DIRECTORY) {
-        throw new CustomError('Invalid path detected in Mod Organizer paths.'); //eslint-disable-line max-len
+        errorText = 'Указан недопустимый путь до папки профилей(profiles) или модов(mods) в настройках программы Mod Organizer. Папки должны находится в корне игры. Игровые настройки будут недоступны.'; //eslint-disable-line max-len
+      } else if (error.name === ErrorName.READ_WRITE) {
+        errorText = 'Файл ModOrganizer.ini не найден. Проверьте правильность пути к папке Mod Organizer. Игровые настройки будут недоступны.'; //eslint-disable-line max-len
       }
 
-      throw error;
+      writeToLogFile(error.message, LogMessageType.ERROR);
     }
   }
 
-  return pathVariables;
+  return [pathVariables, errorText];
 };
 
 /**

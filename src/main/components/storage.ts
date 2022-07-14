@@ -101,6 +101,8 @@ export const createStorage = (): Store<IAppState> => {
   const configurationFileData = getConfigurationData();
   const configurationData = checkLauncherConfigFileData(configurationFileData);
 
+  let isGameSettingsAvailable = true;
+
   // Создаем хранилище пользовательских настроек (настройки темы и т.п.).
   // Хранилище располагается в файле user.json в корне программы.
   const storage = new Storage<IStorage>({
@@ -142,10 +144,15 @@ export const createStorage = (): Store<IAppState> => {
   }
 
   // Переменные путей и настройка кнопок
-  const pathVariables = createPathVariables(
+  const [pathVariables, errorText] = createPathVariables(
     configurationData,
     app,
   );
+
+  if (errorText) {
+    isGameSettingsAvailable = false;
+    messages.push(CreateUserMessage.error(errorText)); //eslint-disable-line max-len
+  }
 
   if (!configurationData.playButton.path) {
     messages.push(CreateUserMessage.warning('Не указан путь для файла запуска игры.')); //eslint-disable-line max-len
@@ -188,6 +195,7 @@ export const createStorage = (): Store<IAppState> => {
         },
       },
       isGameSettingsFileExists,
+      isGameSettingsAvailable,
       isDevWindowOpeninging: configurationData.isFirstLaunch,
       launcherVersion: app.getVersion(),
       pathVariables,
