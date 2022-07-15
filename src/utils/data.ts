@@ -915,6 +915,7 @@ const getFieldsByControllerType = (
 /**
  * Генерирует новый объект опции игровых настроек типа `default`.
  * @param file Объект с данными игрового файла.
+ * @param settingGroup Имя группы игровых настроек, к которой принадлежит опция.
  * @returns Объект опции игровых настроек.
  */
 export const getDefaultGameSettingsOption = (

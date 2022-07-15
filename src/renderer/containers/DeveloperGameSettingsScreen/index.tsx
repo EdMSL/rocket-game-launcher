@@ -391,7 +391,10 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   }, [currentConfig, changeCurrentConfig]);
 
   const addGameSettingsOption = useCallback(() => {
-    const newOption = getDefaultGameSettingsOption(currentConfig.gameSettingsFiles[0]);
+    const newOption = getDefaultGameSettingsOption(
+      currentConfig.gameSettingsFiles[0],
+      currentConfig.gameSettingsGroups[0].name,
+    );
 
     setNewValidationErrors(validateFileRelatedFields(
       newOption,
@@ -406,6 +409,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     setLastAddedOptionId(newOption.id);
   }, [currentConfig.gameSettingsOptions,
     currentConfig.gameSettingsFiles,
+    currentConfig.gameSettingsGroups,
     validationErrors,
     setNewValidationErrors,
     changeCurrentConfig]);
