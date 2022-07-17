@@ -8,7 +8,6 @@ import {
   takeLatest,
   select,
   SagaReturnType,
-  take,
 } from 'redux-saga/effects';
 import fs from 'fs';
 import { ipcRenderer } from 'electron';
@@ -408,8 +407,6 @@ function* locationChangeSaga(
       yield call(initLauncherSaga);
 
       if (isFirstLaunch) {
-        yield take(MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED);
-
         // Здесь должен быть action на setDevWindowOpening, перенесен в storage основного процесса
         // чтобы убрать эффект мигания окна
         ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, true);

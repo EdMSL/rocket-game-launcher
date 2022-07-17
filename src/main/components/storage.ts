@@ -39,7 +39,7 @@ import {
 import { INITIAL_STATE as mainInitialState } from '$reducers/main';
 import { INITIAL_STATE as userSettingsInitialState } from '$reducers/userSettings';
 import { ILauncherConfig } from '$types/main';
-import { CreateUserMessage, showMessageBox } from '$utils/message';
+import { CreateUserMessage } from '$utils/message';
 import { AppChannel, Scope } from '$constants/misc';
 import { IUserMessage } from '$types/common';
 
@@ -49,26 +49,19 @@ interface IStorage {
 
 const saveToStorageParams = ['userSettings'];
 
-const getConfigurationData = (): ILauncherConfig => {
+const getConfigurationData = (): [ILauncherConfig, boolean] => {
   // Считываем данные из файла конфигурации лаунчера. Эти данные затем передаются в стейт Redux.
   // Если файл не найден, то создаем новый с дефолтными настройками.
   try {
     const configData = readJSONFileSync<ILauncherConfig>(CONFIG_FILE_PATH);
 
-    return configData;
+    return [configData, false];
   } catch (error: any) {
     if (error instanceof ReadWriteError) {
       if (error.causeName === ErrorName.NOT_FOUND) {
         writeToLogFileSync(
-          'Launcher config file not found. Load default values. A new config file will be created', //eslint-disable-line max-len
+          'Launcher config file not found. Load default values. A new config file will be created.', //eslint-disable-line max-len
           LogMessageType.WARNING,
-        );
-
-        showMessageBox(
-          dialog,
-          'Will be loaded default values. A new config file will be created',
-          'Launcher config file not found',
-          'warning',
         );
 
         writeJSONFile(CONFIG_FILE_PATH, defaultLauncherConfig)
@@ -79,7 +72,7 @@ const getConfigurationData = (): ILauncherConfig => {
             writeToLogFile('New config file config.json not created.', LogMessageType.WARNING);
           });
 
-        return defaultLauncherConfig;
+        return [defaultLauncherConfig, true];
       }
 
       throw new Error('Found problems with config.json.');
@@ -98,7 +91,12 @@ const getConfigurationData = (): ILauncherConfig => {
 */
 export const createStorage = (): Store<IAppState> => {
   const messages: IUserMessage[] = [];
-  const configurationFileData = getConfigurationData();
+  const [configurationFileData, isNewFile] = getConfigurationData();
+
+  if (isNewFile) {
+    messages.push(CreateUserMessage.info('Файл конфигурации не найден. Загружены значения по умолчанию.')); //eslint-disable-line max-len
+  }
+
   const configurationData = checkLauncherConfigFileData(configurationFileData);
 
   let isGameSettingsAvailable = true;
@@ -154,7 +152,7 @@ export const createStorage = (): Store<IAppState> => {
     messages.push(CreateUserMessage.error(errorText)); //eslint-disable-line max-len
   }
 
-  if (!configurationData.playButton.path) {
+  if (!configurationData.playButton.path && !configurationData.isFirstLaunch) {
     messages.push(CreateUserMessage.warning('Не указан путь для файла запуска игры.')); //eslint-disable-line max-len
   }
 
@@ -196,7 +194,7 @@ export const createStorage = (): Store<IAppState> => {
       },
       isGameSettingsFileExists,
       isGameSettingsAvailable,
-      isDevWindowOpeninging: configurationData.isFirstLaunch,
+      isDevWindowOpening: configurationData.isFirstLaunch,
       launcherVersion: app.getVersion(),
       pathVariables,
       userThemes,
