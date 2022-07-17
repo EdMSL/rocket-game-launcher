@@ -139,10 +139,14 @@ const clearPathVaribaleFromPathString = (
  * @returns Массив из строк переменной и остатка пути.
 */
 export const getVariableAndValueFromPath = (pathStr: string): [string, string] => {
-  const pathVariable = pathStr.match(PathRegExp.PATH_VARIABLE)![0];
-  const pathValue = clearPathVaribaleFromPathString(pathStr);
+  if (pathStr) {
+    const pathVariable = pathStr.match(PathRegExp.PATH_VARIABLE)![0];
+    const pathValue = clearPathVaribaleFromPathString(pathStr);
 
-  return [pathVariable, pathValue];
+    return [pathVariable, pathValue];
+  }
+
+  return ['', ''];
 };
 
 /**

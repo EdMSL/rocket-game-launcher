@@ -187,8 +187,9 @@ export const PathSelector: React.FC<IProps> = ({
       validationErrors
       && validationErrors[id]
       && getValidationCauses(validationErrors[id]).includes(ValidationErrorCause.NOT_AVAILABLE)
-    ),
-  [id, isDisabled, validationErrors]);
+    )
+    || !pathVariable,
+  [id, isDisabled, validationErrors, pathVariable]);
 
   return (
     <div className={classNames(
@@ -208,24 +209,28 @@ export const PathSelector: React.FC<IProps> = ({
         }
       </label>
       <div className="path-selector__input-block">
-        <select
-          className="path-selector__select"
-          name={name}
-          value={currentPathVariable}
-          disabled={isSelectDisabled}
-          onChange={onPathVariableSelectChange}
-        >
-          {
-          selectPathVariables.map((option) => (
-            <option
-              key={`option-${option.label}`}
-              value={option.value}
-            >
-              {option.label}
-            </option>
-          ))
+        {
+          pathVariable && (
+          <select
+            className="path-selector__select"
+            name={name}
+            value={currentPathVariable}
+            disabled={isSelectDisabled}
+            onChange={onPathVariableSelectChange}
+          >
+            {
+            selectPathVariables.map((option) => (
+              <option
+                key={`option-${option.label}`}
+                value={option.value}
+              >
+                {option.label}
+              </option>
+            ))
         }
-        </select>
+          </select>
+          )
+        }
         <input
           className={classNames(
             'path-selector__input',
