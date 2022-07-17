@@ -214,9 +214,9 @@ export const clearRootDirFromPathString = (
 
 /**
  * Заменить корневой путь на переменную пути.
- * @param currPath Изменяемый путь.
- * @param pathVariable Переменная для замены.
- * @param rootDirPathStr Корневая папка в изменяемом пути, которую нужно заменить.
+ * @param pathStr Изменяемый путь.
+ * @param availablePathVariables Переменная для замены.
+ * @param pathVariables Корневая папка в изменяемом пути, которую нужно заменить.
  * @returns Строка пути с переменной вместо корневой папки.
 */
 export const replaceRootDirByPathVariable = (
@@ -265,6 +265,22 @@ export const replacePathVariableByRootDir = (
   const newStr = pathStr;
 
   return newStr.replace(pathVariable, rootDirPathStr).trim();
+};
+
+/**
+ * Заменяет текущую переменную пути на другую.
+ * @param pathStr Изменяемый путь.
+ * @param pathVariable Переменная пути, на которую меняем. По умолчанию `%GAME_DIR%`.
+ * @returns Строка пути с переменной.
+*/
+export const replacePathVariableByAnother = (
+  pathStr: string,
+  pathVariable = PathVariableName.GAME_DIR,
+): string => {
+  const newStr = pathStr;
+  const currentPathVariable = newStr.match(PathRegExp.PATH_VARIABLE)![0];
+
+  return newStr.replace(currentPathVariable, pathVariable).trim();
 };
 
 /**

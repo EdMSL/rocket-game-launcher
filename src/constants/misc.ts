@@ -72,11 +72,15 @@ export const gameSettingsFileAvailableVariablesBase = [
   PathVariableName.DOCS_GAME,
 ];
 
-export const gameSettingsFileAvailableVariablesAll = [
-  ...gameSettingsFileAvailableVariablesBase,
+export const gameSettingsFileAvailableVariablesMO = [
   PathVariableName.MO_PROFILE,
   PathVariableName.MO_MODS,
   PathVariableName.MO_DIR,
+];
+
+export const gameSettingsFileAvailableVariablesAll = [
+  ...gameSettingsFileAvailableVariablesBase,
+  ...gameSettingsFileAvailableVariablesMO,
 ];
 
 export const pathVariablesCheckOrderArr = [
@@ -116,7 +120,7 @@ export const FileExtension = {
 
 export enum AppChannel {
   CHANGE_WINDOW_SIZE_STATE = 'change window state',
-  SAVE_DEV_CONFIG = 'save dev config',
+  SAVE_DEV_CONFIG = 'save developer config',
   CLOSE_APP = 'close app',
   GET_PATH_BY_PATH_SELECTOR = 'get path from native window',
   GET_APP_STATE = 'get app state',
