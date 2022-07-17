@@ -426,11 +426,15 @@ function* locationChangeSaga(
       if (isLauncherInitialised) {
         if (
           (!isGameSettingsLoaded && location.state?.isFromMainPage)
-        || isGameSettingsConfigChanged
+          || isGameSettingsConfigChanged
         ) {
-          yield call(initGameSettingsSaga, false);
+          yield call(initGameSettingsSaga);
 
-          if (location.state?.isFromMainPage) {
+          const {
+            main: { isGameSettingsLoaded }, //eslint-disable-line @typescript-eslint/no-shadow
+          }: ReturnType<typeof getState> = yield select(getState);
+
+          if (isGameSettingsLoaded && location.state?.isFromMainPage) {
             const {
               gameSettings: {
                 gameSettingsGroups,
@@ -470,7 +474,7 @@ function* locationChangeSaga(
           ));
         }
       } else if (!isLauncherInitialised) {
-        yield put(push(`${Routes.MAIN_SCREEN}`));
+        yield put(push(Routes.MAIN_SCREEN));
       }
     }
   } catch (error: any) {

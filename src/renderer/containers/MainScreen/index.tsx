@@ -69,6 +69,7 @@ export const MainScreen: React.FC = () => {
       event: Electron.Event,
       isLauncherConfigProcessing: boolean,
       newConfig: IGameSettingsConfig,
+      isConfigChanged: boolean,
     ) => {
       if (isLauncherConfigProcessing !== undefined) {
         dispatch(setIsConfigLoading(isLauncherConfigProcessing));
@@ -76,7 +77,10 @@ export const MainScreen: React.FC = () => {
 
       if (newConfig !== undefined) {
         dispatch(setGameSettingsConfig(newConfig));
-        dispatch(setIsGameSettingsConfigChanged(true));
+
+        if (isConfigChanged !== undefined) {
+          dispatch(setIsGameSettingsConfigChanged(true));
+        }
 
         if (!isGameSettingsFileExists) {
           dispatch(setIsGameSettingsFileExists(true));

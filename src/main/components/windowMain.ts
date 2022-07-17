@@ -93,12 +93,22 @@ export const createMainWindow = (
     event,
     isProcessing: boolean,
     newConfig: ILauncherConfig|IGameSettingsConfig,
+    isConfigChanged: boolean,
     pathVariables: IPathVariables,
     isChangeWindowSize: boolean,
   ) => {
+    if (isProcessing !== undefined) {
+      mainWindow.webContents.send(AppChannel.SAVE_DEV_CONFIG, isProcessing);
+    }
+
     if (newConfig !== undefined) {
       if ('baseFilesEncoding' in newConfig) {
-        mainWindow.webContents.send(AppChannel.SAVE_DEV_CONFIG, undefined, newConfig);
+        mainWindow.webContents.send(
+          AppChannel.SAVE_DEV_CONFIG,
+          undefined,
+          newConfig,
+          isConfigChanged,
+        );
       } else if ('playButton' in newConfig) {
         if (isChangeWindowSize !== undefined && isChangeWindowSize) {
           changeWindowSize(mainWindow, newConfig);
@@ -110,10 +120,6 @@ export const createMainWindow = (
           appStore.dispatch(setIsGameSettingsConfigChanged(true));
         }
       }
-    }
-
-    if (isProcessing !== undefined) {
-      mainWindow.webContents.send(AppChannel.SAVE_DEV_CONFIG, isProcessing);
     }
   });
 

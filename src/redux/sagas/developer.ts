@@ -135,14 +135,13 @@ function* saveLauncherConfigSaga(
       getWindowSettingsFromLauncherConfig(newConfig),
     );
 
-    yield call(
-      ipcRenderer.send,
+    yield call(ipcRenderer.send,
       AppChannel.SAVE_DEV_CONFIG,
       false,
       newConfig,
+      true,
       newPathVariables,
-      isChangeWindowSize,
-    );
+      isChangeWindowSize);
 
     yield put(setLauncherConfig(newConfig));
     yield put(setPathVariables(newPathVariables));
@@ -171,6 +170,7 @@ function* saveLauncherConfigSaga(
     yield put(addDeveloperMessages([CreateUserMessage.error('Произошла ошибка при сохранении файла конфигурации. Подробности в файле лога.')])); //eslint-disable-line max-len
   } finally {
     yield put(setIsLauncherConfigProcessing(false));
+    yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, false);
   }
 }
 
@@ -205,7 +205,7 @@ function* saveGameSettingsConfigSaga(
     );
     yield put(setGameSettingsConfig(newConfig));
 
-    yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, false, newConfig);
+    yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, false, newConfig, true);
 
     if (isGoToMainScreen) {
       yield call(ipcRenderer.send, AppChannel.CHANGE_DEV_WINDOW_STATE, false);
@@ -245,7 +245,11 @@ function* createGameSettingsConfigFileSaga(): SagaIterator {
     yield put(setIsGameSettingsConfigLoaded(true));
     yield put(setIsGameSettingsConfigFileExists(true));
 
-    yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, undefined, defaultGameSettingsConfig);
+    yield call(ipcRenderer.send,
+      AppChannel.SAVE_DEV_CONFIG,
+      undefined,
+      defaultGameSettingsConfig,
+      true);
   } catch (error: any) {
     let errorMessage = '';
 

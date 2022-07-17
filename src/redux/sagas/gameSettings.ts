@@ -307,7 +307,9 @@ export function* generateGameSettingsParametersSaga(
  * Инициализация игровых настроек. Получаем данные МО,
  * проверяем на валидность параметры игровых настроек (`gameSettingsOptions`),
  * генерируем параметры игровых настроек.
- * @param isFromUpdateAction Обновление настроек или первичная инициализация.
+ * @param isFromUpdateAction Если true, то выполняются действия при обновлении настроек,
+ * иначе первичная инииализация.
+ * @param initialSettingsConfig Начальное состояние для конфигурации.
 */
 export function* initGameSettingsSaga(
   isFromUpdateAction = false,
