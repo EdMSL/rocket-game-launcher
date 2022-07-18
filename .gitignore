@@ -24,3 +24,6 @@ build/
 dist/
 release/
 backup/
+
+# Файлы бэкапа
+*.bk
