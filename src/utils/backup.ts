@@ -29,7 +29,7 @@ export const createBackupFolders = (isThrowError = false): void => {
   try {
     createFolderSync(BACKUP_DIR);
     createFolderSync(BACKUP_DIR_GAME_SETTINGS_FILES);
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     let errorMsg = error.message;
 
     if (error instanceof ReadWriteError) {
@@ -124,7 +124,9 @@ export const getGameSettingsFilesBackups = async (): Promise<IGameSettingsBackup
   const backupFolders = await readDirectory(BACKUP_DIR_GAME_SETTINGS_FILES);
 
   if (backupFolders.length > 0) {
-    const readFolderResult = await Promise.allSettled(backupFolders.map((file) => readBackupFolder(path.join(file))));
+    const readFolderResult = await Promise.allSettled(
+      backupFolders.map((file) => readBackupFolder(path.join(file))),
+    );
     const files = readFolderResult
       .filter((result) => result.status === 'fulfilled')
       .map((folderResult) => (folderResult as PromiseFulfilledResult<IGameSettingsBackup>).value);
@@ -165,7 +167,9 @@ export const deleteGameSettingsFilesBackup = async (
   const deleteResultsWithError = deleteResult.filter((result) => result.status === 'rejected');
 
   if (deleteResultsWithError.length > 0) {
-    const errorsMessages = deleteResultsWithError.map((result) => (result as PromiseRejectedResult).status);
+    const errorsMessages = deleteResultsWithError.map(
+      (result) => (result as PromiseRejectedResult).status,
+    );
 
     writeToLogFile(errorsMessages.join('\n'), LogMessageType.ERROR);
 

@@ -50,7 +50,7 @@ export const getSystemInfo = async (): Promise<void> => {
     }
 
     writeToLogFile(result);
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     writeToLogFile(error.message, LogMessageType.ERROR);
   }
 };

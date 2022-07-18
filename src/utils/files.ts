@@ -20,7 +20,7 @@ import {
   ErrorMessage,
 } from '$utils/errors';
 import {
-  Encoding, GameSettingsFileView, LauncherButtonAction, userThemeStyleFile,
+  Encoding, GameSettingsFileView, userThemeStyleFile,
 } from '$constants/misc';
 import { IPathVariables, USER_THEMES_DIR } from '$constants/paths';
 import { IGameSettingsFile } from '$types/gameSettings';
@@ -74,7 +74,7 @@ export const readDirectorySync = (
 ): string[] => {
   try {
     return fs.readdirSync(directoryPath);
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     throw getReadWriteError(error, directoryPath, "Can't read directory.", true);
   }
 };
@@ -88,7 +88,7 @@ export const createFolderSync = (directoryPath: string): void => {
     if (!fs.existsSync(directoryPath)) {
       fs.mkdirSync(directoryPath);
     }
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     throw getReadWriteError(error, directoryPath, "Can't create folder.", true);
   }
 };
@@ -115,7 +115,7 @@ export const createCopyFileSync = (filePath: string, destinationPath: string): v
       filePath,
       destinationPath,
     );
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     throw getReadWriteError(error, filePath, "Can't copy file.");
   }
 };
@@ -158,7 +158,12 @@ export const renameFileOrFolder = (
   path.join(path.dirname(oldPath), newName),
 )
   .catch((error) => {
-    throw getReadWriteError(error, oldPath, `Can't rename ${isForDirectory ? 'folder' : 'file'}.`, isForDirectory);
+    throw getReadWriteError(
+      error,
+      oldPath,
+      `Can't rename ${isForDirectory ? 'folder' : 'file'}.`,
+      isForDirectory,
+    );
   });
 
 /**
@@ -182,7 +187,7 @@ export const readFileDataSync = (
     }
 
     return fs.readFileSync(filePath, encoding);
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     throw getReadWriteError(error, filePath, "Can't read file.");
   }
 };
@@ -223,7 +228,7 @@ export const readJSONFileSync = <T>(filePath: string, isWriteToLog = true): T =>
     const JSONstring = readFileDataSync(filePath);
 
     return parseJSON<T>(JSONstring);
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     if (isWriteToLog) {
       writeToLogFileSync(
         `Message: ${error.message}. Path: '${filePath}'.`,
@@ -259,7 +264,7 @@ export const readJSONFile = async <T>(filePath: string, isWriteToLog = true): Pr
       .then((dataBuffer) => dataBuffer.toString());
 
     return parseJSON<T>(JSONstring);
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     if (isWriteToLog) {
       writeToLogFileSync(
         `Message: ${error.message}. Path: '${filePath}'.`,
@@ -285,7 +290,7 @@ export const readINIFile = async (
     const INIData = await readFileData(filePath);
 
     return new Ini(iconv.decode(INIData, encoding));
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     writeToLogFileSync(
       `Message: ${error.message}. Path: '${filePath}'.`,
       LogMessageType.ERROR,
@@ -309,7 +314,7 @@ export const readINIFileSync = (
     const INIData = readFileDataSync(filePath, encoding as BufferEncoding);
 
     return new Ini(INIData);
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     writeToLogFileSync(
       `Message: ${error.message}. Path: '${filePath}'.`,
       LogMessageType.ERROR,
@@ -344,7 +349,7 @@ export const readXMLFile = async (
       parseNodeValue: false,
       textNodeName: '#text',
     });
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     writeToLogFileSync(
       `Message: ${error.message}. Path: '${filePath}'.`,
       LogMessageType.ERROR,
@@ -362,7 +367,7 @@ export const readXMLFile = async (
 export const writeFileDataSync = (filePath: string, data: string|Buffer): void => {
   try {
     fs.writeFileSync(filePath, data);
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     throw getReadWriteError(error, filePath, "Can't write file.");
   }
 };
@@ -387,7 +392,7 @@ export const writeFileData = (
 */
 export const writeJSONFile = (
   filePath: string,
-  data: Record<string, any>,
+  data: Record<string, any>, //eslint-disable-line @typescript-eslint/no-explicit-any
 ): Promise<void> => writeFileData(filePath, JSON.stringify(data, null, 2))
   .catch((error) => {
     writeToLogFile(
@@ -486,6 +491,15 @@ export const readGameSettingsFile = async (
 };
 
 /**
+ * Проверяет, существует ли указанный путь.
+ * @param pathToCheck Путь для проверки.
+ * @returns Существует ли указанный путь.
+*/
+export const getIsExists = (
+  pathToCheck: string,
+): boolean => fs.existsSync(pathToCheck);
+
+/**
  * Получает путь до родительской папки для указанного файла.
  * @param filePath Путь до файла, для которого нужно получить путь до папки.
  * @returns Строка абсолютного пути до папки.
@@ -561,7 +575,7 @@ export const getUserThemesFolders = (): string[] => {
     }
 
     return [];
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     let errorMsg = '';
 
     if (error instanceof ReadWriteError) {
@@ -607,7 +621,7 @@ export const getPathFromFileInput = async (
     }
 
     return pathObj.filePaths[0];
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     return '';
   }
 };

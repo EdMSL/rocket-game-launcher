@@ -24,7 +24,7 @@ export const launcherLogPath = path.resolve(
 export const createLogFile = (pathToLogFile = launcherLogPath): void => {
   try {
     fs.writeFileSync(pathToLogFile, `Log file created at: ${new Date().toLocaleString()}.`);
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     showErrorBox(error.message, "Can't create log file.");
   }
 };
@@ -49,7 +49,7 @@ export const writeToLogFileSync = (message: string, messageType = LogMessageType
       launcherLogPath,
       getLogMessage(message, messageType),
     );
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     writeToLogErrorCallback(error);
   }
 };

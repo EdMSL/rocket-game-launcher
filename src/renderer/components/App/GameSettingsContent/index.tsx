@@ -7,6 +7,7 @@ import {
   IGameSettingsParameters,
   IGameSettingsOption,
   IGameSettingsRootState,
+  IGameSettingsOptionItem,
 } from '$types/gameSettings';
 import {
   changeParameterValue,
@@ -193,7 +194,9 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
                     {
                       option.items.map((item) => {
                         optionData = getOptionNameAndId(item);
-                        const multiparameters = option.items.map((item) => getOptionNameAndId(item).id).join();
+                        const multiparameters = option.items.map(
+                          (subitem: IGameSettingsOptionItem) => getOptionNameAndId(subitem).id,
+                        ).join();
 
                         if (item.controllerType === UIControllerType.SELECT) {
                           return (
@@ -225,7 +228,9 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
             }
 
             if (option.optionType === GameSettingsOptionType.GROUP) {
-              const multiparameters = option.items.map((item) => getOptionNameAndId(item).id).join();
+              const multiparameters = option.items
+                .map((item) => getOptionNameAndId(item).id)
+                .join();
 
               if (option.controllerType === UIControllerType.SELECT) {
                 return (
@@ -309,7 +314,9 @@ export const GameSettingsContent: React.FunctionComponent<IProps> = ({
             }
 
             if (option.optionType === GameSettingsOptionType.COMBINED) {
-              const multiparameters = option.items.map((item) => getOptionNameAndId(item).id).join();
+              const multiparameters = option.items
+                .map((item) => getOptionNameAndId(item).id)
+                .join();
 
               if (option.controllerType === UIControllerType.SELECT) {
                 return (

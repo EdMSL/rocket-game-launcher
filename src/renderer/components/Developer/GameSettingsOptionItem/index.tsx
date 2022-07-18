@@ -66,7 +66,8 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
   const onOptionInputChange = useCallback((
     { currentTarget }: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>,
   ) => {
-    const isOptionItemChange = currentTarget.dataset.parent !== undefined && currentTarget.dataset.parent !== '';
+    const isOptionItemChange = currentTarget.dataset.parent !== undefined
+    && currentTarget.dataset.parent !== '';
 
     let currentOption: IGameSettingsOption;
 
@@ -292,9 +293,11 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
             className={styles.option__item}
             id={`controllerType_${option.id}`}
             name="controllerType"
-            selectOptions={generateSelectOptions(option.optionType === GameSettingsOptionType.COMBINED
-              ? [UIControllerType.SELECT.toUpperCase()]
-              : UIControllerType)}
+            selectOptions={generateSelectOptions(
+              option.optionType === GameSettingsOptionType.COMBINED
+                ? [UIControllerType.SELECT.toUpperCase()]
+                : UIControllerType,
+            )}
             label="Тип контроллера"
             value={option.controllerType}
             onChange={onOptionInputChange}

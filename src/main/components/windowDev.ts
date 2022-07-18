@@ -129,7 +129,7 @@ export const addDevWindowListeners = (
     );
   });
 
-  devWindow.on('show', (event) => {
+  devWindow.on('show', () => {
     mainWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, true);
     devWindow.webContents.send(AppChannel.CHANGE_DEV_WINDOW_STATE, true);
   });

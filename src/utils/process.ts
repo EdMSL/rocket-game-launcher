@@ -127,7 +127,7 @@ export const runApplication = (
         cb('', false);
       }
     });
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     if (error.code === ErrorCode.UNKNOWN) {
       writeToLogFile(
         `Message: Can't run application. Unknown file type. ${error.message} App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
@@ -195,7 +195,7 @@ export const openFolder = (
     } else {
       shell.showItemInFolder(pathToOpen);
     }
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     writeToLogFile(
       `Message: Can't open folder. Unknown error. ${error.message} Path ${pathToOpen}.`, //eslint-disable-line max-len
       LogMessageType.ERROR,

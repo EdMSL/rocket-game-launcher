@@ -67,7 +67,10 @@ export const GameSettingsBackupItem: React.FC<IProps> = ({
 
   const changeBackupName = useCallback((value: string) => {
     if (
-      (allBackups.includes(value.trim().toLowerCase()) && backupName.toLowerCase() !== value.trim().toLowerCase())
+      (
+        allBackups.includes(value.trim().toLowerCase())
+        && backupName.toLowerCase() !== value.trim().toLowerCase()
+      )
       || !isValidFolderName(value)
       || (value.length > 0 && value.trim().length === 0)
     ) {

@@ -3,16 +3,15 @@ import {
   ISuccess,
 } from '$types/common';
 import {
-  IGameSettingsConfig, IGameSettingsOptionItem, IGameSettingsOption,
+  IGameSettingsConfig, IGameSettingsOptionItem, IGameSettingsOption, IModOrganizerParams,
 } from '$types/gameSettings';
 import {
   ILauncherConfig,
   ILauncherCustomButton,
-  IModOrganizerParams,
   IWindowSettings,
 } from '$types/main';
 import {
-  Encoding, UIControllerType, GameSettingsOptionType, LauncherButtonAction,
+  Encoding, GameSettingsOptionType, LauncherButtonAction,
 } from './misc';
 
 export const SUCCESS_STATUS: ISuccess = 'success';
@@ -81,7 +80,7 @@ export const defaultLauncherConfig: ILauncherConfig = {
   width: defaultLauncherWindowSettings.width,
   height: defaultLauncherWindowSettings.height,
   isFirstLaunch: true,
-  modOrganizer: defaultModOrganizerParams,
+  // modOrganizer: defaultModOrganizerParams,
   documentsPath: '',
   gameName: 'Rocket Game Launcher',
   playButton: {
@@ -93,6 +92,7 @@ export const defaultLauncherConfig: ILauncherConfig = {
 };
 
 export const defaultGameSettingsConfig: IGameSettingsConfig = {
+  modOrganizer: defaultModOrganizerParams,
   baseFilesEncoding: Encoding.WIN1251,
   gameSettingsGroups: [],
   gameSettingsFiles: [],

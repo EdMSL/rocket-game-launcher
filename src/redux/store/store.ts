@@ -39,7 +39,9 @@ export const configureAppStore = (
   const enhanced = applyMiddleware(...middlewares);
 
   const rootReducer = getRootReducer(scope, history);
-  const enhancer: StoreEnhancer = composeWithDevToolsDevelopmentOnly(composeWithStateSync(enhanced));
+  const enhancer: StoreEnhancer = composeWithDevToolsDevelopmentOnly(
+    composeWithStateSync(enhanced),
+  );
 
   const store = createStore(rootReducer, initialState, enhancer);
 

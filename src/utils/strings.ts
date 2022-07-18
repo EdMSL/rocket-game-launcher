@@ -22,7 +22,7 @@ const HEXADECIMAL_FACTOR = 1e8;
 export const parseJSON = <T>(jsonString: string): T => {
   try {
     return JSON.parse(jsonString);
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     if (error instanceof SyntaxError) {
       throw new Error(`JSON parse error. ${error.message}`);
     } else {
@@ -100,8 +100,8 @@ export const getValueFromRange = (
  * c: new`
  * ```
 */
-export const getObjectAsList = (
-  obj: Record<string, any>,
+export const getListOfObjectKeys = (
+  obj: Record<string, any>, //eslint-disable-line @typescript-eslint/no-explicit-any
   isWithIndent = false,
 ): string => Object.keys(obj)
   .map((key) => `${key}: ${obj[key]}`)
@@ -226,7 +226,9 @@ export const replaceRootDirByPathVariable = (
 ): string => {
   const newPathStr = pathStr;
 
-  const availablePathVariablesOrder = pathVariablesCheckOrderArr.filter((current) => availablePathVariables.includes(current));
+  const availablePathVariablesOrder = pathVariablesCheckOrderArr.filter(
+    (current) => availablePathVariables.includes(current),
+  );
   let variableIndex = -1;
 
   const pathVariableName = availablePathVariablesOrder.find((curr, index) => {

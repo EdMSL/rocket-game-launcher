@@ -109,7 +109,7 @@ export const getReadWriteError = (
   }
 
   if (error.code === ErrorCode.NOT_FOUND) {
-    errorMessage = `${messageTitle} ${isDirOperation ? ErrorMessage.DIRECTORY_NOT_FOUND : ErrorMessage.FILE_NOT_FOUND}`;
+    errorMessage = `${messageTitle} ${isDirOperation ? ErrorMessage.DIRECTORY_NOT_FOUND : ErrorMessage.FILE_NOT_FOUND}`; //eslint-disable-line max-len
     errorCauseName = ErrorName.NOT_FOUND;
     errorCauseCode = error.code;
   }
@@ -144,6 +144,6 @@ export const getReadWriteError = (
  * Выполняет указанные внутри операции при нажатии кнопки 'Report' модуля `unhandled`.
  * @param error Объект ошибки.
  */
-export const reportError = (error) => {
+export const reportError = (error: unknown): void => {
   shell.openExternal(reportLink);
 };

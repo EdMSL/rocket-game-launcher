@@ -7,7 +7,7 @@ import { IGameSettingsConfig } from '$types/gameSettings';
 import { Encoding } from '$constants/misc';
 import { ErrorName } from '$utils/errors';
 
-/* eslint-disable max-len, @typescript-eslint/ban-ts-comment */
+/* eslint-disable max-len, @typescript-eslint/ban-ts-comment, @typescript-eslint/no-magic-numbers */
 describe('#Check', () => {
   before(createMockFilesForCheck);
 

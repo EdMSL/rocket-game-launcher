@@ -125,7 +125,9 @@ export const getUniqueValidationErrors = (
       return {
         ...currentErrors,
         ...totalErrors,
-        [id]: [...currentErrors[id].filter((currError) => !currentCauses.includes(currError.cause))],
+        [id]: [...currentErrors[id].filter(
+          (currError) => !currentCauses.includes(currError.cause),
+        )],
       };
     }
 

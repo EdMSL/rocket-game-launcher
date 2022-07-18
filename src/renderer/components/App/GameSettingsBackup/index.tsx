@@ -32,7 +32,9 @@ export const GameSettingsBackup: React.FC<IProps> = ({
 }) => {
   const dispatch = useDispatch();
 
-  const gameSettingsBackupsNames = gameSettingsFilesBackup.map((backup) => backup.name.toLowerCase());
+  const gameSettingsBackupsNames = gameSettingsFilesBackup.map(
+    (backup) => backup.name.toLowerCase(),
+  );
 
   const sendErrorMessage = useCallback((message: string) => {
     dispatch(addMessages([CreateUserMessage.error(message)]));
