@@ -14,6 +14,7 @@ import {
 import {
   changeConfigArrayItem,
   generateGameSettingsOption,
+  generateSelectOptions,
   getChangedOptionsAfterFileDelete,
   getDefaultGameSettingsFile,
   getDefaultGameSettingsOption,
@@ -22,7 +23,11 @@ import {
 } from '$utils/data';
 import { checkObjectForEqual } from '$utils/check';
 import {
-  AppChannel, AppWindowName, gameSettingsFileAvailableVariablesAll, LauncherButtonAction,
+  AppChannel,
+  AppWindowName,
+  gameSettingsFileAvailableVariablesAll,
+  LauncherButtonAction,
+  PathVariableName,
 } from '$constants/misc';
 import { TextField } from '$components/UI/TextField';
 import { Button } from '$components/UI/Button';
@@ -49,10 +54,14 @@ import {
 import {
   clearComponentValidationErrors,
   getUniqueValidationErrors,
+  IValidationData,
   IValidationErrors,
   validateFileRelatedFields,
   ValidationErrorCause,
 } from '$utils/validation';
+import { Switcher } from '$components/UI/Switcher';
+import { Select } from '$components/UI/Select';
+import { PathSelector } from '$components/UI/PathSelector';
 
 export const DeveloperGameSettingsScreen: React.FC = () => {
   /* eslint-disable max-len */
@@ -62,7 +71,6 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   const isGameSettingsConfigLoaded = useDeveloperSelector((state) => state.developer.isGameSettingsConfigLoaded);
   const isFirstLaunch = useDeveloperSelector((state) => state.developer.launcherConfig.isFirstLaunch);
   const pathVariables = useDeveloperSelector((state) => state.developer.pathVariables);
-  const isModOrganizerUsed = useDeveloperSelector((state) => state.developer.launcherConfig.modOrganizer.isUsed);
 
   const dispatch = useDispatch();
 
@@ -149,6 +157,43 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
   ) => {
     changeCurrentConfig(target.value, target.name);
   }, [changeCurrentConfig]);
+
+  const onSelectChange = useCallback(({ target }: React.ChangeEvent<HTMLSelectElement>) => {
+    changeCurrentConfig(target.value, target.name, target.dataset.parent);
+  }, [changeCurrentConfig]);
+
+  const onSwitcherChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    changeCurrentConfig(target.checked, target.name, target.dataset.parent);
+  }, [changeCurrentConfig]);
+
+  const onPathSelectorChange = useCallback((
+    value: string,
+    id: string,
+    validationData: IValidationData,
+    parent: string|undefined,
+  ) => {
+    let pathStr = value;
+
+    if (pathStr === '') {
+      if (parent) {
+        pathStr = currentConfig[parent][id];
+      } else {
+        pathStr = currentConfig[id];
+      }
+    }
+
+    changeCurrentConfig(
+      pathStr,
+      id,
+      parent,
+    );
+
+    setValidationErrors(getUniqueValidationErrors(
+      validationErrors,
+      validationData.errors,
+      validationData.isForAdd,
+    ));
+  }, [currentConfig, validationErrors, changeCurrentConfig]);
 
   const createNewGroup = useCallback(() => {
     const newName = getRandomName();
@@ -252,7 +297,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
         ],
         'gameSettingsFiles');
         setLastAddedFileId(file.id);
-      } catch (error: any) {
+      } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
         dispatch(addDeveloperMessages([CreateUserMessage.error(
           'Выбранный файл находится в недопустимой папке.',
         )]));
@@ -294,7 +339,10 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     newFiles: IGameSettingsFile[],
     deletedItem: IGameSettingsFile|undefined,
   ) => {
-    if (currentConfig.gameSettingsFiles.length === 1 && currentConfig.gameSettingsOptions.length > 0) {
+    if (
+      currentConfig.gameSettingsFiles.length === 1
+      && currentConfig.gameSettingsOptions.length > 0
+    ) {
       await ipcRenderer.invoke(
         AppChannel.GET_MESSAGE_BOX_RESPONSE,
         'Невозможно удалить единственный файл, если присутствует хотя бы одна игровая опция.', //eslint-disable-line max-len
@@ -303,7 +351,10 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
         undefined,
         AppWindowName.DEV,
       );
-    } else if (currentConfig.gameSettingsOptions.some((currentOption) => currentOption.file === deletedItem?.name)) {
+    } else if (currentConfig.gameSettingsOptions.some(
+      (currentOption) => currentOption.file === deletedItem?.name,
+    )
+    ) {
       const messageBoxResponse = await ipcRenderer.invoke(
         AppChannel.GET_MESSAGE_BOX_RESPONSE,
         'Одна или несколько игровых опций имеют данный файл в зависимостях. Нажмите "Отмена", чтобы вручную изменить используемый опциями файл, "Игнорировать", чтобы автоматически выбрать для опции один из доступных файлов, или "Удалить", чтобы удалить связанные с файлом опции.', //eslint-disable-line max-len
@@ -459,6 +510,48 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                 isGameSettingsConfigLoaded && (
                   <React.Fragment>
                     <div className="developer__block">
+                      <p className="developer__block-title">Настройки Mod Organizer</p>
+                      <Switcher
+                        className="developer__item"
+                        id="isUsed"
+                        name="isUsed"
+                        parent="modOrganizer"
+                        label="Используется ли MO?"
+                        isChecked={currentConfig.modOrganizer.isUsed}
+                        description="Определяет, используется ли в игре\сборке Mod Organizer"//eslint-disable-line max-len
+                        onChange={onSwitcherChange}
+                      />
+                      <Select
+                        className="developer__item"
+                        id="version"
+                        name="version"
+                        parent="modOrganizer"
+                        label="Версия MO"
+                        selectOptions={[
+                          { label: 'Mod Organizer', value: '1' },
+                          { label: 'Mod Organizer 2', value: '2' },
+                        ]}
+                        value={currentConfig.modOrganizer.version.toString()}
+                        isDisabled={!currentConfig.modOrganizer.isUsed}
+                        description="Задает версию использемого Mod Organizer"
+                        onChange={onSelectChange}
+                      />
+                      <PathSelector
+                        className="developer__item"
+                        id="pathToMOFolder"
+                        name="pathToMOFolder"
+                        label="Путь до папки MO"
+                        parent="modOrganizer"
+                        value={currentConfig.modOrganizer.pathToMOFolder}
+                        selectPathVariables={generateSelectOptions([PathVariableName.GAME_DIR])}
+                        pathVariables={pathVariables}
+                        isDisabled={!currentConfig.modOrganizer.isUsed}
+                        description="Задает путь до основной папки Mod Organizer."
+                        validationErrors={validationErrors}
+                        onChange={onPathSelectorChange}
+                      />
+                    </div>
+                    <div className="developer__block">
                       <TextField
                         className="developer__item"
                         id="baseFilesEncoding"
@@ -524,14 +617,17 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                       <p className="developer__subtitle">Файлы игровых настроек</p>
                       <ul className={styles.developer__list}>
                         {
-                        currentConfig.gameSettingsFiles.length > 0 && currentConfig.gameSettingsFiles.map((file, index) => (
+                        currentConfig.gameSettingsFiles.length > 0
+                        && currentConfig.gameSettingsFiles.map((file, index) => (
                           <SpoilerListItem<IGameSettingsFile>
                             key={file.name}
                             item={file}
                             items={currentConfig.gameSettingsFiles}
                             position={index}
                             lastItemId={lastAddedFileId}
-                            summaryText={[{ label: 'Имя файла:', text: file.label }, { label: 'Путь:', text: file.path }]}
+                            summaryText={[
+                              { label: 'Имя файла:', text: file.label },
+                              { label: 'Путь:', text: file.path }]}
                             validationErrors={validationErrors}
                             onDeleteItem={deleteGameSettingsFile}
                           >
@@ -539,7 +635,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                               file={file}
                               pathVariables={pathVariables}
                               validationErrors={validationErrors}
-                              isModOrganizerUsed={isModOrganizerUsed}
+                              isModOrganizerUsed={gameSettingsConfig.modOrganizer.isUsed}
                               onFileDataChange={changeGameSettingsFiles}
                               onValidation={setNewValidationErrors}
                               deleteFile={deleteGameSettingsFileById}
@@ -561,7 +657,8 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                       <p className="developer__subtitle">Игровые опции</p>
                       <ul className={styles.developer__list}>
                         {
-                        currentConfig.gameSettingsOptions.length > 0 && currentConfig.gameSettingsOptions.map((currentOption, index) => (
+                        currentConfig.gameSettingsOptions.length > 0
+                        && currentConfig.gameSettingsOptions.map((currentOption, index) => (
                           <SpoilerListItem<IGameSettingsOption>
                             key={currentOption.id}
                             item={currentOption}
@@ -587,11 +684,13 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                         }
                       </ul>
                       {
-                        currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length !== 0
+                        currentConfig.gameSettingsOptions.length === 0
+                        && currentConfig.gameSettingsFiles.length !== 0
                         && <p> Нет игровых опций</p>
                       }
                       {
-                        currentConfig.gameSettingsOptions.length === 0 && currentConfig.gameSettingsFiles.length === 0
+                        currentConfig.gameSettingsOptions.length === 0
+                        && currentConfig.gameSettingsFiles.length === 0
                         && <p> Добавьте хотя бы один игровой файл, чтобы добавлять игровые опции</p>
                       }
                       {

@@ -8,7 +8,7 @@ export const MAIN_TYPES = {
   SET_IS_DEV_WINDOW_OPENING: 'SET_IS_DEV_WINDOW_OPENING',
   SET_IS_GAME_RUNNING: 'SET_IS_GAME_RUNNING',
   SET_IS_LAUNCHER_INITIALISED: 'SET_IS_LAUNCHER_INITIALISED',
-  SET_IS_LAUNCHER_CONFIG_CHANGED: 'SET_IS_LAUNCHER_CONFIG_CHANGED',
+  SET_IS_GAME_SETTINGS_CONFIG_CHANGED: 'SET_IS_GAME_SETTINGS_CONFIG_CHANGED',
   SET_IS_CONFIG_LOADING: 'SET_IS_CONFIG_LOADING',
   SET_IS_GAME_SETTINGS_FILE_EXISTS: 'SET_IS_GAME_SETTINGS_FILE_EXISTS',
   SET_IS_GAME_SETTINGS_LOADING: 'SET_IS_GAME_SETTINGS_LOADING',
@@ -67,15 +67,15 @@ export interface IWindowSettings {
   height: number,
 }
 
-export interface IModOrganizerParams {
-  isUsed: boolean,
-  version: number,
-  pathToMOFolder: string,
-}
+// export interface IModOrganizerParams {
+//   isUsed: boolean,
+//   version: number,
+//   pathToMOFolder: string,
+// }
 
 export interface ILauncherConfig extends IWindowSettings {
   isFirstLaunch: boolean,
-  modOrganizer: IModOrganizerParams,
+  // modOrganizer: IModOrganizerParams,
   documentsPath: string,
   gameName: string,
   playButton: ILauncherAppButton,

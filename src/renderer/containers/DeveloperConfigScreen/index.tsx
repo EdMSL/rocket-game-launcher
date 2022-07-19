@@ -213,56 +213,7 @@ export const DeveloperConfigScreen: React.FC = () => {
   }, [validationErrors, changeCurrentConfig]);
 
   const onSwitcherChange = useCallback(async ({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    if (
-      target.id === 'isUsed'
-      && !target.checked
-      && gameSettingsConfig.gameSettingsFiles.length > 0
-      && gameSettingsConfig.gameSettingsFiles.some((currentFile) => PathRegExp.MO.test(currentFile.path))
-    ) {
-      const messageBoxResponse = await ipcRenderer.invoke(
-        AppChannel.GET_MESSAGE_BOX_RESPONSE,
-        `В путях к некоторым файлам игровых настроек пристуствуют переменные Mod Organizer.\nНажмите "Отмена", чтобы вручную изменить пути к файлам, "Игнорировать", чтобы изменить переменную на ${PathVariableName.GAME_DIR}, или "Удалить", чтобы удалить файлы и связанные с ними игровые опции.\nИзменения будут приняты только при сохранении текущей конфигурации.`, //eslint-disable-line max-len
-        'Выберите действие',
-        undefined,
-        ['Отмена', 'Игнорировать', 'Удалить'],
-        AppWindowName.DEV,
-      );
-
-      if (messageBoxResponse.response === 1) {
-        const newFiles = gameSettingsConfig.gameSettingsFiles.map((currentFile) => {
-          if (PathRegExp.MO.test(currentFile.path)) {
-            return {
-              ...currentFile,
-              path: currentFile.path.replace(PathRegExp.MO, PathVariableName.GAME_DIR),
-            };
-          }
-
-          return currentFile;
-        });
-
-        setTempGameSettingsFiles(newFiles);
-
-        changeCurrentConfig(target.name, false, target.dataset.parent);
-      } else if (messageBoxResponse.response === 2) {
-        const newFiles = gameSettingsConfig.gameSettingsFiles.filter(
-          (currentFile) => !PathRegExp.MO.test(currentFile.path),
-        );
-        const filesNames = getGameSettingsFilesNames(newFiles);
-
-        setTempGameSettingsFiles(newFiles);
-        setTempGameSettingsOptions(gameSettingsConfig.gameSettingsOptions.filter(
-          (currentOption) => filesNames.includes(currentOption.file),
-        ));
-
-        changeCurrentConfig(target.name, false, target.dataset.parent);
-      }
-    } else {
-      changeCurrentConfig(target.name, target.checked, target.dataset.parent);
-    }
-  }, [gameSettingsConfig, changeCurrentConfig]);
-
-  const onSelectChange = useCallback(({ target }: React.ChangeEvent<HTMLSelectElement>) => {
-    changeCurrentConfig(target.name, target.value, target.dataset.parent);
+    changeCurrentConfig(target.name, target.checked, target.dataset.parent);
   }, [changeCurrentConfig]);
 
   const deleteCustomBtnItem = useCallback((items: ILauncherCustomButton[]) => {
@@ -484,48 +435,6 @@ export const DeveloperConfigScreen: React.FC = () => {
                 Добавить кнопку
               </Button>
             </div>
-          </div>
-          <div className="developer__block">
-            <p className="developer__block-title">Настройки Mod Organizer</p>
-            <Switcher
-              className="developer__item"
-              id="isUsed"
-              name="isUsed"
-              parent="modOrganizer"
-              label="Используется ли MO?"
-              isChecked={currentConfig.modOrganizer.isUsed}
-              description="Определяет, используется ли в игре\сборке Mod Organizer"//eslint-disable-line max-len
-              onChange={onSwitcherChange}
-            />
-            <Select
-              className="developer__item"
-              id="version"
-              name="version"
-              parent="modOrganizer"
-              label="Версия MO"
-              selectOptions={[
-                { label: 'Mod Organizer', value: '1' },
-                { label: 'Mod Organizer 2', value: '2' },
-              ]}
-              value={currentConfig.modOrganizer.version.toString()}
-              isDisabled={!currentConfig.modOrganizer.isUsed}
-              description="Задает версию использемого Mod Organizer"
-              onChange={onSelectChange}
-            />
-            <PathSelector
-              className="developer__item"
-              id="pathToMOFolder"
-              name="pathToMOFolder"
-              label="Путь до папки MO"
-              parent="modOrganizer"
-              value={currentConfig.modOrganizer.pathToMOFolder}
-              selectPathVariables={generateSelectOptions([PathVariableName.GAME_DIR])}
-              pathVariables={pathVariables}
-              isDisabled={!currentConfig.modOrganizer.isUsed}
-              description="Задает путь до основной папки Mod Organizer."
-              validationErrors={validationErrors}
-              onChange={onPathSelectorChange}
-            />
           </div>
         </React.Fragment>
       </ScrollbarsBlock>

@@ -26,7 +26,6 @@ export type IDeveloperRootState = Readonly<{
   isLauncherConfigProcessing: boolean,
   isGameSettingsConfigProcessing: boolean,
   isGameSettingsConfigLoaded: boolean,
-  isGameSettingsConfigChanged: boolean,
   isGameSettingsConfigFileExists: boolean,
   pathVariables: IPathVariables,
   messages: IUserMessage[],

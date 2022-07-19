@@ -6,6 +6,7 @@ import { defaultGameSettingsConfig } from '$constants/defaultData';
 
 // Если добавляем поле в settings.json, то добаляем его здесь в стейт и constants/misc
 export const INITIAL_STATE: IGameSettingsRootState = {
+  modOrganizer: defaultGameSettingsConfig.modOrganizer,
   gameSettingsGroups: defaultGameSettingsConfig.gameSettingsGroups,
   baseFilesEncoding: defaultGameSettingsConfig.baseFilesEncoding,
   gameSettingsFiles: defaultGameSettingsConfig.gameSettingsFiles,

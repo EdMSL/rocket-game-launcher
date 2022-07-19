@@ -19,7 +19,7 @@ import {
   setIsGameSettingsConfigProcessing,
   setIsLauncherConfigProcessing,
   setLauncherConfig,
-  setPathVariables,
+  setPathVariablesDeveloper,
   updateConfig,
 } from '$actions/developer';
 import { Routes } from '$constants/routes';
@@ -32,16 +32,19 @@ import {
 } from '$utils/log';
 import { getGameSettingsConfigSaga } from './gameSettings';
 import { DEVELOPER_TYPES } from '$types/developer';
-import { AppChannel } from '$constants/misc';
+import { AppChannel, AppWindowName } from '$constants/misc';
 import { writeJSONFile } from '$utils/files';
-import { CONFIG_FILE_PATH, GAME_SETTINGS_FILE_PATH } from '$constants/paths';
-import { deepClone, updatePathVariables } from '$utils/data';
+import {
+  CONFIG_FILE_PATH, GAME_SETTINGS_FILE_PATH, IPathVariables,
+} from '$constants/paths';
+import {
+  deepClone, getModOrganizerPathVariables, updatePathVariables,
+} from '$utils/data';
 import {
   checkObjectForEqual, getWindowSettingsFromLauncherConfig,
 } from '$utils/check';
 import { defaultGameSettingsConfig } from '$constants/defaultData';
-import { getFileNameFromPathToFile } from '$utils/strings';
-import { setIsGameSettingsFileExists } from '$actions/main';
+import { getFileNameFromPathToFile, getObjectAsList } from '$utils/strings';
 
 const getState = (state: IDeveloperState): IDeveloperState => state;
 
@@ -62,7 +65,34 @@ export function* initGameSettingsDeveloperSaga(): SagaIterator {
     const {
       data: settingsConfig,
       errors,
-    }: SagaReturnType<typeof getGameSettingsConfigSaga> = yield call(getGameSettingsConfigSaga);
+    }: SagaReturnType<typeof getGameSettingsConfigSaga> = yield call(
+      getGameSettingsConfigSaga,
+      AppWindowName.DEV,
+    );
+
+    let newPathVariables: IPathVariables;
+
+    if (settingsConfig.modOrganizer.isUsed) {
+      const {
+        developer: {
+          pathVariables,
+        },
+      }: ReturnType<typeof getState> = yield select(getState);
+
+      const MOPathVariables = getModOrganizerPathVariables(
+        settingsConfig.modOrganizer.pathToMOFolder,
+        pathVariables,
+      );
+
+      newPathVariables = {
+        ...pathVariables,
+        ...MOPathVariables,
+      };
+
+      yield put(setPathVariablesDeveloper(newPathVariables));
+
+      writeToLogFile(`Mod Organizer paths variables:\n  ${getObjectAsList(MOPathVariables, true, true)}`); //eslint-disable-line max-len
+    }
 
     if (errors.length > 0) {
       yield put(addDeveloperMessages([CreateUserMessage.warning('Обнаружены ошибки в файле settings.json. Подробности в файле лога.')]));//eslint-disable-line max-len
@@ -70,12 +100,23 @@ export function* initGameSettingsDeveloperSaga(): SagaIterator {
 
     yield put(setGameSettingsConfig(settingsConfig));
     yield put(setIsGameSettingsConfigLoaded(true));
-    yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, undefined, settingsConfig);
-  } catch (error: any) {
+    yield call(ipcRenderer.send,
+      AppChannel.SAVE_DEV_CONFIG,
+      undefined,
+      settingsConfig,
+      false,
+      // Игнорируем возможную передачу undefined, т.к. это предусмотрено функцией.
+      //@ts-ignore
+      newPathVariables);
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     let errorMessage = '';
     let isWarning = false;
 
-    if (error instanceof SagaError && error.reason instanceof ReadWriteError && error.reason.causeName === ErrorName.NOT_FOUND) {
+    if (
+      error instanceof SagaError
+      && error.reason instanceof ReadWriteError
+      && error.reason.causeName === ErrorName.NOT_FOUND
+    ) {
       isWarning = true;
       errorMessage = 'Game settings file "settings.json" not found.';
     } else if (error instanceof SagaError) {
@@ -144,12 +185,16 @@ function* saveLauncherConfigSaga(
       isChangeWindowSize);
 
     yield put(setLauncherConfig(newConfig));
-    yield put(setPathVariables(newPathVariables));
+    yield put(setPathVariablesDeveloper(newPathVariables));
+
+    if (!checkObjectForEqual(pathVariables, newPathVariables)) {
+      writeToLogFile(`Paths variables updated:\n  ${getObjectAsList(newPathVariables, true, true)}`); //eslint-disable-line max-len
+    }
 
     if (isGoToMainScreen) {
       yield call(ipcRenderer.send, AppChannel.CHANGE_DEV_WINDOW_STATE, false);
     }
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     let errorMessage = '';
 
     if (error instanceof SagaError) {
@@ -203,6 +248,29 @@ function* saveGameSettingsConfigSaga(
       GAME_SETTINGS_FILE_PATH,
       deepClone(newConfig, ['id', 'selectOptionsValueString']),
     );
+
+    const {
+      developer: {
+        pathVariables,
+        gameSettingsConfig: { modOrganizer: { pathToMOFolder, isUsed } },
+      },
+    }: ReturnType<typeof getState> = yield select(getState);
+
+    if (newConfig.modOrganizer.isUsed
+      && (
+        pathToMOFolder !== newConfig.modOrganizer.pathToMOFolder
+        || !isUsed)
+    ) {
+      const newPathVariables = updatePathVariables(
+        pathVariables,
+        newConfig,
+      );
+
+      yield put(setPathVariablesDeveloper(newPathVariables));
+
+      writeToLogFile(`Paths variables updated:\n  ${getObjectAsList(newPathVariables, true, true)}`); //eslint-disable-line max-len
+    }
+
     yield put(setGameSettingsConfig(newConfig));
 
     yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, false, newConfig, true);
@@ -210,7 +278,7 @@ function* saveGameSettingsConfigSaga(
     if (isGoToMainScreen) {
       yield call(ipcRenderer.send, AppChannel.CHANGE_DEV_WINDOW_STATE, false);
     }
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     let errorMessage = '';
 
     if (error instanceof SagaError) {
@@ -250,7 +318,7 @@ function* createGameSettingsConfigFileSaga(): SagaIterator {
       undefined,
       defaultGameSettingsConfig,
       true);
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     let errorMessage = '';
 
     if (error instanceof CustomError) {

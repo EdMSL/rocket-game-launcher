@@ -1,14 +1,12 @@
 import Storage from 'electron-store';
 import { Store } from 'redux';
 import path from 'path';
-import {
-  app, ipcMain, dialog,
-} from 'electron';
+import { app, ipcMain } from 'electron';
 import fs from 'fs';
 
 import { configureAppStore, IAppState } from '$store/store';
 import { IUserSettingsRootState } from '$types/userSettings';
-import { defaultLauncherConfig, defaultModOrganizerParams } from '$constants/defaultData';
+import { defaultLauncherConfig } from '$constants/defaultData';
 import {
   LogMessageType,
   writeToLogFile,
@@ -32,7 +30,7 @@ import {
 import { checkLauncherConfigFileData, checkObjectForEqual } from '$utils/check';
 import { getObjectAsList } from '$utils/strings';
 import {
-  createPathVariables,
+  createBasePathVariables,
   getCustomButtons,
   getUserThemes,
 } from '$utils/data';
@@ -56,7 +54,7 @@ const getConfigurationData = (): [ILauncherConfig, boolean] => {
     const configData = readJSONFileSync<ILauncherConfig>(CONFIG_FILE_PATH);
 
     return [configData, false];
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     if (error instanceof ReadWriteError) {
       if (error.causeName === ErrorName.NOT_FOUND) {
         writeToLogFileSync(
@@ -99,8 +97,6 @@ export const createStorage = (): Store<IAppState> => {
 
   const configurationData = checkLauncherConfigFileData(configurationFileData);
 
-  let isGameSettingsAvailable = true;
-
   // Создаем хранилище пользовательских настроек (настройки темы и т.п.).
   // Хранилище располагается в файле user.json в корне программы.
   const storage = new Storage<IStorage>({
@@ -132,25 +128,11 @@ export const createStorage = (): Store<IAppState> => {
     storage.set('userSettings.theme', '');
   }
 
-  // Обработка данных Mod Organizer
-  if (configurationData.modOrganizer?.isUsed) {
-    //@ts-ignore
-    configurationData.modOrganizer = {
-      ...defaultModOrganizerParams,
-      ...configurationData.modOrganizer,
-    };
-  }
-
   // Переменные путей и настройка кнопок
-  const [pathVariables, errorText] = createPathVariables(
+  const pathVariables = createBasePathVariables(
     configurationData,
     app,
   );
-
-  if (errorText) {
-    isGameSettingsAvailable = false;
-    messages.push(CreateUserMessage.error(errorText)); //eslint-disable-line max-len
-  }
 
   if (!configurationData.playButton.path && !configurationData.isFirstLaunch) {
     messages.push(CreateUserMessage.warning('Не указан путь для файла запуска игры.')); //eslint-disable-line max-len
@@ -183,17 +165,12 @@ export const createStorage = (): Store<IAppState> => {
       ...mainInitialState,
       config: {
         ...configurationData,
-        modOrganizer: {
-          ...mainInitialState.config.modOrganizer,
-          ...configurationData.modOrganizer,
-        },
         playButton: {
           ...mainInitialState.config.playButton,
           ...configurationData.playButton,
         },
       },
       isGameSettingsFileExists,
-      isGameSettingsAvailable,
       isDevWindowOpening: configurationData.isFirstLaunch,
       launcherVersion: app.getVersion(),
       pathVariables,
@@ -231,11 +208,7 @@ export const createStorage = (): Store<IAppState> => {
   ipcMain.handle(AppChannel.GET_APP_STATE, () => appStore.getState());
 
   writeToLogFileSync(`Working directory: ${GAME_DIR}`);
-  writeToLogFileSync(`Paths variables:\n  ${getObjectAsList(pathVariables, true)}`);
-
-  if (configurationFileData.modOrganizer) {
-    writeToLogFileSync(`MO information:\n  ${getObjectAsList(configurationFileData.modOrganizer!, true)}`); //eslint-disable-line max-len
-  }
+  writeToLogFileSync(`Base paths variables:\n  ${getObjectAsList(pathVariables, true, true)}`);
 
   return appStore;
 };

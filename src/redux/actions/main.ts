@@ -35,7 +35,7 @@ export const setIsGameSettingsFileExists = (
 export const setIsGameSettingsConfigChanged = (
   isGameSettingsConfigChanged: IMainRootState['isGameSettingsConfigChanged'],
 ) => ({
-  type: MAIN_TYPES.SET_IS_LAUNCHER_CONFIG_CHANGED,
+  type: MAIN_TYPES.SET_IS_GAME_SETTINGS_CONFIG_CHANGED,
   payload: isGameSettingsConfigChanged,
 });
 export const setIsGameRunning = (

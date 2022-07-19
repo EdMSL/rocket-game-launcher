@@ -74,7 +74,7 @@ function* initLauncherSaga(): SagaIterator {
     } else {
       // writeToLogFile('Game settings file settings.json not found.');
     }
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     let errorMessage = '';
 
     if (error instanceof SagaError) {
@@ -104,7 +104,7 @@ function* updateGameSettingsParametersSaga(
     yield put(setGameSettingsParameters({}));
 
     yield call(initGameSettingsSaga, true, gameSetingsConfig);
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     if (
       error instanceof SagaError
       && error.reason instanceof ReadWriteError
@@ -150,10 +150,12 @@ function* getGameSettingsFilesBackupSaga(isExternalCall = true): SagaIterator {
       yield put(setIsGameSettingsFilesBackuping(true));
     }
 
-    const result: IUnwrap<typeof getGameSettingsFilesBackups> = yield call(getGameSettingsFilesBackups);
+    const result: IUnwrap<typeof getGameSettingsFilesBackups> = yield call(
+      getGameSettingsFilesBackups,
+    );
 
     yield put(setGameSettingsFilesBackup(result));
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     if (isExternalCall) {
       throw new SagaError('Get game settings files backup', error.message, error);
     } else {
@@ -203,7 +205,7 @@ function* createGameSettingsBackupSaga(
     if (isGetBackup) {
       yield call(getGameSettingsFilesBackupSaga, false);
     }
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     let errorMessage = '';
 
     if (error instanceof SagaError) {
@@ -242,7 +244,7 @@ function* deleteGameSettingsFilesBackupSaga({
     }
 
     yield call(getGameSettingsFilesBackupSaga, false);
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     if (error instanceof ReadWriteError && error.causeName === ErrorName.NOT_FOUND) {
       yield put(addMessages([CreateUserMessage.warning(
         'Не удалось удалить файлы бэкапа. Папка была удалена, перемещена или переименована.',
@@ -307,7 +309,7 @@ function* renameGameSettingsFilesBackupSaga({
     });
 
     yield put(setGameSettingsFilesBackup(backupData));
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     if (error instanceof ReadWriteError && error.causeName === ErrorName.NOT_FOUND) {
       yield put(addMessages([CreateUserMessage.warning(
         'Не удалось переименовать папку бэкапа. Папка была удалена, перемещена или переименована.',
@@ -359,7 +361,9 @@ function* restoreGameSettingsFilesBackupSaga({
       },
     }: ReturnType<typeof getState> = yield select(getState);
 
-    const { gameSettingsParameters }: SagaReturnType<typeof generateGameSettingsParametersSaga> = yield call(
+    const {
+      gameSettingsParameters,
+    }: SagaReturnType<typeof generateGameSettingsParametersSaga> = yield call(
       generateGameSettingsParametersSaga,
       gameSettingsFiles,
       gameSettingsOptions,
@@ -367,7 +371,7 @@ function* restoreGameSettingsFilesBackupSaga({
     );
 
     yield put(setGameSettingsParameters(gameSettingsParameters));
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     let errorMessage = '';
 
     if (error instanceof SagaError) {
@@ -474,7 +478,7 @@ function* locationChangeSaga(
         yield put(push(Routes.MAIN_SCREEN));
       }
     }
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     yield put(addMessages([CreateUserMessage.error(error.message)]));
   }
 }

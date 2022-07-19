@@ -65,7 +65,7 @@ const setIsGameSettingsConfigLoaded: IDeveloperActionHadler<
 });
 
 const setPathVariables: IDeveloperActionHadler<
-  typeof DEVELOPER_ACTIONS.setPathVariables
+  typeof DEVELOPER_ACTIONS.setPathVariablesDeveloper
 > = (
   state,
   { payload: newPathVariables },

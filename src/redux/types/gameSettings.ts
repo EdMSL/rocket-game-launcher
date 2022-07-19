@@ -78,7 +78,14 @@ export interface IGameSettingsOption extends
   IGameSettingsOptionBase,
   IGameSettingsOptionControllerFields {}
 
+export interface IModOrganizerParams {
+  isUsed: boolean,
+  version: number,
+  pathToMOFolder: string,
+}
+
 export interface IGameSettingsConfig {
+  modOrganizer: IModOrganizerParams,
   baseFilesEncoding: IGameSettingsRootState['baseFilesEncoding'],
   gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
   gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
@@ -86,6 +93,7 @@ export interface IGameSettingsConfig {
 }
 
 export type IGameSettingsRootState = Readonly<{
+  modOrganizer: IModOrganizerParams,
   baseFilesEncoding: Encoding,
   gameSettingsGroups: IGameSettingsGroup[],
   gameSettingsFiles: IGameSettingsFile[],

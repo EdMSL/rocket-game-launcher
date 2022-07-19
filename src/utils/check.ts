@@ -21,6 +21,7 @@ import {
   LogMessageType, writeToLogFileSync,
 } from '$utils/log';
 import {
+  defaultGameSettingsConfig,
   defaultLauncherConfig, defaultLauncherWindowSettings, MinWindowSize,
 } from '$constants/defaultData';
 import { CustomError, ErrorName } from './errors';
@@ -73,7 +74,7 @@ const checkIsPathWithVariableCorrect = (
 ): string => {
   if (helpers.state.path![0] === 'customButtons') {
     if (!PathRegExp.CUSTOM_BTNS_AVAILABLE_PATH_VARIABLES.test(value)) {
-      throw new Error(`path variable is not correct or not available for this path. Path: ${value}`);
+      throw new Error(`path variable is not correct or not available for this path. Path: ${value}`); //eslint-disable-line max-len
     }
 
     if (!getIsPathWithVariableCorrect(value, helpers.state.ancestors[0].action)) {
@@ -112,11 +113,6 @@ const configFileDataSchema = Joi.object<ILauncherConfig>({
     .default(defaultLauncherConfig.minHeight),
   maxWidth: Joi.number().integer().optional().default(defaultLauncherConfig.maxWidth),
   maxHeight: Joi.number().integer().optional().default(defaultLauncherConfig.maxHeight),
-  modOrganizer: Joi.object({
-    isUsed: Joi.bool().optional().default(false),
-    version: Joi.number().valid(1, 2).when(Joi.ref('isUsed'), { is: true, then: Joi.required() }),
-    pathToMOFolder: Joi.string().optional().default(defaultLauncherConfig.modOrganizer.pathToMOFolder).pattern(PathRegExp.GAME_DIR, 'correct path'),
-  }).optional().default(defaultLauncherConfig.modOrganizer),
   documentsPath: Joi.string().optional().allow('').default(defaultLauncherConfig.documentsPath)
     .pattern(PathRegExp.DOCUMENTS, 'correct path'),
   isFirstLaunch: Joi.bool().optional().default(defaultLauncherConfig.isFirstLaunch),
@@ -177,6 +173,7 @@ const gameSettingsFileSchema = Joi.object<IGameSettingsFile>({
 
 // Схема для поверхностной проверки. Нужна для записи в state во время генерации storage.
 export const gameSettingsShallowCheckSchema = Joi.object<IGameSettingsConfig>({
+  modOrganizer: Joi.object({}).required(),
   baseFilesEncoding: Joi.string().optional().default(Encoding.WIN1251),
   gameSettingsGroups: Joi.array().optional().default([]),
   gameSettingsFiles: Joi.array().required(),
@@ -185,6 +182,11 @@ export const gameSettingsShallowCheckSchema = Joi.object<IGameSettingsConfig>({
 
 // Полная проверка.
 export const gameSettingsDeepCheckSchema = Joi.object<IGameSettingsConfig>({
+  modOrganizer: Joi.object({
+    isUsed: Joi.bool().optional().default(false),
+    version: Joi.number().valid(1, 2).when(Joi.ref('isUsed'), { is: true, then: Joi.required() }),
+    pathToMOFolder: Joi.string().optional().default(defaultGameSettingsConfig.modOrganizer.pathToMOFolder).pattern(PathRegExp.GAME_DIR, 'correct path'),
+  }).optional().default(defaultGameSettingsConfig.modOrganizer),
   baseFilesEncoding: Joi.string().optional().default(Encoding.WIN1251),
   gameSettingsGroups: Joi.array()
     .items(GameSettingsGroupSchema).optional().default([])
@@ -593,6 +595,8 @@ export const checkGameSettingsConfigFull = (
     ...config,
     gameSettingsOptions: options,
   };
+
+  writeToLogFileSync('Checking completed.');
 
   return {
     data: config,

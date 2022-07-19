@@ -100,11 +100,18 @@ export const getValueFromRange = (
  * c: new`
  * ```
 */
-export const getListOfObjectKeys = (
+export const getObjectAsList = (
   obj: Record<string, any>, //eslint-disable-line @typescript-eslint/no-explicit-any
   isWithIndent = false,
+  isClearEmpty = false,
 ): string => Object.keys(obj)
-  .map((key) => `${key}: ${obj[key]}`)
+  .reduce<string[]>((acc, currentKey) => {
+    if (isClearEmpty && !obj[currentKey]) {
+      return [...acc];
+    }
+
+    return [...acc, `${currentKey}: ${obj[currentKey]}`];
+  }, [])
   .join(`\n${isWithIndent ? '\t' : ''}`);
 
 const createRegexp = (

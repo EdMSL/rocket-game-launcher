@@ -215,7 +215,7 @@ export const MAIN_HANDLERS = {
   [MAIN_TYPES.SET_LAUNCHER_CONFIG]: setLauncherConfig,
   [MAIN_TYPES.SET_PATH_VARIABLES]: setPathVariables,
   [MAIN_TYPES.SET_IS_FIRST_LAUNCH]: setIsFirstLaunch,
-  [MAIN_TYPES.SET_IS_LAUNCHER_CONFIG_CHANGED]: setIsGameSettingsConfigChanged,
+  [MAIN_TYPES.SET_IS_GAME_SETTINGS_CONFIG_CHANGED]: setIsGameSettingsConfigChanged,
   [MAIN_TYPES.SET_IS_GAME_RUNNING]: setIsGameRunning,
   [MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED]: setIsLauncherInitialised,
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_FILE_EXISTS]: setIsGameSettingsFileExists,

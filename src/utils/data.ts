@@ -34,6 +34,7 @@ import {
   IGameSettingsOptionBase,
   IGameSettingsOptionControllerFields,
   IGameSettingsOptionFileViewFields,
+  IGameSettingsConfig,
 } from '$types/gameSettings';
 import {
   DefaultPathVariable,
@@ -446,7 +447,9 @@ export const getOptionsForOutput = (
   const availableFiles = getGameSettingsFilesNames(gameSettingsFiles);
   let currentOptions = [...gameSettingsOptions];
 
-  currentOptions = currentOptions.filter((currentOption) => availableFiles.includes(currentOption.file));
+  currentOptions = currentOptions.filter(
+    (currentOption) => availableFiles.includes(currentOption.file),
+  );
 
   if (gameSettingsGroups.length > 0 && currentGameSettingGroup) {
     return currentOptions.filter(
@@ -654,6 +657,91 @@ export const getNewConfig = <U, T>(
     [fieldName]: value,
   };
 };
+/**
+ * Получает переменные пути Mod Organizer.
+ * @param pathToMOFolder Путь до папки `Mod Organizer`
+ * @param pathVariables Текущие переменные пути.
+ * @returns Переменные пути МО.
+ */
+export const getModOrganizerPathVariables = (
+  pathToMOFolder: string,
+  pathVariables: IPathVariables,
+): IModOrganizerPathVariables => {
+  const MO_DIR_BASE = replacePathVariableByRootDir(pathToMOFolder);
+
+  let modOrganizerModsPath = defaultModOrganizerPaths.pathToMods.replace(
+    PathVariableName.MO_DIR,
+    MO_DIR_BASE,
+  );
+  let modOrganizerProfilesPath = defaultModOrganizerPaths.pathToProfiles.replace(
+    PathVariableName.MO_DIR,
+    MO_DIR_BASE,
+  );
+
+  const MOIniData = readINIFileSync(path.join(MO_DIR_BASE, MOIniFileName));
+  const MoModsSection = MOIniData.getSection('Settings');
+
+  if (MoModsSection) {
+    const modOrganizerModsPathTemp = MoModsSection.getValue('mod_directory');
+    const modOrganizerProfilesPathTemp = MoModsSection.getValue('profiles_directory');
+
+    if (modOrganizerModsPathTemp) {
+      if (modOrganizerModsPathTemp.includes('%BASE_DIR%')) {
+        modOrganizerModsPath = modOrganizerModsPathTemp.replace('%BASE_DIR%', MO_DIR_BASE);
+      } else {
+        checkIsPathIsNotOutsideValidFolder(modOrganizerModsPathTemp, pathVariables);
+        modOrganizerModsPath = modOrganizerModsPathTemp;
+      }
+    }
+
+    if (modOrganizerProfilesPathTemp) {
+      if (modOrganizerProfilesPathTemp.includes('%BASE_DIR%')) {
+        modOrganizerProfilesPath = modOrganizerProfilesPathTemp.replace('%BASE_DIR%', MO_DIR_BASE);
+      } else {
+        checkIsPathIsNotOutsideValidFolder(modOrganizerProfilesPathTemp, pathVariables);
+        modOrganizerProfilesPath = modOrganizerProfilesPathTemp;
+      }
+    }
+  }
+
+  return {
+    '%MO_DIR%': MO_DIR_BASE,
+    '%MO_INI%': defaultModOrganizerPaths.pathToINI.replace(
+      PathVariableName.MO_DIR,
+      MO_DIR_BASE,
+    ),
+    '%MO_MODS%': modOrganizerModsPath,
+    '%MO_PROFILE%': modOrganizerProfilesPath,
+  };
+};
+
+/**
+ * Генерирует базовые переменные путей.
+ * @param configData Данные из файла config.json.
+ * @param app Объект Electron.app.
+ * @returns Объект с переменными путей.
+*/
+export const createBasePathVariables = (
+  configData: ILauncherConfig,
+  app: Electron.App,
+): IPathVariables => {
+  let pathVariables: IPathVariables = {
+    ...DefaultPathVariable,
+    '%DOCUMENTS%': app.getPath('documents'),
+  };
+
+  if (configData.documentsPath) {
+    pathVariables = {
+      ...pathVariables,
+      '%DOCS_GAME%': configData.documentsPath.replace(
+        PathVariableName.DOCUMENTS,
+        pathVariables['%DOCUMENTS%'],
+      ),
+    };
+  }
+
+  return pathVariables;
+};
 
 const getUpdatedModOrganizerPathVariables = (
   pathToMOFolder: string,
@@ -682,116 +770,35 @@ const getUpdatedModOrganizerPathVariables = (
 };
 
 /**
- * Генерирует переменные путей.
- * @param configData Данные из файла config.json.
- * @param app Объект Electron.app.
- * @returns Объект с переменными путей.
-*/
-export const createPathVariables = (
-  configData: ILauncherConfig,
-  app: Electron.App,
-): [IPathVariables, string] => {
-  let errorText = '';
-  let pathVariables: IPathVariables = {
-    ...DefaultPathVariable,
-    '%DOCUMENTS%': app.getPath('documents'),
-  };
-
-  if (configData.documentsPath) {
-    pathVariables = {
-      ...pathVariables,
-      '%DOCS_GAME%': configData.documentsPath.replace(
-        PathVariableName.DOCUMENTS,
-        pathVariables['%DOCUMENTS%'],
-      ),
-    };
-  }
-
-  if (configData.modOrganizer.isUsed) {
-    const MO_DIR_BASE = replacePathVariableByRootDir(configData.modOrganizer.pathToMOFolder);
-
-    try {
-      let modOrganizerModsPath = defaultModOrganizerPaths.pathToMods.replace(
-        PathVariableName.MO_DIR,
-        MO_DIR_BASE,
-      );
-      let modOrganizerProfilesPath = defaultModOrganizerPaths.pathToProfiles.replace(
-        PathVariableName.MO_DIR,
-        MO_DIR_BASE,
-      );
-
-      const MOIniData = readINIFileSync(path.join(MO_DIR_BASE, MOIniFileName));
-      const MoModsSection = MOIniData.getSection('Settings');
-
-      if (MoModsSection) {
-        const modOrganizerModsPathTemp = MoModsSection.getValue('mod_directory');
-        const modOrganizerProfilesPathTemp = MoModsSection.getValue('profiles_directory');
-
-        if (modOrganizerModsPathTemp) {
-          if (modOrganizerModsPathTemp.includes('%BASE_DIR%')) {
-            modOrganizerModsPath = modOrganizerModsPathTemp.replace('%BASE_DIR%', MO_DIR_BASE);
-          } else {
-            checkIsPathIsNotOutsideValidFolder(modOrganizerModsPathTemp, pathVariables);
-            modOrganizerModsPath = modOrganizerModsPathTemp;
-          }
-        }
-
-        if (modOrganizerProfilesPathTemp) {
-          if (modOrganizerProfilesPathTemp.includes('%BASE_DIR%')) {
-            modOrganizerProfilesPath = modOrganizerProfilesPathTemp.replace('%BASE_DIR%', MO_DIR_BASE);
-          } else {
-            checkIsPathIsNotOutsideValidFolder(modOrganizerProfilesPathTemp, pathVariables);
-            modOrganizerProfilesPath = modOrganizerProfilesPathTemp;
-          }
-        }
-      }
-
-      pathVariables = {
-        ...pathVariables,
-        '%MO_DIR%': MO_DIR_BASE,
-        '%MO_INI%': defaultModOrganizerPaths.pathToINI.replace(
-          PathVariableName.MO_DIR,
-          MO_DIR_BASE,
-        ),
-        '%MO_MODS%': modOrganizerModsPath,
-        '%MO_PROFILE%': modOrganizerProfilesPath,
-      };
-    } catch (error: any) {
-      if (error.name === ErrorName.INVALID_DIRECTORY) {
-        errorText = 'Указан недопустимый путь до папки профилей(profiles) или модов(mods) в настройках программы Mod Organizer. Папки должны находится в корне игры. Игровые настройки будут недоступны.'; //eslint-disable-line max-len
-
-        writeToLogFile(error.message, LogMessageType.ERROR);
-      } else if (error.name === ErrorName.READ_WRITE) {
-        errorText = `Файл ${MOIniFileName} не найден. Проверьте правильность пути к папке Mod Organizer. Игровые настройки будут недоступны.`; //eslint-disable-line max-len
-      }
-    }
-  }
-
-  return [pathVariables, errorText];
-};
-
-/**
  * Обновляет переменные путей.
  * @param pathVariables Текущие переменные путей.
- * @param launcherConfig Конфигурационные данные лаунчера из `state`.
+ * @param config Конфигурационные данные лаунчера или игровых настроек из `state`.
  * @returns Объект с переменными путей.
 */
 export const updatePathVariables = (
   pathVariables: IPathVariables,
-  launcherConfig: ILauncherConfig,
-): IPathVariables => ({
-  ...pathVariables,
-  '%DOCS_GAME%': launcherConfig.documentsPath.replace(
-    PathVariableName.DOCUMENTS,
-    pathVariables['%DOCUMENTS%'],
-  ),
-  ...launcherConfig.modOrganizer.isUsed
-    ? getUpdatedModOrganizerPathVariables(
-      launcherConfig.modOrganizer.pathToMOFolder,
-      pathVariables,
-    )
-    : {},
-});
+  config: ILauncherConfig|IGameSettingsConfig,
+): IPathVariables => {
+  if ('playButton' in config) {
+    return {
+      ...pathVariables,
+      '%DOCS_GAME%': config.documentsPath.replace(
+        PathVariableName.DOCUMENTS,
+        pathVariables['%DOCUMENTS%'],
+      ),
+    };
+  } else if ('baseFilesEncoding' in config) {
+    return {
+      ...pathVariables,
+      ...getUpdatedModOrganizerPathVariables(
+        config.modOrganizer.pathToMOFolder,
+        pathVariables,
+      ),
+    };
+  }
+
+  return pathVariables;
+};
 
 /**
  * Получает данные для генерации пользовательских кнопок.
@@ -814,7 +821,7 @@ export const getCustomButtons = (
     checkIsPathIsNotOutsideValidFolder(pathTo, pathVariables);
 
     return btn;
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     writeToLogFileSync(
       `Can't create custom button. "${btn.label}". ${error.message}. Path: ${btn.path}`,
       LogMessageType.WARNING,

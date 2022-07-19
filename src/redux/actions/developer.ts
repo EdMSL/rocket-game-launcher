@@ -72,7 +72,7 @@ export const updateConfig = (config: string) => ({
   payload: config,
 });
 
-export const setPathVariables = (
+export const setPathVariablesDeveloper = (
   newPathVariables: IDeveloperRootState['pathVariables'],
 ) => ({
   type: DEVELOPER_TYPES.SET_PATH_VARIABLES,

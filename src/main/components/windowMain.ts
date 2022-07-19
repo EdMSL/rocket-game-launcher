@@ -102,6 +102,10 @@ export const createMainWindow = (
     }
 
     if (newConfig !== undefined) {
+      if (pathVariables !== undefined) {
+        appStore.dispatch(setPathVariables(pathVariables));
+      }
+
       if ('baseFilesEncoding' in newConfig) {
         mainWindow.webContents.send(
           AppChannel.SAVE_DEV_CONFIG,
@@ -114,9 +118,9 @@ export const createMainWindow = (
           changeWindowSize(mainWindow, newConfig);
         }
 
+        appStore.dispatch(setLauncherConfig(newConfig));
+
         if (pathVariables !== undefined) {
-          appStore.dispatch(setLauncherConfig(newConfig));
-          appStore.dispatch(setPathVariables(pathVariables));
           appStore.dispatch(setIsGameSettingsConfigChanged(true));
         }
       }

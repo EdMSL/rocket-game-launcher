@@ -11,10 +11,9 @@ export const INITIAL_STATE: IDeveloperRootState = {
   isLauncherConfigProcessing: false,
   isGameSettingsConfigProcessing: false,
   isGameSettingsConfigLoaded: false,
-  isGameSettingsConfigChanged: false,
   isGameSettingsConfigFileExists: true,
   pathVariables: DefaultPathVariable,
   messages: [],
 };
 
-export const developerReducer = createReducer<IDeveloperRootState>(INITIAL_STATE, DEVELOPER_HANDLERS);
+export const developerReducer = createReducer<IDeveloperRootState>(INITIAL_STATE, DEVELOPER_HANDLERS); //eslint-disable-line max-len
