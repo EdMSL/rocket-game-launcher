@@ -52,7 +52,11 @@ const getState = (state: IDeveloperState): IDeveloperState => state;
  * Инициализация игровых настроек для режима разработчика.
  * Только проверка полей на валидность и запись в `state`.
  */
-export function* initGameSettingsDeveloperSaga(): SagaIterator {
+export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): SagaIterator {
+  if (isFromUpdateAction) {
+    writeToLogFileSync('Update game settings from developer screen.');
+  }
+
   yield call(
     ipcRenderer.send,
     AppChannel.SAVE_DEV_CONFIG,
@@ -91,7 +95,9 @@ export function* initGameSettingsDeveloperSaga(): SagaIterator {
 
       yield put(setPathVariablesDeveloper(newPathVariables));
 
-      writeToLogFile(`Mod Organizer paths variables:\n  ${getObjectAsList(MOPathVariables, true, true)}`); //eslint-disable-line max-len
+      if (!isFromUpdateAction) {
+        writeToLogFile(`Mod Organizer paths variables:\n  ${getObjectAsList(MOPathVariables, true, true)}`); //eslint-disable-line max-len
+      }
     }
 
     if (errors.length > 0) {
@@ -144,7 +150,7 @@ export function* initGameSettingsDeveloperSaga(): SagaIterator {
 
 function* updateConfigSaga({ payload: configName }: ReturnType<typeof updateConfig>): SagaIterator {
   if (configName === 'gameSettings') {
-    yield call(initGameSettingsDeveloperSaga);
+    yield call(initGameSettingsDeveloperSaga, true);
   }
 }
 

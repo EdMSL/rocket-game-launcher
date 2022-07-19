@@ -19,6 +19,7 @@ import {
   getDefaultGameSettingsFile,
   getDefaultGameSettingsOption,
   getFullOption,
+  getGameSettingsFilesNames,
   getNewConfig,
 } from '$utils/data';
 import { checkObjectForEqual } from '$utils/check';
@@ -27,6 +28,7 @@ import {
   AppWindowName,
   gameSettingsFileAvailableVariablesAll,
   LauncherButtonAction,
+  PathRegExp,
   PathVariableName,
 } from '$constants/misc';
 import { TextField } from '$components/UI/TextField';
@@ -162,9 +164,104 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
     changeCurrentConfig(target.value, target.name, target.dataset.parent);
   }, [changeCurrentConfig]);
 
-  const onSwitcherChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    changeCurrentConfig(target.checked, target.name, target.dataset.parent);
-  }, [changeCurrentConfig]);
+  const onSwitcherChange = useCallback(async ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    if (
+      target.id === 'isUsed'
+      && !target.checked
+      && currentConfig.gameSettingsFiles.length > 0
+      && currentConfig.gameSettingsFiles.some(
+        (currentFile) => PathRegExp.MO.test(currentFile.path),
+      )
+    ) {
+      const messageBoxResponse = await ipcRenderer.invoke(
+        AppChannel.GET_MESSAGE_BOX_RESPONSE,
+        `В путях к некоторым файлам игровых настроек пристуствуют переменные Mod Organizer.\nНажмите "Отмена", чтобы вручную изменить пути к файлам, "Игнорировать", чтобы изменить переменную на ${PathVariableName.GAME_DIR}, или "Удалить", чтобы удалить файлы и связанные с ними игровые опции.\nИзменения будут приняты только при сохранении текущей конфигурации.`, //eslint-disable-line max-len
+        'Выберите действие',
+        undefined,
+        ['Отмена', 'Игнорировать', 'Удалить'],
+        AppWindowName.DEV,
+      );
+
+      if (messageBoxResponse.response > 0) {
+        const changedFileNames: string[] = [];
+
+        let newConfig: IGameSettingsConfig = { ...currentConfig };
+        let message = '';
+
+        if (messageBoxResponse.response === 1) {
+          const newFiles = currentConfig.gameSettingsFiles.map((currentFile) => {
+            if (PathRegExp.MO.test(currentFile.path)) {
+              changedFileNames.push(currentFile.label);
+
+              return {
+                ...currentFile,
+                path: currentFile.path.replace(PathRegExp.MO, PathVariableName.GAME_DIR),
+              };
+            }
+
+            return currentFile;
+          });
+
+          newConfig = {
+            ...newConfig,
+            gameSettingsFiles: newFiles,
+            modOrganizer: {
+              ...newConfig.modOrganizer,
+              isUsed: false,
+            },
+          };
+
+          message = `При сохранении настроек для файлов [${changedFileNames.join()}] переменная пути будет изменена на ${PathVariableName.GAME_DIR}`; //eslint-disable-line max-len
+        } else if (messageBoxResponse.response === 2) {
+          const changedOptionsNames: string[] = [];
+
+          const newFiles = newConfig.gameSettingsFiles.filter(
+            (currentFile) => {
+              if (PathRegExp.MO.test(currentFile.path)) {
+                changedFileNames.push(currentFile.label);
+
+                return false;
+              }
+
+              return true;
+            },
+          );
+          const filesNames = getGameSettingsFilesNames(newFiles);
+
+          newConfig = {
+            ...newConfig,
+            gameSettingsFiles: newFiles,
+            gameSettingsOptions: newConfig.gameSettingsOptions.filter(
+              (currentOption) => {
+                if (!filesNames.includes(currentOption.file)) {
+                  changedOptionsNames.push(currentOption.label);
+
+                  return false;
+                }
+
+                return true;
+              },
+            ),
+            modOrganizer: {
+              ...newConfig.modOrganizer,
+              isUsed: false,
+            },
+          };
+
+          message = `При сохранении настроек файлы [${changedFileNames.join()}]${changedOptionsNames.length > 0 ? ` и опции [${changedOptionsNames.join()}]` : ''} будут удалены`; //eslint-disable-line max-len
+        }
+
+        dispatch(addDeveloperMessages([CreateUserMessage.info(message)]));
+
+        setCurrentConfig(newConfig);
+        setIsConfigChanged(!checkObjectForEqual(currentConfig, newConfig));
+      }
+    } else {
+      changeCurrentConfig(target.checked, target.name, target.dataset.parent);
+    }
+  }, [currentConfig,
+    changeCurrentConfig,
+    dispatch]);
 
   const onPathSelectorChange = useCallback((
     value: string,
@@ -635,7 +732,7 @@ export const DeveloperGameSettingsScreen: React.FC = () => {
                               file={file}
                               pathVariables={pathVariables}
                               validationErrors={validationErrors}
-                              isModOrganizerUsed={gameSettingsConfig.modOrganizer.isUsed}
+                              isModOrganizerUsed={currentConfig.modOrganizer.isUsed}
                               onFileDataChange={changeGameSettingsFiles}
                               onValidation={setNewValidationErrors}
                               deleteFile={deleteGameSettingsFileById}
