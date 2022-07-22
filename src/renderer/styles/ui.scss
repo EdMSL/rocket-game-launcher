@@ -54,7 +54,7 @@ $checkbox-size: 20px;
     content: "";
     position: absolute;
     top: calc(50% - #{$checkbox-size} / 2);
-    right: 0;
+    right: 20px;
 
     display: block;
     box-sizing: border-box;
@@ -71,7 +71,7 @@ $checkbox-size: 20px;
     content: "";
     position: absolute;
     top: calc(50% - 3px);
-    right: 7px;
+    right: 27px;
 
     display: none;
     width: 6px;
@@ -274,7 +274,7 @@ $checkbox-size: 20px;
     content: "";
     position: absolute;
     top: calc(50% - #{$checkbox-size} / 2);
-    right: 0;
+    right: 20px;
 
     width: 36px;
     height: 20px;
@@ -289,7 +289,7 @@ $checkbox-size: 20px;
     content: "";
     position: absolute;
     top: calc(50% - #{$checkbox-size} / 2 + 2px);
-    right: calc(0% + 16px + 1px);
+    right: calc(0% + 16px + 1px + 20px);
 
     display: block;
     width: 16px;
@@ -304,7 +304,7 @@ $checkbox-size: 20px;
   }
 
   .switcher__input:checked + &::after {
-    right: 3px;
+    right: 23px;
   }
 
   .switcher__input:focus + &::before {
