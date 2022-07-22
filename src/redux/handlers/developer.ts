@@ -14,14 +14,14 @@ const setLauncherConfig: IDeveloperActionHadler<
   launcherConfig: newConfig,
 });
 
-const setIsLauncherConfigProcessing: IDeveloperActionHadler<
-  typeof DEVELOPER_ACTIONS.setIsLauncherConfigProcessing
+const setIsConfigProcessing: IDeveloperActionHadler<
+  typeof DEVELOPER_ACTIONS.setIsConfigProcessing
 > = (
   state,
-  { payload: isLauncherConfigProcessing },
+  { payload: isConfigProcessing },
 ) => ({
   ...state,
-  isLauncherConfigProcessing,
+  isConfigProcessing,
 });
 
 const setIsGameSettingsConfigFileExists: IDeveloperActionHadler<
@@ -44,24 +44,14 @@ const setGameSettingsConfig: IDeveloperActionHadler<
   gameSettingsConfig,
 });
 
-const setIsGameSettingsConfigProcessing: IDeveloperActionHadler<
-  typeof DEVELOPER_ACTIONS.setIsGameSettingsConfigProcessing
+const setisGameSettingsConfigDataLoaded: IDeveloperActionHadler<
+  typeof DEVELOPER_ACTIONS.setisGameSettingsConfigDataLoaded
 > = (
   state,
-  { payload: isGameSettingsConfigProcessing },
+  { payload: isGameSettingsConfigDataLoaded },
 ) => ({
   ...state,
-  isGameSettingsConfigProcessing,
-});
-
-const setIsGameSettingsConfigLoaded: IDeveloperActionHadler<
-  typeof DEVELOPER_ACTIONS.setIsGameSettingsConfigLoaded
-> = (
-  state,
-  { payload: isGameSettingsConfigLoaded },
-) => ({
-  ...state,
-  isGameSettingsConfigLoaded,
+  isGameSettingsConfigDataLoaded,
 });
 
 const setPathVariables: IDeveloperActionHadler<
@@ -111,9 +101,8 @@ export const DEVELOPER_HANDLERS = {
   [DEVELOPER_TYPES.SET_LAUNCHER_CONFIG]: setLauncherConfig,
   [DEVELOPER_TYPES.SET_IS_GAME_SETTINGS_CONFIG_FILE_EXISTS]: setIsGameSettingsConfigFileExists,
   [DEVELOPER_TYPES.SET_GAME_SETTINGS_CONFIG]: setGameSettingsConfig,
-  [DEVELOPER_TYPES.SET_IS_LAUNCHER_CONFIG_PROCESSING]: setIsLauncherConfigProcessing,
-  [DEVELOPER_TYPES.SET_IS_GAME_SETTINGS_CONFIG_PROCESSING]: setIsGameSettingsConfigProcessing,
-  [DEVELOPER_TYPES.SET_IS_GAME_SETTINGS_CONFIG_LOADED]: setIsGameSettingsConfigLoaded,
+  [DEVELOPER_TYPES.SET_IS_CONFIG_PROCESSING]: setIsConfigProcessing,
+  [DEVELOPER_TYPES.SET_IS_GAME_SETTINGS_CONFIG_LOADED]: setisGameSettingsConfigDataLoaded,
   [DEVELOPER_TYPES.SET_PATH_VARIABLES]: setPathVariables,
   [DEVELOPER_TYPES.SET_DEVELOPER_MESSAGES]: setDeveloperMessages,
   [DEVELOPER_TYPES.ADD_DEVELOPER_MESSAGES]: addDeveloperMessages,

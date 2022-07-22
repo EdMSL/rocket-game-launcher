@@ -639,8 +639,8 @@ export const getUserThemes = (themesFolders: string[]): { [key: string]: string,
 */
 export const getNewConfig = <U, T>(
   currentConfig: U,
-  value: T,
   fieldName: string,
+  value: T,
   parent?: string,
 ): U => {
   if (parent) {

@@ -8,9 +8,8 @@ import { DefaultPathVariable } from '$constants/paths';
 export const INITIAL_STATE: IDeveloperRootState = {
   launcherConfig: defaultLauncherConfig,
   gameSettingsConfig: defaultGameSettingsConfig,
-  isLauncherConfigProcessing: false,
-  isGameSettingsConfigProcessing: false,
-  isGameSettingsConfigLoaded: false,
+  isConfigProcessing: false,
+  isGameSettingsConfigDataLoaded: false,
   isGameSettingsConfigFileExists: true,
   pathVariables: DefaultPathVariable,
   messages: [],

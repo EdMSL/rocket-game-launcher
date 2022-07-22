@@ -114,7 +114,7 @@
     transform: rotate(180deg);
   }
 
-  .spoiler__block[open] & {
+  .spoiler__block[open] > .spoiler__title > & {
     &:hover {
       fill: var(--focus-color);
     }

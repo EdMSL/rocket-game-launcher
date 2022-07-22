@@ -23,7 +23,7 @@ const initialState = {
     pathVariables: main.pathVariables,
     isGameSettingsConfigFileExists: main.isGameSettingsFileExists,
     ...main.isGameSettingsLoaded ? {
-      isGameSettingsConfigLoaded: main.isGameSettingsLoaded,
+      isGameSettingsConfigDataLoaded: main.isGameSettingsLoaded,
       gameSettingsConfig: {
         modOrganizer: gameSettings.modOrganizer,
         baseFilesEncoding: gameSettings.baseFilesEncoding,

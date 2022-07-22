@@ -1,4 +1,6 @@
-import { LOCATION_CHANGE, LocationChangeAction } from 'connected-react-router';
+import {
+  LOCATION_CHANGE, LocationChangeAction, push,
+} from 'connected-react-router';
 import { SagaIterator } from 'redux-saga';
 import {
   call,
@@ -11,18 +13,16 @@ import { ILocationState } from '$types/common';
 import { IDeveloperState } from '$store/store';
 import {
   addDeveloperMessages,
-  saveGameSettingsConfig,
-  saveLauncherConfig,
+  saveConfiguration,
   setGameSettingsConfig,
   setIsGameSettingsConfigFileExists,
-  setIsGameSettingsConfigLoaded,
-  setIsGameSettingsConfigProcessing,
-  setIsLauncherConfigProcessing,
+  setisGameSettingsConfigDataLoaded,
+  setIsConfigProcessing,
   setLauncherConfig,
   setPathVariablesDeveloper,
   updateConfig,
 } from '$actions/developer';
-import { Routes } from '$constants/routes';
+import { DeveloperScreenName, Routes } from '$constants/routes';
 import { CreateUserMessage } from '$utils/message';
 import {
   CustomError, ErrorName, ReadWriteError, SagaError,
@@ -45,6 +45,8 @@ import {
 } from '$utils/check';
 import { defaultGameSettingsConfig } from '$constants/defaultData';
 import { getFileNameFromPathToFile, getObjectAsList } from '$utils/strings';
+import { ILauncherConfig } from '$types/main';
+import { IGameSettingsConfig } from '$types/gameSettings';
 
 const getState = (state: IDeveloperState): IDeveloperState => state;
 
@@ -64,7 +66,7 @@ export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): Saga
   );
 
   try {
-    yield put(setIsGameSettingsConfigProcessing(true));
+    yield put(setIsConfigProcessing(true));
 
     const {
       data: settingsConfig,
@@ -105,7 +107,7 @@ export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): Saga
     }
 
     yield put(setGameSettingsConfig(settingsConfig));
-    yield put(setIsGameSettingsConfigLoaded(true));
+    yield put(setisGameSettingsConfigDataLoaded(true));
     yield call(ipcRenderer.send,
       AppChannel.SAVE_DEV_CONFIG,
       undefined,
@@ -137,9 +139,9 @@ export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): Saga
 
     writeToLogFile(errorMessage, isWarning ? LogMessageType.WARNING : LogMessageType.ERROR);
 
-    yield put(setIsGameSettingsConfigLoaded(false));
+    yield put(setisGameSettingsConfigDataLoaded(false));
   } finally {
-    yield put(setIsGameSettingsConfigProcessing(false));
+    yield put(setIsConfigProcessing(false));
     yield call(
       ipcRenderer.send,
       AppChannel.SAVE_DEV_CONFIG,
@@ -149,16 +151,16 @@ export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): Saga
 }
 
 function* updateConfigSaga({ payload: configName }: ReturnType<typeof updateConfig>): SagaIterator {
-  if (configName === 'gameSettings') {
+  if (configName === DeveloperScreenName.GAME_SETTINGS) {
     yield call(initGameSettingsDeveloperSaga, true);
   }
 }
 
 function* saveLauncherConfigSaga(
-  { payload: { newConfig, isGoToMainScreen } }: ReturnType<typeof saveLauncherConfig>,
+  newConfig: ILauncherConfig, pathToGo: string,
 ): SagaIterator {
   // Ставим здесь именно сохранение игровых настроек только из-за показа лоадера
-  yield put(setIsLauncherConfigProcessing(true));
+  yield put(setIsConfigProcessing(true));
   yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, true);
   yield delay(2000);
 
@@ -197,8 +199,12 @@ function* saveLauncherConfigSaga(
       writeToLogFile(`Paths variables updated:\n  ${getObjectAsList(newPathVariables, true, true)}`); //eslint-disable-line max-len
     }
 
-    if (isGoToMainScreen) {
-      yield call(ipcRenderer.send, AppChannel.CHANGE_DEV_WINDOW_STATE, false);
+    if (pathToGo) {
+      if (pathToGo === Routes.MAIN_SCREEN) {
+        yield call(ipcRenderer.send, AppChannel.CHANGE_DEV_WINDOW_STATE, false);
+      } else {
+        yield put(push(pathToGo));
+      }
     }
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     let errorMessage = '';
@@ -220,15 +226,15 @@ function* saveLauncherConfigSaga(
 
     yield put(addDeveloperMessages([CreateUserMessage.error('Произошла ошибка при сохранении файла конфигурации. Подробности в файле лога.')])); //eslint-disable-line max-len
   } finally {
-    yield put(setIsLauncherConfigProcessing(false));
+    yield put(setIsConfigProcessing(false));
     yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, false);
   }
 }
 
 function* saveGameSettingsConfigSaga(
-  { payload: { newConfig, isGoToMainScreen } }: ReturnType<typeof saveGameSettingsConfig>,
+  newConfig: IGameSettingsConfig, pathToGo: string,
 ): SagaIterator {
-  yield put(setIsGameSettingsConfigProcessing(true));
+  yield put(setIsConfigProcessing(true));
   yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, true);
   yield delay(2000);
   try {
@@ -281,8 +287,12 @@ function* saveGameSettingsConfigSaga(
 
     yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, false, newConfig, true);
 
-    if (isGoToMainScreen) {
-      yield call(ipcRenderer.send, AppChannel.CHANGE_DEV_WINDOW_STATE, false);
+    if (pathToGo) {
+      if (pathToGo === Routes.MAIN_SCREEN) {
+        yield call(ipcRenderer.send, AppChannel.CHANGE_DEV_WINDOW_STATE, false);
+      } else {
+        yield put(push(pathToGo));
+      }
     }
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     let errorMessage = '';
@@ -304,19 +314,29 @@ function* saveGameSettingsConfigSaga(
 
     yield put(addDeveloperMessages([CreateUserMessage.error('Произошла ошибка при сохранении файла игровых настроек. Подробности в файле лога.')])); //eslint-disable-line max-len
   } finally {
-    yield put(setIsGameSettingsConfigProcessing(false));
+    yield put(setIsConfigProcessing(false));
+  }
+}
+
+function* saveConfigurationSaga(
+  { payload: { newConfig, pathToGo } }: ReturnType<typeof saveConfiguration>,
+): SagaIterator {
+  if ('playButton' in newConfig) {
+    yield call(saveLauncherConfigSaga, newConfig, pathToGo);
+  } else if ('baseFilesEncoding' in newConfig) {
+    yield call(saveGameSettingsConfigSaga, newConfig, pathToGo);
   }
 }
 
 function* createGameSettingsConfigFileSaga(): SagaIterator {
-  yield put(setIsGameSettingsConfigProcessing(true));
+  yield put(setIsConfigProcessing(true));
 
   try {
     yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, true);
 
     yield call(writeJSONFile, GAME_SETTINGS_FILE_PATH, defaultGameSettingsConfig);
     yield put(setGameSettingsConfig(defaultGameSettingsConfig));
-    yield put(setIsGameSettingsConfigLoaded(true));
+    yield put(setisGameSettingsConfigDataLoaded(true));
     yield put(setIsGameSettingsConfigFileExists(true));
 
     yield call(ipcRenderer.send,
@@ -342,7 +362,7 @@ function* createGameSettingsConfigFileSaga(): SagaIterator {
 
     yield put(addDeveloperMessages([CreateUserMessage.error('Произошла ошибка при создании файла игровых настроек. Подробности в файле лога.')])); //eslint-disable-line max-len
   } finally {
-    yield put(setIsGameSettingsConfigProcessing(false));
+    yield put(setIsConfigProcessing(false));
     yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, false);
   }
 }
@@ -352,11 +372,14 @@ function* locationChangeSaga(
 ): SagaIterator {
   const {
     developer: {
-      isGameSettingsConfigLoaded,
+      isGameSettingsConfigDataLoaded,
     },
   }: ReturnType<typeof getState> = yield select(getState);
 
-  if (location.pathname === Routes.DEVELOPER_SCREEN_GAME_SETTINGS && !isGameSettingsConfigLoaded) {
+  if (
+    location.pathname === Routes.DEVELOPER_SCREEN_GAME_SETTINGS
+    && !isGameSettingsConfigDataLoaded
+  ) {
     yield call(initGameSettingsDeveloperSaga);
   }
 }
@@ -365,7 +388,6 @@ function* locationChangeSaga(
 export default function* developerSaga(): SagaIterator {
   yield takeLatest(LOCATION_CHANGE, locationChangeSaga);
   yield takeLatest(DEVELOPER_TYPES.UPDATE_CONFIG, updateConfigSaga);
-  yield takeLatest(DEVELOPER_TYPES.SAVE_LAUNCHER_CONFIG, saveLauncherConfigSaga);
-  yield takeLatest(DEVELOPER_TYPES.SAVE_GAME_SETTINGS_CONFIG, saveGameSettingsConfigSaga);
+  yield takeLatest(DEVELOPER_TYPES.SAVE_CONFIGURATION, saveConfigurationSaga);
   yield takeLatest(DEVELOPER_TYPES.CREATE_GAME_SETTINGS_CONFIG_FILE, createGameSettingsConfigFileSaga);
 }

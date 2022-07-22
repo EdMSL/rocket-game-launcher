@@ -259,6 +259,13 @@ export const replaceRootDirByPathVariable = (
 };
 
 /**
+ * Получает строку пути из поля `hash` у ссылки `Link` или `NavLink`.
+ * @param hash Строка хэша пути.
+ * @returns Строка пути.
+ */
+export const getPathFromLinkHash = (hash: string): string => hash.substring(1);
+
+/**
  * Заменяет переменную пути в переданной строке на заданный путь.
  * @param pathStr Изменяемый путь.
  * @param pathVariable Переменная пути, которую меняем.

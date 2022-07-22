@@ -2,9 +2,9 @@ import {
   DEVELOPER_TYPES, IDeveloperRootState,
 } from '$types/developer';
 import { IGameSettingsConfig } from '$types/gameSettings';
+import { ILauncherConfig } from '$types/main';
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 export const createGameSettingsConfigFile = () => ({
   type: DEVELOPER_TYPES.CREATE_GAME_SETTINGS_CONFIG_FILE,
 });
@@ -16,18 +16,10 @@ export const setLauncherConfig = (
   payload: newConfig,
 });
 
-export const saveLauncherConfig = (
-  newConfig: IDeveloperRootState['launcherConfig'],
-  isGoToMainScreen = false,
+export const setIsConfigProcessing = (
+  isProcessing: IDeveloperRootState['isConfigProcessing'],
 ) => ({
-  type: DEVELOPER_TYPES.SAVE_LAUNCHER_CONFIG,
-  payload: { newConfig, isGoToMainScreen },
-});
-
-export const setIsLauncherConfigProcessing = (
-  isProcessing: IDeveloperRootState['isLauncherConfigProcessing'],
-) => ({
-  type: DEVELOPER_TYPES.SET_IS_LAUNCHER_CONFIG_PROCESSING,
+  type: DEVELOPER_TYPES.SET_IS_CONFIG_PROCESSING,
   payload: isProcessing,
 });
 
@@ -45,23 +37,16 @@ export const setGameSettingsConfig = (
   payload: gameSetingsConfig,
 });
 
-export const saveGameSettingsConfig = (
-  newConfig: IGameSettingsConfig,
-  isGoToMainScreen = false,
+export const saveConfiguration = (
+  newConfig: IGameSettingsConfig|ILauncherConfig,
+  pathToGo = '',
 ) => ({
-  type: DEVELOPER_TYPES.SAVE_GAME_SETTINGS_CONFIG,
-  payload: { newConfig, isGoToMainScreen },
+  type: DEVELOPER_TYPES.SAVE_CONFIGURATION,
+  payload: { newConfig, pathToGo },
 });
 
-export const setIsGameSettingsConfigProcessing = (
-  isProcessing: IDeveloperRootState['isGameSettingsConfigProcessing'],
-) => ({
-  type: DEVELOPER_TYPES.SET_IS_GAME_SETTINGS_CONFIG_PROCESSING,
-  payload: isProcessing,
-});
-
-export const setIsGameSettingsConfigLoaded = (
-  isLoaded: IDeveloperRootState['isGameSettingsConfigLoaded'],
+export const setisGameSettingsConfigDataLoaded = (
+  isLoaded: IDeveloperRootState['isGameSettingsConfigDataLoaded'],
 ) => ({
   type: DEVELOPER_TYPES.SET_IS_GAME_SETTINGS_CONFIG_LOADED,
   payload: isLoaded,

@@ -48,7 +48,7 @@ module.exports = {
       "ignore": ["first-nested"],
     }],
     "selector-class-pattern": /^([a-z][a-z0-9]*)([_-]{1,2}[a-z0-9]+)*$/,
-    "selector-max-compound-selectors": 2,
+    "selector-max-compound-selectors": 3,
     "selector-max-universal": 1,
     "selector-pseudo-class-no-unknown": [true, {
       ignorePseudoClasses: ["global"],

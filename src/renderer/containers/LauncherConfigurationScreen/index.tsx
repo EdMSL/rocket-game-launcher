@@ -2,7 +2,6 @@ import { ipcRenderer } from 'electron';
 import React, {
   useCallback, useState, useEffect,
 } from 'react';
-import { useDispatch } from 'react-redux';
 import classNames from 'classnames';
 
 import styles from './styles.module.scss';
@@ -10,42 +9,27 @@ import { useDeveloperSelector } from '$store/store';
 import { NumberField } from '$components/UI/NumberField';
 import { TextField } from '$components/UI/TextField';
 import { Switcher } from '$components/UI/Switcher';
-import { Select } from '$components/UI/Select';
 import { PathSelector } from '$components/UI/PathSelector';
 import {
   FileExtension,
   LauncherButtonAction,
   PathVariableName,
   AppChannel,
-  AppWindowName,
-  PathRegExp,
 } from '$constants/misc';
 import { MinWindowSize, appWindowFields } from '$constants/defaultData';
 import { Button } from '$components/UI/Button';
 import { CustomBtnItem } from '$components/Developer/CustomBtnItem';
 import {
   IButtonArg,
+  ILauncherConfig,
   ILauncherCustomButton,
 } from '$types/main';
 import {
   changeConfigArrayItem,
   generateSelectOptions,
-  getGameSettingsFilesNames,
   getNewConfig,
 } from '$utils/data';
 import { ArgumentsBlock } from '$components/Developer/ArgumentsBlock';
-import {
-  checkObjectForEqual,
-} from '$utils/check';
-import { getRandomId } from '$utils/strings';
-import { DeveloperScreenController } from '$components/Developer/DeveloperScreenController';
-import { IDeveloperRootState } from '$types/developer';
-import {
-  saveGameSettingsConfig,
-  saveLauncherConfig,
-  updateConfig,
-} from '$actions/developer';
-import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import {
   clearComponentValidationErrors,
@@ -55,64 +39,31 @@ import {
   validateNumberInputs,
   ValidationErrorCause,
 } from '$utils/validation';
-import { IGameSettingsFile, IGameSettingsOption } from '$types/gameSettings';
+import { getRandomId } from '$utils/strings';
 
-export const DeveloperConfigScreen: React.FC = () => {
+interface IProps {
+  currentConfig: ILauncherConfig,
+  validationErrors: IValidationErrors,
+  setNewConfig: (configData: ILauncherConfig, isCheckForChanges?: boolean) => void,
+  resetConfigChanges: () => void,
+  setValidationErrors: (errors: IValidationErrors) => void,
+}
+
+export const LauncherConfigurationScreen: React.FC<IProps> = ({
+  currentConfig,
+  validationErrors,
+  setNewConfig,
+  resetConfigChanges,
+  setValidationErrors,
+}) => {
   /* eslint-disable max-len */
   const pathVariables = useDeveloperSelector((state) => state.developer.pathVariables);
   const launcherConfig = useDeveloperSelector((state) => state.developer.launcherConfig);
-  const gameSettingsConfig = useDeveloperSelector((state) => state.developer.gameSettingsConfig);
-  const isLauncherConfigProcessing = useDeveloperSelector((state) => state.developer.isLauncherConfigProcessing);
+  const isConfigProcessing = useDeveloperSelector((state) => state.developer.isConfigProcessing);
 
-  const dispatch = useDispatch();
-
-  const [currentConfig, setCurrentConfig] = useState<IDeveloperRootState['launcherConfig']>(launcherConfig);
-  const [validationErrors, setValidationErrors] = useState<IValidationErrors>({});
-  const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
   const [lastAddedBtnItemId, setLastAddedBtnItemId] = useState<string>('');
   const [isSettingsInitialized, setIsSettingsInitialized] = useState<boolean>(true);
-  const [tempGameSettingsFiles, setTempGameSettingsFiles] = useState<IGameSettingsFile[]>([]);
-  const [tempGameSettingsOptions, setTempGameSettingsOptions] = useState<IGameSettingsOption[]>([]);
   /* eslint-enable max-len */
-
-  const saveConfigChanges = useCallback((
-    isGoToMainScreen: boolean,
-  ) => {
-    const newConfig = { ...currentConfig, isFirstLaunch: false };
-
-    dispatch(saveLauncherConfig(
-      newConfig,
-      isGoToMainScreen,
-    ));
-
-    if (tempGameSettingsFiles.length > 0) {
-      let newGameSettingsConfig = { ...gameSettingsConfig };
-
-      newGameSettingsConfig = {
-        ...newGameSettingsConfig,
-        gameSettingsFiles: tempGameSettingsFiles,
-      };
-
-      if (tempGameSettingsOptions.length > 0) {
-        newGameSettingsConfig = {
-          ...newGameSettingsConfig,
-          gameSettingsOptions: tempGameSettingsOptions,
-        };
-      }
-
-      dispatch(saveGameSettingsConfig(newGameSettingsConfig));
-    }
-
-    setIsConfigChanged(false);
-  }, [currentConfig, gameSettingsConfig, tempGameSettingsFiles, tempGameSettingsOptions, dispatch]);
-
-  const resetConfigChanges = useCallback(() => {
-    setIsConfigChanged(false);
-    setValidationErrors({});
-    setCurrentConfig(launcherConfig);
-    setTempGameSettingsFiles([]);
-    setTempGameSettingsOptions([]);
-  }, [launcherConfig, setValidationErrors]);
 
   useEffect(() => {
     ipcRenderer.on(AppChannel.CHANGE_DEV_WINDOW_STATE, (
@@ -124,44 +75,25 @@ export const DeveloperConfigScreen: React.FC = () => {
       }
     });
 
-    if (!isSettingsInitialized && !isLauncherConfigProcessing) {
+    if (currentConfig.playButton === undefined) {
+      setNewConfig(launcherConfig, false);
+    }
+
+    if (!isSettingsInitialized && !isConfigProcessing) {
       resetConfigChanges();
       setIsSettingsInitialized(true);
     }
 
     return (): void => { ipcRenderer.removeAllListeners(AppChannel.CHANGE_DEV_WINDOW_STATE); };
-  }, [isSettingsInitialized, isLauncherConfigProcessing, resetConfigChanges]);
+  }, [currentConfig.playButton,
+    currentConfig,
+    launcherConfig, isSettingsInitialized,
+    isConfigProcessing, setNewConfig,
+    resetConfigChanges]);
 
   const setNewValidationErrors = useCallback((errors: IValidationErrors) => {
     setValidationErrors(errors);
-  }, []);
-
-  const onSaveBtnClick = useCallback((
-    { currentTarget }: React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    saveConfigChanges(currentTarget.name === 'ok_save_config_btn');
-  }, [saveConfigChanges]);
-
-  const onResetBtnClick = useCallback(() => {
-    resetConfigChanges();
-  }, [resetConfigChanges]);
-
-  const onCancelBtnClick = useCallback(() => {
-    resetConfigChanges();
-    ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false);
-  }, [resetConfigChanges]);
-
-  const onUpdateBtnClick = useCallback(() => {
-    dispatch(updateConfig('launcher'));
-    setIsSettingsInitialized(false);
-  }, [dispatch]);
-
-  const changeCurrentConfig = useCallback((fieldName: string, value, parent?: string|undefined) => {
-    const newConfig = getNewConfig(currentConfig, value, fieldName, parent);
-
-    setCurrentConfig(newConfig);
-    setIsConfigChanged(!checkObjectForEqual(launcherConfig, newConfig));
-  }, [launcherConfig, currentConfig, setIsConfigChanged]);
+  }, [setValidationErrors]);
 
   const onPathSelectorChange = useCallback((
     value: string,
@@ -179,26 +111,27 @@ export const DeveloperConfigScreen: React.FC = () => {
       }
     }
 
-    changeCurrentConfig(
-      id,
-      pathStr,
-      parent,
-    );
+    setNewConfig(getNewConfig(currentConfig, pathStr, id, parent));
 
     setValidationErrors(getUniqueValidationErrors(
       validationErrors,
       validationData.errors,
       validationData.isForAdd,
     ));
-  }, [currentConfig, validationErrors, changeCurrentConfig]);
+  }, [currentConfig, validationErrors, setValidationErrors, setNewConfig]);
 
   const onNumberInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     const errors = validateNumberInputs(target, currentConfig, validationErrors);
 
     setValidationErrors(errors);
 
-    changeCurrentConfig(target.name, Math.round(+target.value), target.dataset.parent);
-  }, [currentConfig, changeCurrentConfig, validationErrors]);
+    setNewConfig(getNewConfig(
+      currentConfig,
+      target.name,
+      Math.round(+target.value),
+      target.dataset.parent,
+    ));
+  }, [currentConfig, setNewConfig, setValidationErrors, validationErrors]);
 
   const OnTextFieldChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     if (target.required) {
@@ -209,61 +142,72 @@ export const DeveloperConfigScreen: React.FC = () => {
       ));
     }
 
-    changeCurrentConfig(target.name, target.value.trim(), target.dataset.parent);
-  }, [validationErrors, changeCurrentConfig]);
+    setNewConfig(getNewConfig(
+      currentConfig,
+      target.name,
+      target.value.trim(),
+      target.dataset.parent,
+    ));
+  }, [currentConfig, validationErrors, setValidationErrors, setNewConfig]);
 
   const onSwitcherChange = useCallback(async ({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    changeCurrentConfig(target.name, target.checked, target.dataset.parent);
-  }, [changeCurrentConfig]);
+    setNewConfig(getNewConfig(currentConfig, target.name, target.checked, target.dataset.parent));
+  }, [currentConfig, setNewConfig]);
 
   const deleteCustomBtnItem = useCallback((items: ILauncherCustomButton[]) => {
-    changeCurrentConfig('customButtons', items);
+    setNewConfig({ ...currentConfig, customButtons: items });
     setLastAddedBtnItemId('');
-  }, [changeCurrentConfig]);
+  }, [currentConfig, setNewConfig]);
 
   const deleteCustomBtnById = useCallback((id: string) => {
-    changeCurrentConfig('customButtons', currentConfig.customButtons
-      .filter((currentBtn) => currentBtn.id !== id));
+    setNewConfig({
+      ...currentConfig,
+      customButtons: currentConfig.customButtons
+        .filter((currentBtn) => currentBtn.id !== id),
+    });
 
     setLastAddedBtnItemId('');
     setValidationErrors(clearComponentValidationErrors(validationErrors, id));
-  }, [currentConfig, validationErrors, changeCurrentConfig]);
+  }, [currentConfig, validationErrors, setValidationErrors, setNewConfig]);
 
   const onAddCustomBtnBtnClick = useCallback(() => {
     const newId = getRandomId();
 
     setLastAddedBtnItemId(newId);
-    changeCurrentConfig('customButtons', [
-      ...currentConfig.customButtons,
-      {
-        id: newId,
-        path: `${PathVariableName.GAME_DIR}\\`,
-        action: LauncherButtonAction.OPEN,
-        label: 'Открыть папку',
-        args: [],
-      }]);
-  }, [currentConfig, changeCurrentConfig]);
+    setNewConfig({
+      ...currentConfig,
+      customButtons: [
+        ...currentConfig.customButtons,
+        {
+          id: newId,
+          path: `${PathVariableName.GAME_DIR}\\`,
+          action: LauncherButtonAction.OPEN,
+          label: 'Открыть папку',
+          args: [],
+        }],
+    });
+  }, [currentConfig, setNewConfig]);
 
   const changeCustomBtnData = useCallback((
     btnId: string,
     newBtnData: ILauncherCustomButton,
   ) => {
-    changeCurrentConfig(
-      'customButtons',
-      changeConfigArrayItem(btnId, newBtnData, currentConfig.customButtons),
-    );
-  }, [currentConfig, changeCurrentConfig]);
+    setNewConfig({
+      ...currentConfig,
+      customButtons: changeConfigArrayItem(btnId, newBtnData, currentConfig.customButtons),
+    });
+  }, [currentConfig, setNewConfig]);
 
   const changeCustomButtonsOrder = useCallback((customButtons: ILauncherCustomButton[]) => {
-    changeCurrentConfig('customButtons', customButtons);
-  }, [changeCurrentConfig]);
+    setNewConfig({ ...currentConfig, customButtons });
+  }, [currentConfig, setNewConfig]);
 
   const changeArguments = useCallback((
     newArgs: IButtonArg[],
     parent: string,
   ) => {
-    changeCurrentConfig('args', newArgs, parent);
-  }, [changeCurrentConfig]);
+    setNewConfig(getNewConfig(currentConfig, 'args', newArgs, parent));
+  }, [currentConfig, setNewConfig]);
 
   const getNumberFieldMinValue = useCallback((name: string): number => {
     if (name === 'width' || name === 'minWidth') {
@@ -287,17 +231,8 @@ export const DeveloperConfigScreen: React.FC = () => {
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <form className="developer__form">
-      <DeveloperScreenController
-        isConfigChanged={isConfigChanged}
-        isHaveValidationErrors={Object.keys(validationErrors).length > 0}
-        isFirstLaunch={launcherConfig.isFirstLaunch}
-        isUpdateBtnDisabled
-        onSaveBtnClick={onSaveBtnClick}
-        onCancelBtnClick={onCancelBtnClick}
-        onResetBtnClick={onResetBtnClick}
-        onUpdateBtnClick={onUpdateBtnClick}
-      />
-      <ScrollbarsBlock>
+      {
+        currentConfig.playButton !== undefined && (
         <React.Fragment>
           <div className="developer__block">
             <p className="developer__block-title">Настройки резмеров окна</p>
@@ -437,7 +372,8 @@ export const DeveloperConfigScreen: React.FC = () => {
             </div>
           </div>
         </React.Fragment>
-      </ScrollbarsBlock>
+        )
+      }
     </form>
   );
 };

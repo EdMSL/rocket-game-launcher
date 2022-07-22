@@ -223,16 +223,14 @@ export const GameSettingsScreen: React.FC = () => {
                   ? `${Routes.GAME_SETTINGS_SCREEN}/:settingGroup/`
                   : Routes.GAME_SETTINGS_SCREEN}
                 render={(): React.ReactElement => (
-                  <React.Fragment>
-                    <GameSettingsContent
-                      isGameSettingsLoaded={isGameSettingsLoaded}
-                      gameSettingsParameters={gameSettingsParameters}
-                      gameSettingsOptions={gameSettingsOptions}
-                      gameSettingsFiles={gameSettingsFiles}
-                      gameSettingsGroups={gameSettingsGroups}
-                      onSettingOptionChange={onSettingOptionChange}
-                    />
-                  </React.Fragment>
+                  <GameSettingsContent
+                    isGameSettingsLoaded={isGameSettingsLoaded}
+                    gameSettingsParameters={gameSettingsParameters}
+                    gameSettingsOptions={gameSettingsOptions}
+                    gameSettingsFiles={gameSettingsFiles}
+                    gameSettingsGroups={gameSettingsGroups}
+                    onSettingOptionChange={onSettingOptionChange}
+                  />
                 )}
               />
             </Switch>

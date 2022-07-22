@@ -180,7 +180,6 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
   const deleteOptionItem = useCallback((
     newItems: IGameSettingsOptionItem[],
   ) => {
-    // const newItems = option.items.filter((item) => item.id !== currentTarget.id.split(':')[1]);
     const newOption = { ...option, items: newItems };
 
     if (option.optionType === GameSettingsOptionType.COMBINED) {
@@ -198,18 +197,6 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
     { currentTarget }: React.MouseEvent<HTMLButtonElement>,
   ) => {
     deleteOptionItem(option.items.filter((item) => item.id !== currentTarget.id.split(':')[1]));
-    // const newItems = option.items.filter((item) => item.id !== currentTarget.id.split(':')[1]);
-    // const newOption = { ...option, items: newItems };
-
-    // if (option.optionType === GameSettingsOptionType.COMBINED) {
-    //   onValidation(validateControllerTypeRelatedFields(
-    //     newOption,
-    //     validationErrors,
-    //   ));
-    // }
-
-    // onOptionDataChange(option.id, newOption);
-    // setFullOption({ ...fullOption, items: newItems });
   }, [option.items, deleteOptionItem]);
 
   const selectOptionsFiles = gameSettingsFiles.map((file): ISelectOption => ({
