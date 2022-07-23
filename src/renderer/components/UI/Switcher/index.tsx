@@ -13,7 +13,7 @@ export const Switcher: React.FunctionComponent<IProps> = ({
   className = '',
   parentClassname = '',
   description = '',
-  parent = '',
+  parent,
   multiparameters,
   isDisabled = false,
   isChecked,

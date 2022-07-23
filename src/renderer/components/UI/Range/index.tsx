@@ -24,7 +24,7 @@ interface IProps extends IUIElementProps<HTMLInputElement>, IUIControllerRange {
 export const Range: React.FunctionComponent<IProps> = ({
   id,
   name,
-  parent = '',
+  parent,
   multiparameters,
   defaultValue,
   min,
