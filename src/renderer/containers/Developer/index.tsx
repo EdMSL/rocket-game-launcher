@@ -108,23 +108,30 @@ export const Developer: React.FC = () => {
     if (isConfigChanged) {
       event.preventDefault();
 
+      const isHaveErros = Object.keys(validationErrors).length > 0;
       const messageBoxResponse: Electron.MessageBoxReturnValue = await ipcRenderer.invoke(
         AppChannel.GET_MESSAGE_BOX_RESPONSE,
-        'Изменения не сохранены. Сохранить?', //eslint-disable-line max-len
+        isHaveErros
+          ? 'Изменения не сохранены и есть ошибки в текущей конфигурации. При переходе изменения будут потеряны.' //eslint-disable-line max-len
+          : 'Изменения не сохранены. Сохранить?',
         'Выберите действие',
         undefined,
-        ['Да', 'Нет', 'Отмена'],
+        isHaveErros ? ['ОК', 'Отмена'] : ['Да', 'Нет', 'Отмена'],
         AppWindowName.DEV,
       );
 
-      if (messageBoxResponse.response === 0) {
+      if (!isHaveErros && messageBoxResponse.response === 0) {
         saveConfigChanges(getPathFromLinkHash(event.target.hash));
-      } else if (messageBoxResponse.response === 1) {
+      } else if (
+        (!isHaveErros && messageBoxResponse.response === 1)
+        || (isHaveErros && messageBoxResponse.response === 0)
+      ) {
         resetConfigChanges();
+        setValidationErrors({});
         history.push(getPathFromLinkHash(event.target.hash));
       }
     }
-  }, [isConfigChanged, history, saveConfigChanges, resetConfigChanges]);
+  }, [isConfigChanged, history, validationErrors, saveConfigChanges, resetConfigChanges]);
 
   /* eslint-disable react/jsx-props-no-spreading */
   return (
