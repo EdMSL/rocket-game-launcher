@@ -18,11 +18,11 @@ export const setPathVariables = (
   payload: newPathVariables,
 });
 
-export const setIsFirstLaunch = (
-  isFirstLaunch: IMainRootState['config']['isFirstLaunch'],
+export const setIsFirstStart = (
+  isFirstStart: IMainRootState['config']['isFirstStart'],
 ) => ({
-  type: MAIN_TYPES.SET_IS_FIRST_LAUNCH,
-  payload: isFirstLaunch,
+  type: MAIN_TYPES.SET_IS_FIRST_START,
+  payload: isFirstStart,
 });
 
 export const setIsGameSettingsFileExists = (

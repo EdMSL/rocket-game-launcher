@@ -4,7 +4,7 @@ import { IUserMessage } from './common';
 export const MAIN_TYPES = {
   SET_LAUNCHER_CONFIG: 'SET_LAUNCHER_CONFIG',
   SET_PATH_VARIABLES: 'SET_PATH_VARIABLES',
-  SET_IS_FIRST_LAUNCH: 'SET_IS_FIRST_LAUNCH',
+  SET_IS_FIRST_START: 'SET_IS_FIRST_START',
   SET_IS_DEV_WINDOW_OPENING: 'SET_IS_DEV_WINDOW_OPENING',
   SET_IS_GAME_RUNNING: 'SET_IS_GAME_RUNNING',
   SET_IS_LAUNCHER_INITIALISED: 'SET_IS_LAUNCHER_INITIALISED',
@@ -74,7 +74,7 @@ export interface IWindowSettings {
 // }
 
 export interface ILauncherConfig extends IWindowSettings {
-  isFirstLaunch: boolean,
+  isFirstStart: boolean,
   // modOrganizer: IModOrganizerParams,
   documentsPath: string,
   gameName: string,

@@ -6,19 +6,13 @@
   "minHeight": 400,
   "maxWidth": 900,
   "maxHeight": 0,
-  "modOrganizer": {
-    "isUsed": false,
-    "version": 2,
-    "pathToMOFolder": "%GAME_DIR%\\Mod Organizer"
-  },
-  "documentsPath": "%DOCUMENTS%\\My Games\\Oblivion_GBR-bac\\__MO_Saves",
-  "isFirstLaunch": false,
-  "gameName": "OA Launcher",
+  "documentsPath": "%DOCUMENTS%\\My Games\\Oblivion_GBR",
+  "gameName": "OA Launchers",
   "playButton": {
-    "path": "%GAME_DIR%\\Mod Organizer\\ModOrganizer.exe",
+    "path": "%GAME_DIR%\\MO2\\ModOrganizer.exe",
     "args": [
       {
-        "data": "moshortcut://:Oblivion"
+        "data": "moshortcut://:LaunchGame"
       }
     ],
     "label": "Играть"
@@ -31,7 +25,7 @@
       "args": []
     },
     {
-      "path": "%GAME_DIR%\\Mod Organizer\\ModOrganizer.exe",
+      "path": "%GAME_DIR%\\MO2\\ModOrganizer.exe",
       "action": "run",
       "label": "TES CS",
       "args": [
@@ -41,10 +35,11 @@
       ]
     },
     {
-      "path": "%GAME_DIR%\\Mod Organizer",
+      "path": "%GAME_DIR%\\MO2",
       "action": "open",
       "label": "Открыть папку Mod Organizer",
       "args": []
     }
-  ]
+  ],
+  "isFirstStart": false
 }

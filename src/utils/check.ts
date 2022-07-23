@@ -115,7 +115,7 @@ const configFileDataSchema = Joi.object<ILauncherConfig>({
   maxHeight: Joi.number().integer().optional().default(defaultLauncherConfig.maxHeight),
   documentsPath: Joi.string().optional().allow('').default(defaultLauncherConfig.documentsPath)
     .pattern(PathRegExp.DOCUMENTS, 'correct path'),
-  isFirstLaunch: Joi.bool().optional().default(defaultLauncherConfig.isFirstLaunch),
+  isFirstStart: Joi.bool().optional().default(defaultLauncherConfig.isFirstStart),
   gameName: Joi.string().optional().allow('').default(defaultLauncherConfig.gameName),
   playButton: Joi.object({
     path: Joi.string().optional().allow('').default(defaultLauncherConfig.playButton.path)

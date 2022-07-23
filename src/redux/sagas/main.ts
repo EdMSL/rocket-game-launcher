@@ -403,14 +403,14 @@ function* locationChangeSaga(
       main: {
         isLauncherInitialised,
         isGameSettingsLoaded,
-        config: { isFirstLaunch },
+        config: { isFirstStart },
       },
     }: ReturnType<typeof getState> = yield select(getState);
 
     if (!isLauncherInitialised && (location.pathname === Routes.MAIN_SCREEN)) {
       yield call(initLauncherSaga);
 
-      if (isFirstLaunch) {
+      if (isFirstStart) {
         // Здесь должен быть action на setDevWindowOpening, перенесен в storage основного процесса
         // чтобы убрать эффект мигания окна
         ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, true);

@@ -79,8 +79,7 @@ export const defaultLauncherConfig: ILauncherConfig = {
   maxHeight: defaultLauncherWindowSettings.maxHeight,
   width: defaultLauncherWindowSettings.width,
   height: defaultLauncherWindowSettings.height,
-  isFirstLaunch: true,
-  // modOrganizer: defaultModOrganizerParams,
+  isFirstStart: true,
   documentsPath: '',
   gameName: 'Rocket Game Launcher',
   playButton: {

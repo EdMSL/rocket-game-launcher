@@ -134,7 +134,7 @@ export const createStorage = (): Store<IAppState> => {
     app,
   );
 
-  if (!configurationData.playButton.path && !configurationData.isFirstLaunch) {
+  if (!configurationData.playButton.path && !configurationData.isFirstStart) {
     messages.push(CreateUserMessage.warning('Не указан путь для файла запуска игры.')); //eslint-disable-line max-len
   }
 
@@ -171,7 +171,7 @@ export const createStorage = (): Store<IAppState> => {
         },
       },
       isGameSettingsFileExists,
-      isDevWindowOpening: configurationData.isFirstLaunch,
+      isDevWindowOpening: configurationData.isFirstStart,
       launcherVersion: app.getVersion(),
       pathVariables,
       userThemes,

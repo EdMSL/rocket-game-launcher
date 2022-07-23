@@ -6,7 +6,7 @@ import { Button } from '$components/UI/Button';
 import { Routes } from '$constants/routes';
 
 interface IProps {
-  isFirstLaunch: boolean,
+  isFirstStart: boolean,
   isConfigChanged: boolean,
   isHaveValidationErrors: boolean,
   isUpdateBtnDisabled?: boolean,
@@ -17,7 +17,7 @@ interface IProps {
 }
 
 export const DeveloperScreenController: React.FC<IProps> = ({
-  isFirstLaunch,
+  isFirstStart,
   isConfigChanged,
   isHaveValidationErrors,
   isUpdateBtnDisabled = false,
@@ -38,7 +38,7 @@ export const DeveloperScreenController: React.FC<IProps> = ({
           'main-btn',
           styles['develover__controller-btn'],
         )}
-        isDisabled={!isFirstLaunch && (!isConfigChanged || isHaveValidationErrors)}
+        isDisabled={!isFirstStart && (!isConfigChanged || isHaveValidationErrors)}
         onClick={onSaveBtnClick}
       >
         ОК
@@ -49,7 +49,7 @@ export const DeveloperScreenController: React.FC<IProps> = ({
           'main-btn',
           styles['develover__controller-btn'],
         )}
-        isDisabled={isFirstLaunch}
+        isDisabled={isFirstStart}
         onClick={onCancelBtnClick}
       >
         Отмена
@@ -59,7 +59,7 @@ export const DeveloperScreenController: React.FC<IProps> = ({
           'main-btn',
           styles['develover__controller-btn'],
         )}
-        isDisabled={!isFirstLaunch && (!isConfigChanged || isHaveValidationErrors)}
+        isDisabled={!isFirstStart && (!isConfigChanged || isHaveValidationErrors)}
         onClick={onSaveBtnClick}
       >
         Сохранить

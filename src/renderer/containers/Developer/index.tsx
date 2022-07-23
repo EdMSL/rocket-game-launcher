@@ -36,7 +36,7 @@ import { getPathFromLinkHash } from '$utils/strings';
 export const Developer: React.FC = () => {
   /* eslint-disable max-len */
   const isConfigProcessing = useDeveloperSelector((state) => state.developer.isConfigProcessing);
-  const isFirstLaunch = useDeveloperSelector((state) => state.developer.launcherConfig.isFirstLaunch);
+  const isFirstStart = useDeveloperSelector((state) => state.developer.launcherConfig.isFirstStart);
   const launcherConfig = useDeveloperSelector((state) => state.developer.launcherConfig);
   const gameSettingsConfig = useDeveloperSelector((state) => state.developer.gameSettingsConfig);
   const gameName = useDeveloperSelector((state) => state.developer.launcherConfig.gameName);
@@ -133,7 +133,7 @@ export const Developer: React.FC = () => {
         isResizable
         gameName={gameName}
         onClose={closeDevWindow}
-        isCloseBtnDisabled={isFirstLaunch}
+        isCloseBtnDisabled={isFirstStart}
       />
       <main className={styles.developer__main}>
         <nav className={styles.developer__navigation}>
@@ -161,7 +161,7 @@ export const Developer: React.FC = () => {
         <DeveloperScreenController
           isConfigChanged={isConfigChanged}
           isHaveValidationErrors={Object.keys(validationErrors).length > 0}
-          isFirstLaunch={isFirstLaunch}
+          isFirstStart={isFirstStart}
           saveChanges={saveConfigChanges}
           onCancelBtnClick={cancelConfigChanges}
           onResetBtnClick={resetConfigChanges}
