@@ -117,9 +117,9 @@ export const Range: React.FunctionComponent<IProps> = ({
           )
         }
       </div>
-      <p className="range__input">
+      <output className="range__output">
         {value}
-      </p>
+      </output>
     </div>
   );
 };

@@ -56,7 +56,6 @@ import {
   IGetDataFromFilesResult, IIniObj, IXmlObj, ISelectOption,
 } from '$types/common';
 import { readINIFileSync } from './files';
-import { CustomError, ErrorName } from './errors';
 
 const SYMBOLS_TO_TYPE = 8;
 

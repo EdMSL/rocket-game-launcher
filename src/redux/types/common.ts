@@ -64,6 +64,7 @@ export interface IUIElementParams {
 
 export interface IUIElementProps<E> extends IUIElementParams{
   onChange: (event: React.ChangeEvent<E>) => void,
+  onBlur?: (event: React.FocusEvent<E>) => void,
 }
 
 export type IMessageType = 'error'|'warning'|'info'|'success';

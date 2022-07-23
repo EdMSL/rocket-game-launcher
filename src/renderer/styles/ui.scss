@@ -103,6 +103,7 @@ $checkbox-size: 20px;
 }
 
 .range__controls {
+  flex-grow: 1;
   align-self: stretch;
   display: flex;
   align-items: center;
@@ -158,6 +159,12 @@ $checkbox-size: 20px;
   }
 }
 /* stylelint-disable string-no-newline, max-line-length */
+
+.range__output {
+  min-width: 50px;
+
+  text-align: right;
+}
 
 .range__button {
   flex-grow: 1;

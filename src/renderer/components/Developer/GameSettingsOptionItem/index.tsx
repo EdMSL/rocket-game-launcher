@@ -71,21 +71,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
 
     let currentOption: IGameSettingsOption;
 
-    if (currentTarget.type === HTMLInputType.NUMBER) {
-      currentOption = {
-        ...option,
-        ...isOptionItemChange ? {
-          items: changeConfigArrayItem<any>(
-            currentTarget.dataset.parent!,
-            { [currentTarget.name]: +currentTarget.value },
-            option.items,
-            false,
-          ),
-        } : {
-          [currentTarget.name]: +currentTarget.value,
-        },
-      };
-    } else if (currentTarget.tagName === 'TEXTAREA') {
+    if (currentTarget.tagName === 'TEXTAREA') {
       currentOption = {
         ...option,
         ...isOptionItemChange ? {
@@ -143,6 +129,40 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
     gameSettingsFiles,
     onOptionDataChange,
     onValidation]);
+
+  const onNumberInputBlur = useCallback(({ currentTarget }: React.FocusEvent<HTMLInputElement>) => {
+    const isOptionItemChange = currentTarget.dataset.parent !== undefined
+    && currentTarget.dataset.parent !== '';
+    let currentValue = +currentTarget.value;
+
+    if (+currentTarget.min && currentValue <= +currentTarget.min) {
+      currentValue = +currentTarget.min;
+    }
+
+    const { newOption, newFullOption } = generateGameSettingsOption(
+      {
+        ...option,
+        ...isOptionItemChange ? {
+          items: changeConfigArrayItem<any>(
+            currentTarget.dataset.parent!,
+            { [currentTarget.name]: currentValue },
+            option.items,
+            false,
+          ),
+        } : {
+          [currentTarget.name]: currentValue,
+        },
+      },
+      fullOption,
+      optionFile!,
+    );
+
+    onOptionDataChange(option.id, newOption);
+    setFullOption(newFullOption);
+  }, [option,
+    optionFile,
+    fullOption,
+    onOptionDataChange]);
 
   const onDeleteOptionBtnClick = useCallback(() => {
     deleteOption(option.id);
@@ -319,6 +339,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
             label="Минимальное значение"
             value={option.min}
             onChange={onOptionInputChange}
+            onBlur={onNumberInputBlur}
           />
         )
       }
@@ -332,6 +353,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
             label="Максимальное значение"
             value={option.max}
             onChange={onOptionInputChange}
+            onBlur={onNumberInputBlur}
           />
         )
       }
@@ -345,6 +367,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
             label="Шаг изменения значения"
             value={option.step}
             onChange={onOptionInputChange}
+            onBlur={onNumberInputBlur}
           />
         )
       }
@@ -480,6 +503,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                       label="Минимальное значение"
                       value={item.min}
                       onChange={onOptionInputChange}
+                      onBlur={onNumberInputBlur}
                     />
                   )
                 }
@@ -494,6 +518,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                       label="Максимальное значение"
                       value={item.max}
                       onChange={onOptionInputChange}
+                      onBlur={onNumberInputBlur}
                     />
                   )
                 }
@@ -508,6 +533,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                       label="Шаг изменения значения"
                       value={item.step}
                       onChange={onOptionInputChange}
+                      onBlur={onNumberInputBlur}
                     />
                   )
                 }
