@@ -111,7 +111,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
       }
     }
 
-    setNewConfig(getNewConfig(currentConfig, pathStr, id, parent));
+    setNewConfig(getNewConfig(currentConfig, id, pathStr, parent));
 
     setValidationErrors(getUniqueValidationErrors(
       validationErrors,
