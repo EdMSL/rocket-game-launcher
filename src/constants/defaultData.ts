@@ -127,7 +127,7 @@ export const defaultFullGameSettingsOption: IGameSettingsOption = {
   min: 0,
   max: 1,
   step: 0.1,
-  items: [defaultGameSettingsOptionItem, defaultGameSettingsOptionItem],
+  items: [defaultGameSettingsOptionItem],
 };
 
 interface IWindowField {

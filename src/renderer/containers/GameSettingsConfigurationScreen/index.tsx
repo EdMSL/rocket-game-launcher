@@ -16,7 +16,7 @@ import {
   generateSelectOptions,
   getChangedOptionsAfterFileDelete,
   getDefaultGameSettingsFile,
-  getDefaultGameSettingsOption,
+  getNewGameSettingsOption,
   getFullOption,
   getGameSettingsFilesNames,
   getNewConfig,
@@ -373,16 +373,16 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
     fileId: string,
     fileData: IGameSettingsFile,
   ) => {
-    const changedOptions = currentConfig.gameSettingsOptions.map((param) => {
-      if (param.file === fileData.name) {
+    const changedOptions = currentConfig.gameSettingsOptions.map((currentOption) => {
+      if (currentOption.file === fileData.name) {
         return generateGameSettingsOption(
-          param,
-          getFullOption(defaultFullGameSettingsOption, param),
+          currentOption,
+          getFullOption(currentOption),
           fileData,
         ).newOption;
       }
 
-      return param;
+      return currentOption;
     });
 
     const newConfig = {
@@ -501,7 +501,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
   }, [currentConfig, setNewConfig]);
 
   const addGameSettingsOption = useCallback(() => {
-    const newOption = getDefaultGameSettingsOption(
+    const newOption = getNewGameSettingsOption(
       currentConfig.gameSettingsFiles[0],
       currentConfig.gameSettingsGroups[0].name,
     );
@@ -566,6 +566,18 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
         && (
         <React.Fragment>
           <div className="developer__block">
+            <TextField
+              className="developer__item"
+              id="baseFilesEncoding"
+              name="baseFilesEncoding"
+              label="Кодировка файлов настроек"
+              value={currentConfig.baseFilesEncoding}
+              description="Кодировка, которая будет по умолчанию применяться при чтении и записи данных файлов игровых настроек." //eslint-disable-line max-len
+              placeholder={gameSettingsConfig.baseFilesEncoding}
+              onChange={onTextFieldChange}
+            />
+          </div>
+          <div className="developer__block">
             <p className="developer__block-title">Настройки Mod Organizer</p>
             <Switcher
               className="developer__item"
@@ -608,19 +620,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
             />
           </div>
           <div className="developer__block">
-            <TextField
-              className="developer__item"
-              id="baseFilesEncoding"
-              name="baseFilesEncoding"
-              label="Кодировка файлов настроек"
-              value={currentConfig.baseFilesEncoding}
-              description="Кодировка, которая будет по умолчанию применяться при чтении и записи данных файлов игровых настроек." //eslint-disable-line max-len
-              placeholder={gameSettingsConfig.baseFilesEncoding}
-              onChange={onTextFieldChange}
-            />
-          </div>
-          <div className="developer__block">
-            <p className="developer__block-title">Группы игровых настроек</p>
+            <p className="developer__block-title">Группы игровых опций</p>
             <Button
               className={classNames('main-btn', 'developer__btn')}
               isDisabled={!!lastAddedGroupName}

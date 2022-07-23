@@ -52,10 +52,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
   onValidation,
   deleteOption,
 }) => {
-  const [fullOption, setFullOption] = useState<IGameSettingsOption>(getFullOption(
-    defaultFullGameSettingsOption,
-    option,
-  ));
+  const [fullOption, setFullOption] = useState<IGameSettingsOption>(getFullOption(option));
   const [lastAddedItemId, setLastAddedItemId] = useState<string>('');
 
   const optionFile = useMemo(
@@ -66,8 +63,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
   const onOptionInputChange = useCallback((
     { currentTarget }: React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>,
   ) => {
-    const isOptionItemChange = currentTarget.dataset.parent !== undefined
-    && currentTarget.dataset.parent !== '';
+    const isOptionItemChange = currentTarget.dataset.parent !== undefined;
 
     let currentOption: IGameSettingsOption;
 

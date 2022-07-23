@@ -191,6 +191,28 @@ export const setValueForObjectDeepKey = <T>(
 };
 
 /**
+ * Заменяет данные элемента (объект) массива на новые.
+ * @param id Идентификатор элемента массива.
+ * @param data Объект с данными для замены.
+ * @param items Элементы массива, данные элемента которого меняем.
+ * @param isFullData Если `true`, то объект в `data` перезапишет все данные элемента.
+ * @returns Массив элементов с измененным элементом.
+ */
+export const changeConfigArrayItem = <P extends { id: string, }>(
+  id: string,
+  data: P,
+  items: P[],
+  isFullData = true,
+): P[] => {
+  const index = items.findIndex((item) => item.id === id);
+  const newParams = [...items];
+
+  newParams[index] = { ...isFullData ? {} : newParams[index], ...data };
+
+  return newParams;
+};
+
+/**
  * Генерирует объект с полями, необходимыми для создания
  * игрового параметра для записи в state.
  * @param currentFileData Данные из файла, которые используются в опции.
@@ -850,27 +872,46 @@ export const getDefaultGameSettingsFile = (
 
 /**
  * Получает объект игровой опции со всеми доступными полями, измененными текущей опцией.
- * @param currentFullOption Текущий полный объект опции.
  * @param currentOption Текущий объект опции.
+ * @param currentFullOption Текущий полный объект опции.
  * @returns Новый объект опции с обновленными полями.
  */
 export const getFullOption = (
-  currentFullOption: IGameSettingsOption,
   currentOption: IGameSettingsOption,
-): IGameSettingsOption => ({
-  ...currentFullOption,
-  ...currentOption,
-  controllerType: currentOption.controllerType
-    ? currentOption.controllerType
-    : currentFullOption.items[0].controllerType,
-  items: currentOption.items.map((item, index) => ({
-    ...currentFullOption.items[index] || currentFullOption.items[0],
+  currentFullOption = defaultFullGameSettingsOption,
+): IGameSettingsOption => {
+  const newItems = (currentOption.items.length >= currentFullOption.items.length
+    ? currentOption
+    : currentFullOption
+  ).items.map((item, index) => ({
+    ...defaultFullGameSettingsOption.items[0],
+    ...(currentOption.items.length >= currentFullOption.items.length
+      ? currentOption
+      : currentFullOption
+    ).items[index],
     ...item,
+    ...currentOption.items[index] ? currentOption.items[index] : {},
     controllerType: currentOption.items[0].controllerType
       ? currentOption.items[0].controllerType
       : currentOption.controllerType,
-  })),
-});
+  }));
+
+  if (currentOption.optionType !== GameSettingsOptionType.DEFAULT && newItems.length < 2) {
+    newItems.push({
+      ...newItems[0],
+      id: getRandomId(),
+    });
+  }
+
+  return {
+    ...currentFullOption,
+    ...currentOption,
+    controllerType: currentOption.controllerType
+      ? currentOption.controllerType
+      : currentFullOption.items[0].controllerType,
+    items: newItems,
+  };
+};
 
 /**
  * Получает новый объект опции игровых настроек типа `default`.
@@ -924,7 +965,7 @@ const getFieldsByControllerType = (
  * @param settingGroup Имя группы игровых настроек, к которой принадлежит опция.
  * @returns Объект опции игровых настроек.
  */
-export const getDefaultGameSettingsOption = (
+export const getNewGameSettingsOption = (
   file: IGameSettingsFile,
   settingGroup?: string,
 ): IGameSettingsOption => ({
@@ -952,11 +993,12 @@ export const generateGameSettingsOption = (
   file: IGameSettingsFile,
 ): { newOption: IGameSettingsOption, newFullOption: IGameSettingsOption, } => {
   const newFullOption: IGameSettingsOption = getFullOption(
-    fullOption,
     currentOption,
+    fullOption,
   );
 
   let newOption: IGameSettingsOption = getOptionBase(file, newFullOption);
+
   switch (currentOption.optionType) {
     case GameSettingsOptionType.DEFAULT:
     case GameSettingsOptionType.GROUP:
@@ -972,7 +1014,7 @@ export const generateGameSettingsOption = (
       };
 
       if (currentOption.optionType === GameSettingsOptionType.DEFAULT) {
-        newOption.items = [newOption.items[0]];
+        newOption.items = newOption.items.slice(0, 1);
       }
       break;
     case GameSettingsOptionType.COMBINED:
@@ -1013,28 +1055,6 @@ export const generateGameSettingsOption = (
 };
 
 /**
- * Заменяет данные элемента (объект) массива на новые.
- * @param id Идентификатор элемента массива.
- * @param data Объект с данными для замены.
- * @param items Элементы массива, данные элемента которого меняем.
- * @param isFullData Задает, полные или частичные данные переданы в параметре `data`.
- * @returns Массив элементов с измененным элементом.
- */
-export const changeConfigArrayItem = <P extends { id: string, }>(
-  id: string,
-  data: P,
-  items: P[],
-  isFullData = true,
-): P[] => {
-  const index = items.findIndex((item) => item.id === id);
-  const newParams = [...items];
-
-  newParams[index] = { ...isFullData ? {} : newParams[index], ...data };
-
-  return newParams;
-};
-
-/**
  * Получить измененные игровые опции после удаления игрового файла.
  * @param options Массив игровых опций.
  * @param files Массив игровых файлов.
@@ -1069,7 +1089,7 @@ export const getChangedOptionsAfterFileDelete = (
             ...currentOption,
             file: files[0].name,
           },
-          getFullOption(defaultFullGameSettingsOption, currentOption),
+          getFullOption(currentOption),
           files[0],
         ).newOption;
       }
