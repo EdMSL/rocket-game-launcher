@@ -165,7 +165,9 @@ export const SpoilerListItem = <Item extends { id: string, },>({
             )
           }
         </summary>
-        {children}
+        <div className={styles.spoiler__content}>
+          {children}
+        </div>
       </details>
     </li>
   );

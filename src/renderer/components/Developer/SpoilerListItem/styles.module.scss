@@ -7,27 +7,6 @@
 
   display: flex;
   flex-direction: column;
-
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: -10px;
-    left: 40%;
-
-    display: none;
-    width: 20%;
-    height: 1px;
-
-    background-color: var(--text-main);
-  }
-
-  &[open] {
-    margin-bottom: var(--space-xl);
-  }
-
-  &[open]::after {
-    display: block;
-  }
 }
 
 .spoiler__title {
@@ -76,9 +55,11 @@
   }
 
   .spoiler__block[open] > &:first-child {
-    margin-bottom: var(--space-m);
-
     background-color: var(--btn-color);
+
+    &:hover {
+      background-color: var(--hover-color);
+    }
   }
 }
 
@@ -115,10 +96,6 @@
   }
 
   .spoiler__block[open] > .spoiler__title > & {
-    &:hover {
-      fill: var(--focus-color);
-    }
-
     &:disabled:hover {
       fill: rgb(230, 230, 230);
     }
@@ -127,4 +104,12 @@
 
 .spoiler__title-btn > span {
   font-size: 0;
+}
+
+.spoiler__content {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-m) 0 var(--space-m) var(--space-s);
+
+  background-color: var(--border-color);
 }

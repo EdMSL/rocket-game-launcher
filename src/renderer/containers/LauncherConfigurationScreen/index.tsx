@@ -227,8 +227,8 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
       {
         currentConfig.playButton !== undefined && (
         <React.Fragment>
-          <div className="developer__block">
-            <p className="developer__block-title">Настройки резмеров окна</p>
+          <fieldset className="developer__block">
+            <legend className="developer__block-title">Настройки резмеров окна</legend>
             <Switcher
               className="developer__item"
               id="isResizable"
@@ -255,11 +255,11 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
               />
             ))
           }
-          </div>
-          <div className="developer__block">
-            <p className="developer__block-title">
+          </fieldset>
+          <fieldset className="developer__block">
+            <legend className="developer__block-title">
               Настройки путей и запуска программ
-            </p>
+            </legend>
             <TextField
               className="developer__item"
               id="gameName"
@@ -325,7 +325,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
               <p className="developer__subtitle">
                 Кнопки запуска дополнительных программ
               </p>
-              <ul className={styles['custom-btns__list']}>
+              <ul className="developer__list">
                 {
                 currentConfig.customButtons.map((customBtn, index) => (
                   <SpoilerListItem<ILauncherCustomButton>
@@ -363,7 +363,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
                 Добавить кнопку
               </Button>
             </div>
-          </div>
+          </fieldset>
         </React.Fragment>
         )
       }

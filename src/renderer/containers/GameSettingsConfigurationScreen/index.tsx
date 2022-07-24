@@ -587,7 +587,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
         && isGameSettingsConfigDataLoaded
         && (
         <React.Fragment>
-          <div className="developer__block">
+          <fieldset className="developer__block">
             <TextField
               className="developer__item"
               id="baseFilesEncoding"
@@ -598,9 +598,9 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               placeholder={gameSettingsConfig.baseFilesEncoding}
               onChange={onTextFieldChange}
             />
-          </div>
-          <div className="developer__block">
-            <p className="developer__block-title">Настройки Mod Organizer</p>
+          </fieldset>
+          <fieldset className="developer__block">
+            <legend className="developer__block-title">Настройки Mod Organizer</legend>
             <Switcher
               className="developer__item"
               id="isUsed"
@@ -640,9 +640,9 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               validationErrors={validationErrors}
               onChange={onPathSelectorChange}
             />
-          </div>
-          <div className="developer__block">
-            <p className="developer__block-title">Группы игровых опций</p>
+          </fieldset>
+          <fieldset className="developer__block">
+            <legend className="developer__block-title">Группы игровых опций</legend>
             <Button
               className={classNames('main-btn', 'developer__btn')}
               isDisabled={!!lastAddedGroupName}
@@ -689,9 +689,9 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
                 )
               }
             </ul>
-          </div>
-          <div className="developer__block">
-            <p className="developer__block-title">Настройка игровых опций</p>
+          </fieldset>
+          <fieldset className="developer__block">
+            <legend className="developer__block-title">Настройка игровых опций</legend>
             <p className="developer__subtitle">Файлы игровых настроек</p>
             <ul className={styles.developer__list}>
               {
@@ -781,21 +781,21 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               </Button>
               )
             }
-          </div>
+          </fieldset>
         </React.Fragment>
         )
       }
       {
         !isGameSettingsConfigFileExists && (
-          <div className="developer__block">
-            <p className="developer__block-title">Отсутствует файл игровых настроек</p>
+          <fieldset className="developer__block">
+            <legend className="developer__block-title">Отсутствует файл игровых настроек</legend>
             <Button
               className={classNames('main-btn', 'developer__btn')}
               onClick={addGameSettingsConfigFile}
             >
               Создать
             </Button>
-          </div>
+          </fieldset>
         )
       }
     </form>

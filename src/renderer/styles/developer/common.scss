@@ -28,33 +28,36 @@
   display: flex;
   flex-direction: column;
   margin-bottom: var(--space-l);
-  padding: 0 var(--space-m) var(--space-xl);
-
-  border-bottom: 1px solid var(--text-main);
+  padding: var(--space-m);
 
   &:last-child {
     margin-bottom: 0;
-    padding-bottom: 0;
-
-    border-bottom-width: 0;
+    padding-bottom: var(--space-m);
   }
 }
 
 .developer__block-title {
-  @include reset-indents;
-  margin-bottom: var(--space-m);
+  padding: 0 var(--space-m);
 
-  font-size: 18px;
+  color: var(--bg-color);
+
   font-weight: 700;
   text-align: center;
+
+  background-color: var(--text-main);
 }
 
 .developer__subtitle {
   @include reset-indents;
-  margin-bottom: var(--space-m);
+  margin: var(--space-m) 0;
 
+  font-size: 18px;
   font-weight: 700;
   text-align: center;
+
+  &:first-of-type {
+    margin-top: 0;
+  }
 }
 
 .developer__item {
@@ -68,5 +71,8 @@
 .developer__btn {
   align-self: center;
   width: 200px;
-  margin-top: var(--space-m);
+
+  .developer__list + & {
+    margin-top: var(--space-m);
+  }
 }
