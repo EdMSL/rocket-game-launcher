@@ -176,10 +176,10 @@ export const getStringPartFromLineIniParameterForReplace = (
 export const getSpacesFromParameterString = (parameterStr: string): [string, string] => {
   const separator = parameterStr.includes('=') ? '=' : 'to';
   const forBeforeResult = parameterStr.match(
-    new RegExp(`(\\s*)${separator}`),
+    new RegExp(`(\\s${separator === 'to' ? '+' : '*'})${separator}`),
   );
   const forAfterResult = parameterStr.match(
-    new RegExp(`(?<=${separator})\\s*(?<!\\S)`),
+    new RegExp(`(?<=${separator})\\s${separator === 'to' ? '+' : '*'}(?<!\\S)`),
   );
 
   return [
@@ -198,7 +198,7 @@ export const getLineIniParameterValue = (lineText: string, parameterName: string
   const paramResult = lineText.match(getRegExpForLineIniParameter(parameterName.trim()));
 
   if (paramResult) {
-    const value = paramResult[0].match(/to\s+([^;]+);?/);
+    const value = paramResult[0].match(/\s+to\s+([^;]+);?/);
 
     if (value && value.length > 1) {
       return value[1].trim();
