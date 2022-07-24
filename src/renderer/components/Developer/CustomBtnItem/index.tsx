@@ -20,7 +20,7 @@ import {
   getIsPathWithVariableCorrect,
 } from '$utils/check';
 import {
-  getUniqueValidationErrors, IValidationData, IValidationErrors, ValidationErrorCause,
+  getUniqueValidationErrors, IValidationError, IValidationErrors, ValidationErrorCause,
 } from '$utils/validation';
 
 interface IProps {
@@ -62,8 +62,13 @@ export const CustomBtnItem: React.FC<IProps> = ({
 
     onValidationError(getUniqueValidationErrors(
       validationErrors,
-      { [pathSelectorId]: [{ cause: ValidationErrorCause.PATH }] },
-      !isPathCorrect,
+      [{
+        id: pathSelectorId,
+        error: {
+          cause: ValidationErrorCause.PATH,
+        },
+        isForAdd: !isPathCorrect,
+      }],
     ));
   }, [item, validationErrors, pathSelectorId, onValidationError, сhangeBtnData]);
 
@@ -76,8 +81,13 @@ export const CustomBtnItem: React.FC<IProps> = ({
     if (target.required) {
       onValidationError(getUniqueValidationErrors(
         validationErrors,
-        { [target.id]: [{ cause: ValidationErrorCause.PATH }] },
-        target.value.trim() === '',
+        [{
+          id: target.id,
+          error: {
+            cause: ValidationErrorCause.PATH,
+          },
+          isForAdd: target.value.trim() === '',
+        }],
       ));
     }
   }, [item, validationErrors, сhangeBtnData, onValidationError]);
@@ -85,7 +95,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
   const onPathSelectorChange = useCallback((
     value: string,
     id: string,
-    validationData: IValidationData,
+    validationData: IValidationError[],
   ) => {
     if (value) {
       сhangeBtnData(item.id, {
@@ -95,8 +105,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
 
       onValidationError(getUniqueValidationErrors(
         validationErrors,
-        validationData.errors,
-        validationData.isForAdd,
+        validationData,
       ));
     }
   }, [item, validationErrors, onValidationError, сhangeBtnData]);

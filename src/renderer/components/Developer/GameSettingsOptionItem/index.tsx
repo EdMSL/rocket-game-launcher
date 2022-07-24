@@ -12,13 +12,17 @@ import {
   generateSelectOptions,
   getFileByFileName,
   getFullOption,
+  getTempFileLabel,
 } from '$utils/data';
 import {
   UIControllerType, GameSettingsOptionType, availableOptionSeparators,
 } from '$constants/misc';
 import {
   GameSettingsOptionFields,
-  IGameSettingsFile, IGameSettingsGroup, IGameSettingsOption, IGameSettingsOptionItem,
+  IGameSettingsFile,
+  IGameSettingsGroup,
+  IGameSettingsOption,
+  IGameSettingsOptionItem,
 } from '$types/gameSettings';
 import { Button } from '$components/UI/Button';
 import { TextField } from '$components/UI/TextField';
@@ -216,9 +220,10 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
   }, [option.items, deleteOptionItem]);
 
   const selectOptionsFiles = gameSettingsFiles.map((file): ISelectOption => ({
-    label: file.label,
+    label: getTempFileLabel(file),
     value: file.name,
   }));
+
   const selectOptionsGroups = gameSettingsGroups.map((group): ISelectOption => ({
     label: group.label,
     value: group.name,
@@ -399,7 +404,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
               <React.Fragment>
                 <TextField
                   className={styles.option__item}
-                  id={`${GameSettingsOptionFields.NAME}_${item.id}`}
+                  id={`${GameSettingsOptionFields.NAME}_${item.id}_${option.id}`}
                   parent={option.id}
                   name={GameSettingsOptionFields.NAME}
                   label="Имя параметра из файла"
@@ -412,7 +417,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.iniGroup !== undefined && (
                   <TextField
                     className={styles.option__item}
-                    id={`${GameSettingsOptionFields.INI_GROUP}_${item.id}`}
+                    id={`${GameSettingsOptionFields.INI_GROUP}_${item.id}_${option.id}`}
                     parent={option.id}
                     name={GameSettingsOptionFields.INI_GROUP}
                     label="Группа параметра из файла"
@@ -427,7 +432,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.valueName !== undefined && (
                   <TextField
                     className={styles.option__item}
-                    id={`${GameSettingsOptionFields.VALUE_NAME}_${item.id}`}
+                    id={`${GameSettingsOptionFields.VALUE_NAME}_${item.id}_${option.id}`}
                     parent={option.id}
                     name={GameSettingsOptionFields.VALUE_NAME}
                     label="Имя атрибута параметра из файла"
@@ -442,7 +447,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.valuePath !== undefined && (
                   <TextField
                     className={styles.option__item}
-                    id={`${GameSettingsOptionFields.VALUE_PATH}_${item.id}`}
+                    id={`${GameSettingsOptionFields.VALUE_PATH}_${item.id}_${option.id}`}
                     parent={option.id}
                     name={GameSettingsOptionFields.VALUE_PATH}
                     label="Путь до параметра из файла"
@@ -457,7 +462,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.controllerType !== undefined && (
                     <Select
                       className={styles.option__item}
-                      id={`${GameSettingsOptionFields.CONTROLLER_TYPE}_${item.id}`}
+                      id={`${GameSettingsOptionFields.CONTROLLER_TYPE}_${item.id}_${option.id}`}
                       parent={option.id}
                       name={GameSettingsOptionFields.CONTROLLER_TYPE}
                       selectOptions={generateSelectOptions(
@@ -475,7 +480,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.selectOptionsValueString !== undefined && (
                     <TextArea
                       className={styles.option__item}
-                      id={`${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${item.id}`}
+                      id={`${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${item.id}_${option.id}`}
                       parent={option.id}
                       name={GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}
                       label="Опции селектора"
@@ -492,7 +497,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.min !== undefined && (
                     <NumberField
                       className={styles.option__item}
-                      id={`${GameSettingsOptionFields.MIN}_${item.id}`}
+                      id={`${GameSettingsOptionFields.MIN}_${item.id}_${option.id}`}
                       parent={option.id}
                       name={GameSettingsOptionFields.MIN}
                       min=""
@@ -507,7 +512,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.max !== undefined && (
                     <NumberField
                       className={styles.option__item}
-                      id={`${GameSettingsOptionFields.MAX}_${item.id}`}
+                      id={`${GameSettingsOptionFields.MAX}_${item.id}_${option.id}`}
                       parent={option.id}
                       name={GameSettingsOptionFields.MAX}
                       min=""
@@ -522,7 +527,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.step !== undefined && (
                     <NumberField
                       className={styles.option__item}
-                      id={`${GameSettingsOptionFields.STEP}_${item.id}`}
+                      id={`${GameSettingsOptionFields.STEP}_${item.id}_${option.id}`}
                       parent={option.id}
                       name={GameSettingsOptionFields.STEP}
                       min={0.001}

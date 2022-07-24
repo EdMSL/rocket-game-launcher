@@ -64,6 +64,7 @@ export const Developer: React.FC = () => {
       setCurrentConfig(gameSettingsConfig);
     }
 
+    setValidationErrors({});
     setIsConfigChanged(false);
   }, [currentConfig, launcherConfig, gameSettingsConfig]);
 
@@ -111,23 +112,23 @@ export const Developer: React.FC = () => {
     if (isConfigChanged) {
       event.preventDefault();
 
-      const isHaveErros = Object.keys(validationErrors).length > 0;
+      const isHaveErrors = Object.keys(validationErrors).length > 0;
       const messageBoxResponse: Electron.MessageBoxReturnValue = await ipcRenderer.invoke(
         AppChannel.GET_MESSAGE_BOX_RESPONSE,
-        isHaveErros
+        isHaveErrors
           ? 'Изменения не сохранены и есть ошибки в текущей конфигурации. При переходе изменения будут потеряны.' //eslint-disable-line max-len
           : 'Изменения не сохранены. Сохранить?',
         'Выберите действие',
         undefined,
-        isHaveErros ? ['ОК', 'Отмена'] : ['Да', 'Нет', 'Отмена'],
+        isHaveErrors ? ['ОК', 'Отмена'] : ['Да', 'Нет', 'Отмена'],
         AppWindowName.DEV,
       );
 
-      if (!isHaveErros && messageBoxResponse.response === 0) {
+      if (!isHaveErrors && messageBoxResponse.response === 0) {
         saveConfigChanges(getPathFromLinkHash(event.target.hash));
       } else if (
-        (!isHaveErros && messageBoxResponse.response === 1)
-        || (isHaveErros && messageBoxResponse.response === 0)
+        (!isHaveErrors && messageBoxResponse.response === 1)
+        || (isHaveErrors && messageBoxResponse.response === 0)
       ) {
         resetConfigChanges();
         setValidationErrors({});

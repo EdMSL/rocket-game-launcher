@@ -17,7 +17,7 @@ import { IPathVariables } from '$constants/paths';
 import { Button } from '$components/UI/Button';
 import { getFileNameFromPathToFile } from '$utils/strings';
 import {
-  getUniqueValidationErrors, IValidationErrors, IValidationData,
+  getUniqueValidationErrors, IValidationErrors, IValidationError,
 } from '$utils/validation';
 
 interface IProps {
@@ -60,7 +60,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
   const onPathSelectorChange = useCallback((
     value: string,
     id: string,
-    validationData: IValidationData,
+    validationData: IValidationError[],
     fileName?: string|undefined,
   ) => {
     onFileDataChange(file.id, {
@@ -70,8 +70,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
 
     onValidation(getUniqueValidationErrors(
       validationErrors,
-      validationData.errors,
-      validationData.isForAdd,
+      validationData,
     ));
   }, [file, validationErrors, onFileDataChange, onValidation]);
 

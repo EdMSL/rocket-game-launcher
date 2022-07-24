@@ -22,6 +22,7 @@ import {
   getNewConfig,
   getChangedOptionsAfterGroupDelete,
   getFileByFileName,
+  getTempFileLabel,
 } from '$utils/data';
 import {
   AppChannel,
@@ -50,7 +51,7 @@ import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import {
   clearComponentValidationErrors,
   getUniqueValidationErrors,
-  IValidationData,
+  IValidationError,
   IValidationErrors,
   validateFileRelatedFields,
   ValidationErrorCause,
@@ -226,7 +227,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
   const onPathSelectorChange = useCallback((
     value: string,
     id: string,
-    validationData: IValidationData,
+    validationData: IValidationError[],
     parent: string|undefined,
   ) => {
     let pathStr = value;
@@ -248,8 +249,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
 
     setValidationErrors(getUniqueValidationErrors(
       validationErrors,
-      validationData.errors,
-      validationData.isForAdd,
+      validationData,
     ));
   }, [currentConfig, validationErrors, setValidationErrors, setNewConfig]);
 
@@ -308,9 +308,14 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
   const validateGroupLabel = useCallback((value: string, name: string) => {
     setValidationErrors(getUniqueValidationErrors(
       validationErrors,
-      { [name]: [{ cause: ValidationErrorCause.EXISTS }] },
-      currentConfig.gameSettingsGroups.map((group) => group.label).includes(value)
-      && currentConfig.gameSettingsGroups.find((group) => group.name === name)?.label !== value,
+      [{
+        id: name,
+        error: {
+          cause: ValidationErrorCause.EXISTS,
+        },
+        isForAdd: currentConfig.gameSettingsGroups.map((group) => group.label).includes(value)
+          && currentConfig.gameSettingsGroups.find((group) => group.name === name)?.label !== value,
+      }],
     ));
   }, [currentConfig.gameSettingsGroups, setValidationErrors, validationErrors]);
 
@@ -704,7 +709,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
                     position={index}
                     lastItemId={lastAddedFileId}
                     summaryText={[
-                      { label: 'Имя файла:', text: file.label },
+                      { label: 'Имя файла:', text: getTempFileLabel(file) },
                       { label: 'Путь:', text: file.path }]}
                     validationErrors={validationErrors}
                     onDeleteItem={deleteGameSettingsFile}

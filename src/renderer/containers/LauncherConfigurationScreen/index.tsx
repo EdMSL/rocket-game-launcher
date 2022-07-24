@@ -33,9 +33,9 @@ import {
   clearComponentValidationErrors,
   getUniqueValidationErrors,
   IValidationErrors,
-  IValidationData,
   validateNumberInputs,
   ValidationErrorCause,
+  IValidationError,
 } from '$utils/validation';
 import { getRandomId } from '$utils/strings';
 
@@ -91,7 +91,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
   const onPathSelectorChange = useCallback((
     value: string,
     id: string,
-    validationData: IValidationData,
+    validationData: IValidationError[],
     parent: string|undefined,
   ) => {
     let pathStr = value;
@@ -108,8 +108,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
 
     setValidationErrors(getUniqueValidationErrors(
       validationErrors,
-      validationData.errors,
-      validationData.isForAdd,
+      validationData,
     ));
   }, [currentConfig, validationErrors, setValidationErrors, setNewConfig]);
 
@@ -130,8 +129,14 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
     if (target.required) {
       setValidationErrors(getUniqueValidationErrors(
         validationErrors,
-        { [target.id]: [{ cause: ValidationErrorCause.EMPTY, text: 'Поле не может быть пустым' }] },
-        target.value.trim() === '',
+        [{
+          id: target.id,
+          error: {
+            cause: ValidationErrorCause.EMPTY,
+            text: 'Поле не может быть пустым',
+          },
+          isForAdd: target.value.trim() === '',
+        }],
       ));
     }
 

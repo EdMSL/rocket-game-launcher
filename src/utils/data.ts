@@ -22,6 +22,7 @@ import {
   replacePathVariableByRootDir,
   getSpacesFromParameterString,
   getStringPartFromLineIniParameterForReplace,
+  getFileNameFromPathToFile,
 } from './strings';
 import {
   IGameSettingsOptionItem,
@@ -134,13 +135,13 @@ export const getFileByFileName = (
  * @param ignoreKeys Ключи, которые будут проигнорированы, и не войдут в итоговый объект.
  * @returns Клон переданного объекта.
  */
-export const deepClone = (obj: any, ignoreKeys: string[] = []): object => {
+export const deepClone = <T>(obj: any, ignoreKeys: string[] = []): T => {
   const clone = { ...obj };
 
   Object.keys(clone).forEach(
     (key) => {
       if (typeof obj[key] === 'object') {
-        clone[key] = deepClone(obj[key], ignoreKeys);
+        clone[key] = deepClone<T>(obj[key], ignoreKeys);
       } else if (ignoreKeys.includes(key)) {
         delete clone[key];
       } else {
@@ -151,11 +152,12 @@ export const deepClone = (obj: any, ignoreKeys: string[] = []): object => {
 
   if (Array.isArray(obj) && obj.length) {
     clone.length = obj.length;
-
+    //@ts-ignore
     return Array.from(clone);
   }
 
   if (Array.isArray(obj)) {
+    //@ts-ignore
     return Array.from(obj);
   }
 
@@ -1168,3 +1170,7 @@ export const getSelectsOptionStringObj = (
 
   return obj;
 };
+
+export const getTempFileLabel = (
+  file: IGameSettingsFile,
+): string => file.label || getFileNameFromPathToFile(file.path!) || '';

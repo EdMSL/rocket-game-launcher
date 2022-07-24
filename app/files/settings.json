@@ -1,4 +1,9 @@
 {
+  "modOrganizer": {
+    "isUsed": true,
+    "version": 2,
+    "pathToMOFolder": "%GAME_DIR%\\MO2"
+  },
   "baseFilesEncoding": "win1251",
   "gameSettingsGroups": [
     {
@@ -14,22 +19,22 @@
     {
       "name": "oudf7Xd78FdyIIvaq",
       "label": "OblivionIni",
-      "path": "%GAME_DIR%\\oblivion.ini",
+      "path": "%MO_PROFILE%\\oblivion.ini",
       "view": "sectional",
       "encoding": ""
     },
     {
-      "name": "qM3jeQhgXUE505GJ",
-      "label": "MenuIni",
-      "path": "%GAME_DIR%\\Menu.ini",
-      "view": "line",
-      "encoding": "win1251"
+      "name": "9W35oYl6G0OnFWV2",
+      "label": "DynamicMapbase",
+      "path": "%MO_MODS%\\Dynamic Map\\Ini\\Dynamic Map base.ini",
+      "view": "sectional",
+      "encoding": ""
     },
     {
-      "name": "h5TjeQhgXpv605HQ",
-      "label": "OblivionReloaded",
-      "path": "%GAME_DIR%\\OblivionReloaded.dll.config",
-      "view": "tag",
+      "name": "ycA47WxO5GHzm2cI",
+      "label": "formIDFinder",
+      "path": "%MO_MODS%\\Formid Finder\\ini\\formID Finder.ini",
+      "view": "line",
       "encoding": ""
     }
   ],
@@ -39,29 +44,24 @@
       "file": "oudf7Xd78FdyIIvaq",
       "label": "Полный экран",
       "description": "",
-      "settingGroup": "7uED7Xd7gPyIIvlu",
+      "settingGroup": "qM3joLYOXUE5qD6J",
+      "items": [
+        {
+          "name": "bFull Screen",
+          "iniGroup": "Display"
+        }
+      ],
       "controllerType": "range",
       "min": 0,
-      "max": 10,
-      "step": 1,
-      "items": [{
-        "name": "bFull Screen",
-        "iniGroup": "Display"
-      }]
+      "max": 3,
+      "step": 1
     },
     {
       "optionType": "combined",
       "file": "oudf7Xd78FdyIIvaq",
       "label": "Разрешение экрана",
       "description": "Устанавливает разрешение экрана",
-      "settingGroup": "7uED7Xd7gPyIIvlu",
-      "controllerType": "select",
-      "separator": ":",
-      "selectOptions": {
-        "1024 на 768": "1024:768",
-        "1366 на 768": "1366:768",
-        "1920 на 1080": "1920:1080"
-      },
+      "settingGroup": "qM3joLYOXUE5qD6J",
       "items": [
         {
           "name": "iSize W",
@@ -71,57 +71,30 @@
           "name": "iSize H",
           "iniGroup": "Display"
         }
-      ]
+      ],
+      "controllerType": "select",
+      "separator": ":",
+      "selectOptions": {
+        "1024 на 768": "1024:768",
+        "1366 на 768": "1366:768",
+        "1920 на 1080": "1920:1080"
+      }
     },
     {
-      "optionType": "related",
-      "file": "qM3jeQhgXUE505GJ",
-      "label": "Комбинация клавиш",
-      "description": "Укажите комбинацию клавиш для действия",
+      "optionType": "default",
+      "file": "ycA47WxO5GHzm2cI",
+      "label": "Заголовок1",
+      "description": "",
       "settingGroup": "qM3joLYOXUE5qD6J",
       "items": [
         {
-          "name": "DMSMain.VolumeNormalto",
-          "controllerType": "select",
-          "selectOptions": {
-            "aaa": "0.1",
-            "bbb": "0.7",
-            "ввв": "1.4"
-          }
-        },
-        {
-          "name": "DMSMain.VolumeBattle",
-          "controllerType": "select",
-          "selectOptions": {
-            "eee": "0.1",
-            "fff": "0.7",
-            "ккк": "1.4"
-          }
+          "name": "FormIDFinderQuest.KeyPressed1"
         }
-      ]
-    },
-    {
-      "optionType": "group",
-      "file": "h5TjeQhgXpv605HQ",
-      "label": "Общее значение для 3-х параметров",
-      "description": "Укажите комбинацию клавиш для действия",
-      "settingGroup": "qM3joLYOXUE5qD6J",
+      ],
       "controllerType": "range",
-      "min": -0.5,
-      "max": 1,
-      "step": 0.1,
-      "items": [
-        {
-          "name": "SmartControl",
-          "valueName": "Value",
-          "valuePath": "_Main/FrameRate/SmartControl"
-        },
-        {
-          "name": "FlowControl",
-          "valueName": "Value",
-          "valuePath": "_Main/FrameRate/SmartControl"
-        }
-      ]
+      "min": 0,
+      "max": 100,
+      "step": 1
     }
   ]
 }

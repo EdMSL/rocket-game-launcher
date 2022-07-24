@@ -16,7 +16,7 @@ import { getRandomId } from '$utils/strings';
 import {
   clearComponentValidationErrors,
   getUniqueValidationErrors,
-  IValidationData,
+  IValidationError,
   IValidationErrors,
   ValidationErrorCause,
 } from '$utils/validation';
@@ -49,7 +49,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
   const onPathSelectorChange = useCallback((
     value: string,
     id: string,
-    validationData: IValidationData,
+    validationData: IValidationError[],
   ) => {
     if (value) {
       changeArguments(
@@ -68,11 +68,10 @@ export const ArgumentsBlock: React.FC<IProps> = ({
 
       onValidationError(getUniqueValidationErrors(
         validationErrors,
-        { ...validationData.errors, [`${parentId}_${id}`]: [{ cause: ValidationErrorCause.ARG }] },
-        validationData.isForAdd,
+        validationData,
       ));
     }
-  }, [args, parent, parentId, validationErrors, changeArguments, onValidationError]);
+  }, [args, parent, validationErrors, changeArguments, onValidationError]);
 
   const onArgumentTextFieldChange = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
@@ -94,11 +93,22 @@ export const ArgumentsBlock: React.FC<IProps> = ({
     if (target.required) {
       onValidationError(getUniqueValidationErrors(
         validationErrors,
-        {
-          [target.id]: [{ cause: ValidationErrorCause.PATH }],
-          [`${parentId}_${target.id}`]: [{ cause: ValidationErrorCause.ARG }],
-        },
-        target.value.trim() === '',
+        [
+          {
+            id: target.id,
+            error: {
+              cause: ValidationErrorCause.PATH,
+            },
+            isForAdd: target.value.trim() === '',
+          },
+          {
+            id: `${parentId}_${target.id}`,
+            error: {
+              cause: ValidationErrorCause.ARG,
+            },
+            isForAdd: target.value.trim() === '',
+          },
+        ],
       ));
     }
   }, [args, parent, parentId, validationErrors, changeArguments, onValidationError]);

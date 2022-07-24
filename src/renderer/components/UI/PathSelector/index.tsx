@@ -16,7 +16,7 @@ import {
 import { AppChannel, LauncherButtonAction } from '$constants/misc';
 import { getIsPathWithVariableCorrect } from '$utils/check';
 import {
-  getValidationCauses, IValidationData, ValidationErrorCause,
+  getValidationCauses, IValidationError, ValidationErrorCause,
 } from '$utils/validation';
 
 interface IProps extends IUIElementParams, IUIControllerTextField {
@@ -30,7 +30,7 @@ interface IProps extends IUIElementParams, IUIControllerTextField {
   onChange: (
     value: string,
     name: string,
-    validationData: IValidationData,
+    validationData: IValidationError[],
     parent?: string
   ) => void,
 }
@@ -100,10 +100,14 @@ export const PathSelector: React.FC<IProps> = ({
     onChange(
       `${currentPathVariable}\\${target.value}`,
       name || id,
-      {
-        errors: { [id]: [{ cause: ValidationErrorCause.PATH, text: 'Указан некорректный путь' }] },
+      [{
+        id,
+        error: {
+          cause: ValidationErrorCause.PATH,
+          text: 'Указан некорректный путь',
+        },
         isForAdd: !isCorrectPath,
-      },
+      }],
       parent,
     );
   }, [currentPathVariable, selectorType, name, id, parent, extensions, onChange]);
@@ -131,14 +135,24 @@ export const PathSelector: React.FC<IProps> = ({
         onChange(
           `${variablePath}\\${valuePath}`,
           name || id,
-          {
-            errors: {
-              [id]: [
-                { cause: ValidationErrorCause.NOT_AVAILABLE, text: 'Указан недопустимый путь' },
-                { cause: ValidationErrorCause.PATH, text: 'Указан некорректный путь' }],
+          [
+            {
+              id,
+              error: {
+                cause: ValidationErrorCause.NOT_AVAILABLE,
+                text: 'Указан недопустимый путь',
+              },
+              isForAdd: !isCorrectPath,
             },
-            isForAdd: !isCorrectPath,
-          },
+            {
+              id,
+              error: {
+                cause: ValidationErrorCause.PATH,
+                text: 'Указан некорректный путь',
+              },
+              isForAdd: !isCorrectPath,
+            },
+          ],
           parent,
         );
       } catch (error) {
@@ -148,13 +162,14 @@ export const PathSelector: React.FC<IProps> = ({
         onChange(
           `${availablePathVariables[0]}\\${pathStr}`,
           name || id,
-          {
-            errors: {
-              [id]: [
-                { cause: ValidationErrorCause.NOT_AVAILABLE, text: 'Указан недопустимый путь' }],
+          [{
+            id,
+            error: {
+              cause: ValidationErrorCause.NOT_AVAILABLE,
+              text: 'Указан недопустимый путь',
             },
             isForAdd: true,
-          },
+          }],
           parent,
         );
       }
@@ -177,7 +192,7 @@ export const PathSelector: React.FC<IProps> = ({
     onChange(
       `${target.value}\\${currentPathValue}`,
       name || id,
-      { errors: {}, isForAdd: false },
+      [],
       parent,
     );
   }, [currentPathValue, id, name, parent, onChange]);
