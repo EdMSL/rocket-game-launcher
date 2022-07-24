@@ -41,6 +41,27 @@ export interface IGameSettingsFile {
   encoding: string,
 }
 
+export enum GameSettingsOptionFields {
+  ID = 'id',
+  NAME = 'name',
+  OPTION_TYPE = 'optionType',
+  FILE = 'file',
+  LABEL = 'label',
+  DESCRIPTION = 'description',
+  SETTING_GROUP = 'settingGroup',
+  ITEMS = 'items',
+  INI_GROUP = 'iniGroup',
+  VALUE_NAME = 'valueName',
+  VALUE_PATH = 'valuePath',
+  CONTROLLER_TYPE = 'controllerType',
+  SELECT_OPTIONS = 'selectOptions',
+  SELECT_OPTIONS_VALUE_STRING = 'selectOptionsValueString',
+  MIN = 'min',
+  MAX = 'max',
+  STEP = 'step',
+  SEPARATOR = 'separator',
+}
+
 export interface IGameSettingsOptionBase {
   id: string,
   optionType: GameSettingsOptionType,
