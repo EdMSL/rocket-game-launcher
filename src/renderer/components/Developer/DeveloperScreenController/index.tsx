@@ -9,7 +9,7 @@ interface IProps {
   isFirstStart: boolean,
   isConfigChanged: boolean,
   isHaveValidationErrors: boolean,
-  isUpdateBtnDisabled?: boolean,
+  isUpdateBtnEnabled: boolean,
   saveChanges: (pathToGo: string) => void,
   onCancelBtnClick: (event: React.MouseEvent<HTMLButtonElement>) => void,
   onResetBtnClick: (event: React.MouseEvent<HTMLButtonElement>) => void,
@@ -20,7 +20,7 @@ export const DeveloperScreenController: React.FC<IProps> = ({
   isFirstStart,
   isConfigChanged,
   isHaveValidationErrors,
-  isUpdateBtnDisabled = false,
+  isUpdateBtnEnabled,
   saveChanges,
   onCancelBtnClick,
   onResetBtnClick,
@@ -75,7 +75,7 @@ export const DeveloperScreenController: React.FC<IProps> = ({
         Сбросить
       </Button>
       {
-      !isUpdateBtnDisabled && (
+      isUpdateBtnEnabled && (
       <Button
         className={classNames(
           'main-btn',

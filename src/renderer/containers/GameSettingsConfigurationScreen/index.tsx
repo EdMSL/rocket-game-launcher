@@ -18,8 +18,10 @@ import {
   getDefaultGameSettingsFile,
   getNewGameSettingsOption,
   getFullOption,
-  getGameSettingsFilesNames,
+  getGameSettingsElementsNames,
   getNewConfig,
+  getChangedOptionsAfterGroupDelete,
+  getFileByFileName,
 } from '$utils/data';
 import {
   AppChannel,
@@ -45,7 +47,6 @@ import { CreateUserMessage } from '$utils/message';
 import { addDeveloperMessages, createGameSettingsConfigFile } from '$actions/developer';
 import { GameSettingsOptionItem } from '$components/Developer/GameSettingsOptionItem';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
-import { defaultFullGameSettingsOption } from '$constants/defaultData';
 import {
   clearComponentValidationErrors,
   getUniqueValidationErrors,
@@ -60,16 +61,20 @@ import { PathSelector } from '$components/UI/PathSelector';
 
 interface IProps {
   currentConfig: IGameSettingsConfig,
+  isSettingsInitialized: boolean,
   validationErrors: IValidationErrors,
   setNewConfig: (configData: IGameSettingsConfig, isCheckForChanges?: boolean) => void,
+  setIsSettingsInitialized: (isInitialized: boolean) => void,
   resetConfigChanges: () => void,
   setValidationErrors: (errors: IValidationErrors) => void,
 }
 
 export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
   currentConfig,
+  isSettingsInitialized,
   validationErrors,
   setNewConfig,
+  setIsSettingsInitialized,
   resetConfigChanges,
   setValidationErrors,
 }) => {
@@ -80,12 +85,11 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
   const isGameSettingsConfigDataLoaded = useDeveloperSelector((state) => state.developer.isGameSettingsConfigDataLoaded);
   const pathVariables = useDeveloperSelector((state) => state.developer.pathVariables);
 
-  const dispatch = useDispatch();
-
-  const [isSettingsInitialized, setIsSettingsInitialized] = useState<boolean>(isGameSettingsConfigDataLoaded);
   const [lastAddedGroupName, setLastAddedGroupName] = useState<string>('');
   const [lastAddedFileId, setLastAddedFileId] = useState<string>('');
   const [lastAddedOptionId, setLastAddedOptionId] = useState<string>('');
+
+  const dispatch = useDispatch();
   /* eslint-enable max-len */
 
   const getPathFromPathSelector = useCallback(async (
@@ -96,15 +100,6 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
   ), []);
 
   useEffect(() => {
-    ipcRenderer.on(AppChannel.CHANGE_DEV_WINDOW_STATE, (
-      event,
-      isOpened: boolean,
-    ) => {
-      if (isOpened !== undefined && !isOpened) {
-        resetConfigChanges();
-      }
-    });
-
     if (currentConfig.baseFilesEncoding === undefined) {
       setNewConfig(gameSettingsConfig, false);
     }
@@ -113,14 +108,13 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
       resetConfigChanges();
       setIsSettingsInitialized(true);
     }
-
-    return (): void => { ipcRenderer.removeAllListeners(AppChannel.CHANGE_DEV_WINDOW_STATE); };
   }, [currentConfig,
     isSettingsInitialized,
     isGameSettingsConfigDataLoaded,
     isConfigProcessing,
     gameSettingsConfig,
     setNewConfig,
+    setIsSettingsInitialized,
     resetConfigChanges]);
 
   const onTextFieldChange = useCallback((
@@ -144,7 +138,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
     ) {
       const messageBoxResponse = await ipcRenderer.invoke(
         AppChannel.GET_MESSAGE_BOX_RESPONSE,
-        `В путях к некоторым файлам игровых настроек пристуствуют переменные Mod Organizer.\nНажмите "Отмена", чтобы вручную изменить пути к файлам, "Игнорировать", чтобы изменить переменную на ${PathVariableName.GAME_DIR}, или "Удалить", чтобы удалить файлы и связанные с ними игровые опции.\nИзменения будут приняты только при сохранении текущей конфигурации.`, //eslint-disable-line max-len
+        `В путях к некоторым файлам игровых настроек пристуствуют переменные Mod Organizer.\nВыберите "Отмена", чтобы вручную изменить пути к файлам, "Игнорировать", чтобы изменить переменную на ${PathVariableName.GAME_DIR}, или "Удалить", чтобы удалить файлы и связанные с ними игровые опции.\nИзменения будут приняты только при сохранении текущей конфигурации.`, //eslint-disable-line max-len
         'Выберите действие',
         undefined,
         ['Отмена', 'Игнорировать', 'Удалить'],
@@ -195,7 +189,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               return true;
             },
           );
-          const filesNames = getGameSettingsFilesNames(newFiles);
+          const filesNames = getGameSettingsElementsNames(newFiles);
 
           newConfig = {
             ...newConfig,
@@ -261,14 +255,32 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
 
   const createNewGroup = useCallback(() => {
     const newName = getRandomName();
-
-    setNewConfig({
+    const newGroups = [...currentConfig.gameSettingsGroups, {
+      name: newName,
+      label: '',
+    }];
+    let newConfig = {
       ...currentConfig,
-      gameSettingsGroups: [...currentConfig.gameSettingsGroups, {
-        name: newName,
-        label: '',
-      }],
-    });
+      gameSettingsGroups: newGroups,
+    };
+
+    if (newGroups.length === 1) {
+      newConfig = {
+        ...newConfig,
+        gameSettingsOptions: currentConfig.gameSettingsOptions.map(
+          (currentOption) => generateGameSettingsOption(
+            {
+              ...currentOption,
+              settingGroup: newGroups[0].name,
+            },
+            getFullOption(currentOption),
+            getFileByFileName(currentConfig.gameSettingsFiles, currentOption.file)!,
+          ).newOption,
+        ),
+      };
+    }
+
+    setNewConfig(newConfig);
 
     setLastAddedGroupName(newName);
   }, [currentConfig, setNewConfig]);
@@ -302,35 +314,54 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
     ));
   }, [currentConfig.gameSettingsGroups, setValidationErrors, validationErrors]);
 
-  const deleteGroupItem = useCallback((deletedGroupName: string) => {
-    const changedOptions: string[] = [];
+  const deleteGroupItem = useCallback(async (deletedGroupName: string) => {
     const newGroups = currentConfig.gameSettingsGroups.filter(
       (group) => group.name !== deletedGroupName,
     );
-    const newConfig = {
-      ...currentConfig,
-      gameSettingsGroups: newGroups,
-      gameSettingsOptions: currentConfig.gameSettingsOptions.map((option) => {
-        if (option.settingGroup === deletedGroupName) {
-          changedOptions.push(option.label);
 
-          return {
-            ...option,
-            settingGroup: newGroups[0].name,
-          };
+    if (currentConfig.gameSettingsOptions.some(
+      (currentOption) => currentOption.settingGroup === deletedGroupName,
+    )) {
+      const messageBoxResponse = await ipcRenderer.invoke(
+        AppChannel.GET_MESSAGE_BOX_RESPONSE,
+        `Данная группа настроек используется некоторыми опциями.\nВыберите "Отмена", чтобы вручную изменить группы для опций, "Игнорировать", чтобы ${newGroups.length > 0 ? `изменить группу на ${gameSettingsConfig.gameSettingsGroups[0].label},` : 'убрать поле группы для всех опций,'} или "Удалить", чтобы удалить связанные с группой игровые опции.\nИзменения будут приняты только при сохранении текущей конфигурации.`, //eslint-disable-line max-len
+        'Выберите действие',
+        undefined,
+        ['Отмена', 'Игнорировать', 'Удалить'],
+        AppWindowName.DEV,
+      );
+
+      if (messageBoxResponse.response > 0) {
+        const [newOptions, changedOptionsNames] = getChangedOptionsAfterGroupDelete(
+          currentConfig.gameSettingsOptions,
+          newGroups,
+          currentConfig.gameSettingsFiles,
+          messageBoxResponse.response === 2,
+        );
+
+        const newConfig = {
+          ...currentConfig,
+          gameSettingsGroups: newGroups,
+          gameSettingsOptions: newOptions,
+        };
+
+        if (newGroups.length > 0 && messageBoxResponse.response === 1) {
+          dispatch(addDeveloperMessages([CreateUserMessage.info(`При сохранении настроек для опций [${changedOptionsNames.join()}] используемая группа будет изменена на "${newGroups[0].label}".`)])); //eslint-disable-line max-len
+        } else if (newGroups.length > 0 && messageBoxResponse.response === 2) {
+          dispatch(addDeveloperMessages([CreateUserMessage.info(`При сохранении настроек опции [${changedOptionsNames.join()}] будут удалены.`)])); //eslint-disable-line max-len
         }
 
-        return option;
-      }),
-    };
-
-    if (changedOptions.length > 0) {
-      dispatch(addDeveloperMessages([CreateUserMessage.info(`Для опций ${changedOptions.join()} была установлена группа настроек "${newGroups[0].label}"`)])); //eslint-disable-line max-len
+        setLastAddedGroupName('');
+        setNewConfig(newConfig);
+      }
+    } else {
+      setLastAddedGroupName('');
+      setNewConfig({
+        ...currentConfig,
+        gameSettingsGroups: newGroups,
+      });
     }
-
-    setLastAddedGroupName('');
-    setNewConfig(newConfig);
-  }, [currentConfig, setNewConfig, dispatch]);
+  }, [currentConfig, gameSettingsConfig.gameSettingsGroups, setNewConfig, dispatch]);
 
   const onAddGameSettingsFile = useCallback(async () => {
     const pathStr = await getPathFromPathSelector();
@@ -398,28 +429,16 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
     newFiles: IGameSettingsFile[],
     deletedItem: IGameSettingsFile|undefined,
   ) => {
-    if (
-      currentConfig.gameSettingsFiles.length === 1
-      && currentConfig.gameSettingsOptions.length > 0
-    ) {
-      await ipcRenderer.invoke(
-        AppChannel.GET_MESSAGE_BOX_RESPONSE,
-        'Невозможно удалить единственный файл, если присутствует хотя бы одна игровая опция.', //eslint-disable-line max-len
-        'Выберите действие',
-        undefined,
-        undefined,
-        AppWindowName.DEV,
-      );
-    } else if (currentConfig.gameSettingsOptions.some(
+    if (currentConfig.gameSettingsOptions.some(
       (currentOption) => currentOption.file === deletedItem?.name,
     )
     ) {
       const messageBoxResponse = await ipcRenderer.invoke(
         AppChannel.GET_MESSAGE_BOX_RESPONSE,
-        'Одна или несколько игровых опций имеют данный файл в зависимостях. Нажмите "Отмена", чтобы вручную изменить используемый опциями файл, "Игнорировать", чтобы автоматически выбрать для опции один из доступных файлов, или "Удалить", чтобы удалить связанные с файлом опции.', //eslint-disable-line max-len
+        `Одна или несколько игровых опций имеют данный файл в зависимостях. Выберите "Отмена", чтобы вручную изменить используемый опциями файл${newFiles.length > 0 ? ', "Игнорировать", чтобы автоматически выбрать для опции один из доступных файлов,' : ''} или "Удалить", чтобы удалить связанные с файлом опции.`, //eslint-disable-line max-len
         'Выберите действие',
         undefined,
-        ['Отмена', 'Игнорировать', 'Удалить'],
+        newFiles.length > 0 ? ['Отмена', 'Игнорировать', 'Удалить'] : ['Отмена', 'Удалить'],
         AppWindowName.DEV,
       );
 
@@ -427,7 +446,9 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
         const [newOptions, changedOptionsNames] = getChangedOptionsAfterFileDelete(
           currentConfig.gameSettingsOptions,
           newFiles,
-          messageBoxResponse.response === 2,
+          newFiles.length > 0
+            ? messageBoxResponse.response === 2
+            : messageBoxResponse.response === 1,
         );
 
         const newConfig = {
@@ -437,10 +458,10 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
         };
 
         if (changedOptionsNames.length > 0) {
-          if (messageBoxResponse.response === 1) {
-            dispatch(addDeveloperMessages([CreateUserMessage.info(`При сохранении настроек для опций [${changedOptionsNames.join()}] используемый файл будет изменен на "${newFiles[0].label}"`)])); //eslint-disable-line max-len
+          if (newFiles.length > 0 && messageBoxResponse.response === 1) {
+            dispatch(addDeveloperMessages([CreateUserMessage.info(`При сохранении настроек для опций [${changedOptionsNames.join()}] используемый файл будет изменен на "${newFiles[0].label}".`)])); //eslint-disable-line max-len
           } else {
-            dispatch(addDeveloperMessages([CreateUserMessage.info(`При сохранении настроек опции [${changedOptionsNames.join()}] будут удалены`)])); //eslint-disable-line max-len
+            dispatch(addDeveloperMessages([CreateUserMessage.info(`При сохранении настроек опции [${changedOptionsNames.join()}] будут удалены.`)])); //eslint-disable-line max-len
           }
         }
 
@@ -503,7 +524,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
   const addGameSettingsOption = useCallback(() => {
     const newOption = getNewGameSettingsOption(
       currentConfig.gameSettingsFiles[0],
-      currentConfig.gameSettingsGroups[0].name,
+      (currentConfig.gameSettingsGroups[0] && currentConfig.gameSettingsGroups[0].name) || '',
     );
 
     setValidationErrors(validateFileRelatedFields(
@@ -527,13 +548,14 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
 
   const deleteGameSettingsOption = useCallback((
     params: IGameSettingsOption[],
-    deletedItem: IGameSettingsOption,
+    deletedOption: IGameSettingsOption,
   ) => {
     setNewConfig({
       ...currentConfig,
       gameSettingsOptions: params,
     });
-    setValidationErrors(clearComponentValidationErrors(validationErrors, deletedItem.id));
+
+    setValidationErrors(clearComponentValidationErrors(validationErrors, deletedOption.id));
     setLastAddedOptionId('');
   }, [validationErrors, currentConfig, setValidationErrors, setNewConfig]);
 

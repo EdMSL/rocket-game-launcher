@@ -27,9 +27,7 @@ import {
 import { CustomError, ErrorName } from './errors';
 import { generateSelectOptionsString, getRandomId } from './strings';
 import { ILauncherConfig, IWindowSettings } from '$types/main';
-import {
-  getGameSettingsFilesNames, getGameSettingsGroupsNames,
-} from './data';
+import { getGameSettingsElementsNames } from './data';
 
 export interface ICheckResult<T> {
   data: T,
@@ -449,8 +447,8 @@ export const checkGameSettingsOptions = (
     stripUnknown: true,
     context: {
       isGameSettingsGroupsExists: gameSettingsGroups.length > 0,
-      gameSettingsGroups: getGameSettingsGroupsNames(gameSettingsGroups),
-      gameSettingsFiles: getGameSettingsFilesNames(gameSettingsFiles),
+      gameSettingsGroups: getGameSettingsElementsNames(gameSettingsGroups),
+      gameSettingsFiles: getGameSettingsElementsNames(gameSettingsFiles),
     },
   };
 

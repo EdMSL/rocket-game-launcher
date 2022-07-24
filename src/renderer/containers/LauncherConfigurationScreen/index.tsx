@@ -1,4 +1,3 @@
-import { ipcRenderer } from 'electron';
 import React, {
   useCallback, useState, useEffect,
 } from 'react';
@@ -14,7 +13,6 @@ import {
   FileExtension,
   LauncherButtonAction,
   PathVariableName,
-  AppChannel,
 } from '$constants/misc';
 import { MinWindowSize, appWindowFields } from '$constants/defaultData';
 import { Button } from '$components/UI/Button';
@@ -43,16 +41,20 @@ import { getRandomId } from '$utils/strings';
 
 interface IProps {
   currentConfig: ILauncherConfig,
+  isSettingsInitialized: boolean,
   validationErrors: IValidationErrors,
   setNewConfig: (configData: ILauncherConfig, isCheckForChanges?: boolean) => void,
+  setIsSettingsInitialized: (isInitialized: boolean) => void,
   resetConfigChanges: () => void,
   setValidationErrors: (errors: IValidationErrors) => void,
 }
 
 export const LauncherConfigurationScreen: React.FC<IProps> = ({
   currentConfig,
+  isSettingsInitialized,
   validationErrors,
   setNewConfig,
+  setIsSettingsInitialized,
   resetConfigChanges,
   setValidationErrors,
 }) => {
@@ -62,19 +64,9 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
   const isConfigProcessing = useDeveloperSelector((state) => state.developer.isConfigProcessing);
 
   const [lastAddedBtnItemId, setLastAddedBtnItemId] = useState<string>('');
-  const [isSettingsInitialized, setIsSettingsInitialized] = useState<boolean>(true);
   /* eslint-enable max-len */
 
   useEffect(() => {
-    ipcRenderer.on(AppChannel.CHANGE_DEV_WINDOW_STATE, (
-      event,
-      isOpened: boolean,
-    ) => {
-      if (isOpened !== undefined && !isOpened) {
-        resetConfigChanges();
-      }
-    });
-
     if (currentConfig.playButton === undefined) {
       setNewConfig(launcherConfig, false);
     }
@@ -83,12 +75,13 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
       resetConfigChanges();
       setIsSettingsInitialized(true);
     }
-
-    return (): void => { ipcRenderer.removeAllListeners(AppChannel.CHANGE_DEV_WINDOW_STATE); };
   }, [currentConfig.playButton,
+    isSettingsInitialized,
     currentConfig,
-    launcherConfig, isSettingsInitialized,
-    isConfigProcessing, setNewConfig,
+    launcherConfig,
+    isConfigProcessing,
+    setNewConfig,
+    setIsSettingsInitialized,
     resetConfigChanges]);
 
   const setNewValidationErrors = useCallback((errors: IValidationErrors) => {

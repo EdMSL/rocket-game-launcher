@@ -435,20 +435,12 @@ export const generateSelectOptions = (
 };
 
 /**
- * @param gameSettingsFiles Игровые файлы из `state`.
- * @returns Массив имен игровых файлов.
+ * @param components Группы или файлы игровых настроек из `state`.
+ * @returns Массив имен.
  */
-export const getGameSettingsFilesNames = (
-  gameSettingsFiles: IGameSettingsFile[],
-): string[] => gameSettingsFiles.map((file) => file.name);
-
-/**
- * @param gameSettingsGroups Группы игровых настроек из `state`.
- * @returns Массив имен групп.
- */
-export const getGameSettingsGroupsNames = (
-  gameSettingsGroups: IGameSettingsGroup[],
-): string[] => gameSettingsGroups.map((group) => group.name);
+export const getGameSettingsElementsNames = (
+  components: (IGameSettingsGroup|IGameSettingsFile)[],
+): string[] => components.map((component) => component.name);
 
 /**
  * Получить список игровых опций для вывода.
@@ -465,7 +457,7 @@ export const getOptionsForOutput = (
   gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
   currentGameSettingGroup: string,
 ): IGameSettingsOption[] => {
-  const availableFiles = getGameSettingsFilesNames(gameSettingsFiles);
+  const availableFiles = getGameSettingsElementsNames(gameSettingsFiles);
   let currentOptions = [...gameSettingsOptions];
 
   currentOptions = currentOptions.filter(
@@ -1058,7 +1050,7 @@ export const generateGameSettingsOption = (
  * Получить измененные игровые опции после удаления игрового файла.
  * @param options Массив игровых опций.
  * @param files Массив игровых файлов.
- * @param isDelete Если true, то опции будут удалены, а не изменены.
+ * @param isDelete Если true, то опции будут удалены, а не измененыю По умолчанию `false`.
  * @returns Массив измененных игровых опций.
  */
 export const getChangedOptionsAfterFileDelete = (
@@ -1071,7 +1063,7 @@ export const getChangedOptionsAfterFileDelete = (
 
   if (isDelete) {
     newOptions = newOptions.filter((currentOption) => {
-      if (!getGameSettingsFilesNames(files).includes(currentOption.file)) {
+      if (!getGameSettingsElementsNames(files).includes(currentOption.file)) {
         changedOptionsNames.push(currentOption.label);
 
         return false;
@@ -1081,7 +1073,7 @@ export const getChangedOptionsAfterFileDelete = (
     });
   } else {
     newOptions = newOptions.map((currentOption) => {
-      if (!getGameSettingsFilesNames(files).includes(currentOption.file)) {
+      if (!getGameSettingsElementsNames(files).includes(currentOption.file)) {
         changedOptionsNames.push(currentOption.label);
 
         return generateGameSettingsOption(
@@ -1091,6 +1083,55 @@ export const getChangedOptionsAfterFileDelete = (
           },
           getFullOption(currentOption),
           files[0],
+        ).newOption;
+      }
+
+      return currentOption;
+    });
+  }
+
+  return [newOptions, changedOptionsNames];
+};
+
+/**
+ * Получить измененные игровые опции после удаления группы игровых настроек.
+ * @param options Массив игровых опций.
+ * @param groups Массив групп настроек.
+ * @param files Массив игровых файлов.
+ * @param isDelete Если true, то опции будут удалены, а не измененыю По умолчанию `false`.
+ * @returns Массив измененных игровых опций.
+ */
+export const getChangedOptionsAfterGroupDelete = (
+  options: IGameSettingsOption[],
+  groups: IGameSettingsGroup[],
+  files: IGameSettingsFile[],
+  isDelete = false,
+): [IGameSettingsOption[], string[]] => {
+  const changedOptionsNames: string[] = [];
+  let newOptions: IGameSettingsOption[] = [...options];
+
+  if (isDelete) {
+    newOptions = newOptions.filter((currentOption) => {
+      if (!getGameSettingsElementsNames(groups).includes(currentOption.settingGroup!)) {
+        changedOptionsNames.push(currentOption.label);
+
+        return false;
+      }
+
+      return true;
+    });
+  } else {
+    newOptions = newOptions.map((currentOption) => {
+      if (!getGameSettingsElementsNames(groups).includes(currentOption.settingGroup!)) {
+        changedOptionsNames.push(currentOption.label);
+
+        return generateGameSettingsOption(
+          {
+            ...currentOption,
+            settingGroup: groups.length > 0 ? groups[0].name : undefined,
+          },
+          getFullOption(currentOption),
+          getFileByFileName(files, currentOption.file)!,
         ).newOption;
       }
 

@@ -4,7 +4,7 @@ import React, {
 } from 'react';
 import classNames from 'classnames';
 import {
-  NavLink, Redirect, Route, Switch, useHistory,
+  NavLink, Redirect, Route, Switch, useHistory, useLocation,
 } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
@@ -36,42 +36,19 @@ import { getPathFromLinkHash } from '$utils/strings';
 export const Developer: React.FC = () => {
   /* eslint-disable max-len */
   const isConfigProcessing = useDeveloperSelector((state) => state.developer.isConfigProcessing);
-  const isFirstStart = useDeveloperSelector((state) => state.developer.launcherConfig.isFirstStart);
   const launcherConfig = useDeveloperSelector((state) => state.developer.launcherConfig);
   const gameSettingsConfig = useDeveloperSelector((state) => state.developer.gameSettingsConfig);
-  const gameName = useDeveloperSelector((state) => state.developer.launcherConfig.gameName);
   const messages = useDeveloperSelector((state) => state.developer.messages);
 
-  const history = useHistory();
-  const dispatch = useDispatch();
-
   const [currentConfig, setCurrentConfig] = useState<IGameSettingsConfig|ILauncherConfig>(launcherConfig);
+  const [isSettingsInitialized, setIsSettingsInitialized] = useState<boolean>(true);
   const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
   const [validationErrors, setValidationErrors] = useState<IValidationErrors>({});
+
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const location = useLocation();
   /* eslint-enable max-len */
-
-  const closeDevWindow = useCallback(() => {
-    ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false);
-  }, []);
-
-  const setNewCurrentConfigData = useCallback((
-    newConfig: IGameSettingsConfig|ILauncherConfig,
-    isCheckForChanges = true,
-  ) => {
-    if (isCheckForChanges) {
-      let isChanged = false;
-
-      if ('playButton' in currentConfig) {
-        isChanged = !checkObjectForEqual(launcherConfig, newConfig);
-      } else if ('baseFilesEncoding' in currentConfig) {
-        isChanged = !checkObjectForEqual(gameSettingsConfig, newConfig);
-      }
-
-      setIsConfigChanged(isChanged);
-    }
-
-    setCurrentConfig(newConfig);
-  }, [currentConfig, launcherConfig, gameSettingsConfig]);
 
   const saveConfigChanges = useCallback((
     pathToGo: string = '',
@@ -101,7 +78,33 @@ export const Developer: React.FC = () => {
     } else if ('baseFilesEncoding' in currentConfig) {
       dispatch(updateConfig(DeveloperScreenName.GAME_SETTINGS));
     }
+
+    setIsSettingsInitialized(false);
   }, [currentConfig, dispatch]);
+
+  const closeDevWindow = useCallback(() => {
+    resetConfigChanges();
+    ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, false);
+  }, [resetConfigChanges]);
+
+  const setNewCurrentConfigData = useCallback((
+    newConfig: IGameSettingsConfig|ILauncherConfig,
+    isCheckForChanges = true,
+  ) => {
+    if (isCheckForChanges) {
+      let isChanged = false;
+
+      if ('playButton' in currentConfig) {
+        isChanged = !checkObjectForEqual(launcherConfig, newConfig);
+      } else if ('baseFilesEncoding' in currentConfig) {
+        isChanged = !checkObjectForEqual(gameSettingsConfig, newConfig);
+      }
+
+      setIsConfigChanged(isChanged);
+    }
+
+    setCurrentConfig(newConfig);
+  }, [currentConfig, launcherConfig, gameSettingsConfig]);
 
   ///TODO Добавить тип для event. React.MouseEvent<HTMLAnchorElement> не понимает target.hash
   const onNavLinkClick = useCallback(async (event) => {
@@ -131,6 +134,8 @@ export const Developer: React.FC = () => {
         history.push(getPathFromLinkHash(event.target.hash));
       }
     }
+
+    setIsSettingsInitialized(false);
   }, [isConfigChanged, history, validationErrors, saveConfigChanges, resetConfigChanges]);
 
   /* eslint-disable react/jsx-props-no-spreading */
@@ -138,9 +143,9 @@ export const Developer: React.FC = () => {
     <div className={styles.developer}>
       <Header
         isResizable
-        gameName={gameName}
+        gameName={launcherConfig.gameName}
         onClose={closeDevWindow}
-        isCloseBtnDisabled={isFirstStart}
+        isCloseBtnDisabled={launcherConfig.isFirstStart}
       />
       <main className={styles.developer__main}>
         <nav className={styles.developer__navigation}>
@@ -168,7 +173,8 @@ export const Developer: React.FC = () => {
         <DeveloperScreenController
           isConfigChanged={isConfigChanged}
           isHaveValidationErrors={Object.keys(validationErrors).length > 0}
-          isFirstStart={isFirstStart}
+          isFirstStart={launcherConfig.isFirstStart}
+          isUpdateBtnEnabled={location.pathname === Routes.DEVELOPER_SCREEN_GAME_SETTINGS}
           saveChanges={saveConfigChanges}
           onCancelBtnClick={cancelConfigChanges}
           onResetBtnClick={resetConfigChanges}
@@ -182,9 +188,11 @@ export const Developer: React.FC = () => {
               render={(): React.ReactElement => (
                 <LauncherConfigurationScreen
                   currentConfig={currentConfig as ILauncherConfig}
-                  setNewConfig={setNewCurrentConfigData}
-                  resetConfigChanges={resetConfigChanges}
+                  isSettingsInitialized={isSettingsInitialized}
                   validationErrors={validationErrors}
+                  setNewConfig={setNewCurrentConfigData}
+                  setIsSettingsInitialized={setIsSettingsInitialized}
+                  resetConfigChanges={resetConfigChanges}
                   setValidationErrors={setValidationErrors}
                 />
               )}
@@ -195,9 +203,11 @@ export const Developer: React.FC = () => {
               render={(): React.ReactElement => (
                 <GameSettingsConfigurationScreen
                   currentConfig={currentConfig as IGameSettingsConfig}
-                  setNewConfig={setNewCurrentConfigData}
-                  resetConfigChanges={resetConfigChanges}
+                  isSettingsInitialized={isSettingsInitialized}
                   validationErrors={validationErrors}
+                  setNewConfig={setNewCurrentConfigData}
+                  setIsSettingsInitialized={setIsSettingsInitialized}
+                  resetConfigChanges={resetConfigChanges}
                   setValidationErrors={setValidationErrors}
                 />
               )}
