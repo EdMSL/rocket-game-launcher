@@ -71,17 +71,25 @@ export const getValidationCauses = (
 /**
  *Очищает все ошибки валидации, связанные этим компонентом.
  * @param validationErrors Текущие ошибки валидации.
- * @param targetId Идентификатор или массив идентификаторов компонента(ов).
+ * @param target Идентификатор, массив идентификаторов или регулярное выражение, представляющие ID.
  * @returns Ошибки валидации без ошибок, привязанных к текущему компоненту.
  */
-export const clearComponentValidationErrors = (
+export const clearIDRelatedValidationErrors = (
   validationErrors: IValidationErrors,
-  targetId: string|string[],
+  target: string|string[]|RegExp,
 ): IValidationErrors => Object
   .keys(validationErrors)
-  .filter((errorId) => (Array.isArray(targetId)
-    ? !targetId.some((currentId) => errorId.includes(currentId))
-    : !errorId.includes(targetId)))
+  .filter((errorId) => {
+    if (Array.isArray(target)) {
+      return !target.some((currentId) => errorId.includes(currentId));
+    }
+
+    if (target instanceof RegExp) {
+      return !target.test(errorId);
+    }
+
+    return !errorId.includes(target);
+  })
   .reduce<IValidationErrors>((totalErrors, currentId) => ({
     ...totalErrors,
     [currentId]: validationErrors[currentId],
@@ -130,6 +138,16 @@ export const getUniqueValidationErrors = (
 
   return newErrors;
 };
+/**
+ * Проверяет, есть ли среди ошибок валидации ошибки, привязанные к текущей опции.
+ * @param optionId ID опции для проверки.
+ * @param validationErrors Ошибки валидации.
+ * @returns Есть ли ошибки, привязанные к переданному ID.
+ */
+const getIsOptionHasValidationErrors = (
+  optionId: string,
+  validationErrors: IValidationErrors,
+): boolean => Object.keys(validationErrors).some((errorKey) => errorKey.includes(`_${optionId}`));
 
 /**
   Проверяет значения полей `number` в компоненте `developer screen` на корректность.
@@ -318,7 +336,7 @@ const validateSelectOptions = (
       isForAdd: incorrectIndexes.length > 0,
     },
     {
-      id: `${option.id}:${id}`,
+      id: option.id,
       error: {
         cause: ValidationErrorCause.ITEM,
       },
@@ -345,7 +363,7 @@ const validateSelectOptions = (
         isForAdd: incorrectIndexes.length > 0,
       },
       {
-        id: `${option.id}:${id}`,
+        id: option.id,
         error: {
           cause: ValidationErrorCause.ITEM,
         },
@@ -366,7 +384,7 @@ export const validateFileRelatedFields = (
   let newErrors = { ...currentErrors };
 
   option.items.forEach((item) => {
-    newErrors = clearComponentValidationErrors(
+    newErrors = clearIDRelatedValidationErrors(
       { ...currentErrors },
       [`${GameSettingsOptionFields.INI_GROUP}_${item.id}`,
         `${GameSettingsOptionFields.VALUE_NAME}_${item.id}`,
@@ -453,39 +471,46 @@ export const validateControllerTypeRelatedFields = (
   option: IGameSettingsOption,
   currentErrors: IValidationErrors,
 ): IValidationErrors => {
-  let errors = clearComponentValidationErrors(
-    { ...currentErrors },
-    GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING,
+  let errors = { ...currentErrors };
+
+  errors = clearIDRelatedValidationErrors(
+    errors,
+    `${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${option.id}`,
   );
 
   if (option.controllerType && option.controllerType === UIControllerType.SELECT) {
-    errors = {
-      ...validateSelectOptions(
+    errors = validateSelectOptions(
       option.selectOptionsValueString!,
       `${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${option.id}`,
       option,
       errors,
-      ),
-    };
+    );
   }
 
   option.items.forEach((item) => {
+    errors = clearIDRelatedValidationErrors(
+      errors,
+      new RegExp(`${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_.+_${option.id}`),
+    );
+
     if (item.controllerType && item.controllerType === UIControllerType.SELECT) {
-      errors = {
-        ...validateSelectOptions(
-        item.selectOptionsValueString!,
-        `${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${item.id}`,
-        option,
-        errors,
-        ),
-      };
+      errors = validateSelectOptions(
+          item.selectOptionsValueString!,
+          `${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${item.id}_${option.id}`,
+          option,
+          errors,
+      );
     }
   });
+
+  if (!getIsOptionHasValidationErrors(option.id, errors)) {
+    errors = clearIDRelatedValidationErrors(errors, option.id);
+  }
 
   return errors;
 };
 
-export const validateGameSettingsOptions = (
+export const validateTargetGameSettingsOption = (
   target: EventTarget & (HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement),
   option: IGameSettingsOption,
   file: IGameSettingsFile,
@@ -517,14 +542,10 @@ export const validateGameSettingsOptions = (
   }
 
   if (target.name === GameSettingsOptionFields.FILE) {
-    errors = validateFileRelatedFields(
-      option,
-      file,
-      errors,
-    );
-  }
-
-  if (target.name === GameSettingsOptionFields.CONTROLLER_TYPE
+    errors = validateFileRelatedFields(option, file, errors);
+  } else if (target.name === GameSettingsOptionFields.OPTION_TYPE) {
+    errors = validateControllerTypeRelatedFields(option, errors);
+  } else if (target.name === GameSettingsOptionFields.CONTROLLER_TYPE
     || target.name === GameSettingsOptionFields.SEPARATOR) {
     if (target.name === GameSettingsOptionFields.SEPARATOR) {
       errors = getUniqueValidationErrors(
@@ -553,9 +574,7 @@ export const validateGameSettingsOptions = (
       option,
       errors,
     );
-  }
-
-  if (target.name === GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING) {
+  } else if (target.name === GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING) {
     errors = validateSelectOptions(target.value, target.id, option, errors);
   }
 

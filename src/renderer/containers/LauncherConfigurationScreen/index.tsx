@@ -30,7 +30,7 @@ import {
 import { ArgumentsBlock } from '$components/Developer/ArgumentsBlock';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import {
-  clearComponentValidationErrors,
+  clearIDRelatedValidationErrors,
   getUniqueValidationErrors,
   IValidationErrors,
   validateNumberInputs,
@@ -165,7 +165,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
     });
 
     setLastAddedBtnItemId('');
-    setValidationErrors(clearComponentValidationErrors(validationErrors, id));
+    setValidationErrors(clearIDRelatedValidationErrors(validationErrors, id));
   }, [currentConfig, validationErrors, setValidationErrors, setNewConfig]);
 
   const onAddCustomBtnBtnClick = useCallback(() => {

@@ -49,7 +49,7 @@ import { addDeveloperMessages, createGameSettingsConfigFile } from '$actions/dev
 import { GameSettingsOptionItem } from '$components/Developer/GameSettingsOptionItem';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import {
-  clearComponentValidationErrors,
+  clearIDRelatedValidationErrors,
   getUniqueValidationErrors,
   IValidationError,
   IValidationErrors,
@@ -367,7 +367,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
       });
     }
 
-    setValidationErrors(clearComponentValidationErrors(validationErrors, deletedGroupName));
+    setValidationErrors(clearIDRelatedValidationErrors(validationErrors, deletedGroupName));
   }, [currentConfig,
     gameSettingsConfig.gameSettingsGroups,
     validationErrors,
@@ -510,7 +510,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
           gameSettingsFiles: newFiles,
         });
 
-        setValidationErrors(clearComponentValidationErrors(validationErrors, deletedItem.id));
+        setValidationErrors(clearIDRelatedValidationErrors(validationErrors, deletedItem.id));
       }
     }
   }, [currentConfig, validationErrors, setValidationErrors, setNewConfig, dispatch]);
@@ -530,7 +530,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
     deleteGameSettingsFile(files, deletedFile);
   }, [currentConfig.gameSettingsFiles, deleteGameSettingsFile]);
 
-  const changeGameSettingsOptions = useCallback((
+  const changeGameSettingsOption = useCallback((
     optionId: string,
     optionData: IGameSettingsOption,
   ) => {
@@ -555,6 +555,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
       currentConfig.gameSettingsFiles[0],
       validationErrors,
     ));
+
     setNewConfig({
       ...currentConfig,
       gameSettingsOptions: [
@@ -578,7 +579,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
       gameSettingsOptions: params,
     });
 
-    setValidationErrors(clearComponentValidationErrors(validationErrors, deletedOption.id));
+    setValidationErrors(clearIDRelatedValidationErrors(validationErrors, deletedOption.id));
     setLastAddedOptionId('');
   }, [validationErrors, currentConfig, setValidationErrors, setNewConfig]);
 
@@ -776,7 +777,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
                       gameSettingsFiles={currentConfig.gameSettingsFiles}
                       gameSettingsGroups={currentConfig.gameSettingsGroups}
                       validationErrors={validationErrors}
-                      onOptionDataChange={changeGameSettingsOptions}
+                      onOptionDataChange={changeGameSettingsOption}
                       onValidation={setValidationErrors}
                       deleteOption={deleteGameSettingsOptionById}
                     />

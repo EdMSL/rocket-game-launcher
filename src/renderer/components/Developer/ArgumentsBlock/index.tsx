@@ -14,7 +14,7 @@ import { HintItem } from '$components/HintItem';
 import { IButtonArg } from '$types/main';
 import { getRandomId } from '$utils/strings';
 import {
-  clearComponentValidationErrors,
+  clearIDRelatedValidationErrors,
   getUniqueValidationErrors,
   IValidationError,
   IValidationErrors,
@@ -122,7 +122,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
     );
 
     setLastAddedStringArg('');
-    onValidationError(clearComponentValidationErrors(validationErrors, currentTarget.name));
+    onValidationError(clearIDRelatedValidationErrors(validationErrors, currentTarget.name));
   }, [args, parent, validationErrors, changeArguments, onValidationError]);
 
   const OnAddArgumentBtnClick = useCallback(({

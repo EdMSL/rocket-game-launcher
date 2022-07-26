@@ -31,10 +31,10 @@ import { generateSelectOptionsFromString, getRandomId } from '$utils/strings';
 import { TextArea } from '$components/UI/TextArea';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import {
-  clearComponentValidationErrors,
+  clearIDRelatedValidationErrors,
   IValidationErrors,
   validateControllerTypeRelatedFields,
-  validateGameSettingsOptions,
+  validateTargetGameSettingsOption,
 } from '$utils/validation';
 
 interface IProps {
@@ -113,7 +113,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         : optionFile!,
     );
 
-    onValidation(validateGameSettingsOptions(
+    onValidation(validateTargetGameSettingsOption(
       currentTarget,
       newOption,
       getFileByFileName(gameSettingsFiles, newOption.file)!,
@@ -166,7 +166,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
 
   const onDeleteOptionBtnClick = useCallback(() => {
     deleteOption(option.id);
-    onValidation(clearComponentValidationErrors(validationErrors, option.id));
+    onValidation(clearIDRelatedValidationErrors(validationErrors, option.id));
   }, [option.id, validationErrors, onValidation, deleteOption]);
 
   const onAddOptionItemBtnClick = useCallback(() => {
