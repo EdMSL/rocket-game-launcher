@@ -1,7 +1,9 @@
 import {
   availableOptionSeparators, GameSettingsFileView, GameSettingsOptionType, UIControllerType,
 } from '$constants/misc';
-import { IGameSettingsFile, IGameSettingsOption } from '$types/gameSettings';
+import {
+  GameSettingsOptionFields, IGameSettingsFile, IGameSettingsOption,
+} from '$types/gameSettings';
 import { ILauncherConfig } from '$types/main';
 import { deepClone } from './data';
 import { getOptionItemSelectValueRegExp } from './strings';
@@ -16,6 +18,13 @@ export enum ValidationErrorCause {
   PATH = 'incorrect path',
   NOT_AVAILABLE = 'not available path',
   EXISTS = 'already exists',
+}
+
+export enum ValidationErrorText {
+  MIN = 'Значение меньше допустимого',
+  EMPTY = 'Значение не может быть пустым',
+  PATH = 'Некорректный путь',
+  NOT_AVAILABLE = 'Недопустимый путь',
 }
 
 interface IValidationErrorData {
@@ -60,9 +69,9 @@ export const getValidationCauses = (
 ): string[] => errorsArr.map((error) => error.cause);
 
 /**
- *Очищает при удалении компонента все ошибки валидации, связанные этим компонентом.
+ *Очищает все ошибки валидации, связанные этим компонентом.
  * @param validationErrors Текущие ошибки валидации.
- * @param targetId Идентификатор или массив идентификаторов удаляемого(ых) компонента(ов).
+ * @param targetId Идентификатор или массив идентификаторов компонента(ов).
  * @returns Ошибки валидации без ошибок, привязанных к текущему компоненту.
  */
 export const clearComponentValidationErrors = (
@@ -73,7 +82,7 @@ export const clearComponentValidationErrors = (
   .filter((errorId) => (Array.isArray(targetId)
     ? !targetId.some((currentId) => errorId.includes(currentId))
     : !errorId.includes(targetId)))
-  .reduce((totalErrors, currentId) => ({
+  .reduce<IValidationErrors>((totalErrors, currentId) => ({
     ...totalErrors,
     [currentId]: validationErrors[currentId],
   }), {});
@@ -140,7 +149,7 @@ export const validateNumberInputs = (
     id: target.id,
     error: {
       cause: ValidationErrorCause.MIN,
-      text: 'Значение меньше допустимого',
+      text: ValidationErrorText.MIN,
     },
     isForAdd: +target.value < +target.min,
   });
@@ -354,46 +363,49 @@ export const validateFileRelatedFields = (
   currentErrors: IValidationErrors,
 ): IValidationErrors => {
   const errors: IValidationError[] = [];
-  const newErrors = clearComponentValidationErrors(
-    { ...currentErrors },
-    ['iniGroup', 'valueName', 'valuePath'],
-  );
+  let newErrors = { ...currentErrors };
 
   option.items.forEach((item) => {
+    newErrors = clearComponentValidationErrors(
+      { ...currentErrors },
+      [`${GameSettingsOptionFields.INI_GROUP}_${item.id}`,
+        `${GameSettingsOptionFields.VALUE_NAME}_${item.id}`,
+        `${GameSettingsOptionFields.VALUE_PATH}_${item.id}`],
+    );
     errors.push(
       {
-        id: `name_${item.id}_${option.id}`,
+        id: `${GameSettingsOptionFields.NAME}_${item.id}_${option.id}`,
         error: {
           cause: ValidationErrorCause.EMPTY,
-          text: 'Значение не может быть пустым',
+          text: ValidationErrorText.EMPTY,
         },
-        isForAdd: item.name === '',
+        isForAdd: item[GameSettingsOptionFields.NAME] === '',
       },
       {
         id: option.id,
         error: {
           cause: ValidationErrorCause.ITEM,
         },
-        isForAdd: item.name === '',
+        isForAdd: item[GameSettingsOptionFields.NAME] === '',
       },
     );
 
     if (file.view === GameSettingsFileView.SECTIONAL) {
       errors.push(
         {
-          id: `iniGroup_${item.id}_${option.id}`,
+          id: `${GameSettingsOptionFields.INI_GROUP}_${item.id}_${option.id}`,
           error: {
             cause: ValidationErrorCause.EMPTY,
-            text: 'Значение не может быть пустым',
+            text: ValidationErrorText.EMPTY,
           },
-          isForAdd: item.iniGroup === '',
+          isForAdd: item[GameSettingsOptionFields.INI_GROUP] === '',
         },
         {
           id: option.id,
           error: {
             cause: ValidationErrorCause.ITEM,
           },
-          isForAdd: item.iniGroup === '',
+          isForAdd: item[GameSettingsOptionFields.INI_GROUP] === '',
         },
       );
     }
@@ -401,34 +413,34 @@ export const validateFileRelatedFields = (
     if (file.view === GameSettingsFileView.TAG) {
       errors.push(
         {
-          id: `valueName_${item.id}_${option.id}`,
+          id: `${GameSettingsOptionFields.VALUE_NAME}_${item.id}_${option.id}`,
           error: {
             cause: ValidationErrorCause.EMPTY,
-            text: 'Значение не может быть пустым',
+            text: ValidationErrorText.EMPTY,
           },
-          isForAdd: item.valueName === '',
+          isForAdd: item[GameSettingsOptionFields.VALUE_NAME] === '',
         },
         {
           id: option.id,
           error: {
             cause: ValidationErrorCause.ITEM,
           },
-          isForAdd: item.valueName === '',
+          isForAdd: item[GameSettingsOptionFields.VALUE_NAME] === '',
         },
         {
-          id: `valuePath_${item.id}_${option.id}`,
+          id: `${GameSettingsOptionFields.VALUE_PATH}_${item.id}_${option.id}`,
           error: {
             cause: ValidationErrorCause.EMPTY,
-            text: 'Значение не может быть пустым',
+            text: ValidationErrorText.EMPTY,
           },
-          isForAdd: item.valuePath === '',
+          isForAdd: item[GameSettingsOptionFields.VALUE_PATH] === '',
         },
         {
           id: option.id,
           error: {
             cause: ValidationErrorCause.ITEM,
           },
-          isForAdd: item.valuePath === '',
+          isForAdd: item[GameSettingsOptionFields.VALUE_PATH] === '',
         },
       );
     }
@@ -443,14 +455,14 @@ export const validateControllerTypeRelatedFields = (
 ): IValidationErrors => {
   let errors = clearComponentValidationErrors(
     { ...currentErrors },
-    'selectOptionsValueString',
+    GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING,
   );
 
   if (option.controllerType && option.controllerType === UIControllerType.SELECT) {
     errors = {
       ...validateSelectOptions(
       option.selectOptionsValueString!,
-      `selectOptionsValueString_${option.id}`,
+      `${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${option.id}`,
       option,
       errors,
       ),
@@ -462,7 +474,7 @@ export const validateControllerTypeRelatedFields = (
       errors = {
         ...validateSelectOptions(
         item.selectOptionsValueString!,
-        `selectOptionsValueString_${item.id}`,
+        `${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${item.id}`,
         option,
         errors,
         ),
@@ -489,7 +501,7 @@ export const validateGameSettingsOptions = (
           id: target.id,
           error: {
             cause: ValidationErrorCause.EMPTY,
-            text: 'Значение не может быть пустым',
+            text: ValidationErrorText.EMPTY,
           },
           isForAdd: target.value === '',
         },
@@ -504,7 +516,7 @@ export const validateGameSettingsOptions = (
     );
   }
 
-  if (target.name === 'file') {
+  if (target.name === GameSettingsOptionFields.FILE) {
     errors = validateFileRelatedFields(
       option,
       file,
@@ -512,8 +524,9 @@ export const validateGameSettingsOptions = (
     );
   }
 
-  if (target.name === 'controllerType' || target.name === 'separator') {
-    if (target.name === 'separator') {
+  if (target.name === GameSettingsOptionFields.CONTROLLER_TYPE
+    || target.name === GameSettingsOptionFields.SEPARATOR) {
+    if (target.name === GameSettingsOptionFields.SEPARATOR) {
       errors = getUniqueValidationErrors(
         errors,
         [
@@ -542,7 +555,7 @@ export const validateGameSettingsOptions = (
     );
   }
 
-  if (target.name === 'selectOptionsValueString') {
+  if (target.name === GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING) {
     errors = validateSelectOptions(target.value, target.id, option, errors);
   }
 

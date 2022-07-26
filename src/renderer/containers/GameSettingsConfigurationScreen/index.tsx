@@ -366,7 +366,14 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
         gameSettingsGroups: newGroups,
       });
     }
-  }, [currentConfig, gameSettingsConfig.gameSettingsGroups, setNewConfig, dispatch]);
+
+    setValidationErrors(clearComponentValidationErrors(validationErrors, deletedGroupName));
+  }, [currentConfig,
+    gameSettingsConfig.gameSettingsGroups,
+    validationErrors,
+    setNewConfig,
+    setValidationErrors,
+    dispatch]);
 
   const onAddGameSettingsFile = useCallback(async () => {
     const pathStr = await getPathFromPathSelector();
@@ -427,73 +434,84 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
       gameSettingsOptions: changedOptions,
     };
 
+    let currentValidationErrors = { ...validationErrors };
+
+    newConfig.gameSettingsOptions.forEach((currentOption) => {
+      currentValidationErrors = validateFileRelatedFields(
+        currentOption,
+        fileData,
+        currentValidationErrors,
+      );
+    });
+
+    setValidationErrors(currentValidationErrors);
     setNewConfig(newConfig);
-  }, [currentConfig, setNewConfig]);
+  }, [currentConfig, validationErrors, setNewConfig, setValidationErrors]);
 
   const deleteGameSettingsFile = useCallback(async (
     newFiles: IGameSettingsFile[],
     deletedItem: IGameSettingsFile|undefined,
   ) => {
-    if (currentConfig.gameSettingsOptions.some(
-      (currentOption) => currentOption.file === deletedItem?.name,
-    )
-    ) {
-      const messageBoxResponse = await ipcRenderer.invoke(
-        AppChannel.GET_MESSAGE_BOX_RESPONSE,
-        `Одна или несколько игровых опций имеют данный файл в зависимостях. Выберите "Отмена", чтобы вручную изменить используемый опциями файл${newFiles.length > 0 ? ', "Игнорировать", чтобы автоматически выбрать для опции один из доступных файлов,' : ''} или "Удалить", чтобы удалить связанные с файлом опции.`, //eslint-disable-line max-len
-        'Выберите действие',
-        undefined,
-        newFiles.length > 0 ? ['Отмена', 'Игнорировать', 'Удалить'] : ['Отмена', 'Удалить'],
-        AppWindowName.DEV,
-      );
-
-      if (messageBoxResponse.response > 0) {
-        const [newOptions, changedOptionsNames] = getChangedOptionsAfterFileDelete(
-          currentConfig.gameSettingsOptions,
-          newFiles,
-          newFiles.length > 0
-            ? messageBoxResponse.response === 2
-            : messageBoxResponse.response === 1,
+    if (deletedItem !== undefined) {
+      if (currentConfig.gameSettingsOptions.some(
+        (currentOption) => currentOption.file === deletedItem.name,
+      )
+      ) {
+        const messageBoxResponse = await ipcRenderer.invoke(
+          AppChannel.GET_MESSAGE_BOX_RESPONSE,
+          `Одна или несколько игровых опций имеют данный файл в зависимостях. Выберите "Отмена", чтобы вручную изменить используемый опциями файл${newFiles.length > 0 ? ', "Игнорировать", чтобы автоматически выбрать для опции один из доступных файлов,' : ''} или "Удалить", чтобы удалить связанные с файлом опции.`, //eslint-disable-line max-len
+          'Выберите действие',
+          undefined,
+          newFiles.length > 0 ? ['Отмена', 'Игнорировать', 'Удалить'] : ['Отмена', 'Удалить'],
+          AppWindowName.DEV,
         );
 
-        const newConfig = {
-          ...currentConfig,
-          gameSettingsFiles: newFiles,
-          gameSettingsOptions: newOptions,
-        };
+        if (messageBoxResponse.response > 0) {
+          const [newOptions, changedOptionsNames] = getChangedOptionsAfterFileDelete(
+            currentConfig.gameSettingsOptions,
+            newFiles,
+            newFiles.length > 0
+              ? messageBoxResponse.response === 2
+              : messageBoxResponse.response === 1,
+          );
 
-        if (changedOptionsNames.length > 0) {
-          if (newFiles.length > 0 && messageBoxResponse.response === 1) {
-            dispatch(addDeveloperMessages([CreateUserMessage.info(`При сохранении настроек для опций [${changedOptionsNames.join()}] используемый файл будет изменен на "${newFiles[0].label}".`)])); //eslint-disable-line max-len
-          } else {
-            dispatch(addDeveloperMessages([CreateUserMessage.info(`При сохранении настроек опции [${changedOptionsNames.join()}] будут удалены.`)])); //eslint-disable-line max-len
-          }
-        }
-
-        let currentValidationErrors = { ...validationErrors };
-
-        newConfig.gameSettingsOptions.forEach((currentOption) => {
-          currentValidationErrors = {
-            ...currentValidationErrors,
-            ...validateFileRelatedFields(
-              currentOption,
-              newFiles[0],
-              validationErrors,
-            ),
+          const newConfig = {
+            ...currentConfig,
+            gameSettingsFiles: newFiles,
+            gameSettingsOptions: newOptions,
           };
 
+          if (changedOptionsNames.length > 0) {
+            if (newFiles.length > 0 && messageBoxResponse.response === 1) {
+              dispatch(addDeveloperMessages([CreateUserMessage.info(`При сохранении настроек для опций [${changedOptionsNames.join()}] используемый файл будет изменен на "${newFiles[0].label}".`)])); //eslint-disable-line max-len
+            } else {
+              dispatch(addDeveloperMessages([CreateUserMessage.info(`При сохранении настроек опции [${changedOptionsNames.join()}] будут удалены.`)])); //eslint-disable-line max-len
+            }
+          }
+
+          let currentValidationErrors = { ...validationErrors };
+
+          newConfig.gameSettingsOptions.forEach((currentOption) => {
+            currentValidationErrors = validateFileRelatedFields(
+              currentOption,
+              newFiles[0],
+              currentValidationErrors,
+            );
+          });
+
+          setLastAddedFileId('');
+          setNewConfig(newConfig);
           setValidationErrors(currentValidationErrors);
+        }
+      } else {
+        setLastAddedFileId('');
+        setNewConfig({
+          ...currentConfig,
+          gameSettingsFiles: newFiles,
         });
 
-        setLastAddedFileId('');
-        setNewConfig(newConfig);
+        setValidationErrors(clearComponentValidationErrors(validationErrors, deletedItem.id));
       }
-    } else {
-      setLastAddedFileId('');
-      setNewConfig({
-        ...currentConfig,
-        gameSettingsFiles: newFiles,
-      });
     }
   }, [currentConfig, validationErrors, setValidationErrors, setNewConfig, dispatch]);
 
