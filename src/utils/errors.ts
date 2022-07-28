@@ -9,6 +9,7 @@ export const ErrorMessage = {
   DIRECTORY_NOT_FOUND: 'No such directory',
   PATH_TO_DIRECTORY: 'Got path to directory, not file',
   PATH_TO_FILE: 'Got path to file, not directory',
+  PERMISSION: 'Operation not permitted',
   ARG_TYPE: 'Invalid data in path received',
   MIME_TYPE: 'Invalid file extension',
   UNKNOWN: 'An unknown error occurred',
@@ -21,6 +22,7 @@ export const ErrorName = {
   ARG_TYPE: 'InvalidArgumentError',
   PATH_TO_DIRECTORY: 'DirectoryError',
   PATH_TO_FILE: 'NotDirectoryError',
+  PERMISSION: 'NotPermittedError',
   READ_WRITE: 'ReadWriteError',
   SAGA_ERROR: 'SagaError',
   MIME_TYPE: 'IncorrectFileTypeError',
@@ -35,6 +37,7 @@ export const ErrorCode = {
   PATH_TO_DIRECTORY: 'EISDIR',
   PATH_TO_FILE: 'ENOTDIR',
   ARG_TYPE: 'ERR_INVALID_ARG_TYPE',
+  PERMISSION: 'EPERM',
   UNKNOWN: 'UNKNOWN',
 };
 
@@ -129,6 +132,12 @@ export const getReadWriteError = (
   if (error.code === ErrorCode.ARG_TYPE) {
     errorMessage = `${messageTitle} ${ErrorMessage.ARG_TYPE}`;
     errorCauseName = ErrorName.ARG_TYPE;
+    errorCauseCode = error.code;
+  }
+
+  if (error.code === ErrorCode.PERMISSION) {
+    errorMessage = `${messageTitle} ${ErrorMessage.PERMISSION}`;
+    errorCauseName = ErrorName.PERMISSION;
     errorCauseCode = error.code;
   }
 
