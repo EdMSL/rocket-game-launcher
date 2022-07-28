@@ -45,7 +45,9 @@ import { HintItem } from '$components/HintItem';
 import { GameSettingsFileItem } from '$components/Developer/GameSettingsFileItem';
 import { GAME_DIR } from '$constants/paths';
 import { CreateUserMessage } from '$utils/message';
-import { addDeveloperMessages, createGameSettingsConfigFile } from '$actions/developer';
+import {
+  addDeveloperMessages, createGameSettingsConfigFile,
+} from '$actions/developer';
 import { GameSettingsOptionItem } from '$components/Developer/GameSettingsOptionItem';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import {
@@ -59,6 +61,7 @@ import {
 import { Switcher } from '$components/UI/Switcher';
 import { Select } from '$components/UI/Select';
 import { PathSelector } from '$components/UI/PathSelector';
+import { defaultFullGameSettingsOption } from '$constants/defaultData';
 
 interface IProps {
   currentConfig: IGameSettingsConfig,
@@ -86,6 +89,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
   const isGameSettingsConfigDataLoaded = useDeveloperSelector((state) => state.developer.isGameSettingsConfigDataLoaded);
   const pathVariables = useDeveloperSelector((state) => state.developer.pathVariables);
 
+  const [fullOptions, setFullOptions] = useState<IGameSettingsOption[]>([]);
   const [lastAddedGroupName, setLastAddedGroupName] = useState<string>('');
   const [lastAddedFileId, setLastAddedFileId] = useState<string>('');
   const [lastAddedOptionId, setLastAddedOptionId] = useState<string>('');
@@ -106,6 +110,9 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
     }
 
     if (!isSettingsInitialized && !isConfigProcessing && isGameSettingsConfigDataLoaded) {
+      setFullOptions(gameSettingsConfig.gameSettingsOptions.map(
+        (currentOption) => getFullOption(currentOption),
+      ));
       resetConfigChanges();
       setIsSettingsInitialized(true);
     }
@@ -253,6 +260,10 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
     ));
   }, [currentConfig, validationErrors, setValidationErrors, setNewConfig]);
 
+  const getCurrentFullOption = useCallback((optionId: string) => fullOptions.find(
+    (currentOption) => currentOption.id === optionId,
+  ) || defaultFullGameSettingsOption, [fullOptions]);
+
   const createNewGroup = useCallback(() => {
     const newName = getRandomName();
     const newGroups = [...currentConfig.gameSettingsGroups, {
@@ -273,8 +284,8 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               ...currentOption,
               settingGroup: newGroups[0].name,
             },
-            getFullOption(currentOption),
             getFileByFileName(currentConfig.gameSettingsFiles, currentOption.file)!,
+            getFullOption(currentOption),
           ).newOption,
         ),
       };
@@ -420,8 +431,8 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
       if (currentOption.file === fileData.name) {
         return generateGameSettingsOption(
           currentOption,
-          getFullOption(currentOption),
           fileData,
+          getCurrentFullOption(currentOption.id),
         ).newOption;
       }
 
@@ -446,7 +457,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
 
     setValidationErrors(currentValidationErrors);
     setNewConfig(newConfig);
-  }, [currentConfig, validationErrors, setNewConfig, setValidationErrors]);
+  }, [currentConfig, validationErrors, setNewConfig, getCurrentFullOption, setValidationErrors]);
 
   const deleteGameSettingsFile = useCallback(async (
     newFiles: IGameSettingsFile[],
@@ -533,6 +544,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
   const changeGameSettingsOption = useCallback((
     optionId: string,
     optionData: IGameSettingsOption,
+    fullOption: IGameSettingsOption,
   ) => {
     setNewConfig({
       ...currentConfig,
@@ -542,7 +554,13 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
         currentConfig.gameSettingsOptions,
       ),
     });
-  }, [currentConfig, setNewConfig]);
+
+    setFullOptions(changeConfigArrayItem(
+      fullOption.id,
+      fullOption,
+      fullOptions,
+    ));
+  }, [currentConfig, fullOptions, setNewConfig]);
 
   const addGameSettingsOption = useCallback(() => {
     const newOption = getNewGameSettingsOption(
@@ -776,6 +794,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
                       option={currentOption}
                       gameSettingsFiles={currentConfig.gameSettingsFiles}
                       gameSettingsGroups={currentConfig.gameSettingsGroups}
+                      fullOption={getCurrentFullOption(currentOption.id)}
                       validationErrors={validationErrors}
                       onOptionDataChange={changeGameSettingsOption}
                       onValidation={setValidationErrors}

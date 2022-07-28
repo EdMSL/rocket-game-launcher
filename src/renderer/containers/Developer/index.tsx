@@ -41,7 +41,7 @@ export const Developer: React.FC = () => {
   const messages = useDeveloperSelector((state) => state.developer.messages);
 
   const [currentConfig, setCurrentConfig] = useState<IGameSettingsConfig|ILauncherConfig>(launcherConfig);
-  const [isSettingsInitialized, setIsSettingsInitialized] = useState<boolean>(true);
+  const [isSettingsInitialized, setIsSettingsInitialized] = useState<boolean>(false);
   const [isConfigChanged, setIsConfigChanged] = useState<boolean>(false);
   const [validationErrors, setValidationErrors] = useState<IValidationErrors>({});
 

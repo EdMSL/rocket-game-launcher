@@ -11,7 +11,6 @@ import {
   generateGameSettingsOption,
   generateSelectOptions,
   getFileByFileName,
-  getFullOption,
   getTempFileLabel,
 } from '$utils/data';
 import {
@@ -39,16 +38,18 @@ import {
 
 interface IProps {
   option: IGameSettingsOption,
+  fullOption: IGameSettingsOption,
   gameSettingsFiles: IGameSettingsFile[],
   gameSettingsGroups: IGameSettingsGroup[],
   validationErrors: IValidationErrors,
-  onOptionDataChange: (id: string, data: IGameSettingsOption) => void,
+  onOptionDataChange: (id: string, data: IGameSettingsOption, full: IGameSettingsOption) => void,
   onValidation: (errors: IValidationErrors) => void,
   deleteOption: (id: string) => void,
 }
 
 export const GameSettingsOptionItem: React.FC<IProps> = ({
   option,
+  fullOption,
   gameSettingsFiles,
   gameSettingsGroups,
   validationErrors,
@@ -56,7 +57,6 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
   onValidation,
   deleteOption,
 }) => {
-  const [fullOption, setFullOption] = useState<IGameSettingsOption>(getFullOption(option));
   const [lastAddedItemId, setLastAddedItemId] = useState<string>('');
 
   const optionFile = useMemo(
@@ -107,10 +107,10 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
 
     const { newOption, newFullOption } = generateGameSettingsOption(
       currentOption,
-      fullOption,
       currentTarget.name === 'file'
         ? getFileByFileName(gameSettingsFiles, currentTarget.value)!
         : optionFile!,
+      fullOption,
     );
 
     onValidation(validateTargetGameSettingsOption(
@@ -120,8 +120,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
       validationErrors,
     ));
 
-    onOptionDataChange(option.id, newOption);
-    setFullOption(newFullOption);
+    onOptionDataChange(option.id, newOption, newFullOption);
   }, [option,
     validationErrors,
     optionFile,
@@ -153,12 +152,11 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
           [currentTarget.name]: currentValue,
         },
       },
-      fullOption,
       optionFile!,
+      fullOption,
     );
 
-    onOptionDataChange(option.id, newOption);
-    setFullOption(newFullOption);
+    onOptionDataChange(option.id, newOption, newFullOption);
   }, [option,
     optionFile,
     fullOption,
@@ -181,8 +179,8 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
           },
           ...option.items],
       },
-      fullOption,
       optionFile!,
+      fullOption,
     );
 
     if (option.optionType === GameSettingsOptionType.COMBINED) {
@@ -192,8 +190,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
       ));
     }
 
-    onOptionDataChange(option.id, newOption);
-    setFullOption(newFullOption);
+    onOptionDataChange(option.id, newOption, newFullOption);
     setLastAddedItemId(newId);
   }, [option, fullOption, optionFile, validationErrors, onValidation, onOptionDataChange]);
 
@@ -209,8 +206,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
       ));
     }
 
-    onOptionDataChange(option.id, newOption);
-    setFullOption({ ...fullOption, items: newItems });
+    onOptionDataChange(option.id, newOption, { ...fullOption, items: newItems });
   }, [option, fullOption, validationErrors, onValidation, onOptionDataChange]);
 
   const onDeleteOptionItemBtnClick = useCallback((
