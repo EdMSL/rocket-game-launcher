@@ -13,6 +13,7 @@ export const INITIAL_STATE: IGameSettingsRootState = {
   gameSettingsOptions: defaultGameSettingsConfig.gameSettingsOptions,
   initialGameSettingsOptions: defaultGameSettingsConfig.gameSettingsOptions,
   moProfile: '',
+  moVersion: 0,
   moProfiles: [],
   gameSettingsParameters: {},
 };

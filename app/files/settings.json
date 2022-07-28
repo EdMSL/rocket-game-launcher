@@ -1,7 +1,6 @@
 {
   "modOrganizer": {
     "isUsed": true,
-    "version": 2,
     "pathToMOFolder": "%GAME_DIR%\\MO2"
   },
   "baseFilesEncoding": "win1251",

@@ -67,7 +67,6 @@ export const defaultModOrganizerPaths = {
 
 export const defaultModOrganizerParams: IModOrganizerParams = {
   isUsed: false,
-  version: 2,
   pathToMOFolder: '%GAME_DIR%\\Mod Organizer',
 };
 

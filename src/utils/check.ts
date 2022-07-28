@@ -182,7 +182,6 @@ export const gameSettingsShallowCheckSchema = Joi.object<IGameSettingsConfig>({
 export const gameSettingsDeepCheckSchema = Joi.object<IGameSettingsConfig>({
   modOrganizer: Joi.object({
     isUsed: Joi.bool().optional().default(false),
-    version: Joi.number().valid(1, 2).when(Joi.ref('isUsed'), { is: true, then: Joi.required() }),
     pathToMOFolder: Joi.string().optional().default(defaultGameSettingsConfig.modOrganizer.pathToMOFolder).pattern(PathRegExp.GAME_DIR, 'correct path'),
   }).optional().default(defaultGameSettingsConfig.modOrganizer),
   baseFilesEncoding: Joi.string().optional().default(Encoding.WIN1251),

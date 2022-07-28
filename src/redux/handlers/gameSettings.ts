@@ -74,6 +74,16 @@ const setMoProfiles: IGameSettingsActionHadler<
   moProfiles,
 });
 
+const setMoVersion: IGameSettingsActionHadler<
+  typeof GAME_SETTINGS_ACTIONS.setMoVersion
+> = (
+  state,
+  { payload: moVersion },
+) => ({
+  ...state,
+  moVersion,
+});
+
 export const GAME_SETTINGS_HANDLERS = {
   [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_PARAMETERS]: setGameSettingsParameters,
   [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_CONFIG]: setGameSettingsConfig,
@@ -81,5 +91,6 @@ export const GAME_SETTINGS_HANDLERS = {
   [GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_OPTIONS]: setGameSettingsOptions,
   [GAME_SETTINGS_TYPES.SET_INITIAL_GAME_SETTINGS_OPTIONS]: setInitialGameSettingsOptions,
   [GAME_SETTINGS_TYPES.SET_MO_PROFILE]: setMoProfile,
+  [GAME_SETTINGS_TYPES.SET_MO_VERSION]: setMoVersion,
   [GAME_SETTINGS_TYPES.SET_MO_PROFILES]: setMoProfiles,
 };

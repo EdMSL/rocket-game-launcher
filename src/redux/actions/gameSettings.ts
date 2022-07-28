@@ -75,3 +75,10 @@ export const setMoProfiles = (
   type: GAME_SETTINGS_TYPES.SET_MO_PROFILES,
   payload: moProfiles,
 });
+
+export const setMoVersion = (
+  moVersion: IGameSettingsRootState['moVersion'],
+) => ({
+  type: GAME_SETTINGS_TYPES.SET_MO_VERSION,
+  payload: moVersion,
+});

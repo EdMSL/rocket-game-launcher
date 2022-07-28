@@ -653,21 +653,6 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               description="Определяет, используется ли в игре\сборке Mod Organizer"//eslint-disable-line max-len
               onChange={onSwitcherChange}
             />
-            <Select
-              className="developer__item"
-              id="version"
-              name="version"
-              parent="modOrganizer"
-              label="Версия MO"
-              selectOptions={[
-                { label: 'Mod Organizer', value: '1' },
-                { label: 'Mod Organizer 2', value: '2' },
-              ]}
-              value={currentConfig.modOrganizer.version.toString()}
-              isDisabled={!currentConfig.modOrganizer.isUsed}
-              description="Задает версию использемого Mod Organizer"
-              onChange={onSelectChange}
-            />
             <PathSelector
               className="developer__item"
               id="pathToMOFolder"

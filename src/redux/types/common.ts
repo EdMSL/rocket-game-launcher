@@ -119,3 +119,8 @@ export interface IXmlObj {
 export interface IGetDataFromFilesResult {
   [key: string]: IIniObj|IXmlObj,
 }
+
+export interface IModOrganizerINIData {
+  profileName: string,
+  version: number,
+}

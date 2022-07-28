@@ -129,7 +129,8 @@ export enum AppChannel {
   GET_MESSAGE_BOX_RESPONSE = 'get message box response',
 }
 
-export const modOrganizerProfileSection = 'General';
+export const modOrganizerGeneralSection = 'General';
 export const modOrganizerProfileParam = 'selected_profile';
+export const modOrganizerVersionParam = 'version';
 
 export const availableOptionSeparators = ['!', '@', '#', '%', ':', '&', '*', '-', '+', '|'];

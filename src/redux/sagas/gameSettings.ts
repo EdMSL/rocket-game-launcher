@@ -21,7 +21,9 @@ import {
   writeINIFile,
   xmlAttributePrefix,
 } from '$utils/files';
-import { IGetDataFromFilesResult, IUnwrap } from '$types/common';
+import {
+  IGetDataFromFilesResult, IModOrganizerINIData, IUnwrap,
+} from '$types/common';
 import {
   addMessages,
   setIsGameSettingsAvailable,
@@ -57,6 +59,7 @@ import {
   saveGameSettingsFiles,
   setGameSettingsOptions,
   setInitialGameSettingsOptions,
+  setMoVersion,
 } from '$actions/gameSettings';
 import {
   CustomError,
@@ -77,10 +80,11 @@ import {
   PathRegExp,
   Encoding,
   GameSettingsFileView,
-  modOrganizerProfileSection,
+  modOrganizerGeneralSection,
   modOrganizerProfileParam,
   PathVariableName,
   AppWindowName,
+  modOrganizerVersionParam,
 } from '$constants/misc';
 import {
   getRegExpForLineIniParameter,
@@ -176,11 +180,10 @@ function* getMOProfilesSaga(pathToMOFolder: string): SagaIterator {
  * Получить данные из файла ModOrganizer.ini и записать нужные параметры в `state`
  * @returns Строка с профилем ModOrganizer
 */
-function* getDataFromMOIniSaga(): SagaIterator<string> {
+function* getDataFromMOIniSaga(): SagaIterator<IModOrganizerINIData> {
   try {
     const {
       main: { pathVariables },
-      gameSettings: { modOrganizer: { version } },
     }: ReturnType<typeof getState> = yield select(getState);
 
     const iniData: IUnwrap<typeof readINIFile> = yield call(
@@ -188,26 +191,31 @@ function* getDataFromMOIniSaga(): SagaIterator<string> {
       pathVariables['%MO_INI%'],
     );
 
-    const currentMOProfileIniSection = iniData.getSection(modOrganizerProfileSection);
+    const generalSection = iniData.getSection(modOrganizerGeneralSection);
 
-    if (currentMOProfileIniSection) {
-      const profileName = currentMOProfileIniSection.getValue(modOrganizerProfileParam);
+    if (generalSection) {
+      const versionStr = generalSection.getValue(modOrganizerVersionParam);
 
-      if (profileName) {
-        if (version === 1) {
-          return profileName.toString();
+      if (versionStr) {
+        const profileName = generalSection.getValue(modOrganizerProfileParam);
+
+        if (profileName) {
+          const version = +versionStr.split('.')[0];
+
+          if (+version === 1) {
+            return { profileName: profileName.toString(), version };
+          }
+
+          if (+version === 2) {
+            return { profileName: profileName.match(/@ByteArray\((.+)\)/)![1], version };
+          }
+
+          return { profileName: profileName.toString(), version };
         }
-
-        if (version === 2) {
-          return profileName.match(/@ByteArray\((.+)\)/)![1];
-        }
-
-        return profileName.toString();
       }
-
-      throw new CustomError('profileName');
+      throw new CustomError('version');
     } else {
-      throw new CustomError('modOrganizerProfileSection');
+      throw new CustomError('modOrganizerGeneralSection');
     }
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     let errorMessage = '';
@@ -356,7 +364,7 @@ export function* initGameSettingsSaga(
       settingsConfigErrors = [...errors];
     }
 
-    let moProfile: string = '';
+    let moData: SagaReturnType<typeof getDataFromMOIniSaga> = { profileName: '', version: 0 };
 
     if (currentSettingsConfig.modOrganizer.isUsed) {
       const MOPathVariables = getModOrganizerPathVariables(
@@ -375,9 +383,10 @@ export function* initGameSettingsSaga(
 
       yield call(getMOProfilesSaga, MOPathVariables[PathVariableName.MO_PROFILE]);
 
-      moProfile = yield call(getDataFromMOIniSaga);
+      moData = yield call(getDataFromMOIniSaga);
 
-      yield put(setMoProfile(moProfile));
+      yield put(setMoVersion(moData.version));
+      yield put(setMoProfile(moData.profileName));
     }
 
     if (currentSettingsConfig.gameSettingsOptions.length > 0) {
@@ -387,7 +396,7 @@ export function* initGameSettingsSaga(
         generateGameSettingsParametersSaga,
         currentSettingsConfig.gameSettingsFiles,
         currentSettingsConfig.gameSettingsOptions,
-        moProfile,
+        moData.profileName,
       );
 
       if (!initialSettingsConfig && !isFromUpdateAction) {
@@ -472,7 +481,7 @@ function* changeMOProfileSaga(
     const {
       gameSettings: {
         gameSettingsFiles, gameSettingsOptions, gameSettingsParameters,
-        modOrganizer: { version },
+        moVersion,
       },
       main: { pathVariables },
     }: ReturnType<typeof getState> = yield select(getState);
@@ -484,9 +493,9 @@ function* changeMOProfileSaga(
 
     changeSectionalIniParameterStr(
       iniData,
-      modOrganizerProfileSection,
+      modOrganizerGeneralSection,
       modOrganizerProfileParam,
-      version === 1 ? newMOProfile : `@ByteArray(${newMOProfile})`,
+      moVersion === 1 ? newMOProfile : `@ByteArray(${newMOProfile})`,
     );
 
     yield call(

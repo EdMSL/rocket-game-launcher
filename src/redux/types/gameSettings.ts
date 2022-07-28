@@ -10,6 +10,7 @@ export const GAME_SETTINGS_TYPES = {
   SET_GAME_SETTINGS_OPTIONS: 'SET_GAME_SETTINGS_OPTIONS',
   SET_INITIAL_GAME_SETTINGS_OPTIONS: 'SET_INITIAL_GAME_SETTINGS_OPTIONS',
   SAVE_GAME_SETTINGS_FILES: 'SAVE_GAME_SETTINGS_FILES',
+  SET_MO_VERSION: 'SET_MO_VERSION',
   SET_MO_PROFILE: 'SET_MO_PROFILE',
   SET_MO_PROFILES: 'SET_MO_PROFILES',
   CHANGE_MO_PROFILE: 'CHANGE_MO_PROFILE',
@@ -101,7 +102,6 @@ export interface IGameSettingsOption extends
 
 export interface IModOrganizerParams {
   isUsed: boolean,
-  version: number,
   pathToMOFolder: string,
 }
 
@@ -121,6 +121,7 @@ export type IGameSettingsRootState = Readonly<{
   gameSettingsOptions: IGameSettingsOption[],
   initialGameSettingsOptions: IGameSettingsOption[],
   moProfile: string,
+  moVersion: number,
   moProfiles: string[],
   gameSettingsParameters: IGameSettingsParameters,
 }>;
