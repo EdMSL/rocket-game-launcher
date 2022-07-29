@@ -133,4 +133,4 @@ export const modOrganizerGeneralSection = 'General';
 export const modOrganizerProfileParam = 'selected_profile';
 export const modOrganizerVersionParam = 'version';
 
-export const availableOptionSeparators = ['!', '@', '#', '%', ':', '&', '*', '-', '+', '|'];
+export const availableOptionSeparators = ['!', '#', ':', '-', '+', '|'];

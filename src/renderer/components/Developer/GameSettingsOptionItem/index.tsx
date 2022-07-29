@@ -278,15 +278,13 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
       }
       {
         option.separator !== undefined && (
-          <TextField
+          <Select
             className={styles.option__item}
             id={`${GameSettingsOptionFields.SEPARATOR}_${option.id}`}
             name={GameSettingsOptionFields.SEPARATOR}
+            selectOptions={generateSelectOptions(availableOptionSeparators)}
             label="Разделитель"
-            value={option[GameSettingsOptionFields.SEPARATOR]!}
-            placeholder={availableOptionSeparators.join()}
-            isRequied
-            validationErrors={validationErrors}
+            value={option[GameSettingsOptionFields.SEPARATOR]}
             onChange={onOptionInputChange}
           />
         )

@@ -547,29 +547,6 @@ export const validateTargetGameSettingsOption = (
     errors = validateControllerTypeRelatedFields(option, errors);
   } else if (target.name === GameSettingsOptionFields.CONTROLLER_TYPE
     || target.name === GameSettingsOptionFields.SEPARATOR) {
-    if (target.name === GameSettingsOptionFields.SEPARATOR) {
-      errors = getUniqueValidationErrors(
-        errors,
-        [
-          {
-            id: target.id,
-            error: {
-              cause: 'not available separator',
-              text: `Значение разделителя недопустимо. Допустимые значения: [${availableOptionSeparators}]`, //eslint-disable-line max-len
-            },
-            isForAdd: !availableOptionSeparators.includes(target.value),
-          },
-          {
-            id: option.id,
-            error: {
-              cause: ValidationErrorCause.ITEM,
-            },
-            isForAdd: !availableOptionSeparators.includes(target.value),
-          },
-        ],
-      );
-    }
-
     errors = validateControllerTypeRelatedFields(
       option,
       errors,
