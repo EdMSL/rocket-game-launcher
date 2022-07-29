@@ -1,11 +1,8 @@
 .hint__icon {
-  position: relative;
-
   display: inline-flex;
   align-items: center;
   width: 20px;
   height: 20px;
-  margin-left: 4px;
 
   vertical-align: text-bottom;
   /* stylelint-disable string-no-newline, max-line-length */
@@ -35,6 +32,11 @@
 
   background-color: var(--btn-color);
   border-radius: 4px;
+
+  &--left {
+    right: calc(100% + 4px);
+    left: auto;
+  }
 }
 
 .hint__text {

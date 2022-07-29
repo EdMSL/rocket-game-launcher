@@ -5,6 +5,8 @@
 .developer__groups-container {
   @include reset-indents;
   @include reset-list;
+  position: relative;
+
   display: flex;
   flex-wrap: wrap;
   justify-content: center;

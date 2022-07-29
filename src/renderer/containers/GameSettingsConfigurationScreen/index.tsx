@@ -717,6 +717,11 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
                 )
               }
             </ul>
+            <HintItem
+              className="developer__block-hint"
+              description="Группы настроек позволяют группировать опции. На экране настроек они будут отогражаться вверху экрана в виде панели навигации."
+              direction="left"
+            />
           </fieldset>
           <fieldset className="developer__block">
             <legend className="developer__block-title">Настройка игровых опций</legend>

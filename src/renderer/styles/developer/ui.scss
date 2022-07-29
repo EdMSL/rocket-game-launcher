@@ -43,6 +43,12 @@ $checkbox-size: 20px;
   & input {
     box-sizing: border-box;
   }
+
+  & .hint__icon {
+    position: relative;
+
+    margin-left: 4px;
+  }
 }
 
 .select__input {
