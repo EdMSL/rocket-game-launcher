@@ -112,12 +112,12 @@
       "items": [
         {
           "name": "Radius",
-          "valueName": "Value",
+          "valueAttribute": "Value",
           "valuePath": "_Shaders/DepthOfField/FirstPersonView"
         },
         {
           "name": "Radius",
-          "valueName": "Value",
+          "valueAttribute": "Value",
           "valuePath": "_Shaders/DepthOfField/ThirdPersonView"
         }
       ]

@@ -143,7 +143,7 @@ describe('#Check', () => {
       assert.equal(result.data[0].items.length, 1);
       assert.hasAllKeys(result.data[0].items[0], ['id', 'name']);
       assert.hasAllKeys(result.data[1].items[0], ['id', 'name', 'iniGroup']);
-      assert.hasAllKeys(result.data[2].items[0], ['id', 'name', 'valueName', 'valuePath']);
+      assert.hasAllKeys(result.data[2].items[0], ['id', 'name', 'valueAttribute', 'valuePath']);
     });
 
     it('Should return correct data from group option', () => {
@@ -162,7 +162,7 @@ describe('#Check', () => {
       assert.equal(result.data[5].items.length, 2);
 
       result.data[5].items.forEach((item) => {
-        assert.hasAllKeys(item, ['id', 'name', 'valueName', 'valuePath']);
+        assert.hasAllKeys(item, ['id', 'name', 'valueAttribute', 'valuePath']);
       });
     });
 

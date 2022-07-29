@@ -39,6 +39,10 @@ $checkbox-size: 20px;
 
 .ui__container {
   @include ui-container;
+
+  & input {
+    box-sizing: border-box;
+  }
 }
 
 .select__input {
@@ -201,11 +205,11 @@ $checkbox-size: 20px;
 }
 
 .text-field__label {
-  flex: 1 1 50%;
+  flex: 1 1 30%;
 }
 
 .text-field__input {
-  flex: 1 1 50%;
+  flex: 1 1 70%;
   padding: var(--space-m);
 
   font-size: var(--text-size-input);
@@ -234,12 +238,12 @@ $checkbox-size: 20px;
 }
 
 .text-area__label {
-  flex: 1 1 50%;
+  flex: 1 1 30%;
   align-self: flex-start;
 }
 
 .text-area__input {
-  flex: 1 1 50%;
+  flex: 1 1 70%;
   padding: var(--space-m);
   padding-bottom: 0;
 
@@ -268,18 +272,19 @@ $checkbox-size: 20px;
 }
 
 .path-selector__label {
-  flex: 1 1 50%;
+  flex: 1 1 30%;
 }
 
 .path-selector__input-block {
   position: relative;
 
-  flex: 1 1 50%;
+  flex: 1 1 70%;
   display: flex;
   align-items: center;
 }
 
 .path-selector__select {
+  box-sizing: border-box;
   height: 100%;
   padding: calc(var(--space-m) - 1px) var(--space-s);
 

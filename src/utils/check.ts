@@ -242,7 +242,7 @@ const defaultOptionTypeSchema = Joi.object({
           is: GameSettingsFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
-      valueName: Joi.string().when(
+      valueAttribute: Joi.string().when(
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
@@ -300,7 +300,7 @@ const groupOptionTypeSchema = Joi.object({
           is: GameSettingsFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
-      valueName: Joi.string().when(
+      valueAttribute: Joi.string().when(
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
@@ -357,7 +357,7 @@ const combinedOptionTypeSchema = Joi.object({
           is: GameSettingsFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
-      valueName: Joi.string().when(
+      valueAttribute: Joi.string().when(
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
@@ -392,7 +392,7 @@ const relatedOptionTypeSchema = Joi.object({
           is: GameSettingsFileView.SECTIONAL, then: Joi.required(), otherwise: Joi.forbidden(),
         },
       ),
-      valueName: Joi.string().when(
+      valueAttribute: Joi.string().when(
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },

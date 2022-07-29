@@ -630,6 +630,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
         && (
         <React.Fragment>
           <fieldset className="developer__block">
+            <legend className="developer__block-title">Основное</legend>
             <TextField
               className="developer__item"
               id="baseFilesEncoding"
@@ -663,7 +664,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               selectPathVariables={generateSelectOptions([PathVariableName.GAME_DIR])}
               pathVariables={pathVariables}
               isDisabled={!currentConfig.modOrganizer.isUsed}
-              description="Задает путь до основной папки Mod Organizer."
+              description="Задает путь до корневой папки Mod Organizer."
               validationErrors={validationErrors}
               onChange={onPathSelectorChange}
             />

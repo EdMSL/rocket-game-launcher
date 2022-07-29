@@ -107,7 +107,7 @@ export const defaultGameSettingsOptionItem: IGameSettingsOptionItem = {
   step: 0.1,
   selectOptions: {},
   selectOptionsValueString: '',
-  valueName: '',
+  valueAttribute: '',
   valuePath: '',
 };
 

@@ -30,6 +30,7 @@ module.exports = {
       "ignore": ["after-comment", "after-declaration"],
     }],
     "declaration-no-important": true,
+    "declaration-block-no-redundant-longhand-properties": null,
     "font-family-name-quotes": "always-unless-keyword",
     "font-weight-notation": "numeric",
     "function-url-no-scheme-relative": true,

@@ -231,7 +231,8 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         className={styles.option__item}
         id={`${GameSettingsOptionFields.LABEL}_${option.id}`}
         name={GameSettingsOptionFields.LABEL}
-        label="Заголовок опции"
+        label="Заголовок"
+        description="Текст, отображаемый перед контроллером опции."
         value={option[GameSettingsOptionFields.LABEL]}
         isRequied
         validationErrors={validationErrors}
@@ -243,6 +244,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         selectOptions={generateSelectOptions(GameSettingsOptionType)}
         name={GameSettingsOptionFields.OPTION_TYPE}
         label="Тип опции"
+        description="Тип опции определяет, сколько значений параметров она может изменять, а так же способ их изменения." //eslint-disable-line max-len
         value={option[GameSettingsOptionFields.OPTION_TYPE]}
         onChange={onOptionInputChange}
       />
@@ -252,6 +254,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         selectOptions={selectOptionsFiles}
         name={GameSettingsOptionFields.FILE}
         label="Файл"
+        description="Игровой файл, из которого используются параметры для опции."
         value={option[GameSettingsOptionFields.FILE]}
         onChange={onOptionInputChange}
       />
@@ -260,6 +263,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         id={`${GameSettingsOptionFields.DESCRIPTION}_${option.id}`}
         name={GameSettingsOptionFields.DESCRIPTION}
         label="Описание опции"
+        description="Текст для всплывающей подсказки. Аналогична данной подсказке."
         value={option[GameSettingsOptionFields.DESCRIPTION]}
         onChange={onOptionInputChange}
       />
@@ -269,22 +273,10 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
             className={styles.option__item}
             id={`${GameSettingsOptionFields.SETTING_GROUP}_${option.id}`}
             label="Группа настроек"
+            description="Задает группу, к которой приналежит опция."
             selectOptions={selectOptionsGroups}
             name={GameSettingsOptionFields.SETTING_GROUP}
             value={option[GameSettingsOptionFields.SETTING_GROUP]}
-            onChange={onOptionInputChange}
-          />
-        )
-      }
-      {
-        option.separator !== undefined && (
-          <Select
-            className={styles.option__item}
-            id={`${GameSettingsOptionFields.SEPARATOR}_${option.id}`}
-            name={GameSettingsOptionFields.SEPARATOR}
-            selectOptions={generateSelectOptions(availableOptionSeparators)}
-            label="Разделитель"
-            value={option[GameSettingsOptionFields.SEPARATOR]}
             onChange={onOptionInputChange}
           />
         )
@@ -301,7 +293,22 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                 : UIControllerType,
             )}
             label="Тип контроллера"
+            description="Определяет, с помощью какого контроллера будет изменяться значение опции." //eslint-disable-line max-len
             value={option[GameSettingsOptionFields.CONTROLLER_TYPE]}
+            onChange={onOptionInputChange}
+          />
+        )
+      }
+      {
+        option.separator !== undefined && (
+          <Select
+            className={styles.option__item}
+            id={`${GameSettingsOptionFields.SEPARATOR}_${option.id}`}
+            name={GameSettingsOptionFields.SEPARATOR}
+            selectOptions={generateSelectOptions(availableOptionSeparators)}
+            label="Разделитель"
+            description="Выбранный разделитьель следует применять при написании опций для селектора в поле 'Опции селектора'." //eslint-disable-line max-len
+            value={option[GameSettingsOptionFields.SEPARATOR]}
             onChange={onOptionInputChange}
           />
         )
@@ -313,6 +320,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
             id={`${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${option.id}`}
             name={GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}
             label="Опции селектора"
+            description="Определяет, какие варианты будут доступны для выбора. Представляет собой последовательность пар 'Заголовок'='Значение параметра'." //eslint-disable-line max-len
             value={option[GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING]}
             wrap="off"
             placeholder={option.optionType === GameSettingsOptionType.COMBINED
@@ -332,6 +340,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
             name={GameSettingsOptionFields.MIN}
             min=""
             label="Минимальное значение"
+            description="Минимальное значение диапазона значений параметра."
             value={option[GameSettingsOptionFields.MIN]}
             onChange={onOptionInputChange}
             onBlur={onNumberInputBlur}
@@ -346,6 +355,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
             name={GameSettingsOptionFields.MAX}
             min=""
             label="Максимальное значение"
+            description="Максимальное значение диапазона значений параметра."
             value={option[GameSettingsOptionFields.MAX]}
             onChange={onOptionInputChange}
             onBlur={onNumberInputBlur}
@@ -360,6 +370,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
             name={GameSettingsOptionFields.STEP}
             min={0.001}
             label="Шаг изменения значения"
+            description="Величина, на которую будет изменяться значение в контроллере."
             value={option[GameSettingsOptionFields.STEP]}
             onChange={onOptionInputChange}
             onBlur={onNumberInputBlur}
@@ -401,7 +412,8 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   id={`${GameSettingsOptionFields.NAME}_${item.id}_${option.id}`}
                   parent={option.id}
                   name={GameSettingsOptionFields.NAME}
-                  label="Имя параметра из файла"
+                  label="Имя параметра"
+                  description="Имя тега параметра для опции. Все параметры следует брать из того файла, который выбран в поле 'Файл'." //eslint-disable-line max-len
                   value={item[GameSettingsOptionFields.NAME]}
                   isRequied
                   validationErrors={validationErrors}
@@ -414,7 +426,8 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                     id={`${GameSettingsOptionFields.INI_GROUP}_${item.id}_${option.id}`}
                     parent={option.id}
                     name={GameSettingsOptionFields.INI_GROUP}
-                    label="Группа параметра из файла"
+                    label="Группа параметра"
+                    description="Группа, в которой находится параметр в файле. Не путать со значение поля 'Группа настроек'." //eslint-disable-line max-len
                     value={item[GameSettingsOptionFields.INI_GROUP]!}
                     isRequied
                     validationErrors={validationErrors}
@@ -423,14 +436,15 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   )
                 }
                 {
-                  item.valueName !== undefined && (
+                  item.valueAttribute !== undefined && (
                   <TextField
                     className={styles.option__item}
-                    id={`${GameSettingsOptionFields.VALUE_NAME}_${item.id}_${option.id}`}
+                    id={`${GameSettingsOptionFields.VALUE_ATTRIBUTE}_${item.id}_${option.id}`}
                     parent={option.id}
-                    name={GameSettingsOptionFields.VALUE_NAME}
-                    label="Имя атрибута параметра из файла"
-                    value={item[GameSettingsOptionFields.VALUE_NAME]!}
+                    name={GameSettingsOptionFields.VALUE_ATTRIBUTE}
+                    label="Имя атрибута параметра"
+                    description="Атрибут тега параметра, в котором находится значение для опции."
+                    value={item[GameSettingsOptionFields.VALUE_ATTRIBUTE]!}
                     isRequied
                     validationErrors={validationErrors}
                     onChange={onOptionInputChange}
@@ -444,9 +458,10 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                     id={`${GameSettingsOptionFields.VALUE_PATH}_${item.id}_${option.id}`}
                     parent={option.id}
                     name={GameSettingsOptionFields.VALUE_PATH}
-                    label="Путь до параметра из файла"
+                    label="Путь до параметра"
+                    description="Путь до тега, в котором лежит тег параметра, из которого берется значение для опции." //eslint-disable-line max-len
+                    placeholder="path/to/parametertag"
                     value={item[GameSettingsOptionFields.VALUE_PATH]!}
-                    isRequied
                     validationErrors={validationErrors}
                     onChange={onOptionInputChange}
                   />

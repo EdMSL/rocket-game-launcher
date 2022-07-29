@@ -498,14 +498,14 @@ param2=value
 * *tag* имеет два допонительных поля настроек, помимо оьщего поля ***name***. В нем пишется имя тэга-параметра.
 ```js
   "name": "Filtration",
-  "valueName": "Value",
+  "valueAttribute": "Value",
   "valuePath": "Main/Misc",
 ```
-***valueName*** это имя аттрибута параметра, если нужно значение одного из атрибутов тэга с параметром, либо, если нужно значение самого тэга, здесь нужно прописать "#text" или оставить пустую строку "".
+***valueAttribute*** это имя аттрибута параметра, если нужно значение одного из атрибутов тэга с параметром, либо, если нужно значение самого тэга, здесь нужно прописать "#text" или оставить пустую строку "".
 ```js
-  "valueName": "Value",
+  "valueAttribute": "Value",
   // или
-  "valueName": "#text",
+  "valueAttribute": "#text",
 ```
 ***valuePath*** это путь до нужного тэга-параметра. Само имя параметра не указывается, оно указывается в поле ***name***.
 Для файла с содержимым вида:
@@ -519,13 +519,13 @@ param2=value
 и используемом для опции значением аттрибута *Value* параметра *ParamTag* пишем:
 ```js
   "name": "ParamTag",
-  "valueName": "Value",
+  "valueAttribute": "Value",
   "valuePath": "Main/Some",
 ``` 
 Для значения самого тэга-параметра:
 ```js
   "name": "ParamTag",
-  "valueName": "#text",
+  "valueAttribute": "#text",
   "valuePath": "Main/Some",
 ```
 
@@ -600,7 +600,7 @@ param2=value
   "items": [
     {
       "name": "KeyModifier1",
-      "valueName": "FormIDFinderQuest",
+      "valueAttribute": "FormIDFinderQuest",
       "valuePath": "Main/Misc",   
       "": "",
       "controllerType": "select",

@@ -93,8 +93,8 @@ export const getTypeOfElement = (element: unknown): string => {
 export const getParameterName = (
   option: IGameSettingsOptionItem,
 ): string => {
-  if (option.valueName) {
-    return `${option.valuePath ? `${option.valuePath}/` : ''}${option.name}/${option.valueName}`;
+  if (option.valueAttribute) {
+    return `${option.valuePath ? `${option.valuePath}/` : ''}${option.name}/${option.valueAttribute}`;
   }
 
   if (option.iniGroup) {
@@ -288,7 +288,7 @@ export const getParameterData = (
     const pathArr = [
       ...valuePathArr,
       currentGameSettingOption.name!,
-      currentGameSettingOption.valueName!,
+      currentGameSettingOption.valueAttribute!,
     ];
 
     let index = 0;
@@ -298,9 +298,9 @@ export const getParameterData = (
 
       if (typeof obj[key] === 'object') {
         getProp(obj[key], pathArr[index]);
-      } else if (key === currentGameSettingOption.valueName) {
+      } else if (key === currentGameSettingOption.valueAttribute) {
         parameterName = pathArr.join('/');
-        parameterValue = obj[currentGameSettingOption.valueName!];
+        parameterValue = obj[currentGameSettingOption.valueAttribute!];
       }
     };
 
@@ -311,8 +311,8 @@ export const getParameterData = (
       let errorField = '';
 
       if (index === pathArr.length) {
-        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingOption.valueName}" attribute in "${currentGameSettingOption.name}" parameter specified in "${currentGameSettingsFile.label}".`; //eslint-disable-line max-len
-        errorField = 'valueName';
+        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingOption.valueAttribute}" attribute in "${currentGameSettingOption.name}" parameter specified in "${currentGameSettingsFile.label}".`; //eslint-disable-line max-len
+        errorField = 'valueAttribute';
       } else if (index === pathArr.length - 1) {
         errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingOption.name}" parameter${currentGameSettingOption.valuePath ? ` on the path "${currentGameSettingOption.valuePath}"` : ''} specified in "${currentGameSettingsFile.label}".`; //eslint-disable-line max-len
         errorField = 'name';
@@ -941,7 +941,7 @@ const getFieldsByFileView = (
     iniGroup: fullOption.iniGroup || defaultGameSettingsOptionItem.iniGroup,
   } : {},
   ...file.view === GameSettingsFileView.TAG ? {
-    valueName: fullOption.valueName || defaultGameSettingsOptionItem.valueName,
+    valueAttribute: fullOption.valueAttribute || defaultGameSettingsOptionItem.valueAttribute,
     valuePath: fullOption.valuePath || defaultGameSettingsOptionItem.valuePath,
   } : {},
 });

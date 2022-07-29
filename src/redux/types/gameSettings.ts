@@ -52,7 +52,7 @@ export enum GameSettingsOptionFields {
   SETTING_GROUP = 'settingGroup',
   ITEMS = 'items',
   INI_GROUP = 'iniGroup',
-  VALUE_NAME = 'valueName',
+  VALUE_ATTRIBUTE = 'valueAttribute',
   VALUE_PATH = 'valuePath',
   CONTROLLER_TYPE = 'controllerType',
   SELECT_OPTIONS = 'selectOptions',
@@ -75,7 +75,7 @@ export interface IGameSettingsOptionBase {
 
 export interface IGameSettingsOptionFileViewFields {
   iniGroup?: string,
-  valueName?: string,
+  valueAttribute?: string,
   valuePath?: string,
 }
 

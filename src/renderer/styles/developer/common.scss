@@ -22,17 +22,34 @@
   height: 100%;
   padding: 0 var(--space-m) var(--space-m);
   overflow: hidden;
+
+  @media (min-width: $big-screen) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
 }
 
 .developer__block {
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
   margin-bottom: var(--space-l);
   padding: var(--space-m);
 
   &:last-child {
     margin-bottom: 0;
     padding-bottom: var(--space-m);
+  }
+
+  &:nth-last-child(-n+2) {
+    @media (min-width: $big-screen) {
+      flex: 1 1 50%;
+    }
+  }
+
+  @media (min-width: $big-screen) {
+    flex-basis: 49%;
   }
 }
 
