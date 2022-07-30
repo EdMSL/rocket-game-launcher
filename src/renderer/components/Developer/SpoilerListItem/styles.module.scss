@@ -70,7 +70,7 @@
 
   font-size: 0;
   vertical-align: text-bottom;
-  fill: rgb(230, 230, 230);
+  fill: var(--text-main);
 
   background-repeat: no-repeat;
   background-position: center;
@@ -87,7 +87,7 @@
     opacity: 0.4;
 
     &:hover {
-      fill: rgb(230, 230, 230);
+      fill: var(--text-main);
     }
   }
 
@@ -97,7 +97,7 @@
 
   .spoiler__block[open] > .spoiler__title > & {
     &:disabled:hover {
-      fill: rgb(230, 230, 230);
+      fill: var(--text-main);
     }
   }
 }

@@ -350,69 +350,6 @@ export const checkIsPathIsNotOutsideValidFolder = (
 };
 
 /**
- * Получить путь до файла с учетом переменных путей.
- * @param pathToFile Путь до файла.
- * @param pathVariables Переменные путей.
- * @param profileMO Профиль Mod Organizer.
- * @returns Строка с абсолютным путем к файлу.
-*/
-export const getPathToFile = (
-  pathToFile: string,
-  pathVariables: IPathVariables,
-  profileMO = '',
-): string => {
-  let newPath = pathToFile;
-
-  if (PathRegExp.MO_PROFILE.test(pathToFile)) {
-    if (profileMO) {
-      newPath = path.join(
-        pathVariables['%MO_PROFILE%'],
-        profileMO,
-        path.basename(pathToFile),
-      );
-    } else {
-      throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
-    }
-  } else if (PathRegExp.MO_DIR.test(pathToFile)) {
-    if (pathVariables['%MO_DIR%']) {
-      newPath = newPath.replace(PathVariableName.MO_DIR, pathVariables['%MO_DIR%']);
-    } else {
-      if (profileMO) {
-        throw new CustomError('The path to a file in the Mod Organizer folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
-      }
-
-      throw new CustomError(`Incorrect path received. Path variable ${PathVariableName.MO_DIR} is not available.`); //eslint-disable-line max-len
-    }
-  } else if (PathRegExp.MO_MODS.test(pathToFile)) {
-    if (pathVariables['%MO_DIR%']) {
-      newPath = newPath.replace(PathVariableName.MO_MODS, pathVariables['%MO_MODS%']);
-    } else {
-      if (profileMO) {
-        throw new CustomError('The path to a file in the Mod Organizer mods folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
-      }
-
-      throw new CustomError(`Incorrect path received. Path variable ${PathVariableName.MO_MODS} is not available.`); //eslint-disable-line max-len
-    }
-  } else if (PathRegExp.DOCS_GAME.test(pathToFile)) {
-    if (pathVariables['%DOCS_GAME%']) {
-      newPath = newPath.replace(PathVariableName.DOCS_GAME, pathVariables['%DOCS_GAME%']);
-    } else {
-      throw new CustomError('The path to a file in the Documents folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
-    }
-  } else if (PathRegExp.DOCUMENTS.test(pathToFile)) {
-    throw new CustomError(`The path to a file in the Documents folder is not allow. Maybe you wanted to write "${PathVariableName.DOCS_GAME}"?.`); //eslint-disable-line max-len
-  } else if (PathRegExp.GAME_DIR.test(pathToFile)) {
-    newPath = newPath.replace(PathVariableName.GAME_DIR, pathVariables['%GAME_DIR%']);
-  } else {
-    throw new CustomError(`Incorrect path (${pathToFile}) received.`); //eslint-disable-line max-len
-  }
-
-  checkIsPathIsNotOutsideValidFolder(newPath, pathVariables);
-
-  return newPath;
-};
-
-/**
  * Получить имя файла из строки пути до него.
  * @param pathToFile Путь до файла.
  * @returns Имя файла.

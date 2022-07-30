@@ -10,7 +10,7 @@ import {
   writeToLogFile,
   writeToLogFileSync,
 } from '$utils/log';
-import { getPathToFile, parseJSON } from '$utils/strings';
+import { checkIsPathIsNotOutsideValidFolder, parseJSON } from '$utils/strings';
 import {
   ReadWriteError,
   getReadWriteError,
@@ -20,7 +20,7 @@ import {
   ErrorMessage,
 } from '$utils/errors';
 import {
-  Encoding, GameSettingsFileView, userThemeStyleFile,
+  Encoding, GameSettingsFileView, PathRegExp, PathVariableName, userThemeStyleFile,
 } from '$constants/misc';
 import { IPathVariables, USER_THEMES_DIR } from '$constants/paths';
 import { IGameSettingsFile } from '$types/gameSettings';
@@ -452,6 +452,98 @@ export const writeXMLFile = (
 
     throw error;
   });
+
+const getPathToFileFromMOProfileFolder = (
+  pathToProfiles: string,
+  fileName: string,
+  moProfile?: string,
+): string => {
+  if (moProfile) {
+    return path.join(pathToProfiles, moProfile, fileName);
+  }
+
+  const profiles = readDirectorySync(pathToProfiles);
+
+  return path.join(pathToProfiles, profiles[0], fileName);
+};
+
+/**
+ * Получить путь до файла с учетом переменных путей.
+ * @param pathToFile Путь до файла.
+ * @param pathVariables Переменные путей.
+ * @param profileMO Профиль Mod Organizer.
+ * @param isWithCheck Если `true`, то будет производиться проверка на вхождение пути в
+ * корневую папку игры, а так же проверки корректности. По умолчанию `true`.
+ * @returns Строка с абсолютным путем к файлу.
+*/
+export const getPathToFile = (
+  pathToFile: string,
+  pathVariables: IPathVariables,
+  profileMO = '',
+  isWithCheck = true,
+): string => {
+  let newPath = pathToFile;
+
+  if (PathRegExp.MO_PROFILE.test(pathToFile)) {
+    // Получение пути до МО разделено ввиду необходимости получения профилей при использовании
+    // функции в PathSelector.
+    if (isWithCheck) {
+      if (profileMO) {
+        newPath = getPathToFileFromMOProfileFolder(
+          pathVariables['%MO_PROFILE%'],
+          path.basename(pathToFile),
+          profileMO,
+        );
+      } else {
+        throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
+      }
+    } else {
+      newPath = getPathToFileFromMOProfileFolder(
+        pathVariables['%MO_PROFILE%'],
+        path.basename(pathToFile),
+        undefined,
+      );
+    }
+  } else if (PathRegExp.MO_DIR.test(pathToFile)) {
+    if (pathVariables['%MO_DIR%']) {
+      newPath = newPath.replace(PathVariableName.MO_DIR, pathVariables['%MO_DIR%']);
+    } else {
+      if (profileMO) {
+        throw new CustomError('The path to a file in the Mod Organizer folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
+      }
+
+      throw new CustomError(`Incorrect path received. Path variable ${PathVariableName.MO_DIR} is not available.`); //eslint-disable-line max-len
+    }
+  } else if (PathRegExp.MO_MODS.test(pathToFile)) {
+    if (pathVariables['%MO_DIR%']) {
+      newPath = newPath.replace(PathVariableName.MO_MODS, pathVariables['%MO_MODS%']);
+    } else {
+      if (profileMO) {
+        throw new CustomError('The path to a file in the Mod Organizer mods folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
+      }
+
+      throw new CustomError(`Incorrect path received. Path variable ${PathVariableName.MO_MODS} is not available.`); //eslint-disable-line max-len
+    }
+  } else if (PathRegExp.DOCS_GAME.test(pathToFile)) {
+    if (pathVariables['%DOCS_GAME%']) {
+      newPath = newPath.replace(PathVariableName.DOCS_GAME, pathVariables['%DOCS_GAME%']);
+    } else {
+      throw new CustomError('The path to a file in the Documents folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
+    }
+  } else if (PathRegExp.DOCUMENTS.test(pathToFile)) {
+    throw new CustomError(`The path to a file in the Documents folder is not allow. Maybe you wanted to write "${PathVariableName.DOCS_GAME}"?.`); //eslint-disable-line max-len
+  } else if (PathRegExp.GAME_DIR.test(pathToFile)) {
+    newPath = newPath.replace(PathVariableName.GAME_DIR, pathVariables['%GAME_DIR%']);
+  } else {
+    throw new CustomError(`Incorrect path (${pathToFile}) received.`); //eslint-disable-line max-len
+  }
+
+  if (isWithCheck) {
+    checkIsPathIsNotOutsideValidFolder(newPath, pathVariables);
+  }
+
+  return newPath;
+};
 
 /**
  * Асинхронно получает данные из файла для последующей генерации игровых настроек.

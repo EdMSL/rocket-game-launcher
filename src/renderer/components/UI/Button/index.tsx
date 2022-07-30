@@ -4,6 +4,7 @@ import classNames from 'classnames';
 interface IButtonProps {
   id?: string,
   name?: string,
+  title?: string,
   className?: string,
   isDisabled?: boolean,
   isAutofocus?: boolean,
@@ -19,11 +20,12 @@ export const Button: React.FunctionComponent<IButtonProps> = memo(({
   id,
   children,
   name,
+  title,
   className = '',
   isSubmit,
   isDisabled,
   isAutofocus,
-  tabIndex = 0,
+  tabIndex,
   btnPath,
   btnArgs,
   btnLabel,
@@ -46,6 +48,7 @@ export const Button: React.FunctionComponent<IButtonProps> = memo(({
       disabled={Boolean(isDisabled)}
       id={id}
       name={name}
+      title={title}
       autoFocus={isAutofocus}
       tabIndex={tabIndex}
       data-path={btnPath}

@@ -16,7 +16,6 @@ import {
   checkIsPathIsNotOutsideValidFolder,
   generateSelectOptionsString,
   getLineIniParameterValue,
-  getPathToFile,
   getRandomId,
   getRandomName,
   replacePathVariableByRootDir,
@@ -56,7 +55,7 @@ import {
 import {
   IGetDataFromFilesResult, IIniObj, IXmlObj, ISelectOption,
 } from '$types/common';
-import { readINIFileSync } from './files';
+import { getPathToFile, readINIFileSync } from './files';
 
 const SYMBOLS_TO_TYPE = 8;
 
@@ -972,7 +971,7 @@ export const getNewGameSettingsOption = (
 ): IGameSettingsOption => ({
   ...getOptionBase(file),
   label: 'Заголовок',
-  ...settingGroup ? { settingGroup } : {},
+  ...settingGroup && { settingGroup },
   controllerType: UIControllerType.CHECKBOX,
   items: [{
     id: getRandomId(),

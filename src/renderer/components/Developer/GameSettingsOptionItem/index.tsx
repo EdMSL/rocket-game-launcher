@@ -413,7 +413,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   parent={option.id}
                   name={GameSettingsOptionFields.NAME}
                   label="Имя параметра"
-                  description="Имя тега параметра для опции. Все параметры следует брать из того файла, который выбран в поле 'Файл'." //eslint-disable-line max-len
+                  description={`Имя${item.valueAttribute !== undefined ? ' тега' : ''} параметра для опции. Все параметры следует брать из того файла, который выбран в поле 'Файл'.`} //eslint-disable-line max-len
                   value={item[GameSettingsOptionFields.NAME]}
                   isRequied
                   validationErrors={validationErrors}

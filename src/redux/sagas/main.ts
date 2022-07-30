@@ -51,7 +51,6 @@ import {
   renameGameSettingsFilesBackups,
   restoreBackupFiles,
 } from '$utils/backup';
-import { getPathToFile } from '$utils/strings';
 import { ILocationState, IUnwrap } from '$types/common';
 import {
   setGameSettingsParameters, updateGameSettingsParameters,
@@ -59,6 +58,7 @@ import {
 import { getGameSettingsParametersWithNewValues } from '$utils/data';
 import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
 import { AppChannel } from '$constants/misc';
+import { getPathToFile } from '$utils/files';
 
 const getState = (state: IAppState): IAppState => state;
 

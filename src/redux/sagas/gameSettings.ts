@@ -12,6 +12,7 @@ import Joi from 'joi';
 
 import { IAppState } from '$store/store';
 import {
+  getPathToFile,
   isDataFromIniFile,
   readDirectory,
   readGameSettingsFile,
@@ -88,7 +89,6 @@ import {
 } from '$constants/misc';
 import {
   getRegExpForLineIniParameter,
-  getPathToFile,
   getObjectAsList,
 } from '$utils/strings';
 import { setIsGameSettingsConfigFileExists } from '$actions/developer';
@@ -146,10 +146,6 @@ export function* getGameSettingsConfigSaga(
  * @param pathVariables Текущие переменные путей.
 */
 function* getMOProfilesSaga(pathToMOFolder: string): SagaIterator {
-  // const {
-  //   main: { pathVariables },
-  // }: ReturnType<typeof getState> = yield select(getState);
-
   try {
     const profiles: IUnwrap<typeof readDirectory> = yield call(
       readDirectory,

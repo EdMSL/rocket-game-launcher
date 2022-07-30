@@ -18,6 +18,8 @@ import { getIsPathWithVariableCorrect } from '$utils/check';
 import {
   getValidationCauses, IValidationError, ValidationErrorCause,
 } from '$utils/validation';
+import { openFolder } from '$utils/process';
+import { getPathToFile } from '$utils/files';
 
 interface IProps extends IUIElementParams, IUIControllerTextField {
   id: string,
@@ -111,6 +113,14 @@ export const PathSelector: React.FC<IProps> = ({
       parent,
     );
   }, [currentPathVariable, selectorType, name, id, parent, extensions, onChange]);
+
+  const onOpenFolderBtnClick = useCallback(() => {
+    openFolder(
+      getPathToFile(String(value), pathVariables, undefined, false),
+      undefined,
+      selectorType === LauncherButtonAction.OPEN,
+    );
+  }, [value, selectorType, pathVariables]);
 
   const onSelectPatchBtnClick = useCallback(async () => {
     let pathStr = await getPathFromPathSelector();
@@ -261,9 +271,22 @@ export const PathSelector: React.FC<IProps> = ({
           onChange={onPatchTextFieldChange}
         />
         <Button
-          className="path-selector__input-btn"
-          onClick={onSelectPatchBtnClick}
+          className="path-selector__input-btn path-selector__input-btn--open"
+          title="Открыть в проводнике"
           isDisabled={isDisabled}
+          onClick={onOpenFolderBtnClick}
+        >
+          {/* eslint-disable */}
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
+          </svg>
+          {/* eslint-enable */}
+        </Button>
+        <Button
+          className="path-selector__input-btn path-selector__input-btn--choose"
+          title="Выбрать путь"
+          isDisabled={isDisabled}
+          onClick={onSelectPatchBtnClick}
         >
           Выбрать путь
         </Button>
