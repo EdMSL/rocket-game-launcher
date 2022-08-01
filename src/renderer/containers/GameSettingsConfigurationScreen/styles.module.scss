@@ -27,15 +27,13 @@
   }
 
   & .editable-item {
-    padding-top: 2px;
-    padding-bottom: 2px;
+    padding-block: 2px;
   }
 
   & .editable-item--editable {
     flex-grow: 1;
     margin-right: 0;
-    padding-top: 0;
-    padding-bottom: 0;
+    padding-block: 0;
   }
 
   & .editable-item__input {

@@ -307,7 +307,7 @@ $checkbox-size: 20px;
   }
 
   &:disabled {
-    padding: var(--space-m) var(--space-s);
+    padding-block: var(--space-m);
 
     border-color: transparent;
 
