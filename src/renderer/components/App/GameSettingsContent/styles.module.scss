@@ -8,8 +8,20 @@
   padding-right: 20px;
   padding-left: var(--indent-size);
 
+  & label::before {
+    right: calc(0px + var(--indent-size) * 2);
+  }
+
+  & label::after {
+    right: calc(17px + var(--indent-size) * 2);
+  }
+
   &:last-child {
     margin-bottom: 0;
+  }
+
+  & .switcher__input:checked + label::after {
+    right: calc(3px + var(--indent-size) * 2);
   }
 }
 

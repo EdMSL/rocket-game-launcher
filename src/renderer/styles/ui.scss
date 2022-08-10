@@ -281,7 +281,7 @@ $checkbox-size: 20px;
     content: "";
     position: absolute;
     top: calc(50% - #{$checkbox-size} / 2);
-    right: 20px;
+    right: 0;
 
     width: 36px;
     height: 20px;
@@ -296,7 +296,7 @@ $checkbox-size: 20px;
     content: "";
     position: absolute;
     top: calc(50% - #{$checkbox-size} / 2 + 2px);
-    right: calc(0% + 16px + 1px + 20px);
+    right: calc(0% + 16px + 1px);
 
     display: block;
     width: 16px;
@@ -311,7 +311,7 @@ $checkbox-size: 20px;
   }
 
   .switcher__input:checked + &::after {
-    right: 23px;
+    right: 3px;
   }
 
   .switcher__input:focus + &::before {
