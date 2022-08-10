@@ -118,7 +118,7 @@ export const PathSelector: React.FC<IProps> = ({
     openFolder(
       getPathToFile(String(value), pathVariables, undefined, false),
       undefined,
-      selectorType === LauncherButtonAction.OPEN,
+      selectorType === LauncherButtonAction.RUN,
     );
   }, [value, selectorType, pathVariables]);
 
