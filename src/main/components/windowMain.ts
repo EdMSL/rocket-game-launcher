@@ -21,6 +21,7 @@ import {
   setIsGameSettingsConfigChanged, setLauncherConfig, setPathVariables,
 } from '$actions/main';
 import { IGameSettingsConfig } from '$types/gameSettings';
+import { replacePathVariableByRootDir } from '$utils/strings';
 
 /**
  * Функция для создания и показа главного окна приложения
@@ -47,6 +48,9 @@ export const createMainWindow = (
     width: config.isResizable ? mainWindowState.width : config.width,
     height: config.isResizable ? mainWindowState.height : config.height,
     resizable: config.isResizable,
+    ...process.env.NODE_ENV === 'development' && config.icon && {
+      icon: replacePathVariableByRootDir(config.icon),
+    },
     frame: false,
     title: config.gameName ? config.gameName : 'Game Launcher',
     webPreferences: {

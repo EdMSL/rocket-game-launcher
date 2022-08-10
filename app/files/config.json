@@ -6,6 +6,7 @@
   "minHeight": 400,
   "maxWidth": 900,
   "maxHeight": 0,
+  "icon": "%GAME_DIR%\\icon.png",
   "documentsPath": "%DOCUMENTS%\\My Games\\Oblivion_GBR",
   "gameName": "OA Launchers",
   "playButton": {

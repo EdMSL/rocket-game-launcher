@@ -65,17 +65,11 @@ export interface IWindowSettings {
   maxHeight: number,
   width: number,
   height: number,
+  icon: string,
 }
-
-// export interface IModOrganizerParams {
-//   isUsed: boolean,
-//   version: number,
-//   pathToMOFolder: string,
-// }
 
 export interface ILauncherConfig extends IWindowSettings {
   isFirstStart: boolean,
-  // modOrganizer: IModOrganizerParams,
   documentsPath: string,
   gameName: string,
   playButton: ILauncherAppButton,

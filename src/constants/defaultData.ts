@@ -37,6 +37,7 @@ export const defaultLauncherWindowSettings: IWindowSettings = {
   minHeight: MinWindowSize.HEIGHT,
   maxWidth: 0,
   maxHeight: 0,
+  icon: '',
 };
 
 export const defaultDevWindowResolution = {
@@ -78,6 +79,7 @@ export const defaultLauncherConfig: ILauncherConfig = {
   maxHeight: defaultLauncherWindowSettings.maxHeight,
   width: defaultLauncherWindowSettings.width,
   height: defaultLauncherWindowSettings.height,
+  icon: defaultLauncherWindowSettings.icon,
   isFirstStart: true,
   documentsPath: '',
   gameName: 'Rocket Game Launcher',
