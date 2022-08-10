@@ -233,7 +233,21 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
         currentConfig.playButton !== undefined && (
         <React.Fragment>
           <fieldset className="developer__block">
-            <legend className="developer__block-title">Настройки резмеров окна</legend>
+            <legend className="developer__block-title">Настройки окна программы</legend>
+            <PathSelector
+              className="developer__item"
+              id="icon"
+              name="icon"
+              label="Иконка"
+              value={currentConfig.icon}
+              selectPathVariables={generateSelectOptions([PathVariableName.GAME_DIR])}
+              pathVariables={pathVariables}
+              description="Иконка, которая будет отображаться в заголовке, а так же на панели задач для основного окна приложения."//eslint-disable-line max-len
+              extensions={['ico']}
+              selectorType={LauncherButtonAction.RUN}
+              validationErrors={validationErrors}
+              onChange={onPathSelectorChange}
+            />
             <Switcher
               className="developer__item"
               id="isResizable"
