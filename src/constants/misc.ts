@@ -26,8 +26,8 @@ export enum Encoding {
 
 export enum GameSettingsFileView {
   SECTIONAL = 'sectional',
-  LINE = 'line',
   TAG = 'tag',
+  LINE = 'oblivion script',
 }
 
 export enum UIControllerType {
