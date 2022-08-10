@@ -56,16 +56,17 @@ export interface IGameSettingsBackup {
   name: string,
   files: IBackupFile[],
 }
-
-export interface IWindowSettings {
-  isResizable: boolean,
+export interface IWindowSizeSettings {
   minWidth: number,
   minHeight: number,
   maxWidth: number,
   maxHeight: number,
   width: number,
   height: number,
+}
+export interface IWindowSettings extends IWindowSizeSettings {
   icon: string,
+  isResizable: boolean,
 }
 
 export interface ILauncherConfig extends IWindowSettings {

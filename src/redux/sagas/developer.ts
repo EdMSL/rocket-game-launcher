@@ -41,7 +41,7 @@ import {
   deepClone, getModOrganizerPathVariables, updatePathVariables,
 } from '$utils/data';
 import {
-  checkObjectForEqual, getWindowSettingsFromLauncherConfig,
+  checkObjectForEqual, getWindowSizeSettingsFromLauncherConfig,
 } from '$utils/check';
 import { defaultGameSettingsConfig } from '$constants/defaultData';
 import { getFileNameFromPathToFile, getObjectAsList } from '$utils/strings';
@@ -180,8 +180,8 @@ function* saveLauncherConfigSaga(
     }: ReturnType<typeof getState> = yield select(getState);
 
     const isChangeWindowSize = !checkObjectForEqual(
-      getWindowSettingsFromLauncherConfig(launcherConfig),
-      getWindowSettingsFromLauncherConfig(newConfig),
+      getWindowSizeSettingsFromLauncherConfig(launcherConfig),
+      getWindowSizeSettingsFromLauncherConfig(newConfig),
     );
 
     yield call(ipcRenderer.send,

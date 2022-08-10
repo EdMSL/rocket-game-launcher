@@ -243,8 +243,9 @@ export const changeWindowSize = (
       config.maxWidth > 0 && currentSize[0] > config.maxWidth)
         || (config.maxHeight > 0 && currentSize[1] > config.maxHeight)
     ) {
+      ///FIXME Изменяет размер окна, если одно из max значений = 0
       window.setSize(
-        currentSize[0] > config.maxHeight ? config.maxWidth : currentSize[0],
+        currentSize[0] > config.maxWidth ? config.maxWidth : currentSize[0],
         currentSize[1] > config.maxHeight ? config.maxHeight : currentSize[1],
       );
     }
