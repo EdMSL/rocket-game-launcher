@@ -193,16 +193,16 @@ $checkbox-size: 20px;
 
   border: none;
 
+  &::placeholder {
+    color: var(--disabled-color);
+  }
+
   &:focus {
     @include focus;
   }
 
   &:disabled {
     background-color: var(--disabled-color);
-  }
-
-  &::placeholder {
-    color: var(--disabled-color);
   }
 
   &--error {
@@ -223,16 +223,16 @@ $checkbox-size: 20px;
 
   border: none;
 
+  &::placeholder {
+    color: var(--disabled-color);
+  }
+
   &:focus {
     @include focus;
   }
 
   &:disabled {
     background-color: var(--disabled-color);
-  }
-
-  &::placeholder {
-    color: var(--disabled-color);
   }
 
   &--error {
@@ -262,16 +262,16 @@ $checkbox-size: 20px;
 
   resize: vertical;
 
+  &::placeholder {
+    color: var(--disabled-color);
+  }
+
   &:focus {
     @include focus;
   }
 
   &:disabled {
     background-color: var(--disabled-color);
-  }
-
-  &::placeholder {
-    color: var(--disabled-color);
   }
 
   &--error {
@@ -351,16 +351,18 @@ $checkbox-size: 20px;
 
   background-color: var(--btn-color);
 
+  & svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--text-main);
+  }
+
   &:focus {
     @include focus;
   }
 
   &:hover {
     background-color: var(--hover-color);
-  }
-
-  &:disabled:hover {
-    background-color: var(--btn-color);
   }
 
   &--open {
@@ -387,10 +389,8 @@ $checkbox-size: 20px;
     }
   }
 
-  & svg {
-    width: 24px;
-    height: 24px;
-    fill: var(--text-main);
+  &:disabled:hover {
+    background-color: var(--btn-color);
   }
 }
 

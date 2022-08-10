@@ -94,7 +94,11 @@ module.exports = {
         "declarations",
         {
           type: "rule",
-          selector: "^&::(before|after)"
+          selector: /^&\s[^.].+$/
+        },
+        {
+          type: "rule",
+          selector: /^&::[\w-]+$/
         },
         {
           type: "rule",
@@ -102,7 +106,7 @@ module.exports = {
         },
         {
           type: "rule",
-          selector: "^&:"
+          selector: /^&:[\w-]+$/
         },
         {
           type: "rule",
