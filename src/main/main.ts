@@ -4,6 +4,7 @@ import {
   dialog,
   globalShortcut,
   BrowserWindow,
+  protocol,
 } from 'electron';
 import { Store } from 'redux';
 
@@ -66,6 +67,16 @@ const start = async (): Promise<void> => {
 
   globalShortcut.register('Alt+Q', () => {
     quitApp();
+  });
+
+  protocol.registerFileProtocol('image-protocol', (request, callback) => {
+    const url = request.url.replace('image-protocol://getMediaFile/', '');
+
+    try {
+      return callback(url);
+    } catch (error) {
+      return callback('error');
+    }
   });
 
   writeToLogFileSync('Application ready.');

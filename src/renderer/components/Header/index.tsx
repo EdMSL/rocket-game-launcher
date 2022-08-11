@@ -17,6 +17,8 @@ interface IProps {
   gameName: string,
   isResizable: boolean,
   isCloseBtnDisabled?: boolean,
+  icon: string,
+  isDevWindow?: boolean,
   onClose: (event) => void,
   openAppInfo?: () => void,
 }
@@ -25,6 +27,8 @@ export const Header: React.FunctionComponent<IProps> = ({
   gameName,
   isResizable,
   isCloseBtnDisabled = false,
+  icon,
+  isDevWindow,
   onClose,
   openAppInfo = null,
 }) => {
@@ -81,10 +85,14 @@ export const Header: React.FunctionComponent<IProps> = ({
           }
         }}
       >
-        <div className={styles['header__logo-block']}>
+        <div
+          className={styles['header__logo-block']}
+        >
           <img
             className={styles.header__logo}
-            src={launcherIcon}
+            src={!isDevWindow && icon
+              ? `image-protocol://getMediaFile/${icon}`
+              : launcherIcon}
             alt="game logo"
           />
         </div>

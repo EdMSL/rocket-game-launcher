@@ -31,7 +31,7 @@ import { IValidationErrors } from '$utils/validation';
 import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 import { DeveloperScreenController } from '$components/Developer/DeveloperScreenController';
 import { checkObjectForEqual } from '$utils/check';
-import { getPathFromLinkHash } from '$utils/strings';
+import { getPathFromLinkHash, replacePathVariableByRootDir } from '$utils/strings';
 
 export const Developer: React.FC = () => {
   /* eslint-disable max-len */
@@ -145,6 +145,8 @@ export const Developer: React.FC = () => {
       <Header
         isResizable
         gameName={launcherConfig.gameName}
+        icon={replacePathVariableByRootDir(launcherConfig.icon)}
+        isDevWindow
         onClose={closeDevWindow}
         isCloseBtnDisabled={launcherConfig.isFirstStart}
       />
