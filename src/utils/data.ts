@@ -192,6 +192,31 @@ export const setValueForObjectDeepKey = <T>(
 };
 
 /**
+ * Получает значение из трех переданных: текущего, минимального и максимального.
+ * @param value Текущее значение.
+ * @param min Минимальное значение.
+ * @param max Максимальное значение.
+ * @param isWithZero Если `true`, то 0 считается как отсутствие ограничения для max.
+ * @returns Новое значение из трех переданных.
+ */
+export const getOneFromThree = (
+  value: number,
+  min: number,
+  max: number,
+  isWithZero = true,
+): number => {
+  if (value < min) {
+    return min;
+  } else if (
+    (isWithZero && max !== 0 && value > max)
+    || (!isWithZero && value > max)) {
+    return max;
+  }
+
+  return value;
+};
+
+/**
  * Заменяет данные элемента (объект) массива на новые.
  * @param id Идентификатор элемента массива.
  * @param data Объект с данными для замены.

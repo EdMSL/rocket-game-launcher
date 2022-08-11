@@ -7,7 +7,7 @@ import mime from 'mime';
 import { LogMessageType, writeToLogFile } from '$utils/log';
 import { getPathToParentFileFolder, iconvDecode } from '$utils/files';
 import { ErrorCode, ErrorMessage } from '$utils/errors';
-import { getApplicationArgs } from './data';
+import { getApplicationArgs, getOneFromThree } from './data';
 import { ILauncherConfig } from '$types/main';
 import { MinWindowSize } from '$constants/defaultData';
 
@@ -232,22 +232,12 @@ export const changeWindowSize = (
     window.setMinimumSize(config.minWidth, config.minHeight);
     window.setMaximumSize(config.maxWidth, config.maxHeight);
 
-    const currentSize = window.getSize();
+    const [currentWidth, currentHeight] = window.getSize();
+    const newWidth = getOneFromThree(currentWidth, config.minWidth, config.maxWidth);
+    const newHeight = getOneFromThree(currentHeight, config.minHeight, config.maxHeight);
 
-    if (currentSize[0] < config.minWidth || currentSize[1] < config.minHeight) {
-      window.setSize(
-        currentSize[0] < config.minWidth ? config.minWidth : currentSize[0],
-        currentSize[1] < config.minHeight ? config.minHeight : currentSize[1],
-      );
-    } else if ((
-      config.maxWidth > 0 && currentSize[0] > config.maxWidth)
-        || (config.maxHeight > 0 && currentSize[1] > config.maxHeight)
-    ) {
-      ///FIXME Изменяет размер окна, если одно из max значений = 0
-      window.setSize(
-        currentSize[0] > config.maxWidth ? config.maxWidth : currentSize[0],
-        currentSize[1] > config.maxHeight ? config.maxHeight : currentSize[1],
-      );
+    if (newWidth !== currentWidth || newHeight !== currentHeight) {
+      window.setSize(newWidth, newHeight);
     }
   } else {
     window.setMinimumSize(MinWindowSize.WIDTH, MinWindowSize.HEIGHT);
