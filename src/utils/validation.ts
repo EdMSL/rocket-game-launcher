@@ -151,140 +151,154 @@ const getIsOptionHasValidationErrors = (
 
 /**
   Проверяет значения полей `number` в компоненте `developer screen` на корректность.
-  @param target Поле `target` объекта `event`.
+  @param id id поля.
+  @param value Значение поля.
+  @param name Имя поля.
+  @param min Минимальное значение для `value`.
   @param currentConfig Объект конфигурации лаунчера.
   @param currentErrors Текущие ошибки валидации.
   @returns Новый объект ошибок валидации.
 */
 export const validateNumberInputs = (
-  target: EventTarget & HTMLInputElement,
+  id: string,
+  value: number,
+  name: string,
+  min: number|undefined,
   currentConfig: ILauncherConfig,
   currentErrors: IValidationErrors,
 ): IValidationErrors => {
   const errors: IValidationError[] = [];
 
-  errors.push({
-    id: target.id,
-    error: {
-      cause: ValidationErrorCause.MIN,
-      text: ValidationErrorText.MIN,
-    },
-    isForAdd: +target.value < +target.min,
-  });
+  if (min !== undefined) {
+    errors.push({
+      id,
+      error: {
+        cause: ValidationErrorCause.MIN,
+        text: ValidationErrorText.MIN,
+      },
+      isForAdd: +value < min,
+    });
+  }
 
-  if (currentConfig.isResizable) {
-    const namesAndValues = target.name.toLowerCase().includes('width')
-      ? {
-          default: currentConfig.width,
-          min: currentConfig.minWidth,
-          max: currentConfig.maxWidth,
-          defaultName: 'width',
-          minName: 'minWidth',
-          maxName: 'maxWidth',
-        }
-      : {
-          default: currentConfig.height,
-          min: currentConfig.minHeight,
-          max: currentConfig.maxHeight,
-          defaultName: 'height',
-          minName: 'minHeight',
-          maxName: 'maxHeight',
-        };
+  const namesAndValues = name.toLowerCase().includes('width')
+    ? {
+        default: currentConfig.width,
+        min: currentConfig.minWidth,
+        max: currentConfig.maxWidth,
+        defaultName: 'width',
+        minName: 'minWidth',
+        maxName: 'maxWidth',
+      }
+    : {
+        default: currentConfig.height,
+        min: currentConfig.minHeight,
+        max: currentConfig.maxHeight,
+        defaultName: 'height',
+        minName: 'minHeight',
+        maxName: 'maxHeight',
+      };
 
-    if (target.name === 'width' || target.name === 'height') {
-      errors.push(
-        {
-          id: target.id,
-          error: {
-            cause: `less config ${namesAndValues.minName}`,
-          },
-          isForAdd: +target.value < namesAndValues.min,
+  if (name === 'width' || name === 'height') {
+    errors.push(
+      {
+        id,
+        error: {
+          cause: `less config ${namesAndValues.minName}`,
         },
-        {
-          id: target.id,
-          error: {
-            cause: `more config ${namesAndValues.maxName}`,
-          },
-          isForAdd: namesAndValues.max > 0 && +target.value > namesAndValues.max,
+        isForAdd: currentConfig.isResizable && +value < namesAndValues.min,
+      },
+      {
+        id,
+        error: {
+          cause: `more config ${namesAndValues.maxName}`,
         },
-        {
-          id: namesAndValues.minName,
-          error: {
-            cause: `more config ${target.id}`,
-          },
-          isForAdd: +target.value < namesAndValues.min,
+        isForAdd: currentConfig.isResizable
+        && namesAndValues.max > 0
+        && +value > namesAndValues.max,
+      },
+      {
+        id: namesAndValues.minName,
+        error: {
+          cause: `more config ${id}`,
         },
-        {
-          id: namesAndValues.maxName,
-          error: {
-            cause: `less config ${target.id}`,
-          },
-          isForAdd: namesAndValues.max > 0 && +target.value > namesAndValues.max,
+        isForAdd: currentConfig.isResizable && +value < namesAndValues.min,
+      },
+      {
+        id: namesAndValues.maxName,
+        error: {
+          cause: `less config ${id}`,
         },
-      );
-    } else if (target.name === 'minWidth' || target.name === 'minHeight') {
-      errors.push(
-        {
-          id: target.id,
-          error: {
-            cause: `more config ${namesAndValues.defaultName}`,
-          },
-          isForAdd: +target.value > namesAndValues.default,
+        isForAdd: currentConfig.isResizable
+        && namesAndValues.max > 0
+        && +value > namesAndValues.max,
+      },
+    );
+  } else if (name === 'minWidth' || name === 'minHeight') {
+    errors.push(
+      {
+        id,
+        error: {
+          cause: `more config ${namesAndValues.defaultName}`,
         },
-        {
-          id: target.id,
-          error: {
-            cause: `more config ${namesAndValues.maxName}`,
-          },
-          isForAdd: namesAndValues.max > 0 && +target.value > namesAndValues.max,
+        isForAdd: currentConfig.isResizable && +value > namesAndValues.default,
+      },
+      {
+        id,
+        error: {
+          cause: `more config ${namesAndValues.maxName}`,
         },
-        {
-          id: namesAndValues.defaultName,
-          error: {
-            cause: `less config ${target.id}`,
-          },
-          isForAdd: +target.value > namesAndValues.default,
+        isForAdd: currentConfig.isResizable
+        && namesAndValues.max > 0
+        && +value > namesAndValues.max,
+      },
+      {
+        id: namesAndValues.defaultName,
+        error: {
+          cause: `less config ${id}`,
         },
-        {
-          id: namesAndValues.maxName,
-          error: {
-            cause: `less config ${target.id}`,
-          },
-          isForAdd: namesAndValues.max > 0 && +target.value > namesAndValues.max,
+        isForAdd: currentConfig.isResizable && +value > namesAndValues.default,
+      },
+      {
+        id: namesAndValues.maxName,
+        error: {
+          cause: `less config ${id}`,
         },
-      );
-    } else if (target.name === 'maxWidth' || target.name === 'maxHeight') {
-      errors.push(
-        {
-          id: target.id,
-          error: {
-            cause: `less config ${namesAndValues.defaultName}`,
-          },
-          isForAdd: +target.value < namesAndValues.default && +target.value > 0,
+        isForAdd: currentConfig.isResizable
+        && namesAndValues.max > 0
+        && +value > namesAndValues.max,
+      },
+    );
+  } else if (name === 'maxWidth' || name === 'maxHeight') {
+    errors.push(
+      {
+        id,
+        error: {
+          cause: `less config ${namesAndValues.defaultName}`,
         },
-        {
-          id: target.id,
-          error: {
-            cause: `less config ${namesAndValues.minName}`,
-          },
-          isForAdd: +target.value < namesAndValues.min && +target.value > 0,
+        isForAdd: currentConfig.isResizable && +value < namesAndValues.default && +value > 0,
+      },
+      {
+        id,
+        error: {
+          cause: `less config ${namesAndValues.minName}`,
         },
-        {
-          id: namesAndValues.defaultName,
-          error: {
-            cause: `more config ${target.id}`,
-          },
-          isForAdd: +target.value < namesAndValues.default && +target.value > 0,
+        isForAdd: currentConfig.isResizable && +value < namesAndValues.min && +value > 0,
+      },
+      {
+        id: namesAndValues.defaultName,
+        error: {
+          cause: `more config ${id}`,
         },
-        {
-          id: namesAndValues.minName,
-          error: {
-            cause: `more config ${target.id}`,
-          },
-          isForAdd: +target.value < namesAndValues.min && +target.value > 0,
+        isForAdd: currentConfig.isResizable && +value < namesAndValues.default && +value > 0,
+      },
+      {
+        id: namesAndValues.minName,
+        error: {
+          cause: `more config ${id}`,
         },
-      );
-    }
+        isForAdd: currentConfig.isResizable && +value < namesAndValues.min && +value > 0,
+      },
+    );
   }
 
   return getUniqueValidationErrors(currentErrors, errors);

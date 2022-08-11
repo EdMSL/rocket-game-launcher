@@ -126,6 +126,7 @@ export const Developer: React.FC = () => {
 
       if (!isHaveErrors && messageBoxResponse.response === 0) {
         saveConfigChanges(getPathFromLinkHash(event.target.hash));
+        setIsSettingsInitialized(false);
       } else if (
         (!isHaveErrors && messageBoxResponse.response === 1)
         || (isHaveErrors && messageBoxResponse.response === 0)
@@ -133,10 +134,9 @@ export const Developer: React.FC = () => {
         resetConfigChanges();
         setValidationErrors({});
         history.push(getPathFromLinkHash(event.target.hash));
+        setIsSettingsInitialized(false);
       }
     }
-
-    setIsSettingsInitialized(false);
   }, [isConfigChanged, history, validationErrors, saveConfigChanges, resetConfigChanges]);
 
   /* eslint-disable react/jsx-props-no-spreading */

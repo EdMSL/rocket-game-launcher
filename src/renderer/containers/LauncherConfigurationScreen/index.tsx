@@ -112,16 +112,20 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
     ));
   }, [currentConfig, validationErrors, setValidationErrors, setNewConfig]);
 
-  const onNumberInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    const errors = validateNumberInputs(target, currentConfig, validationErrors);
+  const onNumberInputChange = useCallback(({
+    target: {
+      id, value, name, min, dataset,
+    },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    const errors = validateNumberInputs(id, +value, name, +min, currentConfig, validationErrors);
 
     setValidationErrors(errors);
 
     setNewConfig(getNewConfig(
       currentConfig,
-      target.name,
-      Math.round(+target.value),
-      target.dataset.parent,
+      name,
+      Math.round(+value),
+      dataset.parent,
     ));
   }, [currentConfig, setNewConfig, setValidationErrors, validationErrors]);
 
@@ -148,9 +152,20 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
     ));
   }, [currentConfig, validationErrors, setValidationErrors, setNewConfig]);
 
-  const onSwitcherChange = useCallback(async ({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    setNewConfig(getNewConfig(currentConfig, target.name, target.checked, target.dataset.parent));
-  }, [currentConfig, setNewConfig]);
+  const onSwitcherChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    const newConfig = getNewConfig(
+      currentConfig, target.name, target.checked, target.dataset.parent,
+    );
+
+    let errors = validateNumberInputs(
+      'width', newConfig.width, 'width', undefined, newConfig, validationErrors,
+    );
+    errors = validateNumberInputs('width', newConfig.width, 'width', undefined, newConfig, errors);
+
+    setValidationErrors(errors);
+
+    setNewConfig(newConfig);
+  }, [currentConfig, validationErrors, setNewConfig, setValidationErrors]);
 
   const deleteCustomBtnItem = useCallback((items: ILauncherCustomButton[]) => {
     setNewConfig({ ...currentConfig, customButtons: items });
