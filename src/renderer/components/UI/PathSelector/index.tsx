@@ -13,7 +13,9 @@ import { IPathVariables } from '$constants/paths';
 import {
   checkIsPathIsNotOutsideValidFolder, replaceRootDirByPathVariable, getVariableAndValueFromPath,
 } from '$utils/strings';
-import { AppChannel, LauncherButtonAction } from '$constants/misc';
+import {
+  AppChannel, LauncherButtonAction, PathVariableName,
+} from '$constants/misc';
 import { getIsPathWithVariableCorrect } from '$utils/check';
 import {
   getValidationCauses, IValidationError, ValidationErrorCause,
@@ -116,11 +118,17 @@ export const PathSelector: React.FC<IProps> = ({
 
   const onOpenFolderBtnClick = useCallback(() => {
     openFolder(
-      getPathToFile(String(value), pathVariables, undefined, false),
+      getPathToFile(
+        String(value),
+        pathVariables,
+        undefined,
+        false,
+        selectPathVariables.map((currentOption) => currentOption.value).includes(PathVariableName.DOCUMENTS),
+      ),
       undefined,
       selectorType === LauncherButtonAction.RUN,
     );
-  }, [value, selectorType, pathVariables]);
+  }, [value, selectorType, pathVariables, selectPathVariables]);
 
   const onSelectPatchBtnClick = useCallback(async () => {
     let pathStr = await getPathFromPathSelector();

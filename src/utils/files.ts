@@ -481,6 +481,7 @@ export const getPathToFile = (
   pathVariables: IPathVariables,
   profileMO = '',
   isWithCheck = true,
+  isAllowDocuments = false,
 ): string => {
   let newPath = pathToFile;
 
@@ -531,7 +532,11 @@ export const getPathToFile = (
       throw new CustomError('The path to a file in the Documents folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
     }
   } else if (PathRegExp.DOCUMENTS.test(pathToFile)) {
-    throw new CustomError(`The path to a file in the Documents folder is not allow. Maybe you wanted to write "${PathVariableName.DOCS_GAME}"?.`); //eslint-disable-line max-len
+    if (isAllowDocuments) {
+      newPath = newPath.replace(PathVariableName.DOCS_GAME, pathVariables['%DOCUMENTS%']);
+    } else {
+      throw new CustomError(`The path to a file in the Documents folder is not allow. Maybe you wanted to write "${PathVariableName.DOCS_GAME}"?.`); //eslint-disable-line max-len
+    }
   } else if (PathRegExp.GAME_DIR.test(pathToFile)) {
     newPath = newPath.replace(PathVariableName.GAME_DIR, pathVariables['%GAME_DIR%']);
   } else {
