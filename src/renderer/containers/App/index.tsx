@@ -21,14 +21,12 @@ import { AppInfo } from '$components/App/AppInfo';
 import { Developer } from '$containers/Developer';
 import { AppChannel, userThemeStyleFile } from '$constants/misc';
 import { deleteMessages, setMessages } from '$actions/main';
-import { replacePathVariableByRootDir } from '$utils/strings';
 
 export const App = (): JSX.Element => {
   const userTheme = useAppSelector((state) => state.userSettings.theme);
   const launcherVersion = useAppSelector((state) => state.main.launcherVersion);
   const gameName = useAppSelector((state) => state.main.config.gameName);
   const isResizable = useAppSelector((state) => state.main.config.isResizable);
-  const icon = useAppSelector((state) => state.main.config.icon);
   const messages = useAppSelector((state) => state.main.messages);
 
   const [isOpenAppInfo, setIsOpenAppInfo] = useState<boolean>(false);
@@ -76,7 +74,6 @@ export const App = (): JSX.Element => {
           <Header
             isResizable={isResizable}
             gameName={gameName}
-            icon={replacePathVariableByRootDir(icon)}
             openAppInfo={openAppInfo}
             onClose={closeApp}
           />

@@ -111,8 +111,6 @@ const configFileDataSchema = Joi.object<ILauncherConfig>({
     .default(defaultLauncherConfig.minHeight),
   maxWidth: Joi.number().integer().optional().default(defaultLauncherConfig.maxWidth),
   maxHeight: Joi.number().integer().optional().default(defaultLauncherConfig.maxHeight),
-  icon: Joi.string().optional().allow('').default(defaultLauncherConfig.icon)
-    .pattern(PathRegExp.GAME_DIR, 'correct path'),
   documentsPath: Joi.string().optional().allow('').default(defaultLauncherConfig.documentsPath)
     .pattern(PathRegExp.DOCUMENTS, 'correct path'),
   isFirstStart: Joi.bool().optional().default(defaultLauncherConfig.isFirstStart),

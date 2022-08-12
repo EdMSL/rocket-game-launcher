@@ -72,11 +72,7 @@ const start = async (): Promise<void> => {
   protocol.registerFileProtocol('image-protocol', (request, callback) => {
     const url = request.url.replace('image-protocol://getMediaFile/', '');
 
-    try {
-      return callback(url);
-    } catch (error) {
-      return callback('error');
-    }
+    callback({ path: url });
   });
 
   writeToLogFileSync('Application ready.');

@@ -19,7 +19,6 @@ export const INITIAL_STATE: IMainRootState = {
     gameName: defaultLauncherConfig.gameName,
     playButton: defaultLauncherConfig.playButton,
     customButtons: defaultLauncherConfig.customButtons,
-    icon: defaultLauncherConfig.icon,
   },
   launcherVersion: '',
   pathVariables: DefaultPathVariable,

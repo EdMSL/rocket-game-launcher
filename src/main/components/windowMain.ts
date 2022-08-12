@@ -14,14 +14,13 @@ import { ILauncherConfig } from '$types/main';
 import {
   AppChannel, AppWindowName, AppWindowStateAction,
 } from '$constants/misc';
-import { IPathVariables } from '$constants/paths';
+import { ICON_PATH, IPathVariables } from '$constants/paths';
 import { changeWindowSize } from '$utils/process';
 import { IAppState } from '$store/store';
 import {
   setIsGameSettingsConfigChanged, setLauncherConfig, setPathVariables,
 } from '$actions/main';
 import { IGameSettingsConfig } from '$types/gameSettings';
-import { replacePathVariableByRootDir } from '$utils/strings';
 
 /**
  * Функция для создания и показа главного окна приложения
@@ -48,8 +47,8 @@ export const createMainWindow = (
     width: config.isResizable ? mainWindowState.width : config.width,
     height: config.isResizable ? mainWindowState.height : config.height,
     resizable: config.isResizable,
-    ...process.env.NODE_ENV === 'development' && config.icon && {
-      icon: replacePathVariableByRootDir(config.icon),
+    ...process.env.NODE_ENV === 'development' && {
+      icon: ICON_PATH,
     },
     frame: false,
     title: config.gameName ? config.gameName : 'Game Launcher',

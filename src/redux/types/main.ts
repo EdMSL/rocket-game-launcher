@@ -65,7 +65,6 @@ export interface IWindowSizeSettings {
   height: number,
 }
 export interface IWindowSettings extends IWindowSizeSettings {
-  icon: string,
   isResizable: boolean,
 }
 

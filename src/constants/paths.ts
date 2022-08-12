@@ -5,6 +5,9 @@ export const GAME_SETTINGS_FILES_BACKUP_FOLDER_NAME = 'game_settings_files';
 export const CONFIG_FILE_PATH = process.env.NODE_ENV === 'development'
   ? path.resolve('./app/files/config.json') : path.resolve('./config.json');
 
+export const ICON_PATH = process.env.NODE_ENV === 'development'
+  ? './src/public/icon.ico' : path.resolve('./icon.ico');
+
 export const GAME_SETTINGS_FILE_PATH = process.env.NODE_ENV === 'development'
   ? path.resolve('./app/files/settings.json') : path.resolve('./settings.json');
 

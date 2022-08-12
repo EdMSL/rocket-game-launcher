@@ -145,7 +145,6 @@ export const Developer: React.FC = () => {
       <Header
         isResizable
         gameName={launcherConfig.gameName}
-        icon={replacePathVariableByRootDir(launcherConfig.icon)}
         isDevWindow
         onClose={closeDevWindow}
         isCloseBtnDisabled={launcherConfig.isFirstStart}
