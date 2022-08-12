@@ -25,21 +25,21 @@
     "stylelint": "stylelint src/**/*.scss --config ./.stylelintrc-full.js --custom-syntax postcss-scss --fix",
     "eslint": "eslint --config ./.eslintrc.js src --ext .ts,.tsx,.js,.jsx --fix",
     "eslint-nofix": "eslint --config ./.eslintrc.js src --ext .ts,.tsx,.js,.jsx",
-    "tslint": "bash -c tsc --noEmit --project tsconfig.json",
+    "tslint": "bash -c 'tsc --noEmit --project tsconfig.json'",
     "lint": "npm run stylelint && npm run eslint && npm run tslint",
     "test": "mocha --config ./.mocharc.js",
     "prepare": "husky install"
   },
   "lint-staged": {
     "*.{css,scss}": [
-      "stylelint --config ./.stylelintrc-full.js --custom-syntax postcss-scss --fix"
+      "npm run stylelint"
     ],
     "*.{js,jsx}": [
-      "eslint --config ./.eslintrc.js --ext .ts,.tsx,.js,.jsx --fix"
+      "npm run eslint"
     ],
     "*.{ts,tsx}": [
       "npm run tslint",
-      "eslint --config ./.eslintrc.js --ext .ts,.tsx,.js,.jsx --fix"
+      "npm run eslint"
     ]
   },
   "devDependencies": {
