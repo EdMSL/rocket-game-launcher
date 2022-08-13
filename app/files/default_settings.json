@@ -1,4 +1,8 @@
 {
+  "modOrganizer": {
+    "isUsed": false,
+    "pathToMOFolder": "%GAME_DIR%"
+  },
   "baseFilesEncoding": "win1251",
   "gameSettingsGroups": [
     {
@@ -14,7 +18,7 @@
     {
       "name": "oudf7Xd78FdyIIvaq",
       "label": "OblivionIni",
-      "path": "%MO_PROFILE%\\oblivion.ini",
+      "path": "%DOCS_GAME%\\oblivion.ini",
       "view": "sectional",
       "encoding": ""
     }
