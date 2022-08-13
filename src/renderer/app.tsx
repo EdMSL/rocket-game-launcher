@@ -2,28 +2,20 @@ import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
-import unhandled from 'electron-unhandled';
 import { ipcRenderer } from 'electron';
 
 import './styles/app.scss';
+
 import { App } from '$containers/App';
 import { configureAppStore, IAppState } from '$store/store';
 import { AppChannel, Scope } from '$constants/misc';
-import { LogMessageType, writeToLogFile } from '$utils/log';
-import { reportError } from '$utils/errors';
+import { unhandled } from '$utils/system';
 
 const initialState: IAppState = await ipcRenderer.invoke(AppChannel.GET_APP_STATE);
 const { store, history } = configureAppStore(initialState, Scope.RENDERER);
 
-if (!module.hot) {
-  unhandled({
-    showDialog: true,
-    logger: (error) => writeToLogFile(
-      `Message: error.message. Stack: ${error.stack}`,
-      LogMessageType.ERROR,
-    ),
-    reportButton: reportError,
-  });
+if (process.env.NODE_ENV === 'production') {
+  unhandled();
 }
 
 render(

@@ -26,6 +26,7 @@ import {
 } from '$constants/misc';
 import { IAppState } from '$store/store';
 import { showMessageBox } from '$utils/message';
+import { handleUnhandledError } from './components/unhandled';
 
 let appStore: Store<IAppState>;
 let mainWindow: BrowserWindow|null = null;
@@ -78,12 +79,24 @@ const start = async (): Promise<void> => {
   writeToLogFileSync('Application ready.');
 };
 
+process.on('uncaughtException', (error) => {
+  handleUnhandledError('Unhandled Error', error);
+});
+
+process.on('unhandledRejection', (error) => {
+  handleUnhandledError('Unhandled Promise Rejection', error);
+});
+
 ipcMain.on(AppChannel.CHANGE_DEV_WINDOW_STATE, (event, isOpen: boolean) => {
   //отработает один раз
   if (!devWindow && isOpen !== undefined && isOpen) {
     devWindow = createDevWindow();
     addDevWindowListeners(devWindow, mainWindow!);
   }
+});
+
+ipcMain.handle(AppChannel.ERROR_HANDLER_CHANNEL, async (evt, title, error) => {
+  handleUnhandledError(title, error);
 });
 
 ipcMain.handle(
