@@ -56,9 +56,14 @@ export const Developer: React.FC = () => {
   const saveConfigChanges = useCallback((
     pathToGo: string = '',
   ) => {
-    dispatch(saveConfiguration(currentConfig, pathToGo));
+    dispatch(saveConfiguration(
+      launcherConfig.isFirstStart && 'playButton' in currentConfig
+        ? { ...currentConfig, isFirstStart: false }
+        : currentConfig,
+      pathToGo,
+    ));
     setIsConfigChanged(false);
-  }, [currentConfig, dispatch]);
+  }, [currentConfig, launcherConfig.isFirstStart, dispatch]);
 
   const resetConfigChanges = useCallback(() => {
     if ('playButton' in currentConfig) {
