@@ -20,6 +20,7 @@ import { DeveloperScreenName, Routes } from '$constants/routes';
 import { GameSettingsConfigurationScreen } from '$containers/GameSettingsConfigurationScreen';
 import { Messages } from '$components/Messages';
 import {
+  addDeveloperMessages,
   deleteDeveloperMessages,
   saveConfiguration,
   setDeveloperMessages,
@@ -31,7 +32,9 @@ import { IValidationErrors } from '$utils/validation';
 import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 import { DeveloperScreenController } from '$components/Developer/DeveloperScreenController';
 import { checkObjectForEqual } from '$utils/check';
-import { getPathFromLinkHash, replacePathVariableByRootDir } from '$utils/strings';
+import { getPathFromLinkHash } from '$utils/strings';
+import { IUserMessage } from '$types/common';
+import { CreateUserMessage } from '$utils/message';
 
 export const Developer: React.FC = () => {
   /* eslint-disable max-len */
@@ -106,6 +109,12 @@ export const Developer: React.FC = () => {
 
     setCurrentConfig(newConfig);
   }, [currentConfig, launcherConfig, gameSettingsConfig]);
+
+  const addMessage = useCallback((message: IUserMessage|string) => {
+    dispatch(addDeveloperMessages([typeof message === 'string'
+      ? CreateUserMessage.error(message)
+      : message]));
+  }, [dispatch]);
 
   ///TODO Добавить тип для event. React.MouseEvent<HTMLAnchorElement> не понимает target.hash
   const onNavLinkClick = useCallback(async (event) => {
@@ -196,6 +205,7 @@ export const Developer: React.FC = () => {
                   setIsSettingsInitialized={setIsSettingsInitialized}
                   resetConfigChanges={resetConfigChanges}
                   setValidationErrors={setValidationErrors}
+                  addMessage={addMessage}
                 />
               )}
             />
@@ -211,6 +221,7 @@ export const Developer: React.FC = () => {
                   setIsSettingsInitialized={setIsSettingsInitialized}
                   resetConfigChanges={resetConfigChanges}
                   setValidationErrors={setValidationErrors}
+                  addMessage={addMessage}
                 />
               )}
             />

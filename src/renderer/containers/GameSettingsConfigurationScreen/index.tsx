@@ -59,9 +59,9 @@ import {
   ValidationErrorCause,
 } from '$utils/validation';
 import { Switcher } from '$components/UI/Switcher';
-import { Select } from '$components/UI/Select';
 import { PathSelector } from '$components/UI/PathSelector';
 import { defaultFullGameSettingsOption } from '$constants/defaultData';
+import { IUserMessage } from '$types/common';
 
 interface IProps {
   currentConfig: IGameSettingsConfig,
@@ -71,6 +71,7 @@ interface IProps {
   setIsSettingsInitialized: (isInitialized: boolean) => void,
   resetConfigChanges: () => void,
   setValidationErrors: (errors: IValidationErrors) => void,
+  addMessage: (errorMessage: IUserMessage|string) => void,
 }
 
 export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
@@ -81,6 +82,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
   setIsSettingsInitialized,
   resetConfigChanges,
   setValidationErrors,
+  addMessage,
 }) => {
   /* eslint-disable max-len */
   const isGameSettingsConfigFileExists = useDeveloperSelector((state) => state.developer.isGameSettingsConfigFileExists);
@@ -129,10 +131,6 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
     { target }: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setNewConfig(getNewConfig(currentConfig, target.name, target.value));
-  }, [currentConfig, setNewConfig]);
-
-  const onSelectChange = useCallback(({ target }: React.ChangeEvent<HTMLSelectElement>) => {
-    setNewConfig(getNewConfig(currentConfig, target.name, target.value, target.dataset.parent));
   }, [currentConfig, setNewConfig]);
 
   const onSwitcherChange = useCallback(async ({ target }: React.ChangeEvent<HTMLInputElement>) => {
@@ -667,6 +665,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               description="Задает путь до корневой папки Mod Organizer."
               validationErrors={validationErrors}
               onChange={onPathSelectorChange}
+              onOpenPathError={addMessage}
             />
           </fieldset>
           <fieldset className="developer__block">
@@ -693,6 +692,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
                       lastAddedGroupName === item.name && (
                       <div className={styles['developer__group-label']}>
                         <span>Заголовок группы</span>
+                        {/* eslint-disable-next-line max-len */}
                         <HintItem description="Задать заголовок группы. Отображается как имя вкладки на экране игровых настроек." />
                       </div>
                       )
@@ -719,7 +719,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
             </ul>
             <HintItem
               className="developer__block-hint"
-              description="Группы настроек позволяют группировать опции. На экране настроек они будут отогражаться в виде панели навигации."
+              description="Группы настроек позволяют группировать опции. На экране настроек они будут отображаться в виде панели навигации." //eslint-disable-line max-len
               direction="left"
             />
           </fieldset>
@@ -750,6 +750,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
                       onFileDataChange={changeGameSettingsFiles}
                       onValidation={setValidationErrors}
                       deleteFile={deleteGameSettingsFileById}
+                      addMessage={addMessage}
                     />
                   </SpoilerListItem>
                 ))

@@ -38,6 +38,7 @@ import {
   IValidationError,
 } from '$utils/validation';
 import { getRandomId } from '$utils/strings';
+import { IUserMessage } from '$types/common';
 
 interface IProps {
   currentConfig: ILauncherConfig,
@@ -47,6 +48,7 @@ interface IProps {
   setIsSettingsInitialized: (isInitialized: boolean) => void,
   resetConfigChanges: () => void,
   setValidationErrors: (errors: IValidationErrors) => void,
+  addMessage: (errorMessage: IUserMessage|string) => void,
 }
 
 export const LauncherConfigurationScreen: React.FC<IProps> = ({
@@ -57,6 +59,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
   setIsSettingsInitialized,
   resetConfigChanges,
   setValidationErrors,
+  addMessage,
 }) => {
   /* eslint-disable max-len */
   const pathVariables = useDeveloperSelector((state) => state.developer.pathVariables);
@@ -302,6 +305,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
               description="Путь до папки игры в [User]/Documents. Укажите этот путь, если нужно управлять данными из файлов в этой папке через экран игровых настроек"//eslint-disable-line max-len
               validationErrors={validationErrors}
               onChange={onPathSelectorChange}
+              onOpenPathError={addMessage}
             />
             <p className="developer__subtitle">Настройки запуска игры</p>
             <TextField
@@ -330,6 +334,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
               description="Путь до исполняемого файла игры, .exe или .lnk"//eslint-disable-line max-len
               validationErrors={validationErrors}
               onChange={onPathSelectorChange}
+              onOpenPathError={addMessage}
             />
             <ArgumentsBlock
               className="developer__item"
@@ -340,6 +345,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
               validationErrors={validationErrors}
               changeArguments={changeArguments}
               onValidationError={setNewValidationErrors}
+              addMessage={addMessage}
             />
             <div className={styles['custom-btns__container']}>
               <p className="developer__subtitle">
@@ -371,6 +377,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
                       deleteBtnItem={deleteCustomBtnById}
                       сhangeBtnData={changeCustomBtnData}
                       onValidationError={setNewValidationErrors}
+                      addMessage={addMessage}
                     />
                   </SpoilerListItem>
                 ))

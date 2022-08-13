@@ -20,6 +20,7 @@ import {
   IValidationErrors,
   ValidationErrorCause,
 } from '$utils/validation';
+import { IUserMessage } from '$types/common';
 
 interface IProps {
   className?: string,
@@ -31,6 +32,7 @@ interface IProps {
   description?: string,
   changeArguments: (newArgs: IButtonArg[], parent: string) => void,
   onValidationError: (errors: IValidationErrors) => void,
+  addMessage: (message: IUserMessage|string) => void,
 }
 
 export const ArgumentsBlock: React.FC<IProps> = ({
@@ -43,6 +45,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
   validationErrors,
   changeArguments,
   onValidationError,
+  addMessage,
 }) => {
   const [lastAddedStringArg, setLastAddedStringArg] = useState<string>('');
 
@@ -177,6 +180,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
                       selectorType={LauncherButtonAction.RUN}
                       validationErrors={validationErrors}
                       onChange={onPathSelectorChange}
+                      onOpenPathError={addMessage}
                     />
                     )
                   : (

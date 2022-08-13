@@ -37,6 +37,7 @@ interface IProps extends IUIElementParams, IUIControllerTextField {
     validationData: IValidationError[],
     parent?: string
   ) => void,
+  onOpenPathError: (errorText: string) => void,
 }
 
 export const PathSelector: React.FC<IProps> = ({
@@ -58,6 +59,7 @@ export const PathSelector: React.FC<IProps> = ({
   selectorType = LauncherButtonAction.OPEN,
   isGameDocuments = true,
   onChange,
+  onOpenPathError,
 }) => {
   const [pathVariable, pathValue] = getVariableAndValueFromPath(String(value));
   const availablePathVariables = Object.values(selectPathVariables).map((option) => option.value);
@@ -123,12 +125,14 @@ export const PathSelector: React.FC<IProps> = ({
         pathVariables,
         undefined,
         false,
-        selectPathVariables.map((currentOption) => currentOption.value).includes(PathVariableName.DOCUMENTS),
+        selectPathVariables
+          .map((currentOption) => currentOption.value)
+          .includes(PathVariableName.DOCUMENTS),
       ),
-      undefined,
+      onOpenPathError,
       selectorType === LauncherButtonAction.RUN,
     );
-  }, [value, selectorType, pathVariables, selectPathVariables]);
+  }, [value, selectorType, pathVariables, selectPathVariables, onOpenPathError]);
 
   const onSelectPatchBtnClick = useCallback(async () => {
     let pathStr = await getPathFromPathSelector();

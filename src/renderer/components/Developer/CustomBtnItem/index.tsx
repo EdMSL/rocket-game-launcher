@@ -22,6 +22,7 @@ import {
 import {
   getUniqueValidationErrors, IValidationError, IValidationErrors, ValidationErrorCause,
 } from '$utils/validation';
+import { IUserMessage } from '$types/common';
 
 interface IProps {
   item: ILauncherCustomButton,
@@ -31,6 +32,7 @@ interface IProps {
   deleteBtnItem: (id: string) => void,
   сhangeBtnData: (btnId: string, newBtnData: ILauncherCustomButton) => void,
   onValidationError: (errors: IValidationErrors) => void,
+  addMessage: (message: IUserMessage|string) => void,
 }
 
 export const CustomBtnItem: React.FC<IProps> = ({
@@ -41,6 +43,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
   сhangeBtnData,
   deleteBtnItem,
   onValidationError,
+  addMessage,
 }) => {
   const pathSelectorId = `path_${item.id}`;
   const detailsElementRef = useRef<HTMLDetailsElement>(null);
@@ -157,6 +160,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         description="Путь до файла для запуска или папки для открытия в проводнике"
         validationErrors={validationErrors}
         onChange={onPathSelectorChange}
+        onOpenPathError={addMessage}
       />
       <ArgumentsBlock
         args={item.args!}
@@ -168,6 +172,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         validationErrors={validationErrors}
         changeArguments={onChangeArguments}
         onValidationError={onValidationError}
+        addMessage={addMessage}
       />
       <Button
         className={classNames(

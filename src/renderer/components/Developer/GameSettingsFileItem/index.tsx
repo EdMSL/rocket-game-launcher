@@ -19,6 +19,7 @@ import { getFileNameFromPathToFile } from '$utils/strings';
 import {
   getUniqueValidationErrors, IValidationErrors, IValidationError,
 } from '$utils/validation';
+import { IUserMessage } from '$types/common';
 
 interface IProps {
   file: IGameSettingsFile,
@@ -28,6 +29,7 @@ interface IProps {
   onFileDataChange: (fileName: string, fileData: IGameSettingsFile) => void,
   onValidation: (errors: IValidationErrors) => void,
   deleteFile: (id: string) => void,
+  addMessage: (message: IUserMessage|string) => void,
 }
 
 export const GameSettingsFileItem: React.FC<IProps> = ({
@@ -38,6 +40,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
   onFileDataChange,
   onValidation,
   deleteFile,
+  addMessage,
 }) => {
   const onTextFieldChange = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
@@ -104,6 +107,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
           ? gameSettingsFileAvailableVariablesAll
           : gameSettingsFileAvailableVariablesBase)}
         onChange={onPathSelectorChange}
+        onOpenPathError={addMessage}
       />
       <Select
         className={styles.file__item}
