@@ -1,5 +1,6 @@
 const path = require('path');
 const { merge } = require('webpack-merge');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const CssExtractPlugin = require('./webpack/plugins/mini-css-extract-plugin');
 const css = require('./webpack/rules/css');
@@ -29,6 +30,19 @@ const buildWebpackConfig = (env) => {
       target: MAIN ? 'electron-main' : 'electron-renderer',
       optimization: {
         minimize: true,
+        minimizer: [
+          new TerserPlugin({
+            terserOptions: {
+              compress: {
+                keep_fnames: true,
+                keep_infinity: true,
+              },
+              mangle: {
+                keep_fnames: true,
+              },
+            },
+          }),
+        ],
         nodeEnv: (env && env.nodeEnv) || 'production',
       },
       plugins,
