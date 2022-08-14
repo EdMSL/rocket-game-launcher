@@ -150,7 +150,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
     setNewConfig(getNewConfig(
       currentConfig,
       target.name,
-      target.value.trim(),
+      target.value,
       target.dataset.parent,
     ));
   }, [currentConfig, validationErrors, setValidationErrors, setNewConfig]);

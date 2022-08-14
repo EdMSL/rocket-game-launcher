@@ -137,7 +137,7 @@ const clearPathVaribaleFromPathString = (
 ): string => {
   const newStr = currPath;
 
-  return newStr.replace(/%.*%\\?/, '').trim();
+  return newStr.replace(/%.*%\\?/, '');
 };
 
 /**

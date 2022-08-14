@@ -57,7 +57,7 @@ export const getIsPathWithVariableCorrect = (
     return !path.extname(value);
   } else if (action === LauncherButtonAction.RUN && !!path.extname(value)) {
     if (extensions.length > 0) {
-      return extensions.includes(path.extname(value).substr(1));
+      return extensions.includes(path.extname(value).substring(1));
     }
 
     return Boolean(PathRegExp.PATH_EXTNAME.test(path.extname(value)));
