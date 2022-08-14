@@ -24,9 +24,9 @@
     height: 0;
     margin-right: 10px;
 
-    border-top: calc(var(--marker-size) / 2) solid transparent;
-    border-bottom: calc(var(--marker-size) / 2) solid transparent;
-    border-left: var(--marker-size) solid var(--text-main);
+    border-top: calc(#{$marker-size} / 2) solid transparent;
+    border-bottom: calc(#{$marker-size} / 2) solid transparent;
+    border-left: $marker-size solid var(--text-main);
 
     .game-settings-backup__item[open] & {
       transform: rotate(90deg);

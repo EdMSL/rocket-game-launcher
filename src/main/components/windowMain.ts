@@ -51,7 +51,7 @@ export const createMainWindow = (
       icon: ICON_PATH,
     },
     frame: false,
-    title: config.gameName ? config.gameName : 'Game Launcher',
+    title: config.gameName ? config.gameName.trim() : 'Game Launcher',
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,

@@ -1,0 +1,15 @@
+@function center-marker-func($container-width, $marker-width) {
+  @return ($container-width / 2) - ($marker-width / 2);
+}
+
+@function get-switcher-thumb-size-func($height, $border-width) {
+  @return $height - $border-width * 2 - 2;
+}
+
+@function get-switcher-unchecked-thumb-func(
+  $switcher-width,
+  $switcher-thumb-size,
+  $border-width
+) {
+  @return $switcher-width - $switcher-thumb-size - $border-width - 1;
+}

@@ -29,11 +29,11 @@
     &::after {
       content: "";
       position: absolute;
-      top: calc(50% - (var(--marker-size) / 2));
+      top: calc(50% - (#{$marker-size} / 2));
       right: var(--space-m);
 
-      width: var(--marker-size);
-      height: var(--marker-size);
+      width: $marker-size;
+      height: $marker-size;
 
       background-color: var(--error-color);
       border-radius: 50%;
