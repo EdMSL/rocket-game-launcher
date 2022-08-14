@@ -6,7 +6,7 @@ import {
   BACKUP_DIR,
   BACKUP_DIR_GAME_SETTINGS_FILES,
 } from '$constants/paths';
-import { getBackupFolderName } from './data';
+import { getDayAndTimeString } from './data';
 import { LogMessageType, writeToLogFile } from './log';
 import {
   createCopyFile,
@@ -46,7 +46,7 @@ export const createBackupFolders = (isThrowError = false): void => {
 
 export const createGameSettingsFilesBackup = (files: string[]): void => {
   createBackupFolders(true);
-  const folderName = getBackupFolderName();
+  const folderName = `backup_${getDayAndTimeString()}`;
 
   fs.mkdirSync(path.join(BACKUP_DIR_GAME_SETTINGS_FILES, folderName));
 

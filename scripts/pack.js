@@ -69,7 +69,9 @@ bundleElectronApp(process.argv[2])
       path.resolve(data[0]),
       path.resolve(
         path.dirname(data[0]),
-        process.argv[3] === 'test' ? 'Rocket Game Launcher Test' : 'Rocket Game Launcher',
+        process.argv[3] === 'test'
+          ? `Rocket Game Launcher Test ${new Date().toLocaleString().replace(', ', '_')}`
+          : 'Rocket Game Launcher',
       ),
     );
   }).catch((error) => console.log(error.message));

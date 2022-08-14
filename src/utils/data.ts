@@ -571,14 +571,10 @@ export const getGameSettingsParametersWithNewValues = (
 };
 
 /**
- * Сгенерировать имя папки для бэкапа файлов.
- * @returns Строка с именем для папки.
+ * Получает форматированную строку даты вида `$дата_$время`.
+ * @returns Форматированная строка даты.
 */
-export const getBackupFolderName = (): string => {
-  const date = new Date();
-
-  return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}_${date.toTimeString().split(' ')[0].split(':').join('.')}`; // eslint-disable-line max-len
-};
+export const getDayAndTimeString = (): string => new Date().toLocaleString().replace(', ', '_');
 
 /**
  * Изменить строку с указанным параметром на строку с новым значением параметра.
