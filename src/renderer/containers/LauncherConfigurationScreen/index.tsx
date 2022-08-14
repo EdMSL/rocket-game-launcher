@@ -252,11 +252,21 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
         <React.Fragment>
           <fieldset className="developer__block">
             <legend className="developer__block-title">Настройки окна программы</legend>
+            <TextField
+              className="developer__item"
+              id="gameName"
+              name="gameName"
+              value={currentConfig.gameName}
+              label="Заголовок окна"
+              validationErrors={validationErrors}
+              description="Название игры или любой текст, который будет отображаться в заголовке окна программы"//eslint-disable-line max-len
+              onChange={OnTextFieldChange}
+            />
             <Switcher
               className="developer__item"
               id="isResizable"
               name="isResizable"
-              label="Изменяемый размер окна?"
+              label="Изменяемый размер окна"
               isChecked={currentConfig.isResizable}
               onChange={onSwitcherChange}
               description="Определяет, может ли пользователь изменять размеры окна программы"
@@ -283,16 +293,6 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
             <legend className="developer__block-title">
               Настройки путей и запуска программ
             </legend>
-            <TextField
-              className="developer__item"
-              id="gameName"
-              name="gameName"
-              value={currentConfig.gameName}
-              label="Заголовок окна программы"
-              validationErrors={validationErrors}
-              description="Название игры или любой текст, который будет отображаться в заголовке окна программы"//eslint-disable-line max-len
-              onChange={OnTextFieldChange}
-            />
             <PathSelector
               className="developer__item"
               id="documentsPath"

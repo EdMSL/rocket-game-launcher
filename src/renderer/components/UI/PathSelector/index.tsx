@@ -104,7 +104,7 @@ export const PathSelector: React.FC<IProps> = ({
     setCurrentPathValue(target.value);
 
     onChange(
-      `${currentPathVariable}\\${target.value}`,
+      `${currentPathVariable}${target.value !== '' ? `\\${target.value}` : ''}`,
       name || id,
       [{
         id,

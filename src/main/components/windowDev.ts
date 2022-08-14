@@ -33,7 +33,7 @@ export const createDevWindow = (): BrowserWindow => {
     resizable: true,
     frame: false,
     show: false,
-    title: 'Developer Screen',
+    title: 'Developer Window',
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,

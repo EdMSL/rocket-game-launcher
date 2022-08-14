@@ -11,6 +11,7 @@ import {
   gameSettingsFileAvailableVariablesBase,
   GameSettingsFileView,
   LauncherButtonAction,
+  PathVariableName,
 } from '$constants/misc';
 import { PathSelector } from '$components/UI/PathSelector';
 import { IPathVariables } from '$constants/paths';
@@ -81,6 +82,19 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
     deleteFile(file.id);
   }, [file.id, deleteFile]);
 
+  const getPathVariablesForSelect = useCallback(() => {
+    let variables = [...isModOrganizerUsed
+      ? gameSettingsFileAvailableVariablesAll
+      : gameSettingsFileAvailableVariablesBase];
+
+    if (pathVariables['%DOCUMENTS%'] === pathVariables['%DOCS_GAME%']) {
+      variables = variables.filter(
+        (currentVariable) => currentVariable !== PathVariableName.DOCS_GAME,
+      );
+    }
+    return generateSelectOptions(variables);
+  }, [pathVariables, isModOrganizerUsed]);
+
   return (
     <React.Fragment>
       <TextField
@@ -103,9 +117,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         label="Путь до файла настроек"
         description="Состоит из переменной пути и самого пути к файлу. При выборе пути через диалоговое окно, переменная определяется автоматически." //eslint-disable-line
         selectorType={LauncherButtonAction.RUN}
-        selectPathVariables={generateSelectOptions(isModOrganizerUsed
-          ? gameSettingsFileAvailableVariablesAll
-          : gameSettingsFileAvailableVariablesBase)}
+        selectPathVariables={getPathVariablesForSelect()}
         onChange={onPathSelectorChange}
         onOpenPathError={addMessage}
       />

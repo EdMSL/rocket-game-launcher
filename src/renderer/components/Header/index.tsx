@@ -95,9 +95,10 @@ export const Header: React.FunctionComponent<IProps> = ({
               : launcherIcon}
             alt="game logo"
           />
+          {!openAppInfo && <span>Rocket Game Launcher</span>}
         </div>
         <p className={styles['header__game-name']}>
-          {openAppInfo ? gameName : 'Экран разработчика'}
+          {openAppInfo ? gameName : 'Окно разработчика'}
         </p>
         <div className={styles.header__controls}>
           {
