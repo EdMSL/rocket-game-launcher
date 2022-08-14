@@ -14,7 +14,7 @@ import { unhandled } from '$utils/system';
 const initialState: IAppState = await ipcRenderer.invoke(AppChannel.GET_APP_STATE);
 const { store, history } = configureAppStore(initialState, Scope.RENDERER);
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test') {
   unhandled();
 }
 

@@ -55,11 +55,11 @@ export const createMainWindow = (
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      devTools: process.env.NODE_ENV === 'development',
+      devTools: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test',
     },
   });
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test') {
     mainWindow.loadFile('./dist/index.html');
   } else {
     const waitForWebpackDevServer = createWaitForWebpackDevServer(
@@ -80,7 +80,7 @@ export const createMainWindow = (
     });
   }
 
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
     globalShortcut.register('F5', () => {
       mainWindow.reload();
     });

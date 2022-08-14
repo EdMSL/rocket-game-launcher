@@ -106,7 +106,9 @@ export const createStorage = (): Store<IAppState> => {
         theme: '',
       },
     },
-    cwd: process.env.NODE_ENV === 'production' ? path.resolve() : path.resolve('./app/files'),
+    cwd: process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test'
+      ? path.resolve()
+      : path.resolve('./app/files'),
     name: 'user',
   });
 

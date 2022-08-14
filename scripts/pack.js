@@ -13,7 +13,7 @@ async function bundleElectronApp(asar) {
     prune: true,
     icon: 'src/public/icon.ico',
     ignore: new RegExp('(files|backup|build)'),
-    asar: Boolean(asar),
+    asar: asar === '--asar',
     win32metadata: {
       CompanyName: 'OA Team',
       ProductName: 'Rocket Game Launcher',
@@ -61,9 +61,15 @@ bundleElectronApp(process.argv[2])
       path.resolve('./app/files/example_settings.json'),
       path.resolve(data[0], 'help', 'example_settings.json'),
     );
+    fs.copyFileSync(
+      path.resolve('./src/public/icon.ico'),
+      path.resolve(data[0], 'icon.ico'),
+    );
     fs.renameSync(
       path.resolve(data[0]),
-      path.resolve(path.dirname(data[0]), 'Rocket Game Launcher'),
+      path.resolve(
+        path.dirname(data[0]),
+        process.argv[3] === 'test' ? 'Rocket Game Launcher Test' : 'Rocket Game Launcher',
+      ),
     );
   }).catch((error) => console.log(error.message));
-
