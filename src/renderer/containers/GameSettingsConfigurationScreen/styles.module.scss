@@ -12,6 +12,13 @@
   justify-content: center;
 }
 
+.developer__groups-hint {
+  @include reset-indents;
+  position: absolute;
+  top: -2px;
+  right: var(--space-s);
+}
+
 .developer__groups-item {
   display: flex;
   align-items: center;

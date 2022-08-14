@@ -79,13 +79,6 @@
   }
 }
 
-.developer__block-hint {
-  @include reset-indents;
-  position: absolute;
-  top: -2px;
-  right: var(--space-s);
-}
-
 .developer__item {
   margin-bottom: var(--space-m);
 

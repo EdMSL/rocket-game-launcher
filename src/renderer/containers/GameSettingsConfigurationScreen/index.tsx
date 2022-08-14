@@ -40,7 +40,7 @@ import {
   getRandomName,
   replaceRootDirByPathVariable,
 } from '$utils/strings';
-import { EditableItem } from '$components/Developer/EditableItem';
+import { EditableItem } from '$components/EditableItem';
 import { HintItem } from '$components/HintItem';
 import { GameSettingsFileItem } from '$components/Developer/GameSettingsFileItem';
 import { GAME_DIR } from '$constants/paths';
@@ -718,7 +718,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               }
             </ul>
             <HintItem
-              className="developer__block-hint"
+              className={styles['developer__groups-hint']}
               description="Группы настроек позволяют группировать опции. На экране настроек они будут отображаться в виде панели навигации." //eslint-disable-line max-len
               direction="left"
             />
