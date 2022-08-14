@@ -533,7 +533,7 @@ export const getPathToFile = (
     }
   } else if (PathRegExp.DOCUMENTS.test(pathToFile)) {
     if (isAllowDocuments) {
-      newPath = newPath.replace(PathVariableName.DOCS_GAME, pathVariables['%DOCUMENTS%']);
+      newPath = newPath.replace(PathVariableName.DOCUMENTS, pathVariables['%DOCUMENTS%']);
     } else {
       throw new CustomError(`The path to a file in the Documents folder is not allow. Maybe you wanted to write "${PathVariableName.DOCS_GAME}"?.`); //eslint-disable-line max-len
     }
