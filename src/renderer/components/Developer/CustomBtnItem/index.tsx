@@ -11,6 +11,7 @@ import { IButtonArg, ILauncherCustomButton } from '$types/main';
 import {
   PathVariableName,
   LauncherButtonAction,
+  FileExtension,
 } from '$constants/misc';
 import { generateSelectOptions } from '$utils/data';
 import { Button } from '$components/UI/Button';
@@ -143,7 +144,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         id={`action_${item.id}`}
         className={styles['custom-btn__item']}
         name="action"
-        label="Кнопка запуска приложения?"
+        label="Запускает приложение"
         isChecked={item.action === LauncherButtonAction.RUN}
         description="Определяет действие по нажатию кнопки: запуск приложения\файла или открытие папки. Влияет на доступный выбор в селекторе пути ниже"//eslint-disable-line max-len
         onChange={onCheckboxChange}
@@ -157,6 +158,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         selectPathVariables={generateSelectOptions([PathVariableName.GAME_DIR])}
         pathVariables={pathVariables}
         selectorType={item.action}
+        extensions={FileExtension.EXECUTABLE}
         description="Путь до файла для запуска или папки для открытия в проводнике"
         validationErrors={validationErrors}
         onChange={onPathSelectorChange}
