@@ -166,7 +166,7 @@ export const MainScreen: React.FC = () => {
             isAutofocus
             onClick={onPlayGameBtnClick}
           >
-            {playButton.label}
+            {playButton.label || 'Играть'}
           </Button>
           {
             customButtons.map((button) => (

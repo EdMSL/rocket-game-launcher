@@ -122,7 +122,7 @@ const configFileDataSchema = Joi.object<ILauncherConfig>({
       id: Joi.string().optional().default(() => getRandomId()),
       data: Joi.string().required(),
     })).optional().default(defaultLauncherConfig.playButton.args),
-    label: Joi.string().optional().allow('').default(defaultLauncherConfig.playButton.label),
+    label: Joi.string().optional().allow(''),
   }).required(),
   customButtons: Joi.array()
     .items(Joi.object({
