@@ -52,7 +52,7 @@ export const Developer: React.FC = () => {
   const history = useHistory();
   const location = useLocation();
   /* eslint-enable max-len */
-
+  // console.log(currentConfig);
   const saveConfigChanges = useCallback((
     pathToGo: string = '',
   ) => {
@@ -150,6 +150,8 @@ export const Developer: React.FC = () => {
         history.push(getPathFromLinkHash(event.target.hash));
         setIsSettingsInitialized(false);
       }
+    } else {
+      setIsSettingsInitialized(false);
     }
   }, [isConfigChanged, history, validationErrors, saveConfigChanges, resetConfigChanges]);
 
