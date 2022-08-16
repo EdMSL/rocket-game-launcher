@@ -21,7 +21,7 @@ import {
   getValidationCauses, IValidationError, ValidationErrorCause,
 } from '$utils/validation';
 import { openFolder } from '$utils/process';
-import { getPathToFile } from '$utils/files';
+import { getPathToFile, normalizePath } from '$utils/files';
 
 interface IProps extends IUIElementParams, IUIControllerTextField {
   id: string,
@@ -228,6 +228,22 @@ export const PathSelector: React.FC<IProps> = ({
     || !pathVariable,
   [id, isDisabled, validationErrors, pathVariable]);
 
+  const onInputBlur = useCallback(() => {
+    onChange(
+      normalizePath(
+        `${currentPathVariable}${currentPathValue !== '' ? `\\${currentPathValue}` : ''}`,
+      ),
+      name || id,
+      [],
+      parent,
+    );
+  }, [id,
+    name,
+    parent,
+    currentPathVariable,
+    currentPathValue,
+    onChange]);
+
   return (
     <div className={classNames(
       'ui__container',
@@ -281,6 +297,7 @@ export const PathSelector: React.FC<IProps> = ({
           data-multiparameters={multiparameters}
           disabled={getIsDisabled()}
           onChange={onPatchTextFieldChange}
+          onBlur={onInputBlur}
         />
         <Button
           className="path-selector__input-btn path-selector__input-btn--open"
