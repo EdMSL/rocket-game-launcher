@@ -38,6 +38,7 @@ import {
   checkIsPathIsNotOutsideValidFolder,
   getFileNameFromPathToFile,
   getRandomName,
+  replacePathVariableByRootDir,
   replaceRootDirByPathVariable,
 } from '$utils/strings';
 import { EditableItem } from '$components/EditableItem';
@@ -229,7 +230,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
     }
   }, [currentConfig, setNewConfig, dispatch]);
 
-  const onPathSelectorChange = useCallback((
+  const onPathSelectorChange = useCallback(async (
     value: string,
     id: string,
     validationData: IValidationError[],
@@ -245,18 +246,107 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
       }
     }
 
-    setNewConfig(getNewConfig(
-      currentConfig,
-      id,
-      pathStr,
-      parent,
-    ));
+    if (
+      id === 'documentsPath'
+      && replacePathVariableByRootDir(
+        pathStr,
+        PathVariableName.DOCUMENTS,
+        pathVariables['%DOCUMENTS%'],
+      ) === pathVariables['%DOCUMENTS%']
+      && currentConfig.gameSettingsFiles.length > 0
+      && currentConfig.gameSettingsFiles.some(
+        (currentFile) => PathRegExp.DOCS_GAME.test(currentFile.path),
+      )
+    ) {
+      const messageBoxResponse = await ipcRenderer.invoke(
+        AppChannel.GET_MESSAGE_BOX_RESPONSE,
+        `В путях к некоторым файлам игровых настроек пристуствует переменная %DOCS_GAME%, но путь к папке игры в User/Documents не указан или был очищен.\nВыберите "Отмена", чтобы вручную изменить пути к файлам, "Игнорировать", чтобы изменить переменную на ${PathVariableName.GAME_DIR}, или "Удалить", чтобы удалить файлы и связанные с ними игровые опции.\nИзменения будут приняты только при сохранении текущей конфигурации.`, //eslint-disable-line max-len
+        'Выберите действие',
+        undefined,
+        ['Отмена', 'Игнорировать', 'Удалить'],
+        AppWindowName.DEV,
+      );
+
+      if (messageBoxResponse.response > 0) {
+        const changedFileNames: string[] = [];
+
+        let newConfig: IGameSettingsConfig = { ...currentConfig };
+        let message = '';
+
+        if (messageBoxResponse.response === 1) {
+          const newFiles = currentConfig.gameSettingsFiles.map((currentFile) => {
+            if (PathRegExp.DOCS_GAME.test(currentFile.path)) {
+              changedFileNames.push(currentFile.label);
+
+              return {
+                ...currentFile,
+                path: currentFile.path.replace(PathRegExp.DOCS_GAME, PathVariableName.GAME_DIR),
+              };
+            }
+
+            return currentFile;
+          });
+
+          newConfig = {
+            ...newConfig,
+            documentsPath: pathStr,
+            gameSettingsFiles: newFiles,
+          };
+
+          message = `При сохранении настроек для файлов [${changedFileNames.join()}] переменная пути будет изменена на ${PathVariableName.GAME_DIR}`; //eslint-disable-line max-len
+        } else if (messageBoxResponse.response === 2) {
+          const changedOptionsNames: string[] = [];
+
+          const newFiles = newConfig.gameSettingsFiles.filter(
+            (currentFile) => {
+              if (PathRegExp.DOCS_GAME.test(currentFile.path)) {
+                changedFileNames.push(currentFile.label);
+
+                return false;
+              }
+
+              return true;
+            },
+          );
+          const filesNames = getGameSettingsElementsNames(newFiles);
+
+          newConfig = {
+            ...newConfig,
+            documentsPath: pathStr,
+            gameSettingsFiles: newFiles,
+            gameSettingsOptions: newConfig.gameSettingsOptions.filter(
+              (currentOption) => {
+                if (!filesNames.includes(currentOption.file)) {
+                  changedOptionsNames.push(currentOption.label);
+
+                  return false;
+                }
+
+                return true;
+              },
+            ),
+          };
+
+          message = `При сохранении настроек файлы [${changedFileNames.join()}]${changedOptionsNames.length > 0 ? ` и опции [${changedOptionsNames.join()}]` : ''} будут удалены`; //eslint-disable-line max-len
+        }
+
+        dispatch(addDeveloperMessages([CreateUserMessage.info(message)]));
+        setNewConfig(newConfig);
+      }
+    } else {
+      setNewConfig(getNewConfig(
+        currentConfig,
+        id,
+        pathStr,
+        parent,
+      ));
+    }
 
     setValidationErrors(getUniqueValidationErrors(
       validationErrors,
       validationData,
     ));
-  }, [currentConfig, validationErrors, setValidationErrors, setNewConfig]);
+  }, [currentConfig, validationErrors, pathVariables, dispatch, setValidationErrors, setNewConfig]);
 
   const getCurrentFullOption = useCallback((optionId: string) => fullOptions.find(
     (currentOption) => currentOption.id === optionId,
@@ -638,6 +728,20 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               description="Кодировка, которая будет по умолчанию применяться при чтении и записи данных файлов игровых настроек." //eslint-disable-line max-len
               placeholder={gameSettingsConfig.baseFilesEncoding}
               onChange={onTextFieldChange}
+            />
+            <PathSelector
+              className="developer__item"
+              id="documentsPath"
+              name="documentsPath"
+              label="Папка файлов игры в Documents"
+              value={currentConfig.documentsPath}
+              selectPathVariables={generateSelectOptions([PathVariableName.DOCUMENTS])}
+              pathVariables={pathVariables}
+              isGameDocuments={false}
+              description="Путь до папки игры в [User]/Documents. Укажите этот путь, если нужно управлять данными из файлов в этой папке через экран игровых настроек"//eslint-disable-line max-len
+              validationErrors={validationErrors}
+              onChange={onPathSelectorChange}
+              onOpenPathError={addMessage}
             />
           </fieldset>
           <fieldset className="developer__block">

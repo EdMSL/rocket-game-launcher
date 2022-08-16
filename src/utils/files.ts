@@ -722,3 +722,12 @@ export const getPathFromFileInput = async (
     return '';
   }
 };
+
+/**
+ * Приводит строку пути к единому корректному виду.
+ * @param pathStr Строка пути.
+ * @returns Нормализованная строка пути.
+ */
+export const normalizePath = (
+  pathStr: string,
+): string => path.normalize(pathStr).replace(/[/\\]*$/, '');

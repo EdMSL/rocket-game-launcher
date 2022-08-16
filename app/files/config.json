@@ -1,13 +1,12 @@
 {
-  "isResizable": true,
+  "isResizable": false,
   "width": 800,
-  "height": 800,
+  "height": 600,
   "minWidth": 400,
   "minHeight": 400,
   "maxWidth": 900,
   "maxHeight": 0,
-  "documentsPath": "%DOCUMENTS%\\My Games\\Oblivion_GBR",
-  "gameName": "OA Launchers",
+  "gameName": "Some Amazing Game",
   "playButton": {
     "path": "%GAME_DIR%\\MO2\\ModOrganizer.exe",
     "args": [
@@ -15,15 +14,9 @@
         "data": "moshortcut://:LaunchGame"
       }
     ],
-    "label": "Играть"
+    "label": ""
   },
   "customButtons": [
-    {
-      "path": "%GAME_DIR%\\Data",
-      "action": "open",
-      "label": "Data",
-      "args": []
-    },
     {
       "path": "%GAME_DIR%\\MO2\\ModOrganizer.exe",
       "action": "run",
@@ -35,9 +28,9 @@
       ]
     },
     {
-      "path": "%GAME_DIR%\\MO2",
+      "path": "%GAME_DIR%",
       "action": "open",
-      "label": "Открыть папку Mod Organizer",
+      "label": "Открыть папку игры",
       "args": []
     }
   ],

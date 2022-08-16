@@ -132,7 +132,6 @@ export const createStorage = (): Store<IAppState> => {
 
   // Переменные путей и настройка кнопок
   const pathVariables = createBasePathVariables(
-    configurationData,
     app,
   );
 

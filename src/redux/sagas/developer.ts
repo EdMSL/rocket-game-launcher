@@ -32,8 +32,10 @@ import {
 } from '$utils/log';
 import { getGameSettingsConfigSaga } from './gameSettings';
 import { DEVELOPER_TYPES } from '$types/developer';
-import { AppChannel, AppWindowName } from '$constants/misc';
-import { writeJSONFile } from '$utils/files';
+import {
+  AppChannel, AppWindowName, PathVariableName,
+} from '$constants/misc';
+import { normalizePath, writeJSONFile } from '$utils/files';
 import {
   CONFIG_FILE_PATH, GAME_SETTINGS_FILE_PATH, IPathVariables,
 } from '$constants/paths';
@@ -44,7 +46,9 @@ import {
   checkObjectForEqual, getWindowSizeSettingsFromLauncherConfig,
 } from '$utils/check';
 import { defaultGameSettingsConfig } from '$constants/defaultData';
-import { getFileNameFromPathToFile, getObjectAsList } from '$utils/strings';
+import {
+  getFileNameFromPathToFile, getObjectAsList, replacePathVariableByRootDir,
+} from '$utils/strings';
 import { ILauncherConfig } from '$types/main';
 import { IGameSettingsConfig } from '$types/gameSettings';
 
@@ -78,27 +82,43 @@ export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): Saga
 
     let newPathVariables: IPathVariables;
 
-    if (settingsConfig.modOrganizer.isUsed) {
+    if (settingsConfig.modOrganizer.isUsed
+      || settingsConfig.documentsPath !== PathVariableName.DOCUMENTS) {
       const {
         developer: {
           pathVariables,
         },
       }: ReturnType<typeof getState> = yield select(getState);
 
-      const MOPathVariables = getModOrganizerPathVariables(
-        settingsConfig.modOrganizer.pathToMOFolder,
-        pathVariables,
-      );
+      newPathVariables = { ...pathVariables };
 
-      newPathVariables = {
-        ...pathVariables,
-        ...MOPathVariables,
-      };
+      if (settingsConfig.documentsPath !== PathVariableName.DOCUMENTS) {
+        newPathVariables = {
+          ...newPathVariables,
+          [PathVariableName.DOCS_GAME]: replacePathVariableByRootDir(
+            normalizePath(settingsConfig.documentsPath),
+            PathVariableName.DOCUMENTS,
+            pathVariables['%DOCUMENTS%'],
+          ),
+        };
+      }
 
-      yield put(setPathVariablesDeveloper(newPathVariables));
+      if (settingsConfig.modOrganizer.isUsed) {
+        const MOPathVariables = getModOrganizerPathVariables(
+          settingsConfig.modOrganizer.pathToMOFolder,
+          pathVariables,
+        );
 
-      if (!isFromUpdateAction) {
-        writeToLogFile(`Mod Organizer paths variables:\n  ${getObjectAsList(MOPathVariables, true, true)}`); //eslint-disable-line max-len
+        newPathVariables = {
+          ...newPathVariables,
+          ...MOPathVariables,
+        };
+
+        yield put(setPathVariablesDeveloper(newPathVariables));
+
+        if (!isFromUpdateAction) {
+          writeToLogFile(`Mod Organizer paths variables:\n  ${getObjectAsList(MOPathVariables, true, true)}`); //eslint-disable-line max-len
+        }
       }
     }
 
@@ -264,14 +284,13 @@ function* saveGameSettingsConfigSaga(
     const {
       developer: {
         pathVariables,
-        gameSettingsConfig: { modOrganizer: { pathToMOFolder, isUsed } },
+        gameSettingsConfig: { modOrganizer: { pathToMOFolder, isUsed }, documentsPath },
       },
     }: ReturnType<typeof getState> = yield select(getState);
 
-    if (newConfig.modOrganizer.isUsed
-      && (
-        pathToMOFolder !== newConfig.modOrganizer.pathToMOFolder
-        || !isUsed)
+    if ((newConfig.modOrganizer.isUsed
+      && (pathToMOFolder !== newConfig.modOrganizer.pathToMOFolder || !isUsed))
+      || documentsPath !== newConfig.documentsPath
     ) {
       const newPathVariables = updatePathVariables(
         pathVariables,

@@ -52,7 +52,7 @@ export const Developer: React.FC = () => {
   const history = useHistory();
   const location = useLocation();
   /* eslint-enable max-len */
-  // console.log(currentConfig);
+
   const saveConfigChanges = useCallback((
     pathToGo: string = '',
   ) => {

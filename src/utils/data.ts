@@ -55,7 +55,9 @@ import {
 import {
   IGetDataFromFilesResult, IIniObj, IXmlObj, ISelectOption,
 } from '$types/common';
-import { getPathToFile, readINIFileSync } from './files';
+import {
+  getPathToFile, normalizePath, readINIFileSync,
+} from './files';
 
 const SYMBOLS_TO_TYPE = 8;
 
@@ -753,31 +755,15 @@ export const getModOrganizerPathVariables = (
 
 /**
  * Генерирует базовые переменные путей.
- * @param configData Данные из файла config.json.
  * @param app Объект Electron.app.
  * @returns Объект с переменными путей.
 */
 export const createBasePathVariables = (
-  configData: ILauncherConfig,
   app: Electron.App,
-): IPathVariables => {
-  let pathVariables: IPathVariables = {
-    ...DefaultPathVariable,
-    '%DOCUMENTS%': app.getPath('documents'),
-  };
-
-  if (configData.documentsPath) {
-    pathVariables = {
-      ...pathVariables,
-      '%DOCS_GAME%': configData.documentsPath.replace(
-        PathVariableName.DOCUMENTS,
-        pathVariables['%DOCUMENTS%'],
-      ),
-    };
-  }
-
-  return pathVariables;
-};
+): IPathVariables => ({
+  ...DefaultPathVariable,
+  '%DOCUMENTS%': app.getPath('documents'),
+});
 
 const getUpdatedModOrganizerPathVariables = (
   pathToMOFolder: string,
@@ -818,10 +804,6 @@ export const updatePathVariables = (
   if ('playButton' in config) {
     return {
       ...pathVariables,
-      '%DOCS_GAME%': config.documentsPath.replace(
-        PathVariableName.DOCUMENTS,
-        pathVariables['%DOCUMENTS%'],
-      ),
     };
   } else if ('baseFilesEncoding' in config) {
     return {
@@ -829,6 +811,10 @@ export const updatePathVariables = (
       ...getUpdatedModOrganizerPathVariables(
         config.modOrganizer.pathToMOFolder,
         pathVariables,
+      ),
+      '%DOCS_GAME%': config.documentsPath.replace(
+        PathVariableName.DOCUMENTS,
+        pathVariables['%DOCUMENTS%'],
       ),
     };
   }

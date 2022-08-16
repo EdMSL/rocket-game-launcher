@@ -70,7 +70,6 @@ export interface IWindowSettings extends IWindowSizeSettings {
 
 export interface ILauncherConfig extends IWindowSettings {
   isFirstStart: boolean,
-  documentsPath: string,
   gameName: string,
   playButton: ILauncherAppButton,
   customButtons: ILauncherCustomButton[],

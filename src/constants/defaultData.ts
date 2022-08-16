@@ -79,7 +79,6 @@ export const defaultLauncherConfig: ILauncherConfig = {
   width: defaultLauncherWindowSettings.width,
   height: defaultLauncherWindowSettings.height,
   isFirstStart: true,
-  documentsPath: '',
   gameName: 'Rocket Game Launcher',
   playButton: {
     path: '',
@@ -90,8 +89,9 @@ export const defaultLauncherConfig: ILauncherConfig = {
 };
 
 export const defaultGameSettingsConfig: IGameSettingsConfig = {
-  modOrganizer: defaultModOrganizerParams,
   baseFilesEncoding: Encoding.WIN1251,
+  documentsPath: '',
+  modOrganizer: defaultModOrganizerParams,
   gameSettingsGroups: [],
   gameSettingsFiles: [],
   gameSettingsOptions: [],

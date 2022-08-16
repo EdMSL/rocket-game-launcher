@@ -15,7 +15,6 @@ export const INITIAL_STATE: IMainRootState = {
     width: defaultLauncherConfig.width,
     height: defaultLauncherConfig.height,
     isFirstStart: defaultLauncherConfig.isFirstStart,
-    documentsPath: defaultLauncherConfig.documentsPath,
     gameName: defaultLauncherConfig.gameName,
     playButton: defaultLauncherConfig.playButton,
     customButtons: defaultLauncherConfig.customButtons,

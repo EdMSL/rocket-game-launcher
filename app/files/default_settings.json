@@ -1,9 +1,10 @@
 {
+  "baseFilesEncoding": "win1251",
+  "documentsPath": "%DOCUMENTS%\\My Games\\Oblivion",
   "modOrganizer": {
     "isUsed": false,
     "pathToMOFolder": "%GAME_DIR%"
   },
-  "baseFilesEncoding": "win1251",
   "gameSettingsGroups": [
     {
       "name": "hgD38Xp63Pgq10lO",

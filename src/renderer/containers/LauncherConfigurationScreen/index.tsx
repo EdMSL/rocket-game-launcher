@@ -293,20 +293,6 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
             <legend className="developer__block-title">
               Настройки путей и запуска программ
             </legend>
-            <PathSelector
-              className="developer__item"
-              id="documentsPath"
-              name="documentsPath"
-              label="Папка файлов игры в Documents"
-              value={currentConfig.documentsPath}
-              selectPathVariables={generateSelectOptions([PathVariableName.DOCUMENTS])}
-              pathVariables={pathVariables}
-              isGameDocuments={false}
-              description="Путь до папки игры в [User]/Documents. Укажите этот путь, если нужно управлять данными из файлов в этой папке через экран игровых настроек"//eslint-disable-line max-len
-              validationErrors={validationErrors}
-              onChange={onPathSelectorChange}
-              onOpenPathError={addMessage}
-            />
             <p className="developer__subtitle">Настройки запуска игры</p>
             <TextField
               className="developer__item"
@@ -314,10 +300,10 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
               name="label"
               parent="playButton"
               value={currentConfig.playButton.label}
-              label="Заголовок кнопки запуска"
+              placeholder="Играть"
+              label="Заголовок кнопки"
               description="Текст, который будет отображаться на основной кнопке запуска игры"//eslint-disable-line max-len
               validationErrors={validationErrors}
-              isRequied
               onChange={OnTextFieldChange}
             />
             <PathSelector
@@ -325,7 +311,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
               id="path"
               name="path"
               parent="playButton"
-              label="Исполняемый файл игры"
+              label="Исполняемый файл"
               value={currentConfig.playButton.path}
               selectPathVariables={generateSelectOptions([PathVariableName.GAME_DIR])}
               pathVariables={pathVariables}
@@ -349,7 +335,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
             />
             <div className={styles['custom-btns__container']}>
               <p className="developer__subtitle">
-                Кнопки запуска дополнительных программ
+                Настройки запуска дополнительных программ
               </p>
               <ul className="developer__list">
                 {
