@@ -11,7 +11,10 @@ import {
   IWindowSettings,
 } from '$types/main';
 import {
-  Encoding, GameSettingsOptionType, LauncherButtonAction,
+  Encoding,
+  GameSettingsOptionType,
+  LauncherButtonAction,
+  PathVariableName,
 } from './misc';
 
 export const SUCCESS_STATUS: ISuccess = 'success';
@@ -59,15 +62,15 @@ export const defaultLauncherCustomButton: ILauncherCustomButton = {
 export const MOIniFileName = 'ModOrganizer.ini';
 
 export const defaultModOrganizerPaths = {
-  pathToMOFolder: '%GAME_DIR%\\Mod Organizer',
-  pathToINI: `%MO_DIR%\\${MOIniFileName}`,
-  pathToProfiles: '%MO_DIR%\\profiles',
-  pathToMods: '%MO_DIR%\\mods',
+  pathToMOFolder: `${PathVariableName.GAME_DIR}\\Mod Organizer`,
+  pathToINI: `${PathVariableName.MO_DIR}\\${MOIniFileName}`,
+  pathToProfiles: `${PathVariableName.MO_DIR}\\profiles`,
+  pathToMods: `${PathVariableName.MO_DIR}\\mods`,
 };
 
 export const defaultModOrganizerParams: IModOrganizerParams = {
   isUsed: false,
-  pathToMOFolder: '%GAME_DIR%\\Mod Organizer',
+  pathToMOFolder: `${PathVariableName.GAME_DIR}\\Mod Organizer`,
 };
 
 export const defaultLauncherConfig: ILauncherConfig = {
@@ -90,7 +93,7 @@ export const defaultLauncherConfig: ILauncherConfig = {
 
 export const defaultGameSettingsConfig: IGameSettingsConfig = {
   baseFilesEncoding: Encoding.WIN1251,
-  documentsPath: '',
+  documentsPath: PathVariableName.DOCUMENTS,
   modOrganizer: defaultModOrganizerParams,
   gameSettingsGroups: [],
   gameSettingsFiles: [],

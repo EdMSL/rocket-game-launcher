@@ -733,7 +733,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               className="developer__item"
               id="documentsPath"
               name="documentsPath"
-              label="Папка файлов игры в Documents"
+              label="Папка в Documents"
               value={currentConfig.documentsPath}
               selectPathVariables={generateSelectOptions([PathVariableName.DOCUMENTS])}
               pathVariables={pathVariables}
@@ -745,13 +745,13 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
             />
           </fieldset>
           <fieldset className="developer__block">
-            <legend className="developer__block-title">Настройки Mod Organizer</legend>
+            <legend className="developer__block-title">Настройка Mod Organizer</legend>
             <Switcher
               className="developer__item"
               id="isUsed"
               name="isUsed"
               parent="modOrganizer"
-              label="Используется ли MO?"
+              label="Используется Mod Organizer"
               isChecked={currentConfig.modOrganizer.isUsed}
               description="Определяет, используется ли в игре\сборке Mod Organizer"//eslint-disable-line max-len
               onChange={onSwitcherChange}
@@ -760,7 +760,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               className="developer__item"
               id="pathToMOFolder"
               name="pathToMOFolder"
-              label="Путь до папки MO"
+              label="Папка Mod Organizer"
               parent="modOrganizer"
               value={currentConfig.modOrganizer.pathToMOFolder}
               selectPathVariables={generateSelectOptions([PathVariableName.GAME_DIR])}

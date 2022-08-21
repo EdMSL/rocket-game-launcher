@@ -21,8 +21,9 @@ const initialState = {
     ...main.isGameSettingsLoaded ? {
       isGameSettingsConfigDataLoaded: main.isGameSettingsLoaded,
       gameSettingsConfig: {
-        modOrganizer: gameSettings.modOrganizer,
+        documentsPath: gameSettings.documentsPath,
         baseFilesEncoding: gameSettings.baseFilesEncoding,
+        modOrganizer: gameSettings.modOrganizer,
         gameSettingsGroups: gameSettings.gameSettingsGroups,
         gameSettingsFiles: gameSettings.gameSettingsFiles,
         gameSettingsOptions: gameSettings.initialGameSettingsOptions,

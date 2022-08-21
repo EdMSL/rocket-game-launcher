@@ -179,11 +179,14 @@ export const gameSettingsShallowCheckSchema = Joi.object<IGameSettingsConfig>({
 // Полная проверка.
 export const gameSettingsDeepCheckSchema = Joi.object<IGameSettingsConfig>({
   baseFilesEncoding: Joi.string().optional().default(Encoding.WIN1251),
-  documentsPath: Joi.string().optional().default(defaultGameSettingsConfig.documentsPath)
+  documentsPath: Joi.string().optional()
+    .default(defaultGameSettingsConfig.documentsPath)
     .pattern(PathRegExp.DOCUMENTS, 'correct path'),
   modOrganizer: Joi.object({
     isUsed: Joi.bool().optional().default(false),
-    pathToMOFolder: Joi.string().optional().default(defaultGameSettingsConfig.modOrganizer.pathToMOFolder).pattern(PathRegExp.GAME_DIR, 'correct path'),
+    pathToMOFolder: Joi.string().optional()
+      .pattern(PathRegExp.GAME_DIR, 'correct path')
+      .default(defaultGameSettingsConfig.modOrganizer.pathToMOFolder),
   }).optional().default(defaultGameSettingsConfig.modOrganizer),
   gameSettingsGroups: Joi.array()
     .items(GameSettingsGroupSchema).optional().default([])
@@ -246,7 +249,7 @@ const defaultOptionTypeSchema = Joi.object({
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
-      ),
+      ).allow(''),
       valuePath: Joi.string().when(
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),

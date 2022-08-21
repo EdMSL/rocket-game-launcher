@@ -14,13 +14,13 @@ import { IAppState } from '$store/store';
 import {
   getPathToFile,
   isDataFromIniFile,
+  normalizePath,
   readDirectory,
   readGameSettingsFile,
   readINIFile,
   readJSONFile,
   writeGameSettingsFile,
   writeINIFile,
-  xmlAttributePrefix,
 } from '$utils/files';
 import {
   IGetDataFromFilesResult, IModOrganizerINIData, IUnwrap,
@@ -90,6 +90,7 @@ import {
 import {
   getRegExpForLineIniParameter,
   getObjectAsList,
+  replacePathVariableByRootDir,
 } from '$utils/strings';
 import { setIsGameSettingsConfigFileExists } from '$actions/developer';
 
@@ -176,15 +177,11 @@ function* getMOProfilesSaga(pathToMOFolder: string): SagaIterator {
  * Получить данные из файла ModOrganizer.ini и записать нужные параметры в `state`
  * @returns Строка с профилем ModOrganizer
 */
-function* getDataFromMOIniSaga(): SagaIterator<IModOrganizerINIData> {
+function* getDataFromMOIniSaga(pathToMOIni: string): SagaIterator<IModOrganizerINIData> {
   try {
-    const {
-      main: { pathVariables },
-    }: ReturnType<typeof getState> = yield select(getState);
-
     const iniData: IUnwrap<typeof readINIFile> = yield call(
       readINIFile,
-      pathVariables['%MO_INI%'],
+      pathToMOIni,
     );
 
     const generalSection = iniData.getSection(modOrganizerGeneralSection);
@@ -237,7 +234,8 @@ function* getDataFromMOIniSaga(): SagaIterator<IModOrganizerINIData> {
 /**
  * Считывает данные из файлов для генерации игровых опций
  * @param filesForRead Игровые файлы, из которых нужно получить данные.
- * @param isWithPrefix Нужно ли добавлять префикс к именам атрибутов. По умолчанию `false`.
+ * @param isWithPrefix Если `true`, добавит префикс '@_' к именам атрибутов параметров
+ * из файлов со структурой `TAG`. По умолчанию `false`.
 */
 function* getDataFromGameSettingsFilesSaga(
   filesForRead: IGameSettingsFile[],
@@ -293,6 +291,7 @@ export function* generateGameSettingsParametersSaga(
       getDataFromGameSettingsFilesSaga,
       gameSettingsFiles,
       moProfile,
+      true,
     );
 
     const {
@@ -347,6 +346,7 @@ export function* initGameSettingsSaga(
 
     let currentSettingsConfig: IGameSettingsConfig;
     let settingsConfigErrors: Joi.ValidationError[] = [];
+    let currentPathVariables = { ...pathVariables };
 
     if (initialSettingsConfig) {
       currentSettingsConfig = initialSettingsConfig;
@@ -359,6 +359,16 @@ export function* initGameSettingsSaga(
       currentSettingsConfig = data;
       settingsConfigErrors = [...errors];
     }
+    if (currentSettingsConfig.documentsPath !== PathVariableName.DOCUMENTS) {
+      currentPathVariables = {
+        ...currentPathVariables,
+        [PathVariableName.DOCS_GAME]: replacePathVariableByRootDir(
+          normalizePath(currentSettingsConfig.documentsPath),
+          PathVariableName.DOCUMENTS,
+          pathVariables['%DOCUMENTS%'],
+        ),
+      };
+    }
 
     let moData: SagaReturnType<typeof getDataFromMOIniSaga> = { profileName: '', version: 0 };
 
@@ -368,22 +378,24 @@ export function* initGameSettingsSaga(
         pathVariables,
       );
 
+      currentPathVariables = {
+        ...currentPathVariables,
+        ...MOPathVariables,
+      };
+
       if (!isFromUpdateAction) {
         writeToLogFile(`Mod Organizer paths variables:\n  ${getObjectAsList(MOPathVariables, true, true)}`); //eslint-disable-line max-len
       }
 
-      yield put(setPathVariables({
-        ...pathVariables,
-        ...MOPathVariables,
-      }));
-
       yield call(getMOProfilesSaga, MOPathVariables[PathVariableName.MO_PROFILE]);
 
-      moData = yield call(getDataFromMOIniSaga);
+      moData = yield call(getDataFromMOIniSaga, currentPathVariables[PathVariableName.MO_INI]);
 
       yield put(setMoVersion(moData.version));
       yield put(setMoProfile(moData.profileName));
     }
+
+    yield put(setPathVariables(currentPathVariables));
 
     if (currentSettingsConfig.gameSettingsOptions.length > 0) {
       const {
@@ -622,11 +634,6 @@ function* writeGameSettingsFilesSaga(
           && !isDataFromIniFile(currWriteFileView, currWriteFileContent)
         ) {
           const pathArr = [...currentParameter.name.split('/')];
-
-          if (pathArr[pathArr.length - 1] !== '#text') {
-            pathArr[pathArr.length - 1] = `${xmlAttributePrefix}${pathArr[pathArr.length - 1]}`;
-          }
-
           setValueForObjectDeepKey(
             currWriteFileContent,
             pathArr,

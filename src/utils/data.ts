@@ -56,7 +56,7 @@ import {
   IGetDataFromFilesResult, IIniObj, IXmlObj, ISelectOption,
 } from '$types/common';
 import {
-  getPathToFile, normalizePath, readINIFileSync,
+  getPathToFile, readINIFileSync, xmlAttributePrefix,
 } from './files';
 
 const SYMBOLS_TO_TYPE = 8;
@@ -95,7 +95,7 @@ export const getParameterName = (
   option: IGameSettingsOptionItem,
 ): string => {
   if (option.valueAttribute) {
-    return `${option.valuePath ? `${option.valuePath}/` : ''}${option.name}/${option.valueAttribute}`;
+    return `${option.valuePath ? `${option.valuePath}/` : ''}${option.name}/${xmlAttributePrefix}${option.valueAttribute}`; //eslint-disable-line max-len
   }
 
   if (option.iniGroup) {
@@ -305,6 +305,10 @@ export const getParameterData = (
       });
     }
   } else if (currentGameSettingsFile.view === GameSettingsFileView.TAG) {
+    const valueAttribute = currentGameSettingOption.valueAttribute
+      ? `${xmlAttributePrefix}${currentGameSettingOption.valueAttribute}`
+      : '';
+
     let valuePathArr: string[] = [];
 
     if (currentGameSettingOption.valuePath) {
@@ -314,7 +318,9 @@ export const getParameterData = (
     const pathArr = [
       ...valuePathArr,
       currentGameSettingOption.name!,
-      currentGameSettingOption.valueAttribute!,
+      ...currentGameSettingOption.valueAttribute
+        ? [valueAttribute]
+        : [],
     ];
 
     let index = 0;
@@ -324,9 +330,14 @@ export const getParameterData = (
 
       if (typeof obj[key] === 'object') {
         getProp(obj[key], pathArr[index]);
-      } else if (key === currentGameSettingOption.valueAttribute) {
+      } else if (key === currentGameSettingOption.valueAttribute
+        ? valueAttribute
+        : currentGameSettingOption.name
+      ) {
         parameterName = pathArr.join('/');
-        parameterValue = obj[currentGameSettingOption.valueAttribute!];
+        parameterValue = obj[currentGameSettingOption.valueAttribute
+          ? valueAttribute
+          : currentGameSettingOption.name];
       }
     };
 
@@ -337,7 +348,7 @@ export const getParameterData = (
       let errorField = '';
 
       if (index === pathArr.length) {
-        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingOption.valueAttribute}" attribute in "${currentGameSettingOption.name}" parameter specified in "${currentGameSettingsFile.label}".`; //eslint-disable-line max-len
+        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain ${currentGameSettingOption.valueAttribute ? `"${xmlAttributePrefix}${currentGameSettingOption.valueAttribute}" attribute in ` : ''}"${currentGameSettingOption.name}" parameter specified in "${currentGameSettingsFile.label}".`; //eslint-disable-line max-len
         errorField = 'valueAttribute';
       } else if (index === pathArr.length - 1) {
         errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingOption.name}" parameter${currentGameSettingOption.valuePath ? ` on the path "${currentGameSettingOption.valuePath}"` : ''} specified in "${currentGameSettingsFile.label}".`; //eslint-disable-line max-len

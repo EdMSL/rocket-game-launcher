@@ -103,7 +103,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         name="label"
         value={file.label}
         description="Имя файла для идентификации"
-        label="Имя файла"
+        label="Имя"
         placeholder={getFileNameFromPathToFile(file.path)}
         onChange={onTextFieldChange}
       />
@@ -114,7 +114,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         pathVariables={pathVariables}
         validationErrors={validationErrors}
         value={file.path}
-        label="Путь до файла настроек"
+        label="Путь"
         description="Состоит из переменной пути и самого пути к файлу. При выборе пути через диалоговое окно, переменная определяется автоматически." //eslint-disable-line
         selectorType={LauncherButtonAction.RUN}
         selectPathVariables={getPathVariablesForSelect()}
@@ -125,7 +125,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         className={styles.file__item}
         id={`view_${file.id}`}
         name="view"
-        label="Тип структуры файла"
+        label="Структура"
         description='Определяет, какая структура содержимого у файла. Неправильно выбранная структура приведет к ошибке обработки.' //eslint-disable-line
         selectOptions={generateSelectOptions(Object.values(GameSettingsFileView))}
         value={file.view}
@@ -137,7 +137,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         name="encoding"
         value={file.encoding}
         description="Кодировка файла, которая будет применяться при чтении и сохранении файла. Если не указано, берется значение по умолчанию." //eslint-disable-line max-len
-        label="Кодировка файла"
+        label="Кодировка"
         onChange={onTextFieldChange}
       />
       <Button

@@ -334,13 +334,11 @@ export const readINIFileSync = (
 */
 export const readXMLFile = async (
   filePath: string,
-  isWithPrefix: boolean,
+  isWithPrefix = false,
   encoding = Encoding.WIN1251,
 ): Promise<IXmlObj> => {
   try {
-    const XMLDataStr = await readFileData(filePath);
-
-    return xmlParser.parse(iconv.decode(XMLDataStr, encoding), {
+    return xmlParser.parse(iconv.decode(await readFileData(filePath), encoding), {
       attributeNamePrefix: isWithPrefix ? xmlAttributePrefix : '',
       ignoreAttributes: false,
       parseAttributeValue: false,
@@ -565,7 +563,7 @@ export const readGameSettingsFile = async (
   pathVariables: IPathVariables,
   moProfile: string,
   defaultEncoding: Encoding,
-  isWithPrefix: boolean,
+  isWithPrefix = false,
 ): Promise<{ [key: string]: IIniObj|IXmlObj, }> => {
   let fileData: IIniObj|IXmlObj = {};
 

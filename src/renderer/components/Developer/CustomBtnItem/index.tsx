@@ -146,7 +146,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         name="action"
         label="Запускает приложение"
         isChecked={item.action === LauncherButtonAction.RUN}
-        description="Определяет действие по нажатию кнопки: запуск приложения\файла или открытие папки. Влияет на доступный выбор в селекторе пути ниже"//eslint-disable-line max-len
+        description="Если включено, кнопка будет предназначена для запуска исполняемого файла, иначе для открытия папки"//eslint-disable-line max-len
         onChange={onCheckboxChange}
       />
       <PathSelector

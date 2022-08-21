@@ -251,7 +251,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
         currentConfig.playButton !== undefined && (
         <React.Fragment>
           <fieldset className="developer__block">
-            <legend className="developer__block-title">Настройки окна программы</legend>
+            <legend className="developer__block-title">Настройки главного окна</legend>
             <TextField
               className="developer__item"
               id="gameName"
@@ -291,9 +291,9 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
           </fieldset>
           <fieldset className="developer__block">
             <legend className="developer__block-title">
-              Настройки путей и запуска программ
+              Настройки запуска программ
             </legend>
-            <p className="developer__subtitle">Настройки запуска игры</p>
+            <p className="developer__subtitle">Запуск игры</p>
             <TextField
               className="developer__item"
               id="label"
@@ -335,7 +335,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
             />
             <div className={styles['custom-btns__container']}>
               <p className="developer__subtitle">
-                Настройки запуска дополнительных программ
+                Запуск дополнительных программ
               </p>
               <ul className="developer__list">
                 {

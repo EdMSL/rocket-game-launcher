@@ -227,23 +227,12 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
 
   return (
     <React.Fragment>
-      <TextField
-        className={styles.option__item}
-        id={`${GameSettingsOptionFields.LABEL}_${option.id}`}
-        name={GameSettingsOptionFields.LABEL}
-        label="Заголовок"
-        description="Текст, отображаемый перед контроллером опции."
-        value={option[GameSettingsOptionFields.LABEL]}
-        isRequied
-        validationErrors={validationErrors}
-        onChange={onOptionInputChange}
-      />
       <Select
         className={styles.option__item}
         id={`${GameSettingsOptionFields.OPTION_TYPE}_${option.id}`}
         selectOptions={generateSelectOptions(GameSettingsOptionType)}
         name={GameSettingsOptionFields.OPTION_TYPE}
-        label="Тип опции"
+        label="Тип"
         description="Тип опции определяет, сколько значений параметров она может изменять, а так же способ их изменения." //eslint-disable-line max-len
         value={option[GameSettingsOptionFields.OPTION_TYPE]}
         onChange={onOptionInputChange}
@@ -260,9 +249,20 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
       />
       <TextField
         className={styles.option__item}
+        id={`${GameSettingsOptionFields.LABEL}_${option.id}`}
+        name={GameSettingsOptionFields.LABEL}
+        label="Заголовок"
+        description="Текст, отображаемый перед контроллером опции."
+        value={option[GameSettingsOptionFields.LABEL]}
+        isRequied
+        validationErrors={validationErrors}
+        onChange={onOptionInputChange}
+      />
+      <TextField
+        className={styles.option__item}
         id={`${GameSettingsOptionFields.DESCRIPTION}_${option.id}`}
         name={GameSettingsOptionFields.DESCRIPTION}
-        label="Описание опции"
+        label="Описание"
         description="Текст для всплывающей подсказки. Аналогична данной подсказке."
         value={option[GameSettingsOptionFields.DESCRIPTION]}
         onChange={onOptionInputChange}
@@ -292,7 +292,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                 ? [UIControllerType.SELECT.toUpperCase()]
                 : UIControllerType,
             )}
-            label="Тип контроллера"
+            label="Контроллер"
             description="Определяет, с помощью какого контроллера будет изменяться значение опции." //eslint-disable-line max-len
             value={option[GameSettingsOptionFields.CONTROLLER_TYPE]}
             onChange={onOptionInputChange}
@@ -445,7 +445,6 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                     label="Имя атрибута параметра"
                     description="Атрибут тега параметра, в котором находится значение для опции."
                     value={item[GameSettingsOptionFields.VALUE_ATTRIBUTE]!}
-                    isRequied
                     validationErrors={validationErrors}
                     onChange={onOptionInputChange}
                   />

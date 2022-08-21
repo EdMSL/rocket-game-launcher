@@ -441,41 +441,6 @@ export const validateFileRelatedFields = (
         },
       );
     }
-
-    if (file.view === GameSettingsFileView.TAG) {
-      errors.push(
-        {
-          id: `${GameSettingsOptionFields.VALUE_ATTRIBUTE}_${item.id}_${option.id}`,
-          error: {
-            cause: ValidationErrorCause.EMPTY,
-            text: ValidationErrorText.EMPTY,
-          },
-          isForAdd: item[GameSettingsOptionFields.VALUE_ATTRIBUTE] === '',
-        },
-        {
-          id: option.id,
-          error: {
-            cause: ValidationErrorCause.ITEM,
-          },
-          isForAdd: item[GameSettingsOptionFields.VALUE_ATTRIBUTE] === '',
-        },
-        {
-          id: `${GameSettingsOptionFields.VALUE_PATH}_${item.id}_${option.id}`,
-          error: {
-            cause: ValidationErrorCause.EMPTY,
-            text: ValidationErrorText.EMPTY,
-          },
-          isForAdd: item[GameSettingsOptionFields.VALUE_PATH] === '',
-        },
-        {
-          id: option.id,
-          error: {
-            cause: ValidationErrorCause.ITEM,
-          },
-          isForAdd: item[GameSettingsOptionFields.VALUE_PATH] === '',
-        },
-      );
-    }
   });
 
   return getUniqueValidationErrors(newErrors, errors);
