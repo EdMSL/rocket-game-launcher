@@ -708,6 +708,13 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
     dispatch(createGameSettingsConfigFile());
   }, [dispatch]);
 
+  const onCollapseAllOptionsBtnClick = useCallback(() => {
+    const spoilers = document.querySelector('#developer-list-options')?.querySelectorAll('.spoiler__item');
+    spoilers?.forEach((spoiler) => {
+      spoiler.querySelector('.spoiler__block')?.removeAttribute('open');
+    });
+  }, []);
+
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <form className="developer__form">
@@ -871,7 +878,16 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               Добавить
             </Button>
             <p className="developer__subtitle">Игровые опции</p>
-            <ul className={styles.developer__list}>
+            <Button
+              className={classNames('main-btn', 'developer__btn')}
+              onClick={onCollapseAllOptionsBtnClick}
+            >
+              Свернуть все
+            </Button>
+            <ul
+              id="developer-list-options"
+              className={styles.developer__list}
+            >
               {
                 currentConfig.gameSettingsOptions.length > 0
                 && currentConfig.gameSettingsOptions.map((currentOption, index) => (
