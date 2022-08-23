@@ -62,6 +62,7 @@ export const Developer: React.FC = () => {
         : currentConfig,
       pathToGo,
     ));
+
     setIsConfigChanged(false);
   }, [currentConfig, launcherConfig.isFirstStart, dispatch]);
 
@@ -74,6 +75,7 @@ export const Developer: React.FC = () => {
 
     setValidationErrors({});
     setIsConfigChanged(false);
+    setIsSettingsInitialized(false);
   }, [currentConfig, launcherConfig, gameSettingsConfig]);
 
   const cancelConfigChanges = useCallback(() => {

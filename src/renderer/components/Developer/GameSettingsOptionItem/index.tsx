@@ -26,7 +26,9 @@ import {
 import { Button } from '$components/UI/Button';
 import { TextField } from '$components/UI/TextField';
 import { NumberField } from '$components/UI/NumberField';
-import { generateSelectOptionsFromString, getRandomId } from '$utils/strings';
+import {
+  gatGameSettingOptionItemId, generateSelectOptionsFromString, getRandomId,
+} from '$utils/strings';
 import { TextArea } from '$components/UI/TextArea';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import {
@@ -76,7 +78,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         ...option,
         ...isOptionItemChange ? {
           items: changeConfigArrayItem<any>(
-            currentTarget.id.split('_')[1],
+            gatGameSettingOptionItemId(currentTarget.id),
             {
               [currentTarget.name]: currentTarget.value,
               selectOptions: generateSelectOptionsFromString(currentTarget.value),
@@ -94,7 +96,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         ...option,
         ...isOptionItemChange ? {
           items: changeConfigArrayItem<any>(
-            currentTarget.id.split('_')[1],
+            gatGameSettingOptionItemId(currentTarget.id),
             { [currentTarget.name]: currentTarget.value },
             option.items,
             false,
@@ -143,7 +145,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         ...option,
         ...isOptionItemChange ? {
           items: changeConfigArrayItem<any>(
-            currentTarget.id.split('_')[1],
+            gatGameSettingOptionItemId(currentTarget.id),
             { [currentTarget.name]: currentValue },
             option.items,
             false,
@@ -409,7 +411,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
               <React.Fragment>
                 <TextField
                   className={styles.option__item}
-                  id={`${GameSettingsOptionFields.NAME}_${item.id}_${option.id}`}
+                  id={`${GameSettingsOptionFields.NAME}_${option.id}_${item.id}`}
                   parent={option.id}
                   name={GameSettingsOptionFields.NAME}
                   label="Имя параметра"
@@ -423,7 +425,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.iniGroup !== undefined && (
                   <TextField
                     className={styles.option__item}
-                    id={`${GameSettingsOptionFields.INI_GROUP}_${item.id}_${option.id}`}
+                    id={`${GameSettingsOptionFields.INI_GROUP}_${option.id}_${item.id}`}
                     parent={option.id}
                     name={GameSettingsOptionFields.INI_GROUP}
                     label="Группа параметра"
@@ -439,7 +441,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.valueAttribute !== undefined && (
                   <TextField
                     className={styles.option__item}
-                    id={`${GameSettingsOptionFields.VALUE_ATTRIBUTE}_${item.id}_${option.id}`}
+                    id={`${GameSettingsOptionFields.VALUE_ATTRIBUTE}_${option.id}_${item.id}`}
                     parent={option.id}
                     name={GameSettingsOptionFields.VALUE_ATTRIBUTE}
                     label="Имя атрибута параметра"
@@ -454,7 +456,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.valuePath !== undefined && (
                   <TextField
                     className={styles.option__item}
-                    id={`${GameSettingsOptionFields.VALUE_PATH}_${item.id}_${option.id}`}
+                    id={`${GameSettingsOptionFields.VALUE_PATH}_${option.id}_${item.id}`}
                     parent={option.id}
                     name={GameSettingsOptionFields.VALUE_PATH}
                     label="Путь до параметра"
@@ -470,7 +472,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.controllerType !== undefined && (
                     <Select
                       className={styles.option__item}
-                      id={`${GameSettingsOptionFields.CONTROLLER_TYPE}_${item.id}_${option.id}`}
+                      id={`${GameSettingsOptionFields.CONTROLLER_TYPE}_${option.id}_${item.id}`}
                       parent={option.id}
                       name={GameSettingsOptionFields.CONTROLLER_TYPE}
                       selectOptions={generateSelectOptions(
@@ -488,7 +490,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.selectOptionsValueString !== undefined && (
                     <TextArea
                       className={styles.option__item}
-                      id={`${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${item.id}_${option.id}`}
+                      id={`${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${option.id}_${item.id}`}
                       parent={option.id}
                       name={GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}
                       label="Опции селектора"
@@ -505,7 +507,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.min !== undefined && (
                     <NumberField
                       className={styles.option__item}
-                      id={`${GameSettingsOptionFields.MIN}_${item.id}_${option.id}`}
+                      id={`${GameSettingsOptionFields.MIN}_${option.id}_${item.id}`}
                       parent={option.id}
                       name={GameSettingsOptionFields.MIN}
                       min=""
@@ -520,7 +522,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.max !== undefined && (
                     <NumberField
                       className={styles.option__item}
-                      id={`${GameSettingsOptionFields.MAX}_${item.id}_${option.id}`}
+                      id={`${GameSettingsOptionFields.MAX}_${option.id}_${item.id}`}
                       parent={option.id}
                       name={GameSettingsOptionFields.MAX}
                       min=""
@@ -535,7 +537,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.step !== undefined && (
                     <NumberField
                       className={styles.option__item}
-                      id={`${GameSettingsOptionFields.STEP}_${item.id}_${option.id}`}
+                      id={`${GameSettingsOptionFields.STEP}_${option.id}_${item.id}`}
                       parent={option.id}
                       name={GameSettingsOptionFields.STEP}
                       min={0.001}

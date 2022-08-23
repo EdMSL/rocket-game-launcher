@@ -916,7 +916,7 @@ export const getFullOption = (
 
   if (currentOption.optionType !== GameSettingsOptionType.DEFAULT && newItems.length < 2) {
     newItems.push({
-      ...newItems[0],
+      ...defaultGameSettingsOptionItem,
       id: getRandomId(),
     });
   }

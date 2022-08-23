@@ -1,5 +1,5 @@
 import {
-  availableOptionSeparators, GameSettingsFileView, GameSettingsOptionType, UIControllerType,
+  GameSettingsFileView, GameSettingsOptionType, UIControllerType,
 } from '$constants/misc';
 import {
   GameSettingsOptionFields, IGameSettingsFile, IGameSettingsOption,
@@ -400,13 +400,12 @@ export const validateFileRelatedFields = (
   option.items.forEach((item) => {
     newErrors = clearIDRelatedValidationErrors(
       { ...currentErrors },
-      [`${GameSettingsOptionFields.INI_GROUP}_${item.id}`,
-        `${GameSettingsOptionFields.VALUE_ATTRIBUTE}_${item.id}`,
-        `${GameSettingsOptionFields.VALUE_PATH}_${item.id}`],
+      new RegExp(`${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_.+_${item.id}`),
     );
+
     errors.push(
       {
-        id: `${GameSettingsOptionFields.NAME}_${item.id}_${option.id}`,
+        id: `${GameSettingsOptionFields.NAME}_${option.id}_${item.id}`,
         error: {
           cause: ValidationErrorCause.EMPTY,
           text: ValidationErrorText.EMPTY,
@@ -425,7 +424,7 @@ export const validateFileRelatedFields = (
     if (file.view === GameSettingsFileView.SECTIONAL) {
       errors.push(
         {
-          id: `${GameSettingsOptionFields.INI_GROUP}_${item.id}_${option.id}`,
+          id: `${GameSettingsOptionFields.INI_GROUP}_${option.id}_${item.id}`,
           error: {
             cause: ValidationErrorCause.EMPTY,
             text: ValidationErrorText.EMPTY,
@@ -469,13 +468,13 @@ export const validateControllerTypeRelatedFields = (
   option.items.forEach((item) => {
     errors = clearIDRelatedValidationErrors(
       errors,
-      new RegExp(`${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_.+_${option.id}`),
+      new RegExp(`${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_.+_${item.id}`),
     );
 
     if (item.controllerType && item.controllerType === UIControllerType.SELECT) {
       errors = validateSelectOptions(
           item.selectOptionsValueString!,
-          `${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${item.id}_${option.id}`,
+          `${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${option.id}_${item.id}`,
           option,
           errors,
       );
@@ -489,13 +488,26 @@ export const validateControllerTypeRelatedFields = (
   return errors;
 };
 
+export const validateOptionTypeRelatedFields = (
+  option: IGameSettingsOption,
+  file: IGameSettingsFile,
+  currentErrors: IValidationErrors,
+): IValidationErrors => {
+  let errors = { ...currentErrors };
+
+  errors = validateFileRelatedFields(option, file, currentErrors);
+  errors = validateControllerTypeRelatedFields(option, errors);
+
+  return errors;
+};
+
 export const validateTargetGameSettingsOption = (
   target: EventTarget & (HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement),
   option: IGameSettingsOption,
   file: IGameSettingsFile,
   currentErrors: IValidationErrors,
 ): IValidationErrors => {
-  let errors: IValidationErrors = { ...currentErrors };
+  let errors = { ...currentErrors };
 
   if (target.required && (target.type === 'text' || target.tagName === 'TEXTAREA')) {
     errors = getUniqueValidationErrors(
@@ -523,7 +535,7 @@ export const validateTargetGameSettingsOption = (
   if (target.name === GameSettingsOptionFields.FILE) {
     errors = validateFileRelatedFields(option, file, errors);
   } else if (target.name === GameSettingsOptionFields.OPTION_TYPE) {
-    errors = validateControllerTypeRelatedFields(option, errors);
+    errors = validateOptionTypeRelatedFields(option, file, errors);
   } else if (target.name === GameSettingsOptionFields.CONTROLLER_TYPE
     || target.name === GameSettingsOptionFields.SEPARATOR) {
     errors = validateControllerTypeRelatedFields(

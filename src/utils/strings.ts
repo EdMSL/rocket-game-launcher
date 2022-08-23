@@ -425,3 +425,10 @@ export const getOptionItemSelectValueRegExp = (
 
   return /^[^=][^=]*(?<=\S)=[^\s=][^=]*$/;
 };
+
+/**
+ * Получает id элемента item игровой опции из id инпута для данного элемента.
+ * @param id Строка id из инпута.
+ * @returns Строка с id элемента item опции.
+ */
+export const gatGameSettingOptionItemId = (id: string): string => id.split('_')[2];
