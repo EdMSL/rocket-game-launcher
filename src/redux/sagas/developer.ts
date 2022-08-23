@@ -137,6 +137,7 @@ export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): Saga
       //@ts-ignore
       newPathVariables);
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    let userErrorMessage = `В процессе получения игровых настроек возникла ошибка.${isFromUpdateAction ? ' Обновление прервано.' : ''} Подробности в файле лога.`; //eslint-disable-line max-len
     let errorMessage = '';
     let isWarning = false;
 
@@ -145,8 +146,14 @@ export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): Saga
       && error.reason instanceof ReadWriteError
       && error.reason.causeName === ErrorName.NOT_FOUND
     ) {
-      isWarning = true;
-      errorMessage = 'Game settings file "settings.json" not found.';
+      if (isFromUpdateAction) {
+        errorMessage = 'Game settings file "settings.json" not found. Update aborted.';
+        userErrorMessage = 'Не найден файл "settings.json". Обновление прервано.';
+      } else {
+        isWarning = true;
+        errorMessage = 'Game settings file "settings.json" not found.';
+        userErrorMessage = '';
+      }
     } else if (error instanceof SagaError) {
       errorMessage = `Error in "${error.sagaName}". ${error.message}`;
     } else if (error instanceof CustomError) {
@@ -158,6 +165,10 @@ export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): Saga
     }
 
     writeToLogFile(errorMessage, isWarning ? LogMessageType.WARNING : LogMessageType.ERROR);
+
+    if (userErrorMessage) {
+      yield put(addDeveloperMessages([CreateUserMessage.error(userErrorMessage)]));
+    }
 
     yield put(setisGameSettingsConfigDataLoaded(false));
   } finally {

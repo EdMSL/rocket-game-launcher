@@ -310,18 +310,9 @@ export const readINIFileSync = (
   filePath: string,
   encoding = Encoding.UTF8,
 ): IIniObj => {
-  try {
-    const INIData = readFileDataSync(filePath, encoding as BufferEncoding);
+  const INIData = readFileDataSync(filePath, encoding as BufferEncoding);
 
-    return new Ini(INIData);
-  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
-    writeToLogFileSync(
-      `Message: ${error.message}. Path: '${filePath}'.`,
-      LogMessageType.ERROR,
-    );
-
-    throw error;
-  }
+  return new Ini(INIData);
 };
 
 /**
