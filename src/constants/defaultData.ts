@@ -70,7 +70,7 @@ export const defaultModOrganizerPaths = {
 
 export const defaultModOrganizerParams: IModOrganizerParams = {
   isUsed: false,
-  pathToMOFolder: `${PathVariableName.GAME_DIR}\\Mod Organizer`,
+  pathToMOFolder: `${PathVariableName.GAME_DIR}\\MO2`,
 };
 
 export const defaultLauncherConfig: ILauncherConfig = {
