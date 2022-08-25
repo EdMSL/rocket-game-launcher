@@ -586,6 +586,22 @@ export const getIsExists = (
 ): boolean => fs.existsSync(pathToCheck);
 
 /**
+ * Приводит строку пути к единому корректному виду.
+ * @param pathStr Строка пути.
+ * @returns Нормализованная строка пути.
+ */
+export const normalizePath = (
+  pathStr: string,
+): string => path.normalize(pathStr).replace(/[/\\]*$/, '');
+
+/**
+ * Получает строку пути к файлу из составных частей пути.
+ * @param parts Строки пути для объединения.
+ * @returns Нормализованная строка пути.
+ */
+export const getJoinedPath = (...parts: string[]): string => normalizePath(path.join(...parts));
+
+/**
  * Получает путь до родительской папки для указанного файла.
  * @param filePath Путь до файла, для которого нужно получить путь до папки.
  * @returns Строка абсолютного пути до папки.
@@ -711,12 +727,3 @@ export const getPathFromFileInput = async (
     return '';
   }
 };
-
-/**
- * Приводит строку пути к единому корректному виду.
- * @param pathStr Строка пути.
- * @returns Нормализованная строка пути.
- */
-export const normalizePath = (
-  pathStr: string,
-): string => path.normalize(pathStr).replace(/[/\\]*$/, '');

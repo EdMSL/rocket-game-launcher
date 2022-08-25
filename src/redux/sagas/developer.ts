@@ -33,19 +33,21 @@ import {
 import { getGameSettingsConfigSaga } from './gameSettings';
 import { DEVELOPER_TYPES } from '$types/developer';
 import {
-  AppChannel, AppWindowName, PathVariableName,
+  AppChannel, AppWindowName, PathRegExp, PathVariableName,
 } from '$constants/misc';
-import { normalizePath, writeJSONFile } from '$utils/files';
+import {
+  getIsExists, getJoinedPath, normalizePath, writeJSONFile,
+} from '$utils/files';
 import {
   CONFIG_FILE_PATH, GAME_SETTINGS_FILE_PATH, IPathVariables,
 } from '$constants/paths';
 import {
-  deepClone, getModOrganizerPathVariables, updatePathVariables,
+  deepClone, getGameSettingsElementsNames, getModOrganizerPathVariables, updatePathVariables,
 } from '$utils/data';
 import {
   checkObjectForEqual, getWindowSizeSettingsFromLauncherConfig,
 } from '$utils/check';
-import { defaultGameSettingsConfig } from '$constants/defaultData';
+import { defaultGameSettingsConfig, MOIniFileName } from '$constants/defaultData';
 import {
   getFileNameFromPathToFile, getObjectAsList, replacePathVariableByRootDir,
 } from '$utils/strings';
@@ -72,9 +74,9 @@ export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): Saga
   try {
     yield put(setIsConfigProcessing(true));
 
-    const {
+    let {
       data: settingsConfig,
-      errors,
+      errors, //eslint-disable-line prefer-const
     }: SagaReturnType<typeof getGameSettingsConfigSaga> = yield call(
       getGameSettingsConfigSaga,
       AppWindowName.DEV,
@@ -104,20 +106,62 @@ export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): Saga
       }
 
       if (settingsConfig.modOrganizer.isUsed) {
-        const MOPathVariables = getModOrganizerPathVariables(
-          settingsConfig.modOrganizer.pathToMOFolder,
-          pathVariables,
-        );
+        const MO_DIR_BASE = replacePathVariableByRootDir(settingsConfig.modOrganizer.pathToMOFolder);
 
-        newPathVariables = {
-          ...newPathVariables,
-          ...MOPathVariables,
-        };
+        if (getIsExists(getJoinedPath(MO_DIR_BASE, MOIniFileName))) {
+          const MOPathVariables = getModOrganizerPathVariables(
+            MO_DIR_BASE,
+            pathVariables,
+          );
 
-        yield put(setPathVariablesDeveloper(newPathVariables));
+          newPathVariables = {
+            ...newPathVariables,
+            ...MOPathVariables,
+          };
 
-        if (!isFromUpdateAction) {
-          writeToLogFile(`Mod Organizer paths variables:\n  ${getObjectAsList(MOPathVariables, true, true)}`); //eslint-disable-line max-len
+          yield put(setPathVariablesDeveloper(newPathVariables));
+
+          if (!isFromUpdateAction) {
+            writeToLogFile(`Mod Organizer paths variables:\n  ${getObjectAsList(MOPathVariables, true, true)}`); //eslint-disable-line max-len
+          }
+        } else {
+          const changedFileNames: string[] = [];
+          const changedOptionsNames: string[] = [];
+
+          const newFiles = settingsConfig.gameSettingsFiles.filter(
+            (currentFile) => {
+              if (PathRegExp.MO.test(currentFile.path)) {
+                changedFileNames.push(currentFile.label);
+
+                return false;
+              }
+
+              return true;
+            },
+          );
+          const filesNames = getGameSettingsElementsNames(newFiles);
+
+          settingsConfig = {
+            ...settingsConfig,
+            gameSettingsFiles: newFiles,
+            gameSettingsOptions: settingsConfig.gameSettingsOptions.filter(
+              (currentOption) => {
+                if (!filesNames.includes(currentOption.file)) {
+                  changedOptionsNames.push(currentOption.label);
+
+                  return false;
+                }
+
+                return true;
+              },
+            ),
+            modOrganizer: {
+              ...settingsConfig.modOrganizer,
+              isUsed: false,
+            },
+          };
+
+          yield put(addDeveloperMessages([CreateUserMessage.warning(`Включено использование Mod Organizer, но файл ${MOIniFileName} не найден.${changedFileNames.length > 0 ? ` Файлы [${changedFileNames.join()}]${`${changedOptionsNames.length > 0 ? ` и опции [${changedOptionsNames.join()}]` : ''}`} будут проигнорированы, т.к. в них используются переменные Mod Organizer` : ''}`)]));//eslint-disable-line max-len
         }
       }
     }

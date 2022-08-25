@@ -374,7 +374,7 @@ export function* initGameSettingsSaga(
 
     if (currentSettingsConfig.modOrganizer.isUsed) {
       const MOPathVariables = getModOrganizerPathVariables(
-        currentSettingsConfig.modOrganizer.pathToMOFolder,
+        replacePathVariableByRootDir(currentSettingsConfig.modOrganizer.pathToMOFolder),
         pathVariables,
       );
 

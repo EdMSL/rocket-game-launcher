@@ -716,18 +716,16 @@ export const getModOrganizerPathVariables = (
   pathToMOFolder: string,
   pathVariables: IPathVariables,
 ): IModOrganizerPathVariables => {
-  const MO_DIR_BASE = replacePathVariableByRootDir(pathToMOFolder);
-
   let modOrganizerModsPath = defaultModOrganizerPaths.pathToMods.replace(
     PathVariableName.MO_DIR,
-    MO_DIR_BASE,
+    pathToMOFolder,
   );
   let modOrganizerProfilesPath = defaultModOrganizerPaths.pathToProfiles.replace(
     PathVariableName.MO_DIR,
-    MO_DIR_BASE,
+    pathToMOFolder,
   );
 
-  const MOIniData = readINIFileSync(path.join(MO_DIR_BASE, MOIniFileName));
+  const MOIniData = readINIFileSync(path.join(pathToMOFolder, MOIniFileName));
   const MoModsSection = MOIniData.getSection('Settings');
 
   if (MoModsSection) {
@@ -736,7 +734,7 @@ export const getModOrganizerPathVariables = (
 
     if (modOrganizerModsPathTemp) {
       if (modOrganizerModsPathTemp.includes('%BASE_DIR%')) {
-        modOrganizerModsPath = modOrganizerModsPathTemp.replace('%BASE_DIR%', MO_DIR_BASE);
+        modOrganizerModsPath = modOrganizerModsPathTemp.replace('%BASE_DIR%', pathToMOFolder);
       } else {
         checkIsPathIsNotOutsideValidFolder(modOrganizerModsPathTemp, pathVariables);
         modOrganizerModsPath = modOrganizerModsPathTemp;
@@ -745,7 +743,7 @@ export const getModOrganizerPathVariables = (
 
     if (modOrganizerProfilesPathTemp) {
       if (modOrganizerProfilesPathTemp.includes('%BASE_DIR%')) {
-        modOrganizerProfilesPath = modOrganizerProfilesPathTemp.replace('%BASE_DIR%', MO_DIR_BASE);
+        modOrganizerProfilesPath = modOrganizerProfilesPathTemp.replace('%BASE_DIR%', pathToMOFolder);
       } else {
         checkIsPathIsNotOutsideValidFolder(modOrganizerProfilesPathTemp, pathVariables);
         modOrganizerProfilesPath = modOrganizerProfilesPathTemp;
@@ -754,10 +752,10 @@ export const getModOrganizerPathVariables = (
   }
 
   return {
-    '%MO_DIR%': MO_DIR_BASE,
+    '%MO_DIR%': pathToMOFolder,
     '%MO_INI%': defaultModOrganizerPaths.pathToINI.replace(
       PathVariableName.MO_DIR,
-      MO_DIR_BASE,
+      pathToMOFolder,
     ),
     '%MO_MODS%': modOrganizerModsPath,
     '%MO_PROFILE%': modOrganizerProfilesPath,
