@@ -584,12 +584,6 @@ export const getGameSettingsParametersWithNewValues = (
 };
 
 /**
- * Получает форматированную строку даты вида `$дата_$время`.
- * @returns Форматированная строка даты.
-*/
-export const getDayAndTimeString = (): string => new Date().toLocaleString().replace(', ', '_');
-
-/**
  * Изменить строку с указанным параметром на строку с новым значением параметра.
  * Изменяет(мутирует) входные данные `iniData`.
  * @param iniData Входные данные файла, в котором находится изменяемый параметр.

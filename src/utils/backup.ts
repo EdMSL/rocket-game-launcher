@@ -6,7 +6,6 @@ import {
   BACKUP_DIR,
   BACKUP_DIR_GAME_SETTINGS_FILES,
 } from '$constants/paths';
-import { getDayAndTimeString } from './data';
 import { LogMessageType, writeToLogFile } from './log';
 import {
   createCopyFile,
@@ -22,7 +21,7 @@ import {
 import { CustomError, ReadWriteError } from './errors';
 import { IGameSettingsBackup } from '$types/main';
 import { CreateUserMessage } from './message';
-import { getRandomId } from './strings';
+import { getDayAndTimeString, getRandomId } from './strings';
 import { IUserMessage } from '$types/common';
 
 export const createBackupFolders = (isThrowError = false): void => {

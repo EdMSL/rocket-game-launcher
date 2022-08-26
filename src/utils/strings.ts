@@ -432,3 +432,11 @@ export const getOptionItemSelectValueRegExp = (
  * @returns Строка с id элемента item опции.
  */
 export const gatGameSettingOptionItemId = (id: string): string => id.split('_')[2];
+
+/**
+ * Получает форматированную строку даты вида `$дата_$время`.
+ * @returns Форматированная строка даты.
+*/
+export const getDayAndTimeString = (): string => new Date()
+  .toLocaleString()
+  .replaceAll(/[:|,\s]/g, '_');
