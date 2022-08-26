@@ -188,6 +188,7 @@ export const validateNumberInputs = (
         defaultName: 'width',
         minName: 'minWidth',
         maxName: 'maxWidth',
+        text: 'ширины',
       }
     : {
         default: currentConfig.height,
@@ -196,6 +197,7 @@ export const validateNumberInputs = (
         defaultName: 'height',
         minName: 'minHeight',
         maxName: 'maxHeight',
+        text: 'высоты',
       };
 
   if (name === 'width' || name === 'height') {
@@ -204,6 +206,7 @@ export const validateNumberInputs = (
         id,
         error: {
           cause: `less config ${namesAndValues.minName}`,
+          text: `Значение меньше минимальной ${namesAndValues.text}`,
         },
         isForAdd: currentConfig.isResizable && +value < namesAndValues.min,
       },
@@ -211,6 +214,7 @@ export const validateNumberInputs = (
         id,
         error: {
           cause: `more config ${namesAndValues.maxName}`,
+          text: `Значение больше максимальной ${namesAndValues.text}`,
         },
         isForAdd: currentConfig.isResizable
         && namesAndValues.max > 0
@@ -220,6 +224,7 @@ export const validateNumberInputs = (
         id: namesAndValues.minName,
         error: {
           cause: `more config ${id}`,
+          text: `Значение больше ${namesAndValues.text} по умолчанию`,
         },
         isForAdd: currentConfig.isResizable && +value < namesAndValues.min,
       },
@@ -227,6 +232,7 @@ export const validateNumberInputs = (
         id: namesAndValues.maxName,
         error: {
           cause: `less config ${id}`,
+          text: `Значение меньше ${namesAndValues.text} по умолчанию`,
         },
         isForAdd: currentConfig.isResizable
         && namesAndValues.max > 0
@@ -239,6 +245,7 @@ export const validateNumberInputs = (
         id,
         error: {
           cause: `more config ${namesAndValues.defaultName}`,
+          text: `Значение больше ${namesAndValues.text} по умолчанию`,
         },
         isForAdd: currentConfig.isResizable && +value > namesAndValues.default,
       },
@@ -246,6 +253,7 @@ export const validateNumberInputs = (
         id,
         error: {
           cause: `more config ${namesAndValues.maxName}`,
+          text: `Значение больше максимальной ${namesAndValues.text}`,
         },
         isForAdd: currentConfig.isResizable
         && namesAndValues.max > 0
@@ -255,6 +263,7 @@ export const validateNumberInputs = (
         id: namesAndValues.defaultName,
         error: {
           cause: `less config ${id}`,
+          text: `Значение меньше максимальной ${namesAndValues.text}`,
         },
         isForAdd: currentConfig.isResizable && +value > namesAndValues.default,
       },
@@ -262,6 +271,7 @@ export const validateNumberInputs = (
         id: namesAndValues.maxName,
         error: {
           cause: `less config ${id}`,
+          text: `Значение меньше ${namesAndValues.text} по умолчанию`,
         },
         isForAdd: currentConfig.isResizable
         && namesAndValues.max > 0
@@ -274,6 +284,7 @@ export const validateNumberInputs = (
         id,
         error: {
           cause: `less config ${namesAndValues.defaultName}`,
+          text: `Значение меньше ${namesAndValues.text} по умолчанию`,
         },
         isForAdd: currentConfig.isResizable && +value < namesAndValues.default && +value > 0,
       },
@@ -281,6 +292,7 @@ export const validateNumberInputs = (
         id,
         error: {
           cause: `less config ${namesAndValues.minName}`,
+          text: `Значение меньше минимальной ${namesAndValues.text}`,
         },
         isForAdd: currentConfig.isResizable && +value < namesAndValues.min && +value > 0,
       },
@@ -288,6 +300,7 @@ export const validateNumberInputs = (
         id: namesAndValues.defaultName,
         error: {
           cause: `more config ${id}`,
+          text: `Значение больше максимальной ${namesAndValues.text}`,
         },
         isForAdd: currentConfig.isResizable && +value < namesAndValues.default && +value > 0,
       },
@@ -295,6 +308,7 @@ export const validateNumberInputs = (
         id: namesAndValues.minName,
         error: {
           cause: `more config ${id}`,
+          text: `Значение больше максимальной ${namesAndValues.text}`,
         },
         isForAdd: currentConfig.isResizable && +value < namesAndValues.min && +value > 0,
       },

@@ -52,24 +52,37 @@ export const TextField: React.FunctionComponent<IProps> = ({
           description && <HintItem description={description} />
         }
       </label>
-      <input
-        className={classNames(
-          'text-field__input',
-          validationErrors && validationErrors[id]?.length > 0 && 'text-field__input--error',
-        )}
-        ref={inputRef}
-        type="text"
-        id={id}
-        name={name}
-        value={value}
-        maxLength={maxLength}
-        data-parent={parent}
-        data-multiparameters={multiparameters}
-        disabled={isDisabled}
-        required={isRequied}
-        placeholder={placeholder}
-        onChange={onChange}
-      />
+      <div className="text-field__input-block">
+        <input
+          className={classNames(
+            'text-field__input',
+            validationErrors && validationErrors[id]?.length > 0 && 'text-field__input--error',
+          )}
+          ref={inputRef}
+          type="text"
+          id={id}
+          name={name}
+          value={value}
+          maxLength={maxLength}
+          data-parent={parent}
+          data-multiparameters={multiparameters}
+          disabled={isDisabled}
+          required={isRequied}
+          placeholder={placeholder}
+          onChange={onChange}
+        />
+        {
+          validationErrors && validationErrors[id]?.some((currentError) => currentError.text) && (
+            <ul className="input-error__block">
+              {
+                validationErrors[id]
+                  .filter((currentError) => currentError.text)
+                  .map((currentError) => <li key={`${id}${currentError.cause}`}>{currentError.text}</li>)
+              }
+            </ul>
+          )
+        }
+      </div>
     </div>
   );
 };

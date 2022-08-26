@@ -299,6 +299,17 @@ export const PathSelector: React.FC<IProps> = ({
           onChange={onPatchTextFieldChange}
           onBlur={onInputBlur}
         />
+        {
+          validationErrors && validationErrors[id]?.some((currentError) => currentError.text) && (
+            <ul className="input-error__block">
+              {
+                validationErrors[id]
+                  .filter((currentError) => currentError.text)
+                  .map((currentError) => <li key={`${id}${currentError.cause}`}>{currentError.text}</li>)
+              }
+            </ul>
+          )
+        }
         <Button
           className="path-selector__input-btn path-selector__input-btn--open"
           title="Открыть в проводнике"

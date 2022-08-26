@@ -21,7 +21,11 @@ import {
   getIsPathWithVariableCorrect,
 } from '$utils/check';
 import {
-  getUniqueValidationErrors, IValidationError, IValidationErrors, ValidationErrorCause,
+  getUniqueValidationErrors,
+  IValidationError,
+  IValidationErrors,
+  ValidationErrorCause,
+  ValidationErrorText,
 } from '$utils/validation';
 import { IUserMessage } from '$types/common';
 
@@ -70,6 +74,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         id: pathSelectorId,
         error: {
           cause: ValidationErrorCause.PATH,
+          text: ValidationErrorText.PATH,
         },
         isForAdd: !isPathCorrect,
       }],
@@ -88,7 +93,8 @@ export const CustomBtnItem: React.FC<IProps> = ({
         [{
           id: target.id,
           error: {
-            cause: ValidationErrorCause.PATH,
+            cause: ValidationErrorCause.EMPTY,
+            text: ValidationErrorText.EMPTY,
           },
           isForAdd: target.value.trim() === '',
         }],
