@@ -1,3 +1,4 @@
+import { MinWindowSize } from '$constants/defaultData';
 import {
   GameSettingsFileView, GameSettingsOptionType, UIControllerType,
 } from '$constants/misc';
@@ -280,6 +281,16 @@ export const validateNumberInputs = (
     );
   } else if (name === 'maxWidth' || name === 'maxHeight') {
     errors.push(
+      {
+        id,
+        error: {
+          cause: ValidationErrorCause.MIN,
+          text: ValidationErrorText.MIN,
+        },
+        isForAdd: currentConfig.isResizable
+        && +value < MinWindowSize[name === 'maxWidth' ? 'WIDTH' : 'HEIGHT']
+        && +value > 0,
+      },
       {
         id,
         error: {
