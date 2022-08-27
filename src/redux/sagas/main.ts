@@ -59,6 +59,7 @@ import { getGameSettingsParametersWithNewValues } from '$utils/data';
 import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
 import { AppChannel } from '$constants/misc';
 import { getPathToFile } from '$utils/files';
+import { GAME_SETTINGS_CONFIG_FILE_NAME } from '$constants/defaultData';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -105,15 +106,17 @@ function* updateGameSettingsParametersSaga(
 
     yield call(initGameSettingsSaga, true, gameSetingsConfig);
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    console.log(error.reason.path);
     if (
       error instanceof SagaError
       && error.reason instanceof ReadWriteError
       && error.reason.causeName === ErrorName.NOT_FOUND
+      && error.reason.path.includes(GAME_SETTINGS_CONFIG_FILE_NAME)
     ) {
-      writeToLogFile('Game settings file settings.json not found.', LogMessageType.ERROR);
+      writeToLogFile(`Game settings file ${GAME_SETTINGS_CONFIG_FILE_NAME} not found.`, LogMessageType.ERROR);// eslint-disable-line max-len
 
       yield put(addMessages(
-        [CreateUserMessage.error('Не найден файл settings.json, обновление прервано. Игровые настройки будут недоступны.')], // eslint-disable-line max-len
+        [CreateUserMessage.error(`Не найден файл ${GAME_SETTINGS_CONFIG_FILE_NAME}, обновление прервано. Игровые настройки будут недоступны.`)], // eslint-disable-line max-len
       ));
       yield put(push(`${Routes.MAIN_SCREEN}`));
       yield put(setIsGameSettingsLoaded(true));

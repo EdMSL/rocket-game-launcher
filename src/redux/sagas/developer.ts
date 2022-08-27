@@ -47,7 +47,9 @@ import {
 import {
   checkObjectForEqual, getWindowSizeSettingsFromLauncherConfig,
 } from '$utils/check';
-import { defaultGameSettingsConfig, MOIniFileName } from '$constants/defaultData';
+import {
+  defaultGameSettingsConfig, GAME_SETTINGS_CONFIG_FILE_NAME, MO_INI_FILE_NAME,
+} from '$constants/defaultData';
 import {
   getFileNameFromPathToFile, getObjectAsList, replacePathVariableByRootDir,
 } from '$utils/strings';
@@ -108,7 +110,7 @@ export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): Saga
       if (settingsConfig.modOrganizer.isUsed) {
         const MO_DIR_BASE = replacePathVariableByRootDir(settingsConfig.modOrganizer.pathToMOFolder);
 
-        if (getIsExists(getJoinedPath(MO_DIR_BASE, MOIniFileName))) {
+        if (getIsExists(getJoinedPath(MO_DIR_BASE, MO_INI_FILE_NAME))) {
           const MOPathVariables = getModOrganizerPathVariables(
             MO_DIR_BASE,
             pathVariables,
@@ -161,13 +163,13 @@ export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): Saga
             },
           };
 
-          yield put(addDeveloperMessages([CreateUserMessage.warning(`Включено использование Mod Organizer, но файл ${MOIniFileName} не найден.${changedFileNames.length > 0 ? ` Файлы [${changedFileNames.join()}]${`${changedOptionsNames.length > 0 ? ` и опции [${changedOptionsNames.join()}]` : ''}`} будут проигнорированы, т.к. в них используются переменные Mod Organizer` : ''}`)]));//eslint-disable-line max-len
+          yield put(addDeveloperMessages([CreateUserMessage.warning(`Включено использование Mod Organizer, но файл ${MO_INI_FILE_NAME} не найден.${changedFileNames.length > 0 ? ` Файлы [${changedFileNames.join()}]${`${changedOptionsNames.length > 0 ? ` и опции [${changedOptionsNames.join()}]` : ''}`} будут проигнорированы, т.к. в них используются переменные Mod Organizer` : ''}`)]));//eslint-disable-line max-len
         }
       }
     }
 
     if (errors.length > 0) {
-      yield put(addDeveloperMessages([CreateUserMessage.warning('Обнаружены ошибки в файле settings.json. Подробности в файле лога.')]));//eslint-disable-line max-len
+      yield put(addDeveloperMessages([CreateUserMessage.warning(`Обнаружены ошибки в файле ${GAME_SETTINGS_CONFIG_FILE_NAME}. Подробности в файле лога.`)]));//eslint-disable-line max-len
     }
 
     yield put(setGameSettingsConfig(settingsConfig));
@@ -191,11 +193,11 @@ export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): Saga
       && error.reason.causeName === ErrorName.NOT_FOUND
     ) {
       if (isFromUpdateAction) {
-        errorMessage = 'Game settings file "settings.json" not found. Update aborted.';
-        userErrorMessage = 'Не найден файл "settings.json". Обновление прервано.';
+        errorMessage = `Game settings file "${GAME_SETTINGS_CONFIG_FILE_NAME}" not found. Update aborted.`;//eslint-disable-line max-len
+        userErrorMessage = `Не найден файл "${GAME_SETTINGS_CONFIG_FILE_NAME}". Обновление прервано.`;
       } else {
         isWarning = true;
-        errorMessage = 'Game settings file "settings.json" not found.';
+        errorMessage = `Game settings file "${GAME_SETTINGS_CONFIG_FILE_NAME}" not found.`;
         userErrorMessage = '';
       }
     } else if (error instanceof SagaError) {
@@ -237,7 +239,6 @@ function* saveLauncherConfigSaga(
   // Ставим здесь именно сохранение игровых настроек только из-за показа лоадера
   yield put(setIsConfigProcessing(true));
   yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, true);
-  yield delay(2000);
 
   try {
     yield call(writeJSONFile, CONFIG_FILE_PATH, deepClone(newConfig, ['id']));
@@ -311,7 +312,7 @@ function* saveGameSettingsConfigSaga(
 ): SagaIterator {
   yield put(setIsConfigProcessing(true));
   yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, true);
-  yield delay(2000);
+
   try {
     if (!newConfig.baseFilesEncoding) {
       newConfig.baseFilesEncoding = defaultGameSettingsConfig.baseFilesEncoding; //eslint-disable-line no-param-reassign, max-len

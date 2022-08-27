@@ -1,15 +1,19 @@
 import path from 'path';
 
+import { GAME_SETTINGS_CONFIG_FILE_NAME, LAUNCHER_CONFIG_FILE_NAME } from './defaultData';
+
 export const GAME_SETTINGS_FILES_BACKUP_FOLDER_NAME = 'game_settings_files';
 
 export const CONFIG_FILE_PATH = process.env.NODE_ENV === 'development'
-  ? path.resolve('./app/files/config.json') : path.resolve('./config.json');
+  ? path.resolve(`./app/files/${LAUNCHER_CONFIG_FILE_NAME}`)
+  : path.resolve(`./${LAUNCHER_CONFIG_FILE_NAME}`);
 
 export const ICON_PATH = process.env.NODE_ENV === 'development'
   ? './src/public/icon.ico' : path.resolve('./icon.ico');
 
 export const GAME_SETTINGS_FILE_PATH = process.env.NODE_ENV === 'development'
-  ? path.resolve('./app/files/settings.json') : path.resolve('./settings.json');
+  ? path.resolve(`./app/files/${GAME_SETTINGS_CONFIG_FILE_NAME}`)
+  : path.resolve(`./${GAME_SETTINGS_CONFIG_FILE_NAME}`);
 
 export const GAME_DIR = process.env.NODE_ENV === 'development'
   ? path.resolve('./src/tests/fixtures/files')

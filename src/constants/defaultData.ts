@@ -59,11 +59,13 @@ export const defaultLauncherCustomButton: ILauncherCustomButton = {
   args: [],
 };
 
-export const MOIniFileName = 'ModOrganizer.ini';
+export const LAUNCHER_CONFIG_FILE_NAME = 'config.json';
+export const GAME_SETTINGS_CONFIG_FILE_NAME = 'settings.json';
+export const MO_INI_FILE_NAME = 'ModOrganizer.ini';
 
 export const defaultModOrganizerPaths = {
   pathToMOFolder: `${PathVariableName.GAME_DIR}\\Mod Organizer`,
-  pathToINI: `${PathVariableName.MO_DIR}\\${MOIniFileName}`,
+  pathToINI: `${PathVariableName.MO_DIR}\\${MO_INI_FILE_NAME}`,
   pathToProfiles: `${PathVariableName.MO_DIR}\\profiles`,
   pathToMods: `${PathVariableName.MO_DIR}\\mods`,
 };

@@ -22,7 +22,11 @@ import {
 } from '$utils/log';
 import {
   defaultGameSettingsConfig,
-  defaultLauncherConfig, defaultLauncherWindowSettings, MinWindowSize,
+  defaultLauncherConfig,
+  defaultLauncherWindowSettings,
+  GAME_SETTINGS_CONFIG_FILE_NAME,
+  LAUNCHER_CONFIG_FILE_NAME,
+  MinWindowSize,
 } from '$constants/defaultData';
 import { CustomError, ErrorName } from './errors';
 import { generateSelectOptionsString, getRandomId } from './strings';
@@ -136,7 +140,7 @@ const configFileDataSchema = Joi.object<ILauncherConfig>({
 });
 
 export const checkLauncherConfigFileData = (configObj: ILauncherConfig): ILauncherConfig => {
-  writeToLogFileSync('Started checking the config.json file.');
+  writeToLogFileSync(`Started checking the ${LAUNCHER_CONFIG_FILE_NAME} file.`);
 
   const validateResult = configFileDataSchema.validate(configObj, {
     abortEarly: false,
@@ -147,7 +151,10 @@ export const checkLauncherConfigFileData = (configObj: ILauncherConfig): ILaunch
       writeToLogFileSync(currentMsg.message, LogMessageType.ERROR);
     });
 
-    throw new CustomError('Failed to validate the config.json file.', ErrorName.VALIDATION);
+    throw new CustomError(
+      `Failed to validate the ${LAUNCHER_CONFIG_FILE_NAME} file.`,
+      ErrorName.VALIDATION,
+    );
   }
 
   return validateResult.value!;
@@ -523,7 +530,7 @@ export const checkGameSettingsOptions = (
 export const checkGameSettingsConfigShallow = (
   configObj: IGameSettingsConfig,
 ): IGameSettingsConfig => {
-  writeToLogFileSync('Started shallow checking the settings.json file.');
+  writeToLogFileSync(`Started shallow checking the ${GAME_SETTINGS_CONFIG_FILE_NAME} file.`);
 
   const validateResult = gameSettingsShallowCheckSchema.validate(configObj, {
     abortEarly: false,
@@ -531,7 +538,7 @@ export const checkGameSettingsConfigShallow = (
   });
 
   if (validateResult.error) {
-    throw new CustomError(`settings.json validation error. ${validateResult.error.message}.`); //eslint-disable-line max-len
+    throw new CustomError(`${GAME_SETTINGS_CONFIG_FILE_NAME} validation error. ${validateResult.error.message}.`); //eslint-disable-line max-len
   }
 
   return validateResult.value;
@@ -546,7 +553,7 @@ export const checkGameSettingsConfigShallow = (
 export const checkGameSettingsConfigFull = (
   configObj: IGameSettingsConfig,
 ): ICheckResult<IGameSettingsConfig> => {
-  writeToLogFileSync('Started full checking the settings.json file.');
+  writeToLogFileSync(`Started full checking the ${GAME_SETTINGS_CONFIG_FILE_NAME} file.`);
   const validationErrors: Joi.ValidationError[] = [];
 
   const validationResult = gameSettingsDeepCheckSchema.validate(configObj, {

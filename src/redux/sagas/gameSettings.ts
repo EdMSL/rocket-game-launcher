@@ -93,6 +93,7 @@ import {
   replacePathVariableByRootDir,
 } from '$utils/strings';
 import { setIsGameSettingsConfigFileExists } from '$actions/developer';
+import { GAME_SETTINGS_CONFIG_FILE_NAME } from '$constants/defaultData';
 
 export interface IIncorrectGameSettingsFiles {
   [key: string]: number[],
@@ -112,8 +113,6 @@ export function* getGameSettingsConfigSaga(
     const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile,
       GAME_SETTINGS_FILE_PATH,
       false);
-
-    yield delay(2000);
 
     if (windowName === AppWindowName.MAIN) {
       yield put(setIsGameSettingsConfigFileExists(true));
@@ -417,9 +416,9 @@ export function* initGameSettingsSaga(
         );
 
         if (filteredGameSettingsOptions.length === 0) {
-          yield put(addMessages([CreateUserMessage.error('Нет доступных опций для вывода. Ни один параметр в файле игровых настроек settings.json не может быть обработан из-за ошибок. Подробности в файле лога.')])); //eslint-disable-line max-len
+          yield put(addMessages([CreateUserMessage.error(`Нет доступных опций для вывода. Ни один параметр в файле игровых настроек ${GAME_SETTINGS_CONFIG_FILE_NAME} не может быть обработан из-за ошибок. Подробности в файле лога.`)])); //eslint-disable-line max-len
         } else {
-          yield put(addMessages([CreateUserMessage.warning('Обнаружены ошибки в файле игровых настроек settings.json. Некоторые опции будут недоступны. Подробности в файле лога.')])); //eslint-disable-line max-len
+          yield put(addMessages([CreateUserMessage.warning(`Обнаружены ошибки в файле игровых настроек ${GAME_SETTINGS_CONFIG_FILE_NAME}. Некоторые опции будут недоступны. Подробности в файле лога.`)])); //eslint-disable-line max-len
         }
 
         currentSettingsConfig.gameSettingsOptions = [...filteredGameSettingsOptions];

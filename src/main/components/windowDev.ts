@@ -50,7 +50,7 @@ export const createDevWindow = (): BrowserWindow => {
     waitForWebpackDevServer();
   }
 
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
     globalShortcut.register('F6', () => {
       devWindow.reload();
     });

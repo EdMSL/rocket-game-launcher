@@ -360,7 +360,6 @@
 .modal__title {
   @include reset-indents;
   flex-grow: 1;
-  padding-left: calc(var(--modal-btn-padding) * 2);
 
   line-height: calc(var(--modal-btn-padding) * 2);
   text-align: center;

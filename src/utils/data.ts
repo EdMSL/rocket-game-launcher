@@ -50,7 +50,7 @@ import {
   defaultFullGameSettingsOption,
   defaultGameSettingsOptionItem,
   defaultModOrganizerPaths,
-  MOIniFileName,
+  MO_INI_FILE_NAME,
 } from '$constants/defaultData';
 import {
   IGetDataFromFilesResult, IIniObj, IXmlObj, ISelectOption,
@@ -719,7 +719,7 @@ export const getModOrganizerPathVariables = (
     pathToMOFolder,
   );
 
-  const MOIniData = readINIFileSync(path.join(pathToMOFolder, MOIniFileName));
+  const MOIniData = readINIFileSync(path.join(pathToMOFolder, MO_INI_FILE_NAME));
   const MoModsSection = MOIniData.getSection('Settings');
 
   if (MoModsSection) {
