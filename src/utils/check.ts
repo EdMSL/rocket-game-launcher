@@ -23,14 +23,13 @@ import {
 import {
   defaultGameSettingsConfig,
   defaultLauncherConfig,
-  defaultLauncherWindowSettings,
   GAME_SETTINGS_CONFIG_FILE_NAME,
   LAUNCHER_CONFIG_FILE_NAME,
   MinWindowSize,
 } from '$constants/defaultData';
 import { CustomError, ErrorName } from './errors';
 import { generateSelectOptionsString, getRandomId } from './strings';
-import { ILauncherConfig, IWindowSizeSettings } from '$types/main';
+import { ILauncherConfig } from '$types/main';
 import { getGameSettingsElementsNames } from './data';
 
 export interface ICheckResult<T> {
@@ -626,23 +625,3 @@ export const checkObjectForEqual = (a, b): boolean => {
   if (keys.length !== Object.keys(b).length) return false;
   return keys.every((k) => checkObjectForEqual(a[k], b[k]));
 };
-
-/**
- * Получить объект с данными, относящимися к окну приложения.
- * @param config Объект конфигурации лаунчера.
- * @returns Объект с настройками, относящимися к окну приложения.
- */
-export const getWindowSizeSettingsFromLauncherConfig = (
-  config: ILauncherConfig,
-): IWindowSizeSettings => Object.keys(defaultLauncherWindowSettings).reduce<IWindowSizeSettings>(
-  (acc, current) => {
-    if (current !== 'icon' && current !== 'isResizable') {
-      return {
-        ...acc,
-        [current]: config[current],
-      };
-    }
-
-    return { ...acc };
-  }, {} as IWindowSizeSettings,
-);

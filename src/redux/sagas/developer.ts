@@ -40,10 +40,14 @@ import {
   CONFIG_FILE_PATH, GAME_SETTINGS_FILE_PATH, IPathVariables,
 } from '$constants/paths';
 import {
-  deepClone, getGameSettingsElementsNames, getModOrganizerPathVariables, updatePathVariables,
+  deepClone,
+  getGameSettingsElementsNames,
+  getModOrganizerPathVariables,
+  updatePathVariables,
+  getWindowSettingsFromLauncherConfig,
 } from '$utils/data';
 import {
-  checkObjectForEqual, getWindowSizeSettingsFromLauncherConfig,
+  checkObjectForEqual,
 } from '$utils/check';
 import {
   defaultGameSettingsConfig, GAME_SETTINGS_CONFIG_FILE_NAME, MO_INI_FILE_NAME,
@@ -249,8 +253,8 @@ function* saveLauncherConfigSaga(
     }: ReturnType<typeof getState> = yield select(getState);
 
     const isChangeWindowSize = !checkObjectForEqual(
-      getWindowSizeSettingsFromLauncherConfig(launcherConfig),
-      getWindowSizeSettingsFromLauncherConfig(newConfig),
+      getWindowSettingsFromLauncherConfig(launcherConfig),
+      getWindowSettingsFromLauncherConfig(newConfig),
     );
 
     yield call(ipcRenderer.send,

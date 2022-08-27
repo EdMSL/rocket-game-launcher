@@ -45,10 +45,12 @@ import {
 import {
   ILauncherConfig,
   ILauncherCustomButton,
+  IWindowSizeSettings,
 } from '$types/main';
 import {
   defaultFullGameSettingsOption,
   defaultGameSettingsOptionItem,
+  defaultLauncherWindowSettings,
   defaultModOrganizerPaths,
   MO_INI_FILE_NAME,
 } from '$constants/defaultData';
@@ -1190,3 +1192,23 @@ export const getSelectsOptionStringObj = (
 export const getTempFileLabel = (
   file: IGameSettingsFile,
 ): string => file.label || getFileNameFromPathToFile(file.path!) || '';
+
+/**
+ * Получить объект с данными, относящимися к окну приложения.
+ * @param config Объект конфигурации лаунчера.
+ * @returns Объект с настройками, относящимися к окну приложения.
+ */
+export const getWindowSettingsFromLauncherConfig = (
+  config: ILauncherConfig,
+): IWindowSizeSettings => Object.keys(defaultLauncherWindowSettings).reduce<IWindowSizeSettings>(
+  (acc, current) => {
+    if (current !== 'icon') {
+      return {
+        ...acc,
+        [current]: config[current],
+      };
+    }
+
+    return { ...acc };
+  }, {} as IWindowSizeSettings,
+);
