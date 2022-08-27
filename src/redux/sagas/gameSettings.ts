@@ -6,7 +6,6 @@ import {
   select,
   all,
   SagaReturnType,
-  delay,
 } from 'redux-saga/effects';
 import Joi from 'joi';
 
@@ -65,6 +64,7 @@ import {
 import {
   CustomError,
   ErrorName,
+  getSagaErrorLogMessage,
   ReadWriteError,
   SagaError,
 } from '$utils/errors';
@@ -158,17 +158,7 @@ function* getMOProfilesSaga(pathToMOFolder: string): SagaIterator {
       throw new CustomError('There are no profiles in the profiles folder.');
     }
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
-    let errorMessage = '';
-
-    if (error instanceof CustomError) {
-      errorMessage = error.message;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${pathToMOFolder}'.`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
-    throw new SagaError('Get Mod Organizer profiles', errorMessage, error);
+    throw new SagaError('Get Mod Organizer profiles', getSagaErrorLogMessage(error), error);
   }
 }
 
@@ -439,26 +429,7 @@ export function* initGameSettingsSaga(
       writeToLogFileSync('Game settings initialisation completed.');
     }
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
-    let errorMessage = '';
-
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path "${error.path}".`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
-    if (!isFromUpdateAction) {
-      writeToLogFileSync(
-        `Failed to initialize game settings. Reason: ${errorMessage}`,
-        LogMessageType.ERROR,
-      );
-
-      yield put(addMessages([CreateUserMessage.error('Произошла ошибка в процессе генерации игровых настроек. Подробности в файле лога.')]));//eslint-disable-line max-len
-    }
+    const errorMessage = getSagaErrorLogMessage(error);
 
     yield put(setGameSettingsParameters({}));
     yield put(setGameSettingsFiles([]));
@@ -466,7 +437,18 @@ export function* initGameSettingsSaga(
     yield put(setIsGameSettingsLoaded(false));
 
     if (isFromUpdateAction) {
-      throw new SagaError('Init game settings', errorMessage, error);
+      throw new SagaError(
+        'Init game settings',
+        errorMessage,
+        error instanceof SagaError ? error.reason : error,
+      );
+    } else {
+      writeToLogFileSync(
+        `Failed to initialize game settings. Reason: ${errorMessage}`,
+        LogMessageType.ERROR,
+      );
+
+      yield put(addMessages([CreateUserMessage.error('Произошла ошибка в процессе генерации игровых настроек. Подробности в файле лога.')]));//eslint-disable-line max-len
     }
   } finally {
     if (!isFromUpdateAction) {
@@ -535,20 +517,8 @@ function* changeMOProfileSaga(
       ...moProfileGameSettingsParameters,
     }));
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
-    let errorMessage = '';
-
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
     writeToLogFileSync(
-      `Failed to change current Mod Organizer profile . Reason: ${errorMessage}`,
+      `Failed to change current Mod Organizer profile . Reason: ${getSagaErrorLogMessage(error)}`,
       LogMessageType.ERROR,
     );
 
@@ -660,18 +630,7 @@ function* writeGameSettingsFilesSaga(
     }));
     yield put(addMessages([CreateUserMessage.success('Настройки успешно сохранены.')]));
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
-    let errorMessage = '';
-
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
+    const errorMessage = getSagaErrorLogMessage(error);
     writeToLogFileSync(
       `Failed to save game settings. Reason: ${errorMessage}`,
       LogMessageType.ERROR,

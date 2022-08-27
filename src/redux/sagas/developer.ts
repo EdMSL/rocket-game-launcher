@@ -3,9 +3,7 @@ import {
 } from 'connected-react-router';
 import { SagaIterator } from 'redux-saga';
 import {
-  call,
-  delay,
-  put, SagaReturnType, select, takeLatest,
+  call, put, SagaReturnType, select, takeLatest,
 } from 'redux-saga/effects';
 import { ipcRenderer } from 'electron';
 
@@ -25,7 +23,7 @@ import {
 import { DeveloperScreenName, Routes } from '$constants/routes';
 import { CreateUserMessage } from '$utils/message';
 import {
-  CustomError, ErrorName, ReadWriteError, SagaError,
+  ErrorName, getSagaErrorLogMessage, ReadWriteError, SagaError,
 } from '$utils/errors';
 import {
   LogMessageType, writeToLogFile, writeToLogFileSync,
@@ -54,7 +52,7 @@ import {
   getFileNameFromPathToFile, getObjectAsList, replacePathVariableByRootDir,
 } from '$utils/strings';
 import { ILauncherConfig } from '$types/main';
-import { IGameSettingsConfig } from '$types/gameSettings';
+import { GameSettingsOptionFields, IGameSettingsConfig } from '$types/gameSettings';
 
 const getState = (state: IDeveloperState): IDeveloperState => state;
 
@@ -194,22 +192,13 @@ export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): Saga
     ) {
       if (isFromUpdateAction) {
         errorMessage = `Game settings file "${GAME_SETTINGS_CONFIG_FILE_NAME}" not found. Update aborted.`;//eslint-disable-line max-len
-        userErrorMessage = `Не найден файл "${GAME_SETTINGS_CONFIG_FILE_NAME}". Обновление прервано.`;
+        userErrorMessage = `Не найден файл "${GAME_SETTINGS_CONFIG_FILE_NAME}". Обновление прервано.`;//eslint-disable-line max-len
       } else {
         isWarning = true;
         errorMessage = `Game settings file "${GAME_SETTINGS_CONFIG_FILE_NAME}" not found.`;
         userErrorMessage = '';
       }
-    } else if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path "${error.path}".`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
+    } else { errorMessage = getSagaErrorLogMessage(error); }
     writeToLogFile(errorMessage, isWarning ? LogMessageType.WARNING : LogMessageType.ERROR);
 
     if (userErrorMessage) {
@@ -241,7 +230,11 @@ function* saveLauncherConfigSaga(
   yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, true);
 
   try {
-    yield call(writeJSONFile, CONFIG_FILE_PATH, deepClone(newConfig, ['id']));
+    yield call(
+      writeJSONFile,
+      CONFIG_FILE_PATH,
+      deepClone(newConfig, [GameSettingsOptionFields.ID]),
+    );
 
     const {
       developer: { pathVariables },
@@ -283,20 +276,8 @@ function* saveLauncherConfigSaga(
       }
     }
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
-    let errorMessage = '';
-
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
     writeToLogFileSync(
-      `Failed to save launcher configuration file. Reason: ${errorMessage}`,
+      `Failed to save launcher configuration file. Reason: ${getSagaErrorLogMessage(error)}`,
       LogMessageType.ERROR,
     );
 
@@ -334,7 +315,10 @@ function* saveGameSettingsConfigSaga(
     yield call(
       writeJSONFile,
       GAME_SETTINGS_FILE_PATH,
-      deepClone(newConfig, ['id', 'selectOptionsValueString']),
+      deepClone(
+        newConfig,
+        [GameSettingsOptionFields.ID, GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING],
+      ),
     );
 
     const {
@@ -370,20 +354,8 @@ function* saveGameSettingsConfigSaga(
       }
     }
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
-    let errorMessage = '';
-
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
     writeToLogFileSync(
-      `Failed to save game settings file. Reason: ${errorMessage}`,
+      `Failed to save game settings file. Reason: ${getSagaErrorLogMessage(error)}`,
       LogMessageType.ERROR,
     );
 
@@ -420,18 +392,8 @@ function* createGameSettingsConfigFileSaga(): SagaIterator {
       defaultGameSettingsConfig,
       true);
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
-    let errorMessage = '';
-
-    if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
     writeToLogFileSync(
-      `Failed to create game settings file. Reason: ${errorMessage}`,
+      `Failed to create game settings file. Reason: ${getSagaErrorLogMessage(error)}`,
       LogMessageType.ERROR,
     );
 

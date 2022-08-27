@@ -150,6 +150,24 @@ export const getReadWriteError = (
 };
 
 /**
+ * Получает текст ошибки, возникающей в сагах, для записи в лог.
+ * @param error Объект ошибки
+ * @returns Строка сообщения.
+ */
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getSagaErrorLogMessage = (error: any): string => {
+  if (error instanceof SagaError) {
+    return `Error in "${error.sagaName}". ${error.message}`;
+  } else if (error instanceof CustomError) {
+    return error.message;
+  } else if (error instanceof ReadWriteError) {
+    return `${error.message}. Path "${error.path}".`;
+  }
+
+  return `Unknown error. Message: ${error.message}`;
+};
+
+/**
  * Выполняет указанные внутри операции при нажатии кнопки 'Report' модуля `unhandled`.
  * @param error Объект ошибки.
  */

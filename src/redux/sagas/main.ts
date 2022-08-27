@@ -25,8 +25,6 @@ import {
   deleteGameSettingsFilesBackup as deleteGameSettingsFilesBackupAction,
   restoreGameSettingsFilesBackup,
   renameGameSettingsFilesBackup,
-  setIsGameSettingsLoaded,
-  setIsGameSettingsAvailable,
   setIsGameSettingsLoading,
 } from '$actions/main';
 import {
@@ -37,10 +35,10 @@ import {
   GAME_SETTINGS_FILE_PATH,
 } from '$constants/paths';
 import {
-  LogMessageType, writeToLogFile, writeToLogFileSync,
+  LogMessageType, writeToLogFileSync,
 } from '$utils/log';
 import {
-  CustomError, ErrorName, ReadWriteError, SagaError,
+  ErrorName, getSagaErrorLogMessage, ReadWriteError, SagaError,
 } from '$utils/errors';
 import { MAIN_TYPES } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
@@ -60,6 +58,7 @@ import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
 import { AppChannel } from '$constants/misc';
 import { getPathToFile } from '$utils/files';
 import { GAME_SETTINGS_CONFIG_FILE_NAME } from '$constants/defaultData';
+import { getFileNameFromPathToFile } from '$utils/strings';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -76,20 +75,9 @@ function* initLauncherSaga(): SagaIterator {
       // writeToLogFile('Game settings file settings.json not found.');
     }
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
-    let errorMessage = '';
-
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
     writeToLogFileSync(
-      `An error occured during launcher initialization: ${errorMessage}`,
+      `An error occured during launcher initialization: ${getSagaErrorLogMessage(error)};
+}`,
       LogMessageType.ERROR,
     );
   } finally {
@@ -101,47 +89,38 @@ function* updateGameSettingsParametersSaga(
   { payload: gameSetingsConfig }: ReturnType<typeof updateGameSettingsParameters>,
 ): SagaIterator {
   try {
-    yield put(setIsGameSettingsAvailable(false));
     yield put(setGameSettingsParameters({}));
 
     yield call(initGameSettingsSaga, true, gameSetingsConfig);
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
-    console.log(error.reason.path);
+    let errorMessage = '';
+    let userErrorMessage = 'Возникла ошибка в процессе обновления игровых настроек. Подробности в файле лога.';// eslint-disable-line max-len
+
     if (
       error instanceof SagaError
       && error.reason instanceof ReadWriteError
       && error.reason.causeName === ErrorName.NOT_FOUND
-      && error.reason.path.includes(GAME_SETTINGS_CONFIG_FILE_NAME)
     ) {
-      writeToLogFile(`Game settings file ${GAME_SETTINGS_CONFIG_FILE_NAME} not found.`, LogMessageType.ERROR);// eslint-disable-line max-len
+      const fileName = getFileNameFromPathToFile(error.reason.path, true);
 
-      yield put(addMessages(
-        [CreateUserMessage.error(`Не найден файл ${GAME_SETTINGS_CONFIG_FILE_NAME}, обновление прервано. Игровые настройки будут недоступны.`)], // eslint-disable-line max-len
-      ));
-      yield put(push(`${Routes.MAIN_SCREEN}`));
-      yield put(setIsGameSettingsLoaded(true));
-    } else {
-      let errorMessage = '';
+      userErrorMessage = `Не найден файл ${fileName}, обновление прервано.${fileName === GAME_SETTINGS_CONFIG_FILE_NAME ? ' Игровые настройки будут недоступны.' : ''}`;// eslint-disable-line max-len
+      errorMessage = `${error.message}. Path '${error.reason.path}'.`;
 
-      if (error instanceof SagaError) {
-        errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-      } else if (error instanceof CustomError) {
-        errorMessage = `${error.message}`;
-      } else if (error instanceof ReadWriteError) {
-        errorMessage = `${error.message}. Path '${error.path}'.`;
-      } else {
-        errorMessage = `Unknown error. Message: ${error.message}`;
+      if (fileName === GAME_SETTINGS_CONFIG_FILE_NAME) {
+        yield put(push(`${Routes.MAIN_SCREEN}`));
       }
-
-      writeToLogFileSync(
-        `An error occured during update game settings parameters: ${errorMessage}`,
-        LogMessageType.ERROR,
-      );
-
-      yield put(addMessages(
-        [CreateUserMessage.error('Возникла ошибка в процессе обновления игровых настроек. Подробности в файле лога.')], // eslint-disable-line max-len
-      ));
+    } else {
+      errorMessage = getSagaErrorLogMessage(error);
     }
+
+    yield put(addMessages(
+      [CreateUserMessage.error(userErrorMessage)],
+    ));
+
+    writeToLogFileSync(
+      `An error occured during update game settings parameters: ${errorMessage}`,
+      LogMessageType.ERROR,
+    );
   } finally {
     yield put(setIsGameSettingsLoading(false));
   }
@@ -162,18 +141,8 @@ function* getGameSettingsFilesBackupSaga(isExternalCall = true): SagaIterator {
     if (isExternalCall) {
       throw new SagaError('Get game settings files backup', error.message, error);
     } else {
-      let errorMessage = '';
-
-      if (error instanceof CustomError) {
-        errorMessage = `${error.message}`;
-      } else if (error instanceof ReadWriteError) {
-        errorMessage = `${error.message}. Path '${error.path}'.`;
-      } else {
-        errorMessage = `Unknown error. Message: ${error.message}`;
-      }
-
       writeToLogFileSync(
-        `Failed to get game settings files backup. Reason: ${errorMessage}`,
+        `Failed to get game settings files backup. Reason: ${getSagaErrorLogMessage(error)}`,
         LogMessageType.ERROR,
       );
 
@@ -209,20 +178,8 @@ function* createGameSettingsBackupSaga(
       yield call(getGameSettingsFilesBackupSaga, false);
     }
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
-    let errorMessage = '';
-
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
     writeToLogFileSync(
-      `Failed to create game settings files backup. Reason: ${errorMessage}`,
+      `Failed to create game settings files backup. Reason: ${getSagaErrorLogMessage(error)}`,
       LogMessageType.ERROR,
     );
 
@@ -259,20 +216,8 @@ function* deleteGameSettingsFilesBackupSaga({
         LogMessageType.ERROR,
       );
     } else {
-      let errorMessage = '';
-
-      if (error instanceof SagaError) {
-        errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-      } else if (error instanceof CustomError) {
-        errorMessage = `${error.message}`;
-      } else if (error instanceof ReadWriteError) {
-        errorMessage = `${error.message}. Path '${error.path}'.`;
-      } else {
-        errorMessage = `Unknown error. Message: ${error.message}`;
-      }
-
       writeToLogFileSync(
-        `Failed to delete game settings files backup. Reason: ${errorMessage}`,
+        `Failed to delete game settings files backup. Reason: ${getSagaErrorLogMessage(error)}`,
         LogMessageType.ERROR,
       );
 
@@ -324,20 +269,8 @@ function* renameGameSettingsFilesBackupSaga({
         LogMessageType.ERROR,
       );
     } else {
-      let errorMessage = '';
-
-      if (error instanceof SagaError) {
-        errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-      } else if (error instanceof CustomError) {
-        errorMessage = `${error.message}`;
-      } else if (error instanceof ReadWriteError) {
-        errorMessage = `${error.message}. Path '${error.path}'.`;
-      } else {
-        errorMessage = `Unknown error. Message: ${error.message}`;
-      }
-
       writeToLogFileSync(
-        `Failed to rename game settings files backup. Reason: ${errorMessage}`,
+        `Failed to rename game settings files backup. Reason: ${getSagaErrorLogMessage(error)}`,
         LogMessageType.ERROR,
       );
 
@@ -375,20 +308,8 @@ function* restoreGameSettingsFilesBackupSaga({
 
     yield put(setGameSettingsParameters(gameSettingsParameters));
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
-    let errorMessage = '';
-
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
     writeToLogFileSync(
-      `Failed to restore game settings files from backup. Reason: ${errorMessage}`,
+      `Failed to restore game settings files from backup. Reason: ${getSagaErrorLogMessage(error)}`,
       LogMessageType.ERROR,
     );
 

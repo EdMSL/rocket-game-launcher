@@ -179,9 +179,10 @@ export const readFileDataSync = (
 ): string => {
   try {
     if (typeof filePath !== 'string') {
-      throw new CustomError(
-        ErrorMessage.ARG_TYPE,
+      throw new ReadWriteError(
+        "\"filePath\" argument can't be a string",
         ErrorName.ARG_TYPE,
+        filePath,
         ErrorCode.ARG_TYPE,
       );
     }
@@ -254,9 +255,11 @@ export const readJSONFile = async <T>(filePath: string, isWriteToLog = true): Pr
       && path.extname(filePath.toString())
       && !mime.getType(filePath)?.match(/application\/json/)
     ) {
-      throw new CustomError(
+      throw new ReadWriteError(
         'The file must have a ".json" extension',
         ErrorName.MIME_TYPE,
+        filePath,
+        ErrorCode.ARG_TYPE,
       );
     }
 
