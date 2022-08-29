@@ -33,7 +33,7 @@ import {
   clearIDRelatedValidationErrors,
   getUniqueValidationErrors,
   IValidationErrors,
-  validateNumberInputs,
+  validateUserWindowSizeFields,
   ValidationErrorCause,
   IValidationError,
 } from '$utils/validation';
@@ -120,7 +120,9 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
       id, value, name, min, dataset,
     },
   }: React.ChangeEvent<HTMLInputElement>) => {
-    const errors = validateNumberInputs(id, +value, name, +min, currentConfig, validationErrors);
+    const errors = validateUserWindowSizeFields(
+      id, +value, name, +min, currentConfig, validationErrors,
+    );
 
     setValidationErrors(errors);
 
@@ -160,10 +162,10 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
       currentConfig, target.name, target.checked, target.dataset.parent,
     );
 
-    let errors = validateNumberInputs(
+    let errors = validateUserWindowSizeFields(
       'width', newConfig.width, 'width', undefined, newConfig, validationErrors,
     );
-    errors = validateNumberInputs('width', newConfig.width, 'width', undefined, newConfig, errors);
+    errors = validateUserWindowSizeFields('width', newConfig.width, 'width', undefined, newConfig, errors);
 
     setValidationErrors(errors);
 

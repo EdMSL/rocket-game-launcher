@@ -35,8 +35,10 @@ import {
   clearIDRelatedValidationErrors,
   IValidationErrors,
   validateControllerTypeRelatedFields,
+  validateOptionTypeRelatedFields,
   validateTargetGameSettingsOption,
 } from '$utils/validation';
+import { defaultGameSettingsOptionItem } from '$constants/defaultData';
 
 interface IProps {
   option: IGameSettingsOption,
@@ -176,7 +178,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         ...option,
         items: [
           {
-            ...option.items[option.items.length - 1],
+            ...defaultGameSettingsOptionItem,
             id: newId,
           },
           ...option.items],
@@ -185,12 +187,11 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
       fullOption,
     );
 
-    if (option.optionType === GameSettingsOptionType.COMBINED) {
-      onValidation(validateControllerTypeRelatedFields(
-        newOption,
-        validationErrors,
-      ));
-    }
+    onValidation(validateOptionTypeRelatedFields(
+      newOption,
+      optionFile!,
+      validationErrors,
+    ));
 
     onOptionDataChange(option.id, newOption, newFullOption);
     setLastAddedItemId(newId);
@@ -198,15 +199,21 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
 
   const deleteOptionItem = useCallback((
     newItems: IGameSettingsOptionItem[],
+    deletedItem: IGameSettingsOptionItem,
   ) => {
     const newOption = { ...option, items: newItems };
-
     if (option.optionType === GameSettingsOptionType.COMBINED) {
       onValidation(validateControllerTypeRelatedFields(
         newOption,
         validationErrors,
       ));
     }
+    onValidation(option.optionType === GameSettingsOptionType.COMBINED
+      ? validateControllerTypeRelatedFields(
+        newOption,
+        clearIDRelatedValidationErrors(validationErrors, deletedItem.id),
+      )
+      : clearIDRelatedValidationErrors(validationErrors, deletedItem.id));
 
     onOptionDataChange(option.id, newOption, { ...fullOption, items: newItems });
   }, [option, fullOption, validationErrors, onValidation, onOptionDataChange]);
@@ -214,7 +221,10 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
   const onDeleteOptionItemBtnClick = useCallback((
     { currentTarget }: React.MouseEvent<HTMLButtonElement>,
   ) => {
-    deleteOptionItem(option.items.filter((item) => item.id !== currentTarget.id.split(':')[1]));
+    deleteOptionItem(
+      option.items.filter((currentItem) => currentItem.id !== currentTarget.id.split(':')[1]),
+      option.items.find((currentItem) => currentItem.id === currentTarget.id.split(':')[1])!,
+    );
   }, [option.items, deleteOptionItem]);
 
   const selectOptionsFiles = gameSettingsFiles.map((file): ISelectOption => ({

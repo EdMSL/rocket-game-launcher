@@ -160,7 +160,7 @@ const getIsOptionHasValidationErrors = (
   @param currentErrors Текущие ошибки валидации.
   @returns Новый объект ошибок валидации.
 */
-export const validateNumberInputs = (
+export const validateUserWindowSizeFields = (
   id: string,
   value: number,
   name: string,
