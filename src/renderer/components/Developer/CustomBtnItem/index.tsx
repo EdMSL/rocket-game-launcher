@@ -120,7 +120,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
     }
   }, [item, validationErrors, onValidationError, сhangeBtnData]);
 
-  const onChangeArguments = useCallback((
+  const changeArguments = useCallback((
     newArgs: IButtonArg[],
   ) => {
     сhangeBtnData(item.id, {
@@ -166,6 +166,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         selectorType={item.action}
         extensions={FileExtension.EXECUTABLE}
         description="Путь до файла для запуска или папки для открытия в проводнике"
+        isGameDocuments={false}
         validationErrors={validationErrors}
         onChange={onPathSelectorChange}
         onOpenPathError={addMessage}
@@ -178,7 +179,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         pathVariables={pathVariables}
         description="Дополнительные агрументы запуска"
         validationErrors={validationErrors}
-        changeArguments={onChangeArguments}
+        changeArguments={changeArguments}
         onValidationError={onValidationError}
         addMessage={addMessage}
       />

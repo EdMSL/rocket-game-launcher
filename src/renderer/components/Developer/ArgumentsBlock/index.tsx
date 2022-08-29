@@ -19,6 +19,7 @@ import {
   IValidationError,
   IValidationErrors,
   ValidationErrorCause,
+  ValidationErrorText,
 } from '$utils/validation';
 import { IUserMessage } from '$types/common';
 
@@ -49,42 +50,17 @@ export const ArgumentsBlock: React.FC<IProps> = ({
 }) => {
   const [lastAddedStringArg, setLastAddedStringArg] = useState<string>('');
 
-  const onPathSelectorChange = useCallback((
-    value: string,
+  const onChangeArguments = useCallback((
     id: string,
-    validationData: IValidationError[],
-  ) => {
-    if (value) {
-      changeArguments(
-        args.map((currentArg) => {
-          if (currentArg.id === id) {
-            return {
-              id,
-              data: value,
-            };
-          }
-
-          return currentArg;
-        }),
-        parent,
-      );
-
-      onValidationError(getUniqueValidationErrors(
-        validationErrors,
-        validationData,
-      ));
-    }
-  }, [args, parent, validationErrors, changeArguments, onValidationError]);
-
-  const onArgumentTextFieldChange = useCallback((
-    { target }: React.ChangeEvent<HTMLInputElement>,
+    value,
+    handledErrors?: IValidationError[],
   ) => {
     changeArguments(
       args.map((currentArg) => {
-        if (currentArg.id === target.id) {
+        if (currentArg.id === id) {
           return {
-            id: target.id,
-            data: target.value,
+            id,
+            data: value,
           };
         }
 
@@ -93,45 +69,43 @@ export const ArgumentsBlock: React.FC<IProps> = ({
       parent,
     );
 
-    if (target.required) {
+    if (handledErrors && handledErrors.length > 0) {
       onValidationError(getUniqueValidationErrors(
         validationErrors,
-        [
-          {
-            id: target.id,
-            error: {
-              cause: ValidationErrorCause.PATH,
-            },
-            isForAdd: target.value.trim() === '',
-          },
-          {
-            id: `${parentId}_${target.id}`,
-            error: {
-              cause: ValidationErrorCause.ARG,
-            },
-            isForAdd: target.value.trim() === '',
-          },
-        ],
+        handledErrors,
       ));
     }
-  }, [args, parent, parentId, validationErrors, changeArguments, onValidationError]);
-
-  const onDeleteArgBtnClick = useCallback(({
-    currentTarget,
-  }: React.MouseEvent<HTMLButtonElement>) => {
-    changeArguments(
-      args.filter((currentArg) => currentArg.id !== currentTarget.name),
-      parent,
-    );
-
-    setLastAddedStringArg('');
-    onValidationError(clearIDRelatedValidationErrors(validationErrors, currentTarget.name));
   }, [args, parent, validationErrors, changeArguments, onValidationError]);
+
+  const onPathSelectorChange = useCallback((
+    value: string,
+    id: string,
+    validationData: IValidationError[],
+  ) => {
+    if (value) {
+      onChangeArguments(id, value, validationData);
+    }
+  }, [onChangeArguments]);
+
+  const onArgumentTextFieldChange = useCallback((
+    { target }: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    onChangeArguments(target.id, target.value, target.required ? [
+      {
+        id: target.id,
+        error: {
+          cause: ValidationErrorCause.EMPTY,
+          text: ValidationErrorText.EMPTY,
+        },
+        isForAdd: target.value.trim() === '',
+      },
+    ] : []);
+  }, [onChangeArguments]);
 
   const OnAddArgumentBtnClick = useCallback(({
     currentTarget,
   }: React.MouseEvent<HTMLButtonElement>) => {
-    const newId = getRandomId();
+    const newId = `${parentId}_${getRandomId()}`;
     const newArgs = [
       ...args,
       {
@@ -147,7 +121,26 @@ export const ArgumentsBlock: React.FC<IProps> = ({
     }
 
     changeArguments(newArgs, parent);
-  }, [args, parent, changeArguments]);
+  }, [args, parent, parentId, changeArguments]);
+
+  const onDeleteArgBtnClick = useCallback(({
+    currentTarget,
+  }: React.MouseEvent<HTMLButtonElement>) => {
+    changeArguments(
+      args.filter((currentArg) => currentArg.id !== currentTarget.name),
+      parent,
+    );
+
+    setLastAddedStringArg('');
+
+    let newErrors = clearIDRelatedValidationErrors(validationErrors, currentTarget.name);
+
+    if (Object.keys(validationErrors).filter((key) => key.includes(parentId)).length <= 1) {
+      newErrors = clearIDRelatedValidationErrors(validationErrors, parentId);
+    }
+
+    onValidationError(newErrors);
+  }, [args, parent, validationErrors, parentId, changeArguments, onValidationError]);
 
   return (
     <div className={classNames(
@@ -181,6 +174,7 @@ export const ArgumentsBlock: React.FC<IProps> = ({
                       validationErrors={validationErrors}
                       onChange={onPathSelectorChange}
                       onOpenPathError={addMessage}
+                      isGameDocuments={false}
                     />
                     )
                   : (

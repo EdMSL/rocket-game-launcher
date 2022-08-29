@@ -318,6 +318,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
               extensions={FileExtension.EXECUTABLE}
               selectorType={LauncherButtonAction.RUN}
               description="Путь до исполняемого файла игры, .exe или .lnk"//eslint-disable-line max-len
+              isGameDocuments={false}
               validationErrors={validationErrors}
               onChange={onPathSelectorChange}
               onOpenPathError={addMessage}

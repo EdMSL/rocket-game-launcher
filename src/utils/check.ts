@@ -130,7 +130,9 @@ const configFileDataSchema = Joi.object<ILauncherConfig>({
       id: Joi.string().optional().default(() => getRandomId()),
       path: Joi.string().required().custom(checkIsPathWithVariableCorrect),
       args: Joi.array().items(Joi.object({
-        id: Joi.string().optional().default(() => getRandomId()),
+        id: Joi.string().optional().default(
+          (parent, helpers) => `${helpers.state.ancestors[2].id}_${getRandomId()}`,
+        ),
         data: Joi.string().required(),
       })).optional().default([]),
       label: Joi.string().optional().default('Запуск'),
