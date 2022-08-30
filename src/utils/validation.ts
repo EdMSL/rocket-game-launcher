@@ -563,12 +563,25 @@ export const validateTargetGameSettingsOption = (
     errors = validateOptionTypeRelatedFields(option, file, errors);
   } else if (target.name === GameSettingsOptionFields.CONTROLLER_TYPE
     || target.name === GameSettingsOptionFields.SEPARATOR) {
-    errors = validateControllerTypeRelatedFields(
-      option,
-      errors,
-    );
+    errors = validateControllerTypeRelatedFields(option, errors);
   } else if (target.name === GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING) {
     errors = validateSelectOptions(target.value, target.id, option, errors);
+  } else if (target.name === GameSettingsOptionFields.NAME
+    && option.optionType !== GameSettingsOptionType.DEFAULT) {
+    errors = getUniqueValidationErrors(
+      errors,
+      [
+        {
+          id: target.id,
+          error: {
+            cause: ValidationErrorCause.EXISTS,
+            text: 'Параметр с таким именем уже есть',
+          },
+          isForAdd: target.value !== ''
+        && option.items.filter((currtItem) => currtItem.name === target.value).length > 1,
+        },
+      ],
+    );
   }
 
   return errors;
