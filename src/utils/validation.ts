@@ -77,12 +77,18 @@ export const getValidationCauses = (
  */
 export const clearIDRelatedValidationErrors = (
   validationErrors: IValidationErrors,
-  target: string|string[]|RegExp,
+  target: string|string[]|RegExp|RegExp[],
 ): IValidationErrors => Object
   .keys(validationErrors)
   .filter((errorId) => {
     if (Array.isArray(target)) {
-      return !target.some((currentId) => errorId.includes(currentId));
+      return !target.some((current: string|RegExp) => {
+        if (current instanceof RegExp) {
+          return current.test(errorId);
+        }
+
+        return errorId.includes(current);
+      });
     }
 
     if (target instanceof RegExp) {
@@ -91,9 +97,9 @@ export const clearIDRelatedValidationErrors = (
 
     return !errorId.includes(target);
   })
-  .reduce<IValidationErrors>((totalErrors, currentId) => ({
+  .reduce<IValidationErrors>((totalErrors, current) => ({
     ...totalErrors,
-    [currentId]: validationErrors[currentId],
+    [current]: validationErrors[current],
   }), {});
 
 /**
@@ -425,7 +431,10 @@ export const validateFileRelatedFields = (
   option.items.forEach((item) => {
     newErrors = clearIDRelatedValidationErrors(
       { ...currentErrors },
-      new RegExp(`${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_.+_${item.id}`),
+      [
+        new RegExp(`${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_.+_${item.id}`),
+        new RegExp(`${GameSettingsOptionFields.INI_GROUP}_.+_${item.id}`),
+      ],
     );
 
     errors.push(
