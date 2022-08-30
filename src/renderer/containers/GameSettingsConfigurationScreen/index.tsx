@@ -617,13 +617,13 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
   const deleteGameSettingsFileById = useCallback((id: string) => {
     let deletedFile: IGameSettingsFile|undefined;
     const files = currentConfig.gameSettingsFiles.filter((item) => {
-      if (id !== item.id) {
+      if (id === item.id) {
         deletedFile = item;
 
-        return true;
+        return false;
       }
 
-      return false;
+      return true;
     });
 
     deleteGameSettingsFile(files, deletedFile);
