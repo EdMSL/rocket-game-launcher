@@ -813,10 +813,15 @@ export const updatePathVariables = (
   } else if ('baseFilesEncoding' in config) {
     return {
       ...pathVariables,
-      ...getUpdatedModOrganizerPathVariables(
-        config.modOrganizer.pathToMOFolder,
-        pathVariables,
-      ),
+      ...pathVariables['%MO_DIR%']
+        ? getUpdatedModOrganizerPathVariables(
+          config.modOrganizer.pathToMOFolder,
+          pathVariables,
+        )
+        : getModOrganizerPathVariables(
+          replacePathVariableByRootDir(config.modOrganizer.pathToMOFolder),
+          pathVariables,
+        ),
       '%DOCS_GAME%': config.documentsPath.replace(
         PathVariableName.DOCUMENTS,
         pathVariables['%DOCUMENTS%'],

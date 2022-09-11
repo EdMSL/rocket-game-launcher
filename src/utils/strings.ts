@@ -232,11 +232,11 @@ export const replaceRootDirByPathVariable = (
   pathVariables: IPathVariables,
 ): string => {
   const newPathStr = pathStr;
+  let variableIndex = -1;
 
   const availablePathVariablesOrder = pathVariablesCheckOrderArr.filter(
     (current) => availablePathVariables.includes(current),
   );
-  let variableIndex = -1;
 
   const pathVariableName = availablePathVariablesOrder.find((curr, index) => {
     if (pathVariables[curr] && pathStr.includes(pathVariables[curr])) {
@@ -337,10 +337,12 @@ export const checkIsPathIsNotOutsideValidFolder = (
 ): void => {
   if (
     !createRegexp(GAME_DIR).test(pathForCheck)
-    && !createRegexp(pathVariables[isGameDocuments
-      ? PathVariableName.DOCS_GAME
-      : PathVariableName.DOCUMENTS])
-      .test(pathForCheck)
+    && ((isGameDocuments && pathVariables[PathVariableName.DOCS_GAME] !== '' && !createRegexp(pathVariables[PathVariableName.DOCS_GAME]).test(pathForCheck))
+    || (!isGameDocuments && !createRegexp(pathVariables[PathVariableName.DOCUMENTS]).test(pathForCheck)))
+    // && !createRegexp(pathVariables[isGameDocuments
+    //   ? PathVariableName.DOCS_GAME
+    //   : PathVariableName.DOCUMENTS])
+    //   .test(pathForCheck)
   ) {
     throw new CustomError(
       `The path is outside of a valid folder. Path: ${pathForCheck}`,
