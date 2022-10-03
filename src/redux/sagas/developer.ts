@@ -59,7 +59,6 @@ import { ILauncherConfig } from '$types/main';
 import { GameSettingsOptionFields, IGameSettingsConfig } from '$types/gameSettings';
 
 const getState = (state: IDeveloperState): IDeveloperState => state;
-
 /**
  * Инициализация игровых настроек для режима разработчика.
  * Только проверка полей на валидность и запись в `state`.

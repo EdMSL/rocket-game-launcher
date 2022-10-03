@@ -13,6 +13,7 @@ module.exports = {
     "app/build/**/*"
   ],
   rules: {
+    "annotation-no-unknown": true,
     "at-rule-no-unknown": [true, {
       ignoreAtRules: [
         /mixin/,

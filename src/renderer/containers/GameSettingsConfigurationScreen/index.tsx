@@ -878,12 +878,16 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               Добавить
             </Button>
             <p className="developer__subtitle">Игровые опции</p>
-            <Button
-              className={classNames('main-btn', 'developer__btn')}
-              onClick={onCollapseAllOptionsBtnClick}
-            >
-              Свернуть все
-            </Button>
+            {
+              currentConfig.gameSettingsOptions.length > 1 && (
+              <Button
+                className={classNames('main-btn', 'developer__btn')}
+                onClick={onCollapseAllOptionsBtnClick}
+              >
+                Свернуть все
+              </Button>
+              )
+            }
             <ul
               id="developer-list-options"
               className={styles.developer__list}

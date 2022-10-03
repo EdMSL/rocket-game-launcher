@@ -219,14 +219,8 @@ export const PathSelector: React.FC<IProps> = ({
     );
   }, [currentPathValue, id, name, parent, onChange]);
 
-  const getIsDisabled = useCallback(() => isDisabled
-    || (
-      validationErrors
-      && validationErrors[id]
-      && getValidationCauses(validationErrors[id]).includes(ValidationErrorCause.NOT_AVAILABLE)
-    )
-    || !pathVariable,
-  [id, isDisabled, validationErrors, pathVariable]);
+  const getIsDisabled = useCallback(() => isDisabled || !pathVariable,
+    [isDisabled, pathVariable]);
 
   const onInputBlur = useCallback(() => {
     onChange(
