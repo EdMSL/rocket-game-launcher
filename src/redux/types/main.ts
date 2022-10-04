@@ -56,9 +56,7 @@ export interface IGameSettingsBackup {
   name: string,
   files: IBackupFile[],
 }
-
-export interface IWindowSettings {
-  isResizable: boolean,
+export interface IWindowSizeSettings {
   minWidth: number,
   minHeight: number,
   maxWidth: number,
@@ -66,17 +64,12 @@ export interface IWindowSettings {
   width: number,
   height: number,
 }
-
-// export interface IModOrganizerParams {
-//   isUsed: boolean,
-//   version: number,
-//   pathToMOFolder: string,
-// }
+export interface IWindowSettings extends IWindowSizeSettings {
+  isResizable: boolean,
+}
 
 export interface ILauncherConfig extends IWindowSettings {
   isFirstStart: boolean,
-  // modOrganizer: IModOrganizerParams,
-  documentsPath: string,
   gameName: string,
   playButton: ILauncherAppButton,
   customButtons: ILauncherCustomButton[],

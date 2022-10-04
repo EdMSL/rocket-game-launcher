@@ -1,26 +1,34 @@
 import path from 'path';
 
+import { GAME_SETTINGS_CONFIG_FILE_NAME, LAUNCHER_CONFIG_FILE_NAME } from './defaultData';
+
 export const GAME_SETTINGS_FILES_BACKUP_FOLDER_NAME = 'game_settings_files';
 
-export const CONFIG_FILE_PATH = process.env.NODE_ENV === 'development'
-  ? path.resolve('./app/files/config.json') : path.resolve('./config.json');
+export const CONFIG_FILE_PATH = path.resolve(process.env.NODE_ENV === 'development'
+  ? `./app/files/${LAUNCHER_CONFIG_FILE_NAME}`
+  : `./${LAUNCHER_CONFIG_FILE_NAME}`);
 
-export const GAME_SETTINGS_FILE_PATH = process.env.NODE_ENV === 'development'
-  ? path.resolve('./app/files/settings.json') : path.resolve('./settings.json');
+export const ICON_PATH = path.resolve(process.env.NODE_ENV === 'development'
+  ? './src/public/icon.ico'
+  : './icon.ico');
+
+export const GAME_SETTINGS_FILE_PATH = path.resolve(process.env.NODE_ENV === 'development'
+  ? `./app/files/${GAME_SETTINGS_CONFIG_FILE_NAME}`
+  : `./${GAME_SETTINGS_CONFIG_FILE_NAME}`);
 
 export const GAME_DIR = process.env.NODE_ENV === 'development'
   ? path.resolve('./src/tests/fixtures/files')
   : path.resolve('../');
 
-export const BACKUP_DIR = process.env.NODE_ENV === 'development'
-  ? path.resolve('./app/backup')
-  : path.resolve('./backup');
+export const BACKUP_DIR = path.resolve(process.env.NODE_ENV === 'development'
+  ? './app/backup'
+  : './backup');
 
 export const BACKUP_DIR_GAME_SETTINGS_FILES = path.resolve(`${BACKUP_DIR}/${GAME_SETTINGS_FILES_BACKUP_FOLDER_NAME}`); //eslint-disable-line max-len
 
-export const USER_THEMES_DIR = process.env.NODE_ENV === 'development'
-  ? path.resolve('./app/themes')
-  : path.resolve('./themes');
+export const USER_THEMES_DIR = path.resolve(process.env.NODE_ENV === 'development'
+  ? './app/themes'
+  : './themes');
 
 export const DefaultPathVariable: IPathVariables = {
   '%GAME_DIR%': GAME_DIR,

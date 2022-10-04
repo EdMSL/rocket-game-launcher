@@ -14,7 +14,7 @@ import { ILauncherConfig } from '$types/main';
 import {
   AppChannel, AppWindowName, AppWindowStateAction,
 } from '$constants/misc';
-import { IPathVariables } from '$constants/paths';
+import { ICON_PATH, IPathVariables } from '$constants/paths';
 import { changeWindowSize } from '$utils/process';
 import { IAppState } from '$store/store';
 import {
@@ -47,16 +47,19 @@ export const createMainWindow = (
     width: config.isResizable ? mainWindowState.width : config.width,
     height: config.isResizable ? mainWindowState.height : config.height,
     resizable: config.isResizable,
+    ...process.env.NODE_ENV === 'development' && {
+      icon: ICON_PATH,
+    },
     frame: false,
-    title: config.gameName ? config.gameName : 'Game Launcher',
+    title: config.gameName ? config.gameName.trim() : 'Game Launcher',
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      devTools: process.env.NODE_ENV === 'development',
+      devTools: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test',
     },
   });
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test') {
     mainWindow.loadFile('./dist/index.html');
   } else {
     const waitForWebpackDevServer = createWaitForWebpackDevServer(
@@ -77,7 +80,7 @@ export const createMainWindow = (
     });
   }
 
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
     globalShortcut.register('F5', () => {
       mainWindow.reload();
     });

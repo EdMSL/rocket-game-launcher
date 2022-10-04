@@ -1,8 +1,13 @@
+$icon-size: 20px;
+$hint-block-indent: 4px;
+
 .hint__icon {
+  position: relative;
+
   display: inline-flex;
   align-items: center;
-  width: 20px;
-  height: 20px;
+  width: $icon-size;
+  height: $icon-size;
 
   vertical-align: text-bottom;
   /* stylelint-disable string-no-newline, max-line-length */
@@ -24,17 +29,16 @@
 .hint__block {
   position: absolute;
   top: 0;
-  left: calc(100% + 4px);
+  left: calc(100% + #{$hint-block-indent});
   z-index: 10;
 
   min-width: 300px;
   padding: 6px;
 
   background-color: var(--btn-color);
-  border-radius: 4px;
 
   &--left {
-    right: calc(100% + 4px);
+    right: calc(100% + #{$hint-block-indent});
     left: auto;
   }
 }

@@ -1,5 +1,6 @@
+import { MinWindowSize } from '$constants/defaultData';
 import {
-  availableOptionSeparators, GameSettingsFileView, GameSettingsOptionType, UIControllerType,
+  GameSettingsFileView, GameSettingsOptionType, UIControllerType,
 } from '$constants/misc';
 import {
   GameSettingsOptionFields, IGameSettingsFile, IGameSettingsOption,
@@ -76,12 +77,18 @@ export const getValidationCauses = (
  */
 export const clearIDRelatedValidationErrors = (
   validationErrors: IValidationErrors,
-  target: string|string[]|RegExp,
+  target: string|string[]|RegExp|RegExp[],
 ): IValidationErrors => Object
   .keys(validationErrors)
   .filter((errorId) => {
     if (Array.isArray(target)) {
-      return !target.some((currentId) => errorId.includes(currentId));
+      return !target.some((current: string|RegExp) => {
+        if (current instanceof RegExp) {
+          return current.test(errorId);
+        }
+
+        return errorId.includes(current);
+      });
     }
 
     if (target instanceof RegExp) {
@@ -90,9 +97,9 @@ export const clearIDRelatedValidationErrors = (
 
     return !errorId.includes(target);
   })
-  .reduce<IValidationErrors>((totalErrors, currentId) => ({
+  .reduce<IValidationErrors>((totalErrors, current) => ({
     ...totalErrors,
-    [currentId]: validationErrors[currentId],
+    [current]: validationErrors[current],
   }), {});
 
 /**
@@ -151,140 +158,178 @@ const getIsOptionHasValidationErrors = (
 
 /**
   Проверяет значения полей `number` в компоненте `developer screen` на корректность.
-  @param target Поле `target` объекта `event`.
+  @param id id поля.
+  @param value Значение поля.
+  @param name Имя поля.
+  @param min Минимальное значение для `value`.
   @param currentConfig Объект конфигурации лаунчера.
   @param currentErrors Текущие ошибки валидации.
   @returns Новый объект ошибок валидации.
 */
-export const validateNumberInputs = (
-  target: EventTarget & HTMLInputElement,
+export const validateUserWindowSizeFields = (
+  id: string,
+  value: number,
+  name: string,
+  min: number|undefined,
   currentConfig: ILauncherConfig,
   currentErrors: IValidationErrors,
 ): IValidationErrors => {
   const errors: IValidationError[] = [];
 
-  errors.push({
-    id: target.id,
-    error: {
-      cause: ValidationErrorCause.MIN,
-      text: ValidationErrorText.MIN,
-    },
-    isForAdd: +target.value < +target.min,
-  });
+  if (min !== undefined) {
+    errors.push({
+      id,
+      error: {
+        cause: ValidationErrorCause.MIN,
+        text: ValidationErrorText.MIN,
+      },
+      isForAdd: +value < min,
+    });
+  }
 
-  if (currentConfig.isResizable) {
-    const namesAndValues = target.name.toLowerCase().includes('width')
-      ? {
-          default: currentConfig.width,
-          min: currentConfig.minWidth,
-          max: currentConfig.maxWidth,
-          defaultName: 'width',
-          minName: 'minWidth',
-          maxName: 'maxWidth',
-        }
-      : {
-          default: currentConfig.height,
-          min: currentConfig.minHeight,
-          max: currentConfig.maxHeight,
-          defaultName: 'height',
-          minName: 'minHeight',
-          maxName: 'maxHeight',
-        };
+  const namesAndValues = name.toLowerCase().includes('width')
+    ? {
+        default: currentConfig.width,
+        min: currentConfig.minWidth,
+        max: currentConfig.maxWidth,
+        defaultName: 'width',
+        minName: 'minWidth',
+        maxName: 'maxWidth',
+        text: 'ширины',
+      }
+    : {
+        default: currentConfig.height,
+        min: currentConfig.minHeight,
+        max: currentConfig.maxHeight,
+        defaultName: 'height',
+        minName: 'minHeight',
+        maxName: 'maxHeight',
+        text: 'высоты',
+      };
 
-    if (target.name === 'width' || target.name === 'height') {
-      errors.push(
-        {
-          id: target.id,
-          error: {
-            cause: `less config ${namesAndValues.minName}`,
-          },
-          isForAdd: +target.value < namesAndValues.min,
+  if (name === 'width' || name === 'height') {
+    errors.push(
+      {
+        id,
+        error: {
+          cause: `less config ${namesAndValues.minName}`,
+          text: `Значение меньше минимальной ${namesAndValues.text}`,
         },
-        {
-          id: target.id,
-          error: {
-            cause: `more config ${namesAndValues.maxName}`,
-          },
-          isForAdd: namesAndValues.max > 0 && +target.value > namesAndValues.max,
+        isForAdd: currentConfig.isResizable && +value < namesAndValues.min,
+      },
+      {
+        id,
+        error: {
+          cause: `more config ${namesAndValues.maxName}`,
+          text: `Значение больше максимальной ${namesAndValues.text}`,
         },
-        {
-          id: namesAndValues.minName,
-          error: {
-            cause: `more config ${target.id}`,
-          },
-          isForAdd: +target.value < namesAndValues.min,
+        isForAdd: currentConfig.isResizable
+        && namesAndValues.max > 0
+        && +value > namesAndValues.max,
+      },
+      {
+        id: namesAndValues.minName,
+        error: {
+          cause: `more config ${id}`,
+          text: `Значение больше ${namesAndValues.text} по умолчанию`,
         },
-        {
-          id: namesAndValues.maxName,
-          error: {
-            cause: `less config ${target.id}`,
-          },
-          isForAdd: namesAndValues.max > 0 && +target.value > namesAndValues.max,
+        isForAdd: currentConfig.isResizable && +value < namesAndValues.min,
+      },
+      {
+        id: namesAndValues.maxName,
+        error: {
+          cause: `less config ${id}`,
+          text: `Значение меньше ${namesAndValues.text} по умолчанию`,
         },
-      );
-    } else if (target.name === 'minWidth' || target.name === 'minHeight') {
-      errors.push(
-        {
-          id: target.id,
-          error: {
-            cause: `more config ${namesAndValues.defaultName}`,
-          },
-          isForAdd: +target.value > namesAndValues.default,
+        isForAdd: currentConfig.isResizable
+        && namesAndValues.max > 0
+        && +value > namesAndValues.max,
+      },
+    );
+  } else if (name === 'minWidth' || name === 'minHeight') {
+    errors.push(
+      {
+        id,
+        error: {
+          cause: `more config ${namesAndValues.defaultName}`,
+          text: `Значение больше ${namesAndValues.text} по умолчанию`,
         },
-        {
-          id: target.id,
-          error: {
-            cause: `more config ${namesAndValues.maxName}`,
-          },
-          isForAdd: namesAndValues.max > 0 && +target.value > namesAndValues.max,
+        isForAdd: currentConfig.isResizable && +value > namesAndValues.default,
+      },
+      {
+        id,
+        error: {
+          cause: `more config ${namesAndValues.maxName}`,
+          text: `Значение больше максимальной ${namesAndValues.text}`,
         },
-        {
-          id: namesAndValues.defaultName,
-          error: {
-            cause: `less config ${target.id}`,
-          },
-          isForAdd: +target.value > namesAndValues.default,
+        isForAdd: currentConfig.isResizable
+        && namesAndValues.max > 0
+        && +value > namesAndValues.max,
+      },
+      {
+        id: namesAndValues.defaultName,
+        error: {
+          cause: `less config ${id}`,
+          text: `Значение меньше максимальной ${namesAndValues.text}`,
         },
-        {
-          id: namesAndValues.maxName,
-          error: {
-            cause: `less config ${target.id}`,
-          },
-          isForAdd: namesAndValues.max > 0 && +target.value > namesAndValues.max,
+        isForAdd: currentConfig.isResizable && +value > namesAndValues.default,
+      },
+      {
+        id: namesAndValues.maxName,
+        error: {
+          cause: `less config ${id}`,
+          text: `Значение меньше ${namesAndValues.text} по умолчанию`,
         },
-      );
-    } else if (target.name === 'maxWidth' || target.name === 'maxHeight') {
-      errors.push(
-        {
-          id: target.id,
-          error: {
-            cause: `less config ${namesAndValues.defaultName}`,
-          },
-          isForAdd: +target.value < namesAndValues.default && +target.value > 0,
+        isForAdd: currentConfig.isResizable
+        && namesAndValues.max > 0
+        && +value > namesAndValues.max,
+      },
+    );
+  } else if (name === 'maxWidth' || name === 'maxHeight') {
+    errors.push(
+      {
+        id,
+        error: {
+          cause: ValidationErrorCause.MIN,
+          text: ValidationErrorText.MIN,
         },
-        {
-          id: target.id,
-          error: {
-            cause: `less config ${namesAndValues.minName}`,
-          },
-          isForAdd: +target.value < namesAndValues.min && +target.value > 0,
+        isForAdd: currentConfig.isResizable
+        && +value < MinWindowSize[name === 'maxWidth' ? 'WIDTH' : 'HEIGHT']
+        && +value > 0,
+      },
+      {
+        id,
+        error: {
+          cause: `less config ${namesAndValues.defaultName}`,
+          text: `Значение меньше ${namesAndValues.text} по умолчанию`,
         },
-        {
-          id: namesAndValues.defaultName,
-          error: {
-            cause: `more config ${target.id}`,
-          },
-          isForAdd: +target.value < namesAndValues.default && +target.value > 0,
+        isForAdd: currentConfig.isResizable && +value < namesAndValues.default && +value > 0,
+      },
+      {
+        id,
+        error: {
+          cause: `less config ${namesAndValues.minName}`,
+          text: `Значение меньше минимальной ${namesAndValues.text}`,
         },
-        {
-          id: namesAndValues.minName,
-          error: {
-            cause: `more config ${target.id}`,
-          },
-          isForAdd: +target.value < namesAndValues.min && +target.value > 0,
+        isForAdd: currentConfig.isResizable && +value < namesAndValues.min && +value > 0,
+      },
+      {
+        id: namesAndValues.defaultName,
+        error: {
+          cause: `more config ${id}`,
+          text: `Значение больше максимальной ${namesAndValues.text}`,
         },
-      );
-    }
+        isForAdd: currentConfig.isResizable && +value < namesAndValues.default && +value > 0,
+      },
+      {
+        id: namesAndValues.minName,
+        error: {
+          cause: `more config ${id}`,
+          text: `Значение больше максимальной ${namesAndValues.text}`,
+        },
+        isForAdd: currentConfig.isResizable && +value < namesAndValues.min && +value > 0,
+      },
+    );
   }
 
   return getUniqueValidationErrors(currentErrors, errors);
@@ -386,13 +431,15 @@ export const validateFileRelatedFields = (
   option.items.forEach((item) => {
     newErrors = clearIDRelatedValidationErrors(
       { ...currentErrors },
-      [`${GameSettingsOptionFields.INI_GROUP}_${item.id}`,
-        `${GameSettingsOptionFields.VALUE_ATTRIBUTE}_${item.id}`,
-        `${GameSettingsOptionFields.VALUE_PATH}_${item.id}`],
+      [
+        new RegExp(`${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_.+_${item.id}`),
+        new RegExp(`${GameSettingsOptionFields.INI_GROUP}_.+_${item.id}`),
+      ],
     );
+
     errors.push(
       {
-        id: `${GameSettingsOptionFields.NAME}_${item.id}_${option.id}`,
+        id: `${GameSettingsOptionFields.NAME}_${option.id}_${item.id}`,
         error: {
           cause: ValidationErrorCause.EMPTY,
           text: ValidationErrorText.EMPTY,
@@ -411,7 +458,7 @@ export const validateFileRelatedFields = (
     if (file.view === GameSettingsFileView.SECTIONAL) {
       errors.push(
         {
-          id: `${GameSettingsOptionFields.INI_GROUP}_${item.id}_${option.id}`,
+          id: `${GameSettingsOptionFields.INI_GROUP}_${option.id}_${item.id}`,
           error: {
             cause: ValidationErrorCause.EMPTY,
             text: ValidationErrorText.EMPTY,
@@ -424,41 +471,6 @@ export const validateFileRelatedFields = (
             cause: ValidationErrorCause.ITEM,
           },
           isForAdd: item[GameSettingsOptionFields.INI_GROUP] === '',
-        },
-      );
-    }
-
-    if (file.view === GameSettingsFileView.TAG) {
-      errors.push(
-        {
-          id: `${GameSettingsOptionFields.VALUE_ATTRIBUTE}_${item.id}_${option.id}`,
-          error: {
-            cause: ValidationErrorCause.EMPTY,
-            text: ValidationErrorText.EMPTY,
-          },
-          isForAdd: item[GameSettingsOptionFields.VALUE_ATTRIBUTE] === '',
-        },
-        {
-          id: option.id,
-          error: {
-            cause: ValidationErrorCause.ITEM,
-          },
-          isForAdd: item[GameSettingsOptionFields.VALUE_ATTRIBUTE] === '',
-        },
-        {
-          id: `${GameSettingsOptionFields.VALUE_PATH}_${item.id}_${option.id}`,
-          error: {
-            cause: ValidationErrorCause.EMPTY,
-            text: ValidationErrorText.EMPTY,
-          },
-          isForAdd: item[GameSettingsOptionFields.VALUE_PATH] === '',
-        },
-        {
-          id: option.id,
-          error: {
-            cause: ValidationErrorCause.ITEM,
-          },
-          isForAdd: item[GameSettingsOptionFields.VALUE_PATH] === '',
         },
       );
     }
@@ -490,13 +502,13 @@ export const validateControllerTypeRelatedFields = (
   option.items.forEach((item) => {
     errors = clearIDRelatedValidationErrors(
       errors,
-      new RegExp(`${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_.+_${option.id}`),
+      new RegExp(`${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_.+_${item.id}`),
     );
 
     if (item.controllerType && item.controllerType === UIControllerType.SELECT) {
       errors = validateSelectOptions(
           item.selectOptionsValueString!,
-          `${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${item.id}_${option.id}`,
+          `${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${option.id}_${item.id}`,
           option,
           errors,
       );
@@ -510,13 +522,26 @@ export const validateControllerTypeRelatedFields = (
   return errors;
 };
 
+export const validateOptionTypeRelatedFields = (
+  option: IGameSettingsOption,
+  file: IGameSettingsFile,
+  currentErrors: IValidationErrors,
+): IValidationErrors => {
+  let errors = { ...currentErrors };
+
+  errors = validateFileRelatedFields(option, file, currentErrors);
+  errors = validateControllerTypeRelatedFields(option, errors);
+
+  return errors;
+};
+
 export const validateTargetGameSettingsOption = (
   target: EventTarget & (HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement),
   option: IGameSettingsOption,
   file: IGameSettingsFile,
   currentErrors: IValidationErrors,
 ): IValidationErrors => {
-  let errors: IValidationErrors = { ...currentErrors };
+  let errors = { ...currentErrors };
 
   if (target.required && (target.type === 'text' || target.tagName === 'TEXTAREA')) {
     errors = getUniqueValidationErrors(
@@ -544,15 +569,28 @@ export const validateTargetGameSettingsOption = (
   if (target.name === GameSettingsOptionFields.FILE) {
     errors = validateFileRelatedFields(option, file, errors);
   } else if (target.name === GameSettingsOptionFields.OPTION_TYPE) {
-    errors = validateControllerTypeRelatedFields(option, errors);
+    errors = validateOptionTypeRelatedFields(option, file, errors);
   } else if (target.name === GameSettingsOptionFields.CONTROLLER_TYPE
     || target.name === GameSettingsOptionFields.SEPARATOR) {
-    errors = validateControllerTypeRelatedFields(
-      option,
-      errors,
-    );
+    errors = validateControllerTypeRelatedFields(option, errors);
   } else if (target.name === GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING) {
     errors = validateSelectOptions(target.value, target.id, option, errors);
+  } else if (target.name === GameSettingsOptionFields.NAME
+    && option.optionType !== GameSettingsOptionType.DEFAULT) {
+    errors = getUniqueValidationErrors(
+      errors,
+      [
+        {
+          id: target.id,
+          error: {
+            cause: ValidationErrorCause.EXISTS,
+            text: 'Параметр с таким именем уже есть',
+          },
+          isForAdd: target.value !== ''
+        && option.items.filter((currtItem) => currtItem.name === target.value).length > 1,
+        },
+      ],
+    );
   }
 
   return errors;

@@ -1,7 +1,7 @@
 {
   "name": "rocket-game-launcher",
   "version": "2.0.0",
-  "description": "A program for launching games and managing game builds based on them ",
+  "description": "A program for launching games and managing game builds based on them",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -16,30 +16,33 @@
     "dev:main": "cross-env webpack --env main --config ./config/webpack.dev.config.js",
     "dev:renderer": "cross-env FAST_REFRESH=true NODE_ENV=development webpack serve --config ./config/webpack.dev.config.js",
     "build": "rm -rf ./app/dist/* && npm run build:main && npm run build:renderer",
+    "build:test": "rm -rf ./app/dist/* && npm run build:main:test && npm run build:renderer:test",
     "build:main": "cross-env NODE_ENV=production webpack --env main --config=./config/webpack.build.config.js --progress",
+    "build:main:test": "cross-env NODE_ENV=production webpack --env main --env nodeEnv=test --config=./config/webpack.build.config.js --progress",
     "build:renderer": "cross-env NODE_ENV=production webpack --config=./config/webpack.build.config.js --progress",
+    "build:renderer:test": "cross-env NODE_ENV=production webpack --env nodeEnv=test --config=./config/webpack.build.config.js --progress",
     "pack": "node scripts/pack.js --asar",
-    "pack:test": "node scripts/pack.js",
+    "pack:test": "node scripts/pack.js undefined test",
     "release": "npm run build && npm run pack",
-    "release:test": "npm run build && npm run pack:test",
+    "release:test": "npm run build:test && npm run pack:test",
     "stylelint": "stylelint src/**/*.scss --config ./.stylelintrc-full.js --custom-syntax postcss-scss --fix",
     "eslint": "eslint --config ./.eslintrc.js src --ext .ts,.tsx,.js,.jsx --fix",
     "eslint-nofix": "eslint --config ./.eslintrc.js src --ext .ts,.tsx,.js,.jsx",
-    "tslint": "bash -c tsc --noEmit --project tsconfig.json",
+    "tslint": "bash -c 'tsc --noEmit --project tsconfig.json'",
     "lint": "npm run stylelint && npm run eslint && npm run tslint",
     "test": "mocha --config ./.mocharc.js",
     "prepare": "husky install"
   },
   "lint-staged": {
     "*.{css,scss}": [
-      "stylelint --config ./.stylelintrc-full.js --custom-syntax postcss-scss --fix"
+      "npm run stylelint"
     ],
     "*.{js,jsx}": [
-      "eslint --config ./.eslintrc.js --ext .ts,.tsx,.js,.jsx --fix"
+      "npm run eslint"
     ],
     "*.{ts,tsx}": [
       "npm run tslint",
-      "eslint --config ./.eslintrc.js --ext .ts,.tsx,.js,.jsx --fix"
+      "npm run eslint"
     ]
   },
   "devDependencies": {
@@ -64,9 +67,8 @@
     "classnames": "2.3.1",
     "cross-env": "7.0.3",
     "css-loader": "5.2.0",
-    "electron": "17.4.1",
+    "electron": "17.4.11",
     "electron-packager": "15.4.0",
-    "electron-unhandled": "4.0.1",
     "eslint": "7.23.0",
     "eslint-config-airbnb-typescript": "12.3.1",
     "eslint-import-resolver-webpack": "0.13.1",
@@ -74,7 +76,7 @@
     "eslint-plugin-jsx-a11y": "6.4.1",
     "eslint-plugin-react": "7.24.0",
     "eslint-plugin-react-hooks": "4.2.0",
-    "fast-xml-parser": "3.19.0",
+    "fast-xml-parser": "3.21.0",
     "html-webpack-plugin": "5.3.1",
     "husky": "7.0.4",
     "iconv-lite": "0.6.3",
@@ -114,7 +116,7 @@
   },
   "dependencies": {
     "axios": "^0.26.1",
-    "connected-react-router": "6.9.1",
+    "connected-react-router": "6.9.3",
     "electron-redux": "2.0.0-alpha.8",
     "electron-store": "7.0.3",
     "electron-window-state": "5.0.3",

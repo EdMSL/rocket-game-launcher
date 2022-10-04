@@ -1,4 +1,5 @@
 .launcher-settings__container {
+  min-width: 300px;
   padding: 20px;
 
   color: inherit;
@@ -6,8 +7,9 @@
 
 .launcher-settings__item {
   margin-bottom: 20px;
-}
 
-.launcher-settings-switcher__container {
-  padding-right: 40px;
+  & .select__label {
+    margin-bottom: 0;
+    padding-right: 10px;
+  }
 }

@@ -1,3 +1,5 @@
+const customFunctionPattern = /.+-func/;
+
 module.exports = {
   extends: [
     "stylelint-config-standard",
@@ -33,6 +35,7 @@ module.exports = {
     "declaration-block-no-redundant-longhand-properties": null,
     "font-family-name-quotes": "always-unless-keyword",
     "font-weight-notation": "numeric",
+    "function-no-unknown": [true, {ignoreFunctions: customFunctionPattern}],
     "function-url-no-scheme-relative": true,
     "function-url-quotes": "always",
     "max-line-length": 100,
@@ -79,7 +82,7 @@ module.exports = {
     ]],
     "scss/dollar-variable-colon-newline-after": "always-multi-line", // --fix
     "scss/at-function-parentheses-space-before": "never", // --fix
-    "scss/at-function-pattern": /.+-func/,
+    "scss/at-function-pattern": customFunctionPattern,
     "scss/no-duplicate-dollar-variables": true,
     "scss/media-feature-value-dollar-variable": "always",
     "scss/operator-no-unspaced": true,
@@ -94,7 +97,11 @@ module.exports = {
         "declarations",
         {
           type: "rule",
-          selector: "^&::(before|after)"
+          selector: /^&\s[^.].+$/
+        },
+        {
+          type: "rule",
+          selector: /^&::[\w-]+$/
         },
         {
           type: "rule",
@@ -102,7 +109,7 @@ module.exports = {
         },
         {
           type: "rule",
-          selector: "^&:"
+          selector: /^&:[\w-]+$/
         },
         {
           type: "rule",

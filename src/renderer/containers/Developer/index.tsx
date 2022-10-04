@@ -20,6 +20,7 @@ import { DeveloperScreenName, Routes } from '$constants/routes';
 import { GameSettingsConfigurationScreen } from '$containers/GameSettingsConfigurationScreen';
 import { Messages } from '$components/Messages';
 import {
+  addDeveloperMessages,
   deleteDeveloperMessages,
   saveConfiguration,
   setDeveloperMessages,
@@ -32,6 +33,8 @@ import { ScrollbarsBlock } from '$components/UI/ScrollbarsBlock';
 import { DeveloperScreenController } from '$components/Developer/DeveloperScreenController';
 import { checkObjectForEqual } from '$utils/check';
 import { getPathFromLinkHash } from '$utils/strings';
+import { IUserMessage } from '$types/common';
+import { CreateUserMessage } from '$utils/message';
 
 export const Developer: React.FC = () => {
   /* eslint-disable max-len */
@@ -53,9 +56,15 @@ export const Developer: React.FC = () => {
   const saveConfigChanges = useCallback((
     pathToGo: string = '',
   ) => {
-    dispatch(saveConfiguration(currentConfig, pathToGo));
+    dispatch(saveConfiguration(
+      launcherConfig.isFirstStart && 'playButton' in currentConfig
+        ? { ...currentConfig, isFirstStart: false }
+        : currentConfig,
+      pathToGo,
+    ));
+
     setIsConfigChanged(false);
-  }, [currentConfig, dispatch]);
+  }, [currentConfig, launcherConfig.isFirstStart, dispatch]);
 
   const resetConfigChanges = useCallback(() => {
     if ('playButton' in currentConfig) {
@@ -66,6 +75,7 @@ export const Developer: React.FC = () => {
 
     setValidationErrors({});
     setIsConfigChanged(false);
+    setIsSettingsInitialized(false);
   }, [currentConfig, launcherConfig, gameSettingsConfig]);
 
   const cancelConfigChanges = useCallback(() => {
@@ -107,6 +117,12 @@ export const Developer: React.FC = () => {
     setCurrentConfig(newConfig);
   }, [currentConfig, launcherConfig, gameSettingsConfig]);
 
+  const addMessage = useCallback((message: IUserMessage|string) => {
+    dispatch(addDeveloperMessages([typeof message === 'string'
+      ? CreateUserMessage.error(message)
+      : message]));
+  }, [dispatch]);
+
   ///TODO Добавить тип для event. React.MouseEvent<HTMLAnchorElement> не понимает target.hash
   const onNavLinkClick = useCallback(async (event) => {
     if (isConfigChanged) {
@@ -126,6 +142,7 @@ export const Developer: React.FC = () => {
 
       if (!isHaveErrors && messageBoxResponse.response === 0) {
         saveConfigChanges(getPathFromLinkHash(event.target.hash));
+        setIsSettingsInitialized(false);
       } else if (
         (!isHaveErrors && messageBoxResponse.response === 1)
         || (isHaveErrors && messageBoxResponse.response === 0)
@@ -133,10 +150,11 @@ export const Developer: React.FC = () => {
         resetConfigChanges();
         setValidationErrors({});
         history.push(getPathFromLinkHash(event.target.hash));
+        setIsSettingsInitialized(false);
       }
+    } else {
+      setIsSettingsInitialized(false);
     }
-
-    setIsSettingsInitialized(false);
   }, [isConfigChanged, history, validationErrors, saveConfigChanges, resetConfigChanges]);
 
   /* eslint-disable react/jsx-props-no-spreading */
@@ -145,6 +163,7 @@ export const Developer: React.FC = () => {
       <Header
         isResizable
         gameName={launcherConfig.gameName}
+        isDevWindow
         onClose={closeDevWindow}
         isCloseBtnDisabled={launcherConfig.isFirstStart}
       />
@@ -195,6 +214,7 @@ export const Developer: React.FC = () => {
                   setIsSettingsInitialized={setIsSettingsInitialized}
                   resetConfigChanges={resetConfigChanges}
                   setValidationErrors={setValidationErrors}
+                  addMessage={addMessage}
                 />
               )}
             />
@@ -210,6 +230,7 @@ export const Developer: React.FC = () => {
                   setIsSettingsInitialized={setIsSettingsInitialized}
                   resetConfigChanges={resetConfigChanges}
                   setValidationErrors={setValidationErrors}
+                  addMessage={addMessage}
                 />
               )}
             />

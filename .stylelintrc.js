@@ -1,3 +1,5 @@
+const customFunctionPattern = /.+-func/;
+
 module.exports = {
   extends: [
     "stylelint-config-recommended",
@@ -11,6 +13,7 @@ module.exports = {
     "app/build/**/*"
   ],
   rules: {
+    "annotation-no-unknown": true,
     "at-rule-no-unknown": [true, {
       ignoreAtRules: [
         /mixin/,
@@ -28,6 +31,7 @@ module.exports = {
     "declaration-no-important": true,
     "font-family-name-quotes": "always-unless-keyword",
     "font-weight-notation": "numeric",
+    "function-no-unknown": [true, {ignoreFunctions: customFunctionPattern}],
     "function-url-no-scheme-relative": true,
     "function-url-quotes": "always",
     "max-line-length": 80,
@@ -67,7 +71,7 @@ module.exports = {
         ],
       },
     ]],
-    "scss/at-function-pattern": /.+-func/,
+    "scss/at-function-pattern": customFunctionPattern,
     "scss/no-duplicate-dollar-variables": true,
     "scss/media-feature-value-dollar-variable": "always",
   },

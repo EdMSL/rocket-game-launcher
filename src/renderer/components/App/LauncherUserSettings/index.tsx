@@ -70,7 +70,7 @@ export const LauncherUserSettings: React.FC<IProps> = ({
       <Switcher
         className={styles['launcher-settings__item']}
         id="is-autoclose"
-        label="Автозакрытие программы при старте игры"
+        label="Автозакрытие при старте игры"
         isChecked={isAutoclose}
         parentClassname="launcher-settings"
         onChange={onConfigIniSwitcherToggle}

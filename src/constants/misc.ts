@@ -26,8 +26,8 @@ export enum Encoding {
 
 export enum GameSettingsFileView {
   SECTIONAL = 'sectional',
-  LINE = 'line',
   TAG = 'tag',
+  LINE = 'oblivion script',
 }
 
 export enum UIControllerType {
@@ -127,6 +127,7 @@ export enum AppChannel {
   APP_STORE_UPDATED = 'app store updated',
   CHANGE_DEV_WINDOW_STATE = 'change dev window state',
   GET_MESSAGE_BOX_RESPONSE = 'get message box response',
+  ERROR_HANDLER_CHANNEL = 'handle unhandled error',
 }
 
 export const modOrganizerGeneralSection = 'General';

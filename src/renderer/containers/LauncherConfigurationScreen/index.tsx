@@ -33,11 +33,12 @@ import {
   clearIDRelatedValidationErrors,
   getUniqueValidationErrors,
   IValidationErrors,
-  validateNumberInputs,
+  validateUserWindowSizeFields,
   ValidationErrorCause,
   IValidationError,
 } from '$utils/validation';
 import { getRandomId } from '$utils/strings';
+import { IUserMessage } from '$types/common';
 
 interface IProps {
   currentConfig: ILauncherConfig,
@@ -47,6 +48,7 @@ interface IProps {
   setIsSettingsInitialized: (isInitialized: boolean) => void,
   resetConfigChanges: () => void,
   setValidationErrors: (errors: IValidationErrors) => void,
+  addMessage: (errorMessage: IUserMessage|string) => void,
 }
 
 export const LauncherConfigurationScreen: React.FC<IProps> = ({
@@ -57,6 +59,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
   setIsSettingsInitialized,
   resetConfigChanges,
   setValidationErrors,
+  addMessage,
 }) => {
   /* eslint-disable max-len */
   const pathVariables = useDeveloperSelector((state) => state.developer.pathVariables);
@@ -112,16 +115,22 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
     ));
   }, [currentConfig, validationErrors, setValidationErrors, setNewConfig]);
 
-  const onNumberInputChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    const errors = validateNumberInputs(target, currentConfig, validationErrors);
+  const onNumberInputChange = useCallback(({
+    target: {
+      id, value, name, min, dataset,
+    },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    const errors = validateUserWindowSizeFields(
+      id, +value, name, +min, currentConfig, validationErrors,
+    );
 
     setValidationErrors(errors);
 
     setNewConfig(getNewConfig(
       currentConfig,
-      target.name,
-      Math.round(+target.value),
-      target.dataset.parent,
+      name,
+      Math.round(+value),
+      dataset.parent,
     ));
   }, [currentConfig, setNewConfig, setValidationErrors, validationErrors]);
 
@@ -143,14 +152,25 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
     setNewConfig(getNewConfig(
       currentConfig,
       target.name,
-      target.value.trim(),
+      target.value,
       target.dataset.parent,
     ));
   }, [currentConfig, validationErrors, setValidationErrors, setNewConfig]);
 
-  const onSwitcherChange = useCallback(async ({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    setNewConfig(getNewConfig(currentConfig, target.name, target.checked, target.dataset.parent));
-  }, [currentConfig, setNewConfig]);
+  const onSwitcherChange = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    const newConfig = getNewConfig(
+      currentConfig, target.name, target.checked, target.dataset.parent,
+    );
+
+    let errors = validateUserWindowSizeFields(
+      'width', newConfig.width, 'width', undefined, newConfig, validationErrors,
+    );
+    errors = validateUserWindowSizeFields('width', newConfig.width, 'width', undefined, newConfig, errors);
+
+    setValidationErrors(errors);
+
+    setNewConfig(newConfig);
+  }, [currentConfig, validationErrors, setNewConfig, setValidationErrors]);
 
   const deleteCustomBtnItem = useCallback((items: ILauncherCustomButton[]) => {
     setNewConfig({ ...currentConfig, customButtons: items });
@@ -233,12 +253,22 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
         currentConfig.playButton !== undefined && (
         <React.Fragment>
           <fieldset className="developer__block">
-            <legend className="developer__block-title">Настройки резмеров окна</legend>
+            <legend className="developer__block-title">Настройки главного окна</legend>
+            <TextField
+              className="developer__item"
+              id="gameName"
+              name="gameName"
+              value={currentConfig.gameName}
+              label="Заголовок окна"
+              validationErrors={validationErrors}
+              description="Название игры или любой текст, который будет отображаться в заголовке окна программы"//eslint-disable-line max-len
+              onChange={OnTextFieldChange}
+            />
             <Switcher
               className="developer__item"
               id="isResizable"
               name="isResizable"
-              label="Изменяемый размер окна?"
+              label="Изменяемый размер окна"
               isChecked={currentConfig.isResizable}
               onChange={onSwitcherChange}
               description="Определяет, может ли пользователь изменять размеры окна программы"
@@ -263,42 +293,19 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
           </fieldset>
           <fieldset className="developer__block">
             <legend className="developer__block-title">
-              Настройки путей и запуска программ
+              Настройки запуска программ
             </legend>
-            <TextField
-              className="developer__item"
-              id="gameName"
-              name="gameName"
-              value={currentConfig.gameName}
-              label="Заголовок окна программы"
-              validationErrors={validationErrors}
-              description="Название игры или любой текст, который будет отображаться в заголовке окна программы"//eslint-disable-line max-len
-              onChange={OnTextFieldChange}
-            />
-            <PathSelector
-              className="developer__item"
-              id="documentsPath"
-              name="documentsPath"
-              label="Папка файлов игры в Documents"
-              value={currentConfig.documentsPath}
-              selectPathVariables={generateSelectOptions([PathVariableName.DOCUMENTS])}
-              pathVariables={pathVariables}
-              isGameDocuments={false}
-              description="Путь до папки игры в [User]/Documents. Укажите этот путь, если нужно управлять данными из файлов в этой папке через экран игровых настроек"//eslint-disable-line max-len
-              validationErrors={validationErrors}
-              onChange={onPathSelectorChange}
-            />
-            <p className="developer__subtitle">Настройки запуска игры</p>
+            <p className="developer__subtitle">Запуск игры</p>
             <TextField
               className="developer__item"
               id="label"
               name="label"
               parent="playButton"
               value={currentConfig.playButton.label}
-              label="Заголовок кнопки запуска"
+              placeholder="Играть"
+              label="Заголовок кнопки"
               description="Текст, который будет отображаться на основной кнопке запуска игры"//eslint-disable-line max-len
               validationErrors={validationErrors}
-              isRequied
               onChange={OnTextFieldChange}
             />
             <PathSelector
@@ -306,15 +313,17 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
               id="path"
               name="path"
               parent="playButton"
-              label="Исполняемый файл игры"
+              label="Исполняемый файл"
               value={currentConfig.playButton.path}
               selectPathVariables={generateSelectOptions([PathVariableName.GAME_DIR])}
               pathVariables={pathVariables}
               extensions={FileExtension.EXECUTABLE}
               selectorType={LauncherButtonAction.RUN}
               description="Путь до исполняемого файла игры, .exe или .lnk"//eslint-disable-line max-len
+              isGameDocuments={false}
               validationErrors={validationErrors}
               onChange={onPathSelectorChange}
+              onOpenPathError={addMessage}
             />
             <ArgumentsBlock
               className="developer__item"
@@ -325,10 +334,11 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
               validationErrors={validationErrors}
               changeArguments={changeArguments}
               onValidationError={setNewValidationErrors}
+              addMessage={addMessage}
             />
             <div className={styles['custom-btns__container']}>
               <p className="developer__subtitle">
-                Кнопки запуска дополнительных программ
+                Запуск дополнительных программ
               </p>
               <ul className="developer__list">
                 {
@@ -356,6 +366,7 @@ export const LauncherConfigurationScreen: React.FC<IProps> = ({
                       deleteBtnItem={deleteCustomBtnById}
                       сhangeBtnData={changeCustomBtnData}
                       onValidationError={setNewValidationErrors}
+                      addMessage={addMessage}
                     />
                   </SpoilerListItem>
                 ))

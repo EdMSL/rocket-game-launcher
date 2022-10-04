@@ -11,7 +11,10 @@ import {
   IWindowSettings,
 } from '$types/main';
 import {
-  Encoding, GameSettingsOptionType, LauncherButtonAction,
+  Encoding,
+  GameSettingsOptionType,
+  LauncherButtonAction,
+  PathVariableName,
 } from './misc';
 
 export const SUCCESS_STATUS: ISuccess = 'success';
@@ -56,18 +59,20 @@ export const defaultLauncherCustomButton: ILauncherCustomButton = {
   args: [],
 };
 
-export const MOIniFileName = 'ModOrganizer.ini';
+export const LAUNCHER_CONFIG_FILE_NAME = 'config.json';
+export const GAME_SETTINGS_CONFIG_FILE_NAME = 'settings.json';
+export const MO_INI_FILE_NAME = 'ModOrganizer.ini';
 
 export const defaultModOrganizerPaths = {
-  pathToMOFolder: '%GAME_DIR%\\Mod Organizer',
-  pathToINI: `%MO_DIR%\\${MOIniFileName}`,
-  pathToProfiles: '%MO_DIR%\\profiles',
-  pathToMods: '%MO_DIR%\\mods',
+  pathToMOFolder: `${PathVariableName.GAME_DIR}\\Mod Organizer`,
+  pathToINI: `${PathVariableName.MO_DIR}\\${MO_INI_FILE_NAME}`,
+  pathToProfiles: `${PathVariableName.MO_DIR}\\profiles`,
+  pathToMods: `${PathVariableName.MO_DIR}\\mods`,
 };
 
 export const defaultModOrganizerParams: IModOrganizerParams = {
   isUsed: false,
-  pathToMOFolder: '%GAME_DIR%\\Mod Organizer',
+  pathToMOFolder: `${PathVariableName.GAME_DIR}\\MO2`,
 };
 
 export const defaultLauncherConfig: ILauncherConfig = {
@@ -79,7 +84,6 @@ export const defaultLauncherConfig: ILauncherConfig = {
   width: defaultLauncherWindowSettings.width,
   height: defaultLauncherWindowSettings.height,
   isFirstStart: true,
-  documentsPath: '',
   gameName: 'Rocket Game Launcher',
   playButton: {
     path: '',
@@ -90,8 +94,9 @@ export const defaultLauncherConfig: ILauncherConfig = {
 };
 
 export const defaultGameSettingsConfig: IGameSettingsConfig = {
-  modOrganizer: defaultModOrganizerParams,
   baseFilesEncoding: Encoding.WIN1251,
+  documentsPath: PathVariableName.DOCUMENTS,
+  modOrganizer: defaultModOrganizerParams,
   gameSettingsGroups: [],
   gameSettingsFiles: [],
   gameSettingsOptions: [],

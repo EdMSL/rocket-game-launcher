@@ -22,11 +22,14 @@ import {
 } from '$utils/log';
 import {
   defaultGameSettingsConfig,
-  defaultLauncherConfig, defaultLauncherWindowSettings, MinWindowSize,
+  defaultLauncherConfig,
+  GAME_SETTINGS_CONFIG_FILE_NAME,
+  LAUNCHER_CONFIG_FILE_NAME,
+  MinWindowSize,
 } from '$constants/defaultData';
 import { CustomError, ErrorName } from './errors';
 import { generateSelectOptionsString, getRandomId } from './strings';
-import { ILauncherConfig, IWindowSettings } from '$types/main';
+import { ILauncherConfig } from '$types/main';
 import { getGameSettingsElementsNames } from './data';
 
 export interface ICheckResult<T> {
@@ -57,7 +60,7 @@ export const getIsPathWithVariableCorrect = (
     return !path.extname(value);
   } else if (action === LauncherButtonAction.RUN && !!path.extname(value)) {
     if (extensions.length > 0) {
-      return extensions.includes(path.extname(value).substr(1));
+      return extensions.includes(path.extname(value).substring(1));
     }
 
     return Boolean(PathRegExp.PATH_EXTNAME.test(path.extname(value)));
@@ -111,8 +114,6 @@ const configFileDataSchema = Joi.object<ILauncherConfig>({
     .default(defaultLauncherConfig.minHeight),
   maxWidth: Joi.number().integer().optional().default(defaultLauncherConfig.maxWidth),
   maxHeight: Joi.number().integer().optional().default(defaultLauncherConfig.maxHeight),
-  documentsPath: Joi.string().optional().allow('').default(defaultLauncherConfig.documentsPath)
-    .pattern(PathRegExp.DOCUMENTS, 'correct path'),
   isFirstStart: Joi.bool().optional().default(defaultLauncherConfig.isFirstStart),
   gameName: Joi.string().optional().allow('').default(defaultLauncherConfig.gameName),
   playButton: Joi.object({
@@ -122,14 +123,16 @@ const configFileDataSchema = Joi.object<ILauncherConfig>({
       id: Joi.string().optional().default(() => getRandomId()),
       data: Joi.string().required(),
     })).optional().default(defaultLauncherConfig.playButton.args),
-    label: Joi.string().optional().allow('').default(defaultLauncherConfig.playButton.label),
+    label: Joi.string().optional().allow(''),
   }).required(),
   customButtons: Joi.array()
     .items(Joi.object({
       id: Joi.string().optional().default(() => getRandomId()),
       path: Joi.string().required().custom(checkIsPathWithVariableCorrect),
       args: Joi.array().items(Joi.object({
-        id: Joi.string().optional().default(() => getRandomId()),
+        id: Joi.string().optional().default(
+          (parent, helpers) => `${helpers.state.ancestors[2].id}_${getRandomId()}`,
+        ),
         data: Joi.string().required(),
       })).optional().default([]),
       label: Joi.string().optional().default('Запуск'),
@@ -138,7 +141,7 @@ const configFileDataSchema = Joi.object<ILauncherConfig>({
 });
 
 export const checkLauncherConfigFileData = (configObj: ILauncherConfig): ILauncherConfig => {
-  writeToLogFileSync('Started checking the config.json file.');
+  writeToLogFileSync(`Started checking the ${LAUNCHER_CONFIG_FILE_NAME} file.`);
 
   const validateResult = configFileDataSchema.validate(configObj, {
     abortEarly: false,
@@ -149,7 +152,10 @@ export const checkLauncherConfigFileData = (configObj: ILauncherConfig): ILaunch
       writeToLogFileSync(currentMsg.message, LogMessageType.ERROR);
     });
 
-    throw new CustomError('Failed to validate the config.json file.', ErrorName.VALIDATION);
+    throw new CustomError(
+      `Failed to validate the ${LAUNCHER_CONFIG_FILE_NAME} file.`,
+      ErrorName.VALIDATION,
+    );
   }
 
   return validateResult.value!;
@@ -180,11 +186,16 @@ export const gameSettingsShallowCheckSchema = Joi.object<IGameSettingsConfig>({
 
 // Полная проверка.
 export const gameSettingsDeepCheckSchema = Joi.object<IGameSettingsConfig>({
+  baseFilesEncoding: Joi.string().optional().default(Encoding.WIN1251),
+  documentsPath: Joi.string().optional()
+    .default(defaultGameSettingsConfig.documentsPath)
+    .pattern(PathRegExp.DOCUMENTS, 'correct path'),
   modOrganizer: Joi.object({
     isUsed: Joi.bool().optional().default(false),
-    pathToMOFolder: Joi.string().optional().default(defaultGameSettingsConfig.modOrganizer.pathToMOFolder).pattern(PathRegExp.GAME_DIR, 'correct path'),
+    pathToMOFolder: Joi.string().optional()
+      .pattern(PathRegExp.GAME_DIR, 'correct path')
+      .default(defaultGameSettingsConfig.modOrganizer.pathToMOFolder),
   }).optional().default(defaultGameSettingsConfig.modOrganizer),
-  baseFilesEncoding: Joi.string().optional().default(Encoding.WIN1251),
   gameSettingsGroups: Joi.array()
     .items(GameSettingsGroupSchema).optional().default([])
     .unique((a, b) => a.name === b.name),
@@ -246,7 +257,7 @@ const defaultOptionTypeSchema = Joi.object({
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
         },
-      ),
+      ).allow(''),
       valuePath: Joi.string().when(
         Joi.ref('$view'), {
           is: GameSettingsFileView.TAG, then: Joi.required(), otherwise: Joi.forbidden(),
@@ -520,7 +531,7 @@ export const checkGameSettingsOptions = (
 export const checkGameSettingsConfigShallow = (
   configObj: IGameSettingsConfig,
 ): IGameSettingsConfig => {
-  writeToLogFileSync('Started shallow checking the settings.json file.');
+  writeToLogFileSync(`Started shallow checking the ${GAME_SETTINGS_CONFIG_FILE_NAME} file.`);
 
   const validateResult = gameSettingsShallowCheckSchema.validate(configObj, {
     abortEarly: false,
@@ -528,7 +539,7 @@ export const checkGameSettingsConfigShallow = (
   });
 
   if (validateResult.error) {
-    throw new CustomError(`settings.json validation error. ${validateResult.error.message}.`); //eslint-disable-line max-len
+    throw new CustomError(`${GAME_SETTINGS_CONFIG_FILE_NAME} validation error. ${validateResult.error.message}.`); //eslint-disable-line max-len
   }
 
   return validateResult.value;
@@ -543,7 +554,7 @@ export const checkGameSettingsConfigShallow = (
 export const checkGameSettingsConfigFull = (
   configObj: IGameSettingsConfig,
 ): ICheckResult<IGameSettingsConfig> => {
-  writeToLogFileSync('Started full checking the settings.json file.');
+  writeToLogFileSync(`Started full checking the ${GAME_SETTINGS_CONFIG_FILE_NAME} file.`);
   const validationErrors: Joi.ValidationError[] = [];
 
   const validationResult = gameSettingsDeepCheckSchema.validate(configObj, {
@@ -616,17 +627,3 @@ export const checkObjectForEqual = (a, b): boolean => {
   if (keys.length !== Object.keys(b).length) return false;
   return keys.every((k) => checkObjectForEqual(a[k], b[k]));
 };
-
-/**
- * Получить объект с данными, относящимися к окну приложения.
- * @param config Объект конфигурации лаунчера.
- * @returns Объект с настройками, относящимися к окну приложения.
- */
-export const getWindowSettingsFromLauncherConfig = (
-  config: ILauncherConfig,
-): IWindowSettings => Object.keys(defaultLauncherWindowSettings).reduce<IWindowSettings>(
-  (acc, current) => ({
-    ...acc,
-    [current]: config[current],
-  }), {} as IWindowSettings,
-);

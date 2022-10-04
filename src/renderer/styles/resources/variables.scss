@@ -1,0 +1,23 @@
+$ui-border-width: 1px;
+$marker-size: 10px;
+$checkbox-size: 20px;
+$checkbox-marker-size: 6px;
+$centered-checkbox-marker:
+  center-marker-func(
+    $checkbox-size,
+    $checkbox-marker-size
+  );
+$switcher-width: 36px;
+$switcher-height: 20px;
+$switcher-thumb-size:
+  get-switcher-thumb-size-func(
+    $switcher-height,
+    $ui-border-width
+  );
+$switcher-unchecked:
+  get-switcher-unchecked-thumb-func(
+    $switcher-width,
+    $switcher-thumb-size,
+    $ui-border-width
+  );
+$switcher-checked: $ui-border-width + 1px;

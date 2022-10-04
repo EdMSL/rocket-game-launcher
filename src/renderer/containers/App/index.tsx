@@ -32,9 +32,9 @@ export const App = (): JSX.Element => {
   const [isOpenAppInfo, setIsOpenAppInfo] = useState<boolean>(false);
 
   useEffect(() => {
-    document.addEventListener('auxclick', (e) => {
-      if (e.button === 1) {
-        e.preventDefault();
+    document.addEventListener('auxclick', (event) => {
+      if (event.button === 1) {
+        event.preventDefault();
       }
     });
 

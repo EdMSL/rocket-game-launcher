@@ -1,9 +1,14 @@
-import { screen } from 'electron';
+import { screen, ipcRenderer } from 'electron';
 import si from 'systeminformation';
+import debounce from 'lodash.debounce';
 
 import { LogMessageType, writeToLogFile } from './log';
+import { AppChannel } from '$constants/misc';
+// import ensureError from 'ensure-error';
+// import { serializeError } from 'serialize-error';
 
 const ONE_GB = 1073741824;
+const DEBOUNCE_DELAY = 200;
 
 /**
  * Получить информацию о доступных дисплеях и записать их в файл лога.
@@ -53,4 +58,52 @@ export const getSystemInfo = async (): Promise<void> => {
   } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     writeToLogFile(error.message, LogMessageType.ERROR);
   }
+};
+
+const invokeErrorHandler = async (
+  title: string,
+  error: any,
+): Promise<void> => {
+  await ipcRenderer.invoke(AppChannel.ERROR_HANDLER_CHANNEL, title, error);
+  /* try {
+    return;
+  } catch (invokeError: any) {
+    if (invokeError.message === 'An object could not be cloned.') {
+      // 1. If serialization failed, force the passed arg to an error format
+      // error = ensureError(error);
+
+      // 2. Then attempt serialization on each property, defaulting to undefined otherwise
+      const serialized = serializeError(ensureError(error));
+      // 3. Invoke the error handler again with only the serialized error properties
+      ipcRenderer.invoke('ERROR_HANDLER_CHANNEL', title, serialized);
+    }
+  } */
+};
+
+let installed = false;
+
+export const unhandled = (): void => {
+  if (installed) {
+    return;
+  }
+
+  installed = true;
+
+  const errorHandler = debounce((error) => {
+    invokeErrorHandler('Unhandled Error', error);
+  }, DEBOUNCE_DELAY);
+
+  window.addEventListener('error', (event) => {
+    event.preventDefault();
+    errorHandler(event.error || event);
+  });
+
+  const rejectionHandler = debounce((reason) => {
+    invokeErrorHandler('Unhandled Promise Rejection', reason);
+  }, DEBOUNCE_DELAY);
+
+  window.addEventListener('unhandledrejection', (event) => {
+    event.preventDefault();
+    rejectionHandler(event.reason);
+  });
 };

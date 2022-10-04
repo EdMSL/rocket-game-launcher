@@ -10,7 +10,7 @@ import {
   writeToLogFile,
   writeToLogFileSync,
 } from '$utils/log';
-import { getPathToFile, parseJSON } from '$utils/strings';
+import { checkIsPathIsNotOutsideValidFolder, parseJSON } from '$utils/strings';
 import {
   ReadWriteError,
   getReadWriteError,
@@ -20,7 +20,7 @@ import {
   ErrorMessage,
 } from '$utils/errors';
 import {
-  Encoding, GameSettingsFileView, userThemeStyleFile,
+  Encoding, GameSettingsFileView, PathRegExp, PathVariableName, userThemeStyleFile,
 } from '$constants/misc';
 import { IPathVariables, USER_THEMES_DIR } from '$constants/paths';
 import { IGameSettingsFile } from '$types/gameSettings';
@@ -179,9 +179,10 @@ export const readFileDataSync = (
 ): string => {
   try {
     if (typeof filePath !== 'string') {
-      throw new CustomError(
-        ErrorMessage.ARG_TYPE,
+      throw new ReadWriteError(
+        "\"filePath\" argument can't be a string",
         ErrorName.ARG_TYPE,
+        filePath,
         ErrorCode.ARG_TYPE,
       );
     }
@@ -254,9 +255,11 @@ export const readJSONFile = async <T>(filePath: string, isWriteToLog = true): Pr
       && path.extname(filePath.toString())
       && !mime.getType(filePath)?.match(/application\/json/)
     ) {
-      throw new CustomError(
+      throw new ReadWriteError(
         'The file must have a ".json" extension',
         ErrorName.MIME_TYPE,
+        filePath,
+        ErrorCode.ARG_TYPE,
       );
     }
 
@@ -310,18 +313,9 @@ export const readINIFileSync = (
   filePath: string,
   encoding = Encoding.UTF8,
 ): IIniObj => {
-  try {
-    const INIData = readFileDataSync(filePath, encoding as BufferEncoding);
+  const INIData = readFileDataSync(filePath, encoding as BufferEncoding);
 
-    return new Ini(INIData);
-  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
-    writeToLogFileSync(
-      `Message: ${error.message}. Path: '${filePath}'.`,
-      LogMessageType.ERROR,
-    );
-
-    throw error;
-  }
+  return new Ini(INIData);
 };
 
 /**
@@ -334,13 +328,11 @@ export const readINIFileSync = (
 */
 export const readXMLFile = async (
   filePath: string,
-  isWithPrefix: boolean,
+  isWithPrefix = false,
   encoding = Encoding.WIN1251,
 ): Promise<IXmlObj> => {
   try {
-    const XMLDataStr = await readFileData(filePath);
-
-    return xmlParser.parse(iconv.decode(XMLDataStr, encoding), {
+    return xmlParser.parse(iconv.decode(await readFileData(filePath), encoding), {
       attributeNamePrefix: isWithPrefix ? xmlAttributePrefix : '',
       ignoreAttributes: false,
       parseAttributeValue: false,
@@ -453,6 +445,103 @@ export const writeXMLFile = (
     throw error;
   });
 
+const getPathToFileFromMOProfileFolder = (
+  pathToProfiles: string,
+  fileName: string,
+  moProfile?: string,
+): string => {
+  if (moProfile) {
+    return path.join(pathToProfiles, moProfile, fileName);
+  }
+
+  const profiles = readDirectorySync(pathToProfiles);
+
+  return path.join(pathToProfiles, profiles[0], fileName);
+};
+
+/**
+ * Получить путь до файла с учетом переменных путей.
+ * @param pathToFile Путь до файла.
+ * @param pathVariables Переменные путей.
+ * @param profileMO Профиль Mod Organizer.
+ * @param isWithCheck Если `true`, то будет производиться проверка на вхождение пути в
+ * корневую папку игры, а так же проверки корректности. По умолчанию `true`.
+ * @returns Строка с абсолютным путем к файлу.
+*/
+export const getPathToFile = (
+  pathToFile: string,
+  pathVariables: IPathVariables,
+  profileMO = '',
+  isWithCheck = true,
+  isAllowDocuments = false,
+): string => {
+  let newPath = pathToFile;
+
+  if (PathRegExp.MO_PROFILE.test(pathToFile)) {
+    // Получение пути до МО разделено ввиду необходимости получения профилей при использовании
+    // функции в PathSelector.
+    if (isWithCheck) {
+      if (profileMO) {
+        newPath = getPathToFileFromMOProfileFolder(
+          pathVariables['%MO_PROFILE%'],
+          path.basename(pathToFile),
+          profileMO,
+        );
+      } else {
+        throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
+      }
+    } else {
+      newPath = getPathToFileFromMOProfileFolder(
+        pathVariables['%MO_PROFILE%'],
+        path.basename(pathToFile),
+        undefined,
+      );
+    }
+  } else if (PathRegExp.MO_DIR.test(pathToFile)) {
+    if (pathVariables['%MO_DIR%']) {
+      newPath = newPath.replace(PathVariableName.MO_DIR, pathVariables['%MO_DIR%']);
+    } else {
+      if (profileMO) {
+        throw new CustomError('The path to a file in the Mod Organizer folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
+      }
+
+      throw new CustomError(`Incorrect path received. Path variable ${PathVariableName.MO_DIR} is not available.`); //eslint-disable-line max-len
+    }
+  } else if (PathRegExp.MO_MODS.test(pathToFile)) {
+    if (pathVariables['%MO_DIR%']) {
+      newPath = newPath.replace(PathVariableName.MO_MODS, pathVariables['%MO_MODS%']);
+    } else {
+      if (profileMO) {
+        throw new CustomError('The path to a file in the Mod Organizer mods folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
+      }
+
+      throw new CustomError(`Incorrect path received. Path variable ${PathVariableName.MO_MODS} is not available.`); //eslint-disable-line max-len
+    }
+  } else if (PathRegExp.DOCS_GAME.test(pathToFile)) {
+    if (pathVariables['%DOCS_GAME%']) {
+      newPath = newPath.replace(PathVariableName.DOCS_GAME, pathVariables['%DOCS_GAME%']);
+    } else {
+      throw new CustomError('The path to a file in the Documents folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
+    }
+  } else if (PathRegExp.DOCUMENTS.test(pathToFile)) {
+    if (isAllowDocuments) {
+      newPath = newPath.replace(PathVariableName.DOCUMENTS, pathVariables['%DOCUMENTS%']);
+    } else {
+      throw new CustomError(`The path to a file in the Documents folder is not allow. Maybe you wanted to write "${PathVariableName.DOCS_GAME}"?.`); //eslint-disable-line max-len
+    }
+  } else if (PathRegExp.GAME_DIR.test(pathToFile)) {
+    newPath = newPath.replace(PathVariableName.GAME_DIR, pathVariables['%GAME_DIR%']);
+  } else {
+    throw new CustomError(`Incorrect path (${pathToFile}) received.`); //eslint-disable-line max-len
+  }
+
+  if (isWithCheck) {
+    checkIsPathIsNotOutsideValidFolder(newPath, pathVariables);
+  }
+
+  return newPath;
+};
+
 /**
  * Асинхронно получает данные из файла для последующей генерации игровых настроек.
  * @param file Объект файла игровых настроек из `state`.
@@ -468,7 +557,7 @@ export const readGameSettingsFile = async (
   pathVariables: IPathVariables,
   moProfile: string,
   defaultEncoding: Encoding,
-  isWithPrefix: boolean,
+  isWithPrefix = false,
 ): Promise<{ [key: string]: IIniObj|IXmlObj, }> => {
   let fileData: IIniObj|IXmlObj = {};
 
@@ -498,6 +587,22 @@ export const readGameSettingsFile = async (
 export const getIsExists = (
   pathToCheck: string,
 ): boolean => fs.existsSync(pathToCheck);
+
+/**
+ * Приводит строку пути к единому корректному виду.
+ * @param pathStr Строка пути.
+ * @returns Нормализованная строка пути.
+ */
+export const normalizePath = (
+  pathStr: string,
+): string => path.normalize(pathStr).replace(/[/\\]*$/, '');
+
+/**
+ * Получает строку пути к файлу из составных частей пути.
+ * @param parts Строки пути для объединения.
+ * @returns Нормализованная строка пути.
+ */
+export const getJoinedPath = (...parts: string[]): string => normalizePath(path.join(...parts));
 
 /**
  * Получает путь до родительской папки для указанного файла.

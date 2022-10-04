@@ -11,6 +11,7 @@ import {
   gameSettingsFileAvailableVariablesBase,
   GameSettingsFileView,
   LauncherButtonAction,
+  PathVariableName,
 } from '$constants/misc';
 import { PathSelector } from '$components/UI/PathSelector';
 import { IPathVariables } from '$constants/paths';
@@ -19,6 +20,7 @@ import { getFileNameFromPathToFile } from '$utils/strings';
 import {
   getUniqueValidationErrors, IValidationErrors, IValidationError,
 } from '$utils/validation';
+import { IUserMessage } from '$types/common';
 
 interface IProps {
   file: IGameSettingsFile,
@@ -28,6 +30,7 @@ interface IProps {
   onFileDataChange: (fileName: string, fileData: IGameSettingsFile) => void,
   onValidation: (errors: IValidationErrors) => void,
   deleteFile: (id: string) => void,
+  addMessage: (message: IUserMessage|string) => void,
 }
 
 export const GameSettingsFileItem: React.FC<IProps> = ({
@@ -38,6 +41,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
   onFileDataChange,
   onValidation,
   deleteFile,
+  addMessage,
 }) => {
   const onTextFieldChange = useCallback((
     { target }: React.ChangeEvent<HTMLInputElement>,
@@ -78,6 +82,19 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
     deleteFile(file.id);
   }, [file.id, deleteFile]);
 
+  const getPathVariablesForSelect = useCallback(() => {
+    let variables = [...isModOrganizerUsed
+      ? gameSettingsFileAvailableVariablesAll
+      : gameSettingsFileAvailableVariablesBase];
+
+    if (pathVariables['%DOCUMENTS%'] === pathVariables['%DOCS_GAME%']) {
+      variables = variables.filter(
+        (currentVariable) => currentVariable !== PathVariableName.DOCS_GAME,
+      );
+    }
+    return generateSelectOptions(variables);
+  }, [pathVariables, isModOrganizerUsed]);
+
   return (
     <React.Fragment>
       <TextField
@@ -86,7 +103,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         name="label"
         value={file.label}
         description="Имя файла для идентификации"
-        label="Имя файла"
+        label="Имя"
         placeholder={getFileNameFromPathToFile(file.path)}
         onChange={onTextFieldChange}
       />
@@ -97,21 +114,20 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         pathVariables={pathVariables}
         validationErrors={validationErrors}
         value={file.path}
-        label="Путь до файла настроек"
+        label="Путь"
         description="Состоит из переменной пути и самого пути к файлу. При выборе пути через диалоговое окно, переменная определяется автоматически." //eslint-disable-line
         selectorType={LauncherButtonAction.RUN}
-        selectPathVariables={generateSelectOptions(isModOrganizerUsed
-          ? gameSettingsFileAvailableVariablesAll
-          : gameSettingsFileAvailableVariablesBase)}
+        selectPathVariables={getPathVariablesForSelect()}
         onChange={onPathSelectorChange}
+        onOpenPathError={addMessage}
       />
       <Select
         className={styles.file__item}
         id={`view_${file.id}`}
         name="view"
-        label="Тип структуры файла"
+        label="Структура"
         description='Определяет, какая структура содержимого у файла. Неправильно выбранная структура приведет к ошибке обработки.' //eslint-disable-line
-        selectOptions={generateSelectOptions(GameSettingsFileView)}
+        selectOptions={generateSelectOptions(Object.values(GameSettingsFileView))}
         value={file.view}
         onChange={onSelectChange}
       />
@@ -121,7 +137,7 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
         name="encoding"
         value={file.encoding}
         description="Кодировка файла, которая будет применяться при чтении и сохранении файла. Если не указано, берется значение по умолчанию." //eslint-disable-line max-len
-        label="Кодировка файла"
+        label="Кодировка"
         onChange={onTextFieldChange}
       />
       <Button

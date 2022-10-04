@@ -1,12 +1,23 @@
 {
+  "isResizable": true,
   "width": 800,
-  "height": 600,
-  "modOrganizer": {
-    "isUsed": false
-  },
-  "documentsPath": "%DOCUMENTS%\\My Games\\Oblivion",
+  "height": 800,
+  "minWidth": 400,
+  "minHeight": 400,
+  "maxWidth": 900,
+  "maxHeight": 0,
+  "gameName": "",
   "playButton": {
     "path": "%GAME_DIR%\\Oblivion.exe",
     "label": "Играть"
-  }
+  },
+  "customButtons": [
+    {
+      "path": "%GAME_DIR%",
+      "action": "open",
+      "label": "Открыть папку игры",
+      "args": []
+    }
+  ],
+  "isFirstStart": true
 }

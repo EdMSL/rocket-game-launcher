@@ -9,6 +9,8 @@ import styles from './styles.module.scss';
 import {
   AppChannel, AppWindowName, AppWindowStateAction,
 } from '$constants/misc';
+import { ICON_PATH } from '$constants/paths';
+import { getIsExists } from '$utils/files';
 
 const launcherIcon = require('$images/icon.png');
 
@@ -17,6 +19,7 @@ interface IProps {
   gameName: string,
   isResizable: boolean,
   isCloseBtnDisabled?: boolean,
+  isDevWindow?: boolean,
   onClose: (event) => void,
   openAppInfo?: () => void,
 }
@@ -25,6 +28,7 @@ export const Header: React.FunctionComponent<IProps> = ({
   gameName,
   isResizable,
   isCloseBtnDisabled = false,
+  isDevWindow,
   onClose,
   openAppInfo = null,
 }) => {
@@ -81,15 +85,20 @@ export const Header: React.FunctionComponent<IProps> = ({
           }
         }}
       >
-        <div className={styles['header__logo-block']}>
+        <div
+          className={styles['header__logo-block']}
+        >
           <img
             className={styles.header__logo}
-            src={launcherIcon}
+            src={!isDevWindow && getIsExists(ICON_PATH)
+              ? `image-protocol://getMediaFile/${ICON_PATH}`
+              : launcherIcon}
             alt="game logo"
           />
+          {!openAppInfo && <span>Rocket Game Launcher</span>}
         </div>
         <p className={styles['header__game-name']}>
-          {openAppInfo ? gameName : 'Экран разработчика'}
+          {openAppInfo ? gameName : 'Окно разработчика'}
         </p>
         <div className={styles.header__controls}>
           {

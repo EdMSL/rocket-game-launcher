@@ -185,6 +185,15 @@ $checkbox-size: 20px;
   }
 }
 
+.number-field__label {
+  display: flex;
+  align-items: center;
+}
+
+.number-field-input__block {
+  position: relative;
+}
+
 .number-field__input {
   padding: var(--space-m);
 
@@ -193,16 +202,16 @@ $checkbox-size: 20px;
 
   border: none;
 
+  &::placeholder {
+    color: var(--disabled-color);
+  }
+
   &:focus {
     @include focus;
   }
 
   &:disabled {
     background-color: var(--disabled-color);
-  }
-
-  &::placeholder {
-    color: var(--disabled-color);
   }
 
   &--error {
@@ -210,17 +219,34 @@ $checkbox-size: 20px;
   }
 }
 
+.text-field__container {
+  position: relative;
+}
+
 .text-field__label {
   flex: 1 1 30%;
+  display: flex;
+  align-items: center;
+}
+
+.text-field__input-block {
+  position: relative;
+
+  flex: 1 1 50%;
 }
 
 .text-field__input {
-  flex: 1 1 70%;
+  width: 100%;
   padding: var(--space-m);
 
   font-size: var(--text-size-input);
+  text-align: right;
 
   border: none;
+
+  &::placeholder {
+    color: var(--disabled-color);
+  }
 
   &:focus {
     @include focus;
@@ -228,10 +254,6 @@ $checkbox-size: 20px;
 
   &:disabled {
     background-color: var(--disabled-color);
-  }
-
-  &::placeholder {
-    color: var(--disabled-color);
   }
 
   &--error {
@@ -249,16 +271,21 @@ $checkbox-size: 20px;
 }
 
 .text-area__input {
-  flex: 1 1 70%;
+  flex: 1 1 50%;
   padding: var(--space-m);
   padding-bottom: 0;
 
   font-family: inherit;
   font-size: var(--text-size-input);
+  text-align: right;
 
   border: none;
 
   resize: vertical;
+
+  &::placeholder {
+    color: var(--disabled-color);
+  }
 
   &:focus {
     @include focus;
@@ -266,10 +293,6 @@ $checkbox-size: 20px;
 
   &:disabled {
     background-color: var(--disabled-color);
-  }
-
-  &::placeholder {
-    color: var(--disabled-color);
   }
 
   &--error {
@@ -284,7 +307,7 @@ $checkbox-size: 20px;
 .path-selector__input-block {
   position: relative;
 
-  flex: 1 1 70%;
+  flex: 1 1 50%;
   display: flex;
   align-items: center;
 }
@@ -317,9 +340,10 @@ $checkbox-size: 20px;
 
 .path-selector__input {
   width: 100%;
-  padding: var(--space-m) 44px var(--space-m) 4px;
+  padding: var(--space-m) 80px var(--space-m) 4px;
 
   font-size: var(--text-size-input);
+  text-align: right;
 
   border: none;
 
@@ -338,30 +362,20 @@ $checkbox-size: 20px;
 }
 
 .path-selector__input-btn {
+  $btn-width: 36px;
   position: absolute;
-  right: 0;
 
-  width: 36px;
+  width: $btn-width;
   height: 100%;
 
   font-size: 0;
 
   background-color: var(--btn-color);
 
-  &::before {
-    content: ". . .";
-
-    position: absolute;
-    bottom: 50%;
-    left: 0;
-
-    display: inline-block;
-    width: 100%;
-
-    font-size: var(--text-size-input);
-    line-height: calc(var(--text-size-input) / 2);
-    font-weight: 700;
-    text-align: center;
+  & svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--text-main);
   }
 
   &:focus {
@@ -372,8 +386,60 @@ $checkbox-size: 20px;
     background-color: var(--hover-color);
   }
 
+  &--open {
+    right: $btn-width;
+  }
+
+  &--choose {
+    right: 0;
+
+    &::before {
+      content: ". . .";
+
+      position: absolute;
+      bottom: 50%;
+      left: 0;
+
+      display: inline-block;
+      width: 100%;
+
+      font-size: var(--text-size-input);
+      line-height: calc(var(--text-size-input) / 2);
+      font-weight: 700;
+      text-align: center;
+    }
+  }
+
   &:disabled:hover {
     background-color: var(--btn-color);
+  }
+}
+
+.input__block {
+  position: relative;
+}
+
+.input-error__block {
+  @include reset-list;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 100;
+
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--space-s);
+
+  font-size: 12px;
+  text-align: left;
+
+  background-color: var(--error-color);
+  visibility: hidden;
+
+  .text-field__input:focus + &,
+  .path-selector__input:focus + &,
+  .number-field__input:focus + & {
+    visibility: visible;
   }
 }
 

@@ -13,11 +13,15 @@ import { IPathVariables } from '$constants/paths';
 import {
   checkIsPathIsNotOutsideValidFolder, replaceRootDirByPathVariable, getVariableAndValueFromPath,
 } from '$utils/strings';
-import { AppChannel, LauncherButtonAction } from '$constants/misc';
+import {
+  AppChannel, LauncherButtonAction, PathVariableName,
+} from '$constants/misc';
 import { getIsPathWithVariableCorrect } from '$utils/check';
 import {
   getValidationCauses, IValidationError, ValidationErrorCause,
 } from '$utils/validation';
+import { openFolder } from '$utils/process';
+import { getPathToFile, normalizePath } from '$utils/files';
 
 interface IProps extends IUIElementParams, IUIControllerTextField {
   id: string,
@@ -33,6 +37,7 @@ interface IProps extends IUIElementParams, IUIControllerTextField {
     validationData: IValidationError[],
     parent?: string
   ) => void,
+  onOpenPathError: (errorText: string) => void,
 }
 
 export const PathSelector: React.FC<IProps> = ({
@@ -54,6 +59,7 @@ export const PathSelector: React.FC<IProps> = ({
   selectorType = LauncherButtonAction.OPEN,
   isGameDocuments = true,
   onChange,
+  onOpenPathError,
 }) => {
   const [pathVariable, pathValue] = getVariableAndValueFromPath(String(value));
   const availablePathVariables = Object.values(selectPathVariables).map((option) => option.value);
@@ -98,7 +104,7 @@ export const PathSelector: React.FC<IProps> = ({
     setCurrentPathValue(target.value);
 
     onChange(
-      `${currentPathVariable}\\${target.value}`,
+      `${currentPathVariable}${target.value !== '' ? `\\${target.value}` : ''}`,
       name || id,
       [{
         id,
@@ -111,6 +117,22 @@ export const PathSelector: React.FC<IProps> = ({
       parent,
     );
   }, [currentPathVariable, selectorType, name, id, parent, extensions, onChange]);
+
+  const onOpenFolderBtnClick = useCallback(() => {
+    openFolder(
+      getPathToFile(
+        String(value),
+        pathVariables,
+        undefined,
+        false,
+        selectPathVariables
+          .map((currentOption) => currentOption.value)
+          .includes(PathVariableName.DOCUMENTS),
+      ),
+      onOpenPathError,
+      selectorType === LauncherButtonAction.RUN,
+    );
+  }, [value, selectorType, pathVariables, selectPathVariables, onOpenPathError]);
 
   const onSelectPatchBtnClick = useCallback(async () => {
     let pathStr = await getPathFromPathSelector();
@@ -197,14 +219,24 @@ export const PathSelector: React.FC<IProps> = ({
     );
   }, [currentPathValue, id, name, parent, onChange]);
 
-  const getIsDisabled = useCallback(() => isDisabled
-    || (
-      validationErrors
-      && validationErrors[id]
-      && getValidationCauses(validationErrors[id]).includes(ValidationErrorCause.NOT_AVAILABLE)
-    )
-    || !pathVariable,
-  [id, isDisabled, validationErrors, pathVariable]);
+  const getIsDisabled = useCallback(() => isDisabled || !pathVariable,
+    [isDisabled, pathVariable]);
+
+  const onInputBlur = useCallback(() => {
+    onChange(
+      normalizePath(
+        `${currentPathVariable}${currentPathValue !== '' ? `\\${currentPathValue}` : ''}`,
+      ),
+      name || id,
+      [],
+      parent,
+    );
+  }, [id,
+    name,
+    parent,
+    currentPathVariable,
+    currentPathValue,
+    onChange]);
 
   return (
     <div className={classNames(
@@ -259,11 +291,36 @@ export const PathSelector: React.FC<IProps> = ({
           data-multiparameters={multiparameters}
           disabled={getIsDisabled()}
           onChange={onPatchTextFieldChange}
+          onBlur={onInputBlur}
         />
+        {
+          validationErrors && validationErrors[id]?.some((currentError) => currentError.text) && (
+            <ul className="input-error__block">
+              {
+                validationErrors[id]
+                  .filter((currentError) => currentError.text)
+                  .map((currentError) => <li key={`${id}${currentError.cause}`}>{currentError.text}</li>)
+              }
+            </ul>
+          )
+        }
         <Button
-          className="path-selector__input-btn"
-          onClick={onSelectPatchBtnClick}
+          className="path-selector__input-btn path-selector__input-btn--open"
+          title="Открыть в проводнике"
           isDisabled={isDisabled}
+          onClick={onOpenFolderBtnClick}
+        >
+          {/* eslint-disable */}
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
+          </svg>
+          {/* eslint-enable */}
+        </Button>
+        <Button
+          className="path-selector__input-btn path-selector__input-btn--choose"
+          title="Выбрать путь"
+          isDisabled={isDisabled}
+          onClick={onSelectPatchBtnClick}
         >
           Выбрать путь
         </Button>

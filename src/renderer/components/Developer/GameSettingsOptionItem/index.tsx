@@ -26,15 +26,19 @@ import {
 import { Button } from '$components/UI/Button';
 import { TextField } from '$components/UI/TextField';
 import { NumberField } from '$components/UI/NumberField';
-import { generateSelectOptionsFromString, getRandomId } from '$utils/strings';
+import {
+  gatGameSettingOptionItemId, generateSelectOptionsFromString, getRandomId,
+} from '$utils/strings';
 import { TextArea } from '$components/UI/TextArea';
 import { SpoilerListItem } from '$components/Developer/SpoilerListItem';
 import {
   clearIDRelatedValidationErrors,
   IValidationErrors,
   validateControllerTypeRelatedFields,
+  validateOptionTypeRelatedFields,
   validateTargetGameSettingsOption,
 } from '$utils/validation';
+import { defaultGameSettingsOptionItem } from '$constants/defaultData';
 
 interface IProps {
   option: IGameSettingsOption,
@@ -76,7 +80,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         ...option,
         ...isOptionItemChange ? {
           items: changeConfigArrayItem<any>(
-            currentTarget.id.split('_')[1],
+            gatGameSettingOptionItemId(currentTarget.id),
             {
               [currentTarget.name]: currentTarget.value,
               selectOptions: generateSelectOptionsFromString(currentTarget.value),
@@ -94,7 +98,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         ...option,
         ...isOptionItemChange ? {
           items: changeConfigArrayItem<any>(
-            currentTarget.id.split('_')[1],
+            gatGameSettingOptionItemId(currentTarget.id),
             { [currentTarget.name]: currentTarget.value },
             option.items,
             false,
@@ -143,7 +147,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         ...option,
         ...isOptionItemChange ? {
           items: changeConfigArrayItem<any>(
-            currentTarget.id.split('_')[1],
+            gatGameSettingOptionItemId(currentTarget.id),
             { [currentTarget.name]: currentValue },
             option.items,
             false,
@@ -174,7 +178,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
         ...option,
         items: [
           {
-            ...option.items[option.items.length - 1],
+            ...defaultGameSettingsOptionItem,
             id: newId,
           },
           ...option.items],
@@ -183,12 +187,11 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
       fullOption,
     );
 
-    if (option.optionType === GameSettingsOptionType.COMBINED) {
-      onValidation(validateControllerTypeRelatedFields(
-        newOption,
-        validationErrors,
-      ));
-    }
+    onValidation(validateOptionTypeRelatedFields(
+      newOption,
+      optionFile!,
+      validationErrors,
+    ));
 
     onOptionDataChange(option.id, newOption, newFullOption);
     setLastAddedItemId(newId);
@@ -196,15 +199,21 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
 
   const deleteOptionItem = useCallback((
     newItems: IGameSettingsOptionItem[],
+    deletedItem: IGameSettingsOptionItem,
   ) => {
     const newOption = { ...option, items: newItems };
-
     if (option.optionType === GameSettingsOptionType.COMBINED) {
       onValidation(validateControllerTypeRelatedFields(
         newOption,
         validationErrors,
       ));
     }
+    onValidation(option.optionType === GameSettingsOptionType.COMBINED
+      ? validateControllerTypeRelatedFields(
+        newOption,
+        clearIDRelatedValidationErrors(validationErrors, deletedItem.id),
+      )
+      : clearIDRelatedValidationErrors(validationErrors, deletedItem.id));
 
     onOptionDataChange(option.id, newOption, { ...fullOption, items: newItems });
   }, [option, fullOption, validationErrors, onValidation, onOptionDataChange]);
@@ -212,7 +221,10 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
   const onDeleteOptionItemBtnClick = useCallback((
     { currentTarget }: React.MouseEvent<HTMLButtonElement>,
   ) => {
-    deleteOptionItem(option.items.filter((item) => item.id !== currentTarget.id.split(':')[1]));
+    deleteOptionItem(
+      option.items.filter((currentItem) => currentItem.id !== currentTarget.id.split(':')[1]),
+      option.items.find((currentItem) => currentItem.id === currentTarget.id.split(':')[1])!,
+    );
   }, [option.items, deleteOptionItem]);
 
   const selectOptionsFiles = gameSettingsFiles.map((file): ISelectOption => ({
@@ -227,23 +239,12 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
 
   return (
     <React.Fragment>
-      <TextField
-        className={styles.option__item}
-        id={`${GameSettingsOptionFields.LABEL}_${option.id}`}
-        name={GameSettingsOptionFields.LABEL}
-        label="Заголовок"
-        description="Текст, отображаемый перед контроллером опции."
-        value={option[GameSettingsOptionFields.LABEL]}
-        isRequied
-        validationErrors={validationErrors}
-        onChange={onOptionInputChange}
-      />
       <Select
         className={styles.option__item}
         id={`${GameSettingsOptionFields.OPTION_TYPE}_${option.id}`}
         selectOptions={generateSelectOptions(GameSettingsOptionType)}
         name={GameSettingsOptionFields.OPTION_TYPE}
-        label="Тип опции"
+        label="Тип"
         description="Тип опции определяет, сколько значений параметров она может изменять, а так же способ их изменения." //eslint-disable-line max-len
         value={option[GameSettingsOptionFields.OPTION_TYPE]}
         onChange={onOptionInputChange}
@@ -260,9 +261,20 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
       />
       <TextField
         className={styles.option__item}
+        id={`${GameSettingsOptionFields.LABEL}_${option.id}`}
+        name={GameSettingsOptionFields.LABEL}
+        label="Заголовок"
+        description="Текст, отображаемый перед контроллером опции."
+        value={option[GameSettingsOptionFields.LABEL]}
+        isRequied
+        validationErrors={validationErrors}
+        onChange={onOptionInputChange}
+      />
+      <TextField
+        className={styles.option__item}
         id={`${GameSettingsOptionFields.DESCRIPTION}_${option.id}`}
         name={GameSettingsOptionFields.DESCRIPTION}
-        label="Описание опции"
+        label="Описание"
         description="Текст для всплывающей подсказки. Аналогична данной подсказке."
         value={option[GameSettingsOptionFields.DESCRIPTION]}
         onChange={onOptionInputChange}
@@ -292,7 +304,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                 ? [UIControllerType.SELECT.toUpperCase()]
                 : UIControllerType,
             )}
-            label="Тип контроллера"
+            label="Контроллер"
             description="Определяет, с помощью какого контроллера будет изменяться значение опции." //eslint-disable-line max-len
             value={option[GameSettingsOptionFields.CONTROLLER_TYPE]}
             onChange={onOptionInputChange}
@@ -409,11 +421,11 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
               <React.Fragment>
                 <TextField
                   className={styles.option__item}
-                  id={`${GameSettingsOptionFields.NAME}_${item.id}_${option.id}`}
+                  id={`${GameSettingsOptionFields.NAME}_${option.id}_${item.id}`}
                   parent={option.id}
                   name={GameSettingsOptionFields.NAME}
                   label="Имя параметра"
-                  description="Имя тега параметра для опции. Все параметры следует брать из того файла, который выбран в поле 'Файл'." //eslint-disable-line max-len
+                  description={`Имя${item.valueAttribute !== undefined ? ' тега' : ''} параметра для опции. Все параметры следует брать из того файла, который выбран в поле 'Файл'.`} //eslint-disable-line max-len
                   value={item[GameSettingsOptionFields.NAME]}
                   isRequied
                   validationErrors={validationErrors}
@@ -423,7 +435,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.iniGroup !== undefined && (
                   <TextField
                     className={styles.option__item}
-                    id={`${GameSettingsOptionFields.INI_GROUP}_${item.id}_${option.id}`}
+                    id={`${GameSettingsOptionFields.INI_GROUP}_${option.id}_${item.id}`}
                     parent={option.id}
                     name={GameSettingsOptionFields.INI_GROUP}
                     label="Группа параметра"
@@ -439,13 +451,12 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.valueAttribute !== undefined && (
                   <TextField
                     className={styles.option__item}
-                    id={`${GameSettingsOptionFields.VALUE_ATTRIBUTE}_${item.id}_${option.id}`}
+                    id={`${GameSettingsOptionFields.VALUE_ATTRIBUTE}_${option.id}_${item.id}`}
                     parent={option.id}
                     name={GameSettingsOptionFields.VALUE_ATTRIBUTE}
                     label="Имя атрибута параметра"
                     description="Атрибут тега параметра, в котором находится значение для опции."
                     value={item[GameSettingsOptionFields.VALUE_ATTRIBUTE]!}
-                    isRequied
                     validationErrors={validationErrors}
                     onChange={onOptionInputChange}
                   />
@@ -455,7 +466,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.valuePath !== undefined && (
                   <TextField
                     className={styles.option__item}
-                    id={`${GameSettingsOptionFields.VALUE_PATH}_${item.id}_${option.id}`}
+                    id={`${GameSettingsOptionFields.VALUE_PATH}_${option.id}_${item.id}`}
                     parent={option.id}
                     name={GameSettingsOptionFields.VALUE_PATH}
                     label="Путь до параметра"
@@ -471,7 +482,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.controllerType !== undefined && (
                     <Select
                       className={styles.option__item}
-                      id={`${GameSettingsOptionFields.CONTROLLER_TYPE}_${item.id}_${option.id}`}
+                      id={`${GameSettingsOptionFields.CONTROLLER_TYPE}_${option.id}_${item.id}`}
                       parent={option.id}
                       name={GameSettingsOptionFields.CONTROLLER_TYPE}
                       selectOptions={generateSelectOptions(
@@ -489,7 +500,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.selectOptionsValueString !== undefined && (
                     <TextArea
                       className={styles.option__item}
-                      id={`${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${item.id}_${option.id}`}
+                      id={`${GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}_${option.id}_${item.id}`}
                       parent={option.id}
                       name={GameSettingsOptionFields.SELECT_OPTIONS_VALUE_STRING}
                       label="Опции селектора"
@@ -506,7 +517,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.min !== undefined && (
                     <NumberField
                       className={styles.option__item}
-                      id={`${GameSettingsOptionFields.MIN}_${item.id}_${option.id}`}
+                      id={`${GameSettingsOptionFields.MIN}_${option.id}_${item.id}`}
                       parent={option.id}
                       name={GameSettingsOptionFields.MIN}
                       min=""
@@ -521,7 +532,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.max !== undefined && (
                     <NumberField
                       className={styles.option__item}
-                      id={`${GameSettingsOptionFields.MAX}_${item.id}_${option.id}`}
+                      id={`${GameSettingsOptionFields.MAX}_${option.id}_${item.id}`}
                       parent={option.id}
                       name={GameSettingsOptionFields.MAX}
                       min=""
@@ -536,7 +547,7 @@ export const GameSettingsOptionItem: React.FC<IProps> = ({
                   item.step !== undefined && (
                     <NumberField
                       className={styles.option__item}
-                      id={`${GameSettingsOptionFields.STEP}_${item.id}_${option.id}`}
+                      id={`${GameSettingsOptionFields.STEP}_${option.id}_${item.id}`}
                       parent={option.id}
                       name={GameSettingsOptionFields.STEP}
                       min={0.001}

@@ -16,7 +16,6 @@ import {
   checkIsPathIsNotOutsideValidFolder,
   generateSelectOptionsString,
   getLineIniParameterValue,
-  getPathToFile,
   getRandomId,
   getRandomName,
   replacePathVariableByRootDir,
@@ -46,17 +45,21 @@ import {
 import {
   ILauncherConfig,
   ILauncherCustomButton,
+  IWindowSizeSettings,
 } from '$types/main';
 import {
   defaultFullGameSettingsOption,
   defaultGameSettingsOptionItem,
+  defaultLauncherWindowSettings,
   defaultModOrganizerPaths,
-  MOIniFileName,
+  MO_INI_FILE_NAME,
 } from '$constants/defaultData';
 import {
   IGetDataFromFilesResult, IIniObj, IXmlObj, ISelectOption,
 } from '$types/common';
-import { readINIFileSync } from './files';
+import {
+  getPathToFile, readINIFileSync, xmlAttributePrefix,
+} from './files';
 
 const SYMBOLS_TO_TYPE = 8;
 
@@ -94,7 +97,7 @@ export const getParameterName = (
   option: IGameSettingsOptionItem,
 ): string => {
   if (option.valueAttribute) {
-    return `${option.valuePath ? `${option.valuePath}/` : ''}${option.name}/${option.valueAttribute}`;
+    return `${option.valuePath ? `${option.valuePath}/` : ''}${option.name}/${xmlAttributePrefix}${option.valueAttribute}`; //eslint-disable-line max-len
   }
 
   if (option.iniGroup) {
@@ -193,6 +196,31 @@ export const setValueForObjectDeepKey = <T>(
 };
 
 /**
+ * Получает значение из трех переданных: текущего, минимального и максимального.
+ * @param value Текущее значение.
+ * @param min Минимальное значение.
+ * @param max Максимальное значение.
+ * @param isWithZero Если `true`, то 0 считается как отсутствие ограничения для max.
+ * @returns Новое значение из трех переданных.
+ */
+export const getOneFromThree = (
+  value: number,
+  min: number,
+  max: number,
+  isWithZero = true,
+): number => {
+  if (value < min) {
+    return min;
+  } else if (
+    (isWithZero && max !== 0 && value > max)
+    || (!isWithZero && value > max)) {
+    return max;
+  }
+
+  return value;
+};
+
+/**
  * Заменяет данные элемента (объект) массива на новые.
  * @param id Идентификатор элемента массива.
  * @param data Объект с данными для замены.
@@ -279,6 +307,10 @@ export const getParameterData = (
       });
     }
   } else if (currentGameSettingsFile.view === GameSettingsFileView.TAG) {
+    const valueAttribute = currentGameSettingOption.valueAttribute
+      ? `${xmlAttributePrefix}${currentGameSettingOption.valueAttribute}`
+      : '';
+
     let valuePathArr: string[] = [];
 
     if (currentGameSettingOption.valuePath) {
@@ -288,7 +320,9 @@ export const getParameterData = (
     const pathArr = [
       ...valuePathArr,
       currentGameSettingOption.name!,
-      currentGameSettingOption.valueAttribute!,
+      ...currentGameSettingOption.valueAttribute
+        ? [valueAttribute]
+        : [],
     ];
 
     let index = 0;
@@ -298,9 +332,14 @@ export const getParameterData = (
 
       if (typeof obj[key] === 'object') {
         getProp(obj[key], pathArr[index]);
-      } else if (key === currentGameSettingOption.valueAttribute) {
+      } else if (key === currentGameSettingOption.valueAttribute
+        ? valueAttribute
+        : currentGameSettingOption.name
+      ) {
         parameterName = pathArr.join('/');
-        parameterValue = obj[currentGameSettingOption.valueAttribute!];
+        parameterValue = obj[currentGameSettingOption.valueAttribute
+          ? valueAttribute
+          : currentGameSettingOption.name];
       }
     };
 
@@ -311,7 +350,7 @@ export const getParameterData = (
       let errorField = '';
 
       if (index === pathArr.length) {
-        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingOption.valueAttribute}" attribute in "${currentGameSettingOption.name}" parameter specified in "${currentGameSettingsFile.label}".`; //eslint-disable-line max-len
+        errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain ${currentGameSettingOption.valueAttribute ? `"${xmlAttributePrefix}${currentGameSettingOption.valueAttribute}" attribute in ` : ''}"${currentGameSettingOption.name}" parameter specified in "${currentGameSettingsFile.label}".`; //eslint-disable-line max-len
         errorField = 'valueAttribute';
       } else if (index === pathArr.length - 1) {
         errorMsg = `The ${baseFileName} file${moProfileName ? ` from the "${moProfileName}" profile` : ''} does not contain "${currentGameSettingOption.name}" parameter${currentGameSettingOption.valuePath ? ` on the path "${currentGameSettingOption.valuePath}"` : ''} specified in "${currentGameSettingsFile.label}".`; //eslint-disable-line max-len
@@ -547,16 +586,6 @@ export const getGameSettingsParametersWithNewValues = (
 };
 
 /**
- * Сгенерировать имя папки для бэкапа файлов.
- * @returns Строка с именем для папки.
-*/
-export const getBackupFolderName = (): string => {
-  const date = new Date();
-
-  return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}_${date.toTimeString().split(' ')[0].split(':').join('.')}`; // eslint-disable-line max-len
-};
-
-/**
  * Изменить строку с указанным параметром на строку с новым значением параметра.
  * Изменяет(мутирует) входные данные `iniData`.
  * @param iniData Входные данные файла, в котором находится изменяемый параметр.
@@ -683,18 +712,16 @@ export const getModOrganizerPathVariables = (
   pathToMOFolder: string,
   pathVariables: IPathVariables,
 ): IModOrganizerPathVariables => {
-  const MO_DIR_BASE = replacePathVariableByRootDir(pathToMOFolder);
-
   let modOrganizerModsPath = defaultModOrganizerPaths.pathToMods.replace(
     PathVariableName.MO_DIR,
-    MO_DIR_BASE,
+    pathToMOFolder,
   );
   let modOrganizerProfilesPath = defaultModOrganizerPaths.pathToProfiles.replace(
     PathVariableName.MO_DIR,
-    MO_DIR_BASE,
+    pathToMOFolder,
   );
 
-  const MOIniData = readINIFileSync(path.join(MO_DIR_BASE, MOIniFileName));
+  const MOIniData = readINIFileSync(path.join(pathToMOFolder, MO_INI_FILE_NAME));
   const MoModsSection = MOIniData.getSection('Settings');
 
   if (MoModsSection) {
@@ -703,7 +730,7 @@ export const getModOrganizerPathVariables = (
 
     if (modOrganizerModsPathTemp) {
       if (modOrganizerModsPathTemp.includes('%BASE_DIR%')) {
-        modOrganizerModsPath = modOrganizerModsPathTemp.replace('%BASE_DIR%', MO_DIR_BASE);
+        modOrganizerModsPath = modOrganizerModsPathTemp.replace('%BASE_DIR%', pathToMOFolder);
       } else {
         checkIsPathIsNotOutsideValidFolder(modOrganizerModsPathTemp, pathVariables);
         modOrganizerModsPath = modOrganizerModsPathTemp;
@@ -712,7 +739,7 @@ export const getModOrganizerPathVariables = (
 
     if (modOrganizerProfilesPathTemp) {
       if (modOrganizerProfilesPathTemp.includes('%BASE_DIR%')) {
-        modOrganizerProfilesPath = modOrganizerProfilesPathTemp.replace('%BASE_DIR%', MO_DIR_BASE);
+        modOrganizerProfilesPath = modOrganizerProfilesPathTemp.replace('%BASE_DIR%', pathToMOFolder);
       } else {
         checkIsPathIsNotOutsideValidFolder(modOrganizerProfilesPathTemp, pathVariables);
         modOrganizerProfilesPath = modOrganizerProfilesPathTemp;
@@ -721,10 +748,10 @@ export const getModOrganizerPathVariables = (
   }
 
   return {
-    '%MO_DIR%': MO_DIR_BASE,
+    '%MO_DIR%': pathToMOFolder,
     '%MO_INI%': defaultModOrganizerPaths.pathToINI.replace(
       PathVariableName.MO_DIR,
-      MO_DIR_BASE,
+      pathToMOFolder,
     ),
     '%MO_MODS%': modOrganizerModsPath,
     '%MO_PROFILE%': modOrganizerProfilesPath,
@@ -733,31 +760,15 @@ export const getModOrganizerPathVariables = (
 
 /**
  * Генерирует базовые переменные путей.
- * @param configData Данные из файла config.json.
  * @param app Объект Electron.app.
  * @returns Объект с переменными путей.
 */
 export const createBasePathVariables = (
-  configData: ILauncherConfig,
   app: Electron.App,
-): IPathVariables => {
-  let pathVariables: IPathVariables = {
-    ...DefaultPathVariable,
-    '%DOCUMENTS%': app.getPath('documents'),
-  };
-
-  if (configData.documentsPath) {
-    pathVariables = {
-      ...pathVariables,
-      '%DOCS_GAME%': configData.documentsPath.replace(
-        PathVariableName.DOCUMENTS,
-        pathVariables['%DOCUMENTS%'],
-      ),
-    };
-  }
-
-  return pathVariables;
-};
+): IPathVariables => ({
+  ...DefaultPathVariable,
+  '%DOCUMENTS%': app.getPath('documents'),
+});
 
 const getUpdatedModOrganizerPathVariables = (
   pathToMOFolder: string,
@@ -798,17 +809,22 @@ export const updatePathVariables = (
   if ('playButton' in config) {
     return {
       ...pathVariables,
-      '%DOCS_GAME%': config.documentsPath.replace(
-        PathVariableName.DOCUMENTS,
-        pathVariables['%DOCUMENTS%'],
-      ),
     };
   } else if ('baseFilesEncoding' in config) {
     return {
       ...pathVariables,
-      ...getUpdatedModOrganizerPathVariables(
-        config.modOrganizer.pathToMOFolder,
-        pathVariables,
+      ...pathVariables['%MO_DIR%']
+        ? getUpdatedModOrganizerPathVariables(
+          config.modOrganizer.pathToMOFolder,
+          pathVariables,
+        )
+        : getModOrganizerPathVariables(
+          replacePathVariableByRootDir(config.modOrganizer.pathToMOFolder),
+          pathVariables,
+        ),
+      '%DOCS_GAME%': config.documentsPath.replace(
+        PathVariableName.DOCUMENTS,
+        pathVariables['%DOCUMENTS%'],
       ),
     };
   }
@@ -899,7 +915,7 @@ export const getFullOption = (
 
   if (currentOption.optionType !== GameSettingsOptionType.DEFAULT && newItems.length < 2) {
     newItems.push({
-      ...newItems[0],
+      ...defaultGameSettingsOptionItem,
       id: getRandomId(),
     });
   }
@@ -972,7 +988,7 @@ export const getNewGameSettingsOption = (
 ): IGameSettingsOption => ({
   ...getOptionBase(file),
   label: 'Заголовок',
-  ...settingGroup ? { settingGroup } : {},
+  ...settingGroup && { settingGroup },
   controllerType: UIControllerType.CHECKBOX,
   items: [{
     id: getRandomId(),
@@ -1181,3 +1197,23 @@ export const getSelectsOptionStringObj = (
 export const getTempFileLabel = (
   file: IGameSettingsFile,
 ): string => file.label || getFileNameFromPathToFile(file.path!) || '';
+
+/**
+ * Получить объект с данными, относящимися к окну приложения.
+ * @param config Объект конфигурации лаунчера.
+ * @returns Объект с настройками, относящимися к окну приложения.
+ */
+export const getWindowSettingsFromLauncherConfig = (
+  config: ILauncherConfig,
+): IWindowSizeSettings => Object.keys(defaultLauncherWindowSettings).reduce<IWindowSizeSettings>(
+  (acc, current) => {
+    if (current !== 'icon') {
+      return {
+        ...acc,
+        [current]: config[current],
+      };
+    }
+
+    return { ...acc };
+  }, {} as IWindowSizeSettings,
+);

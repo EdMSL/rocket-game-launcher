@@ -11,6 +11,7 @@ import { IButtonArg, ILauncherCustomButton } from '$types/main';
 import {
   PathVariableName,
   LauncherButtonAction,
+  FileExtension,
 } from '$constants/misc';
 import { generateSelectOptions } from '$utils/data';
 import { Button } from '$components/UI/Button';
@@ -20,8 +21,13 @@ import {
   getIsPathWithVariableCorrect,
 } from '$utils/check';
 import {
-  getUniqueValidationErrors, IValidationError, IValidationErrors, ValidationErrorCause,
+  getUniqueValidationErrors,
+  IValidationError,
+  IValidationErrors,
+  ValidationErrorCause,
+  ValidationErrorText,
 } from '$utils/validation';
+import { IUserMessage } from '$types/common';
 
 interface IProps {
   item: ILauncherCustomButton,
@@ -31,6 +37,7 @@ interface IProps {
   deleteBtnItem: (id: string) => void,
   сhangeBtnData: (btnId: string, newBtnData: ILauncherCustomButton) => void,
   onValidationError: (errors: IValidationErrors) => void,
+  addMessage: (message: IUserMessage|string) => void,
 }
 
 export const CustomBtnItem: React.FC<IProps> = ({
@@ -41,6 +48,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
   сhangeBtnData,
   deleteBtnItem,
   onValidationError,
+  addMessage,
 }) => {
   const pathSelectorId = `path_${item.id}`;
   const detailsElementRef = useRef<HTMLDetailsElement>(null);
@@ -66,6 +74,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
         id: pathSelectorId,
         error: {
           cause: ValidationErrorCause.PATH,
+          text: ValidationErrorText.PATH,
         },
         isForAdd: !isPathCorrect,
       }],
@@ -84,7 +93,8 @@ export const CustomBtnItem: React.FC<IProps> = ({
         [{
           id: target.id,
           error: {
-            cause: ValidationErrorCause.PATH,
+            cause: ValidationErrorCause.EMPTY,
+            text: ValidationErrorText.EMPTY,
           },
           isForAdd: target.value.trim() === '',
         }],
@@ -110,7 +120,7 @@ export const CustomBtnItem: React.FC<IProps> = ({
     }
   }, [item, validationErrors, onValidationError, сhangeBtnData]);
 
-  const onChangeArguments = useCallback((
+  const changeArguments = useCallback((
     newArgs: IButtonArg[],
   ) => {
     сhangeBtnData(item.id, {
@@ -140,9 +150,9 @@ export const CustomBtnItem: React.FC<IProps> = ({
         id={`action_${item.id}`}
         className={styles['custom-btn__item']}
         name="action"
-        label="Кнопка запуска приложения?"
+        label="Запускает приложение"
         isChecked={item.action === LauncherButtonAction.RUN}
-        description="Определяет действие по нажатию кнопки: запуск приложения\файла или открытие папки. Влияет на доступный выбор в селекторе пути ниже"//eslint-disable-line max-len
+        description="Если включено, кнопка будет предназначена для запуска исполняемого файла, иначе для открытия папки"//eslint-disable-line max-len
         onChange={onCheckboxChange}
       />
       <PathSelector
@@ -154,9 +164,12 @@ export const CustomBtnItem: React.FC<IProps> = ({
         selectPathVariables={generateSelectOptions([PathVariableName.GAME_DIR])}
         pathVariables={pathVariables}
         selectorType={item.action}
+        extensions={FileExtension.EXECUTABLE}
         description="Путь до файла для запуска или папки для открытия в проводнике"
+        isGameDocuments={false}
         validationErrors={validationErrors}
         onChange={onPathSelectorChange}
+        onOpenPathError={addMessage}
       />
       <ArgumentsBlock
         args={item.args!}
@@ -166,8 +179,9 @@ export const CustomBtnItem: React.FC<IProps> = ({
         pathVariables={pathVariables}
         description="Дополнительные агрументы запуска"
         validationErrors={validationErrors}
-        changeArguments={onChangeArguments}
+        changeArguments={changeArguments}
         onValidationError={onValidationError}
+        addMessage={addMessage}
       />
       <Button
         className={classNames(

@@ -106,16 +106,18 @@ export interface IModOrganizerParams {
 }
 
 export interface IGameSettingsConfig {
-  modOrganizer: IModOrganizerParams,
   baseFilesEncoding: IGameSettingsRootState['baseFilesEncoding'],
+  documentsPath: IGameSettingsRootState['documentsPath'],
+  modOrganizer: IModOrganizerParams,
   gameSettingsGroups: IGameSettingsRootState['gameSettingsGroups'],
   gameSettingsFiles: IGameSettingsRootState['gameSettingsFiles'],
   gameSettingsOptions: IGameSettingsRootState['gameSettingsOptions'],
 }
 
 export type IGameSettingsRootState = Readonly<{
-  modOrganizer: IModOrganizerParams,
   baseFilesEncoding: Encoding,
+  documentsPath: string,
+  modOrganizer: IModOrganizerParams,
   gameSettingsGroups: IGameSettingsGroup[],
   gameSettingsFiles: IGameSettingsFile[],
   gameSettingsOptions: IGameSettingsOption[],

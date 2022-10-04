@@ -24,12 +24,12 @@ import { CreateUserMessage } from '$utils/message';
 import { LauncherButtonAction, AppChannel } from '$constants/misc';
 import { Modal } from '$components/UI/Modal';
 import { LauncherUserSettings } from '$components/App/LauncherUserSettings';
-import { getPathToFile } from '$utils/strings';
 import { Loader } from '$components/UI/Loader';
 import { IButtonArg } from '$types/main';
 import { ILocationState } from '$types/common';
 import { IGameSettingsConfig } from '$types/gameSettings';
 import { setGameSettingsConfig } from '$actions/gameSettings';
+import { getPathToFile } from '$utils/files';
 
 export const MainScreen: React.FC = () => {
   /* eslint-disable max-len */
@@ -166,7 +166,7 @@ export const MainScreen: React.FC = () => {
             isAutofocus
             onClick={onPlayGameBtnClick}
           >
-            {playButton.label}
+            {playButton.label || 'Играть'}
           </Button>
           {
             customButtons.map((button) => (

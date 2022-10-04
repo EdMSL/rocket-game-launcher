@@ -6,7 +6,7 @@ import fs from 'fs';
 
 import { configureAppStore, IAppState } from '$store/store';
 import { IUserSettingsRootState } from '$types/userSettings';
-import { defaultLauncherConfig } from '$constants/defaultData';
+import { defaultLauncherConfig, LAUNCHER_CONFIG_FILE_NAME } from '$constants/defaultData';
 import {
   LogMessageType,
   writeToLogFile,
@@ -64,23 +64,26 @@ const getConfigurationData = (): [ILauncherConfig, boolean] => {
 
         writeJSONFile(CONFIG_FILE_PATH, defaultLauncherConfig)
           .then(() => {
-            writeToLogFile('New config file config.json successfully created.');
+            writeToLogFile(`New config file ${LAUNCHER_CONFIG_FILE_NAME} successfully created.`);
           })
           .catch(() => {
-            writeToLogFile('New config file config.json not created.', LogMessageType.WARNING);
+            writeToLogFile(
+              `New config file ${LAUNCHER_CONFIG_FILE_NAME} not created.`,
+              LogMessageType.WARNING,
+            );
           });
 
         return [defaultLauncherConfig, true];
       }
 
-      throw new Error('Found problems with config.json.');
+      throw new Error(`Found problems with ${LAUNCHER_CONFIG_FILE_NAME}.`);
     } else if (error instanceof CustomError) {
       if (error.name === ErrorName.VALIDATION) {
         writeToLogFileSync(error.message, LogMessageType.ERROR);
       }
     }
 
-    throw new Error('Found problems with config.json.');
+    throw new Error(`Found problems with ${LAUNCHER_CONFIG_FILE_NAME}.`);
   }
 };
 
@@ -106,7 +109,9 @@ export const createStorage = (): Store<IAppState> => {
         theme: '',
       },
     },
-    cwd: process.env.NODE_ENV === 'production' ? path.resolve() : path.resolve('./app/files'),
+    cwd: process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test'
+      ? path.resolve()
+      : path.resolve('./app/files'),
     name: 'user',
   });
 
@@ -130,7 +135,6 @@ export const createStorage = (): Store<IAppState> => {
 
   // Переменные путей и настройка кнопок
   const pathVariables = createBasePathVariables(
-    configurationData,
     app,
   );
 

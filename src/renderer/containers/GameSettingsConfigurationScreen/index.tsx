@@ -38,9 +38,10 @@ import {
   checkIsPathIsNotOutsideValidFolder,
   getFileNameFromPathToFile,
   getRandomName,
+  replacePathVariableByRootDir,
   replaceRootDirByPathVariable,
 } from '$utils/strings';
-import { EditableItem } from '$components/Developer/EditableItem';
+import { EditableItem } from '$components/EditableItem';
 import { HintItem } from '$components/HintItem';
 import { GameSettingsFileItem } from '$components/Developer/GameSettingsFileItem';
 import { GAME_DIR } from '$constants/paths';
@@ -59,9 +60,9 @@ import {
   ValidationErrorCause,
 } from '$utils/validation';
 import { Switcher } from '$components/UI/Switcher';
-import { Select } from '$components/UI/Select';
 import { PathSelector } from '$components/UI/PathSelector';
 import { defaultFullGameSettingsOption } from '$constants/defaultData';
+import { IUserMessage } from '$types/common';
 
 interface IProps {
   currentConfig: IGameSettingsConfig,
@@ -71,6 +72,7 @@ interface IProps {
   setIsSettingsInitialized: (isInitialized: boolean) => void,
   resetConfigChanges: () => void,
   setValidationErrors: (errors: IValidationErrors) => void,
+  addMessage: (errorMessage: IUserMessage|string) => void,
 }
 
 export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
@@ -81,6 +83,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
   setIsSettingsInitialized,
   resetConfigChanges,
   setValidationErrors,
+  addMessage,
 }) => {
   /* eslint-disable max-len */
   const isGameSettingsConfigFileExists = useDeveloperSelector((state) => state.developer.isGameSettingsConfigFileExists);
@@ -129,10 +132,6 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
     { target }: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setNewConfig(getNewConfig(currentConfig, target.name, target.value));
-  }, [currentConfig, setNewConfig]);
-
-  const onSelectChange = useCallback(({ target }: React.ChangeEvent<HTMLSelectElement>) => {
-    setNewConfig(getNewConfig(currentConfig, target.name, target.value, target.dataset.parent));
   }, [currentConfig, setNewConfig]);
 
   const onSwitcherChange = useCallback(async ({ target }: React.ChangeEvent<HTMLInputElement>) => {
@@ -231,7 +230,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
     }
   }, [currentConfig, setNewConfig, dispatch]);
 
-  const onPathSelectorChange = useCallback((
+  const onPathSelectorChange = useCallback(async (
     value: string,
     id: string,
     validationData: IValidationError[],
@@ -247,18 +246,107 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
       }
     }
 
-    setNewConfig(getNewConfig(
-      currentConfig,
-      id,
-      pathStr,
-      parent,
-    ));
+    if (
+      id === 'documentsPath'
+      && replacePathVariableByRootDir(
+        pathStr,
+        PathVariableName.DOCUMENTS,
+        pathVariables['%DOCUMENTS%'],
+      ) === pathVariables['%DOCUMENTS%']
+      && currentConfig.gameSettingsFiles.length > 0
+      && currentConfig.gameSettingsFiles.some(
+        (currentFile) => PathRegExp.DOCS_GAME.test(currentFile.path),
+      )
+    ) {
+      const messageBoxResponse = await ipcRenderer.invoke(
+        AppChannel.GET_MESSAGE_BOX_RESPONSE,
+        `В путях к некоторым файлам игровых настроек пристуствует переменная %DOCS_GAME%, но путь к папке игры в User/Documents не указан или был очищен.\nВыберите "Отмена", чтобы вручную изменить пути к файлам, "Игнорировать", чтобы изменить переменную на ${PathVariableName.GAME_DIR}, или "Удалить", чтобы удалить файлы и связанные с ними игровые опции.\nИзменения будут приняты только при сохранении текущей конфигурации.`, //eslint-disable-line max-len
+        'Выберите действие',
+        undefined,
+        ['Отмена', 'Игнорировать', 'Удалить'],
+        AppWindowName.DEV,
+      );
+
+      if (messageBoxResponse.response > 0) {
+        const changedFileNames: string[] = [];
+
+        let newConfig: IGameSettingsConfig = { ...currentConfig };
+        let message = '';
+
+        if (messageBoxResponse.response === 1) {
+          const newFiles = currentConfig.gameSettingsFiles.map((currentFile) => {
+            if (PathRegExp.DOCS_GAME.test(currentFile.path)) {
+              changedFileNames.push(currentFile.label);
+
+              return {
+                ...currentFile,
+                path: currentFile.path.replace(PathRegExp.DOCS_GAME, PathVariableName.GAME_DIR),
+              };
+            }
+
+            return currentFile;
+          });
+
+          newConfig = {
+            ...newConfig,
+            documentsPath: pathStr,
+            gameSettingsFiles: newFiles,
+          };
+
+          message = `При сохранении настроек для файлов [${changedFileNames.join()}] переменная пути будет изменена на ${PathVariableName.GAME_DIR}`; //eslint-disable-line max-len
+        } else if (messageBoxResponse.response === 2) {
+          const changedOptionsNames: string[] = [];
+
+          const newFiles = newConfig.gameSettingsFiles.filter(
+            (currentFile) => {
+              if (PathRegExp.DOCS_GAME.test(currentFile.path)) {
+                changedFileNames.push(currentFile.label);
+
+                return false;
+              }
+
+              return true;
+            },
+          );
+          const filesNames = getGameSettingsElementsNames(newFiles);
+
+          newConfig = {
+            ...newConfig,
+            documentsPath: pathStr,
+            gameSettingsFiles: newFiles,
+            gameSettingsOptions: newConfig.gameSettingsOptions.filter(
+              (currentOption) => {
+                if (!filesNames.includes(currentOption.file)) {
+                  changedOptionsNames.push(currentOption.label);
+
+                  return false;
+                }
+
+                return true;
+              },
+            ),
+          };
+
+          message = `При сохранении настроек файлы [${changedFileNames.join()}]${changedOptionsNames.length > 0 ? ` и опции [${changedOptionsNames.join()}]` : ''} будут удалены`; //eslint-disable-line max-len
+        }
+
+        dispatch(addDeveloperMessages([CreateUserMessage.info(message)]));
+        setNewConfig(newConfig);
+      }
+    } else {
+      setNewConfig(getNewConfig(
+        currentConfig,
+        id,
+        pathStr,
+        parent,
+      ));
+    }
 
     setValidationErrors(getUniqueValidationErrors(
       validationErrors,
       validationData,
     ));
-  }, [currentConfig, validationErrors, setValidationErrors, setNewConfig]);
+  }, [currentConfig, validationErrors, pathVariables, dispatch, setValidationErrors, setNewConfig]);
 
   const getCurrentFullOption = useCallback((optionId: string) => fullOptions.find(
     (currentOption) => currentOption.id === optionId,
@@ -529,13 +617,13 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
   const deleteGameSettingsFileById = useCallback((id: string) => {
     let deletedFile: IGameSettingsFile|undefined;
     const files = currentConfig.gameSettingsFiles.filter((item) => {
-      if (id !== item.id) {
+      if (id === item.id) {
         deletedFile = item;
 
-        return true;
+        return false;
       }
 
-      return false;
+      return true;
     });
 
     deleteGameSettingsFile(files, deletedFile);
@@ -620,6 +708,13 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
     dispatch(createGameSettingsConfigFile());
   }, [dispatch]);
 
+  const onCollapseAllOptionsBtnClick = useCallback(() => {
+    const spoilers = document.querySelector('#developer-list-options')?.querySelectorAll('.spoiler__item');
+    spoilers?.forEach((spoiler) => {
+      spoiler.querySelector('.spoiler__block')?.removeAttribute('open');
+    });
+  }, []);
+
   /* eslint-disable react/jsx-props-no-spreading */
   return (
     <form className="developer__form">
@@ -641,15 +736,29 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               placeholder={gameSettingsConfig.baseFilesEncoding}
               onChange={onTextFieldChange}
             />
+            <PathSelector
+              className="developer__item"
+              id="documentsPath"
+              name="documentsPath"
+              label="Папка в Documents"
+              value={currentConfig.documentsPath}
+              selectPathVariables={generateSelectOptions([PathVariableName.DOCUMENTS])}
+              pathVariables={pathVariables}
+              isGameDocuments={false}
+              description="Путь до папки игры в [User]/Documents. Укажите этот путь, если нужно управлять данными из файлов в этой папке через экран игровых настроек"//eslint-disable-line max-len
+              validationErrors={validationErrors}
+              onChange={onPathSelectorChange}
+              onOpenPathError={addMessage}
+            />
           </fieldset>
           <fieldset className="developer__block">
-            <legend className="developer__block-title">Настройки Mod Organizer</legend>
+            <legend className="developer__block-title">Настройка Mod Organizer</legend>
             <Switcher
               className="developer__item"
               id="isUsed"
               name="isUsed"
               parent="modOrganizer"
-              label="Используется ли MO?"
+              label="Используется Mod Organizer"
               isChecked={currentConfig.modOrganizer.isUsed}
               description="Определяет, используется ли в игре\сборке Mod Organizer"//eslint-disable-line max-len
               onChange={onSwitcherChange}
@@ -658,7 +767,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               className="developer__item"
               id="pathToMOFolder"
               name="pathToMOFolder"
-              label="Путь до папки MO"
+              label="Папка Mod Organizer"
               parent="modOrganizer"
               value={currentConfig.modOrganizer.pathToMOFolder}
               selectPathVariables={generateSelectOptions([PathVariableName.GAME_DIR])}
@@ -667,6 +776,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               description="Задает путь до корневой папки Mod Organizer."
               validationErrors={validationErrors}
               onChange={onPathSelectorChange}
+              onOpenPathError={addMessage}
             />
           </fieldset>
           <fieldset className="developer__block">
@@ -693,6 +803,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
                       lastAddedGroupName === item.name && (
                       <div className={styles['developer__group-label']}>
                         <span>Заголовок группы</span>
+                        {/* eslint-disable-next-line max-len */}
                         <HintItem description="Задать заголовок группы. Отображается как имя вкладки на экране игровых настроек." />
                       </div>
                       )
@@ -718,8 +829,8 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               }
             </ul>
             <HintItem
-              className="developer__block-hint"
-              description="Группы настроек позволяют группировать опции. На экране настроек они будут отогражаться вверху экрана в виде панели навигации."
+              className={styles['developer__groups-hint']}
+              description="Группы настроек позволяют группировать опции. На экране настроек они будут отображаться в виде панели навигации." //eslint-disable-line max-len
               direction="left"
             />
           </fieldset>
@@ -750,6 +861,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
                       onFileDataChange={changeGameSettingsFiles}
                       onValidation={setValidationErrors}
                       deleteFile={deleteGameSettingsFileById}
+                      addMessage={addMessage}
                     />
                   </SpoilerListItem>
                 ))
@@ -766,7 +878,20 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
               Добавить
             </Button>
             <p className="developer__subtitle">Игровые опции</p>
-            <ul className={styles.developer__list}>
+            {
+              currentConfig.gameSettingsOptions.length > 1 && (
+              <Button
+                className={classNames('main-btn', 'developer__btn')}
+                onClick={onCollapseAllOptionsBtnClick}
+              >
+                Свернуть все
+              </Button>
+              )
+            }
+            <ul
+              id="developer-list-options"
+              className={styles.developer__list}
+            >
               {
                 currentConfig.gameSettingsOptions.length > 0
                 && currentConfig.gameSettingsOptions.map((currentOption, index) => (

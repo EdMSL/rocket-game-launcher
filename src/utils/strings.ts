@@ -137,7 +137,7 @@ const clearPathVaribaleFromPathString = (
 ): string => {
   const newStr = currPath;
 
-  return newStr.replace(/%.*%\\?/, '').trim();
+  return newStr.replace(/%.*%\\?/, '');
 };
 
 /**
@@ -232,11 +232,11 @@ export const replaceRootDirByPathVariable = (
   pathVariables: IPathVariables,
 ): string => {
   const newPathStr = pathStr;
+  let variableIndex = -1;
 
   const availablePathVariablesOrder = pathVariablesCheckOrderArr.filter(
     (current) => availablePathVariables.includes(current),
   );
-  let variableIndex = -1;
 
   const pathVariableName = availablePathVariablesOrder.find((curr, index) => {
     if (pathVariables[curr] && pathStr.includes(pathVariables[curr])) {
@@ -337,79 +337,18 @@ export const checkIsPathIsNotOutsideValidFolder = (
 ): void => {
   if (
     !createRegexp(GAME_DIR).test(pathForCheck)
-    && !createRegexp(pathVariables[isGameDocuments
-      ? PathVariableName.DOCS_GAME
-      : PathVariableName.DOCUMENTS])
-      .test(pathForCheck)
+    && ((isGameDocuments && pathVariables[PathVariableName.DOCS_GAME] !== '' && !createRegexp(pathVariables[PathVariableName.DOCS_GAME]).test(pathForCheck))
+    || (!isGameDocuments && !createRegexp(pathVariables[PathVariableName.DOCUMENTS]).test(pathForCheck)))
+    // && !createRegexp(pathVariables[isGameDocuments
+    //   ? PathVariableName.DOCS_GAME
+    //   : PathVariableName.DOCUMENTS])
+    //   .test(pathForCheck)
   ) {
     throw new CustomError(
       `The path is outside of a valid folder. Path: ${pathForCheck}`,
       ErrorName.INVALID_DIRECTORY,
     );
   }
-};
-
-/**
- * Получить путь до файла с учетом переменных путей.
- * @param pathToFile Путь до файла.
- * @param pathVariables Переменные путей.
- * @param profileMO Профиль Mod Organizer.
- * @returns Строка с абсолютным путем к файлу.
-*/
-export const getPathToFile = (
-  pathToFile: string,
-  pathVariables: IPathVariables,
-  profileMO = '',
-): string => {
-  let newPath = pathToFile;
-
-  if (PathRegExp.MO_PROFILE.test(pathToFile)) {
-    if (profileMO) {
-      newPath = path.join(
-        pathVariables['%MO_PROFILE%'],
-        profileMO,
-        path.basename(pathToFile),
-      );
-    } else {
-      throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
-    }
-  } else if (PathRegExp.MO_DIR.test(pathToFile)) {
-    if (pathVariables['%MO_DIR%']) {
-      newPath = newPath.replace(PathVariableName.MO_DIR, pathVariables['%MO_DIR%']);
-    } else {
-      if (profileMO) {
-        throw new CustomError('The path to a file in the Mod Organizer folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
-      }
-
-      throw new CustomError(`Incorrect path received. Path variable ${PathVariableName.MO_DIR} is not available.`); //eslint-disable-line max-len
-    }
-  } else if (PathRegExp.MO_MODS.test(pathToFile)) {
-    if (pathVariables['%MO_DIR%']) {
-      newPath = newPath.replace(PathVariableName.MO_MODS, pathVariables['%MO_MODS%']);
-    } else {
-      if (profileMO) {
-        throw new CustomError('The path to a file in the Mod Organizer mods folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
-      }
-
-      throw new CustomError(`Incorrect path received. Path variable ${PathVariableName.MO_MODS} is not available.`); //eslint-disable-line max-len
-    }
-  } else if (PathRegExp.DOCS_GAME.test(pathToFile)) {
-    if (pathVariables['%DOCS_GAME%']) {
-      newPath = newPath.replace(PathVariableName.DOCS_GAME, pathVariables['%DOCS_GAME%']);
-    } else {
-      throw new CustomError('The path to a file in the Documents folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
-    }
-  } else if (PathRegExp.DOCUMENTS.test(pathToFile)) {
-    throw new CustomError(`The path to a file in the Documents folder is not allow. Maybe you wanted to write "${PathVariableName.DOCS_GAME}"?.`); //eslint-disable-line max-len
-  } else if (PathRegExp.GAME_DIR.test(pathToFile)) {
-    newPath = newPath.replace(PathVariableName.GAME_DIR, pathVariables['%GAME_DIR%']);
-  } else {
-    throw new CustomError(`Incorrect path (${pathToFile}) received.`); //eslint-disable-line max-len
-  }
-
-  checkIsPathIsNotOutsideValidFolder(newPath, pathVariables);
-
-  return newPath;
 };
 
 /**
@@ -488,3 +427,18 @@ export const getOptionItemSelectValueRegExp = (
 
   return /^[^=][^=]*(?<=\S)=[^\s=][^=]*$/;
 };
+
+/**
+ * Получает id элемента item игровой опции из id инпута для данного элемента.
+ * @param id Строка id из инпута.
+ * @returns Строка с id элемента item опции.
+ */
+export const gatGameSettingOptionItemId = (id: string): string => id.split('_')[2];
+
+/**
+ * Получает форматированную строку даты вида `$дата_$время`.
+ * @returns Форматированная строка даты.
+*/
+export const getDayAndTimeString = (): string => new Date()
+  .toLocaleString()
+  .replaceAll(/[:|,\s]/g, '_');
