@@ -90,7 +90,7 @@ import {
 import {
   getRegExpForLineIniParameter,
   getObjectAsList,
-  replacePathVariableByRootDir,
+  replacePathVariableByDirPath,
 } from '$utils/strings';
 import { setIsGameSettingsConfigFileExists } from '$actions/developer';
 import { GAME_SETTINGS_CONFIG_FILE_NAME } from '$constants/defaultData';
@@ -351,7 +351,7 @@ export function* initGameSettingsSaga(
     if (currentSettingsConfig.documentsPath !== PathVariableName.DOCUMENTS) {
       currentPathVariables = {
         ...currentPathVariables,
-        [PathVariableName.DOCS_GAME]: replacePathVariableByRootDir(
+        [PathVariableName.DOCS_GAME]: replacePathVariableByDirPath(
           normalizePath(currentSettingsConfig.documentsPath),
           PathVariableName.DOCUMENTS,
           pathVariables['%DOCUMENTS%'],
@@ -363,7 +363,7 @@ export function* initGameSettingsSaga(
 
     if (currentSettingsConfig.modOrganizer.isUsed) {
       const MOPathVariables = getModOrganizerPathVariables(
-        replacePathVariableByRootDir(currentSettingsConfig.modOrganizer.pathToMOFolder),
+        replacePathVariableByDirPath(currentSettingsConfig.modOrganizer.pathToMOFolder),
         pathVariables,
       );
 

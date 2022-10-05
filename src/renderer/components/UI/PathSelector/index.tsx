@@ -11,7 +11,9 @@ import { HintItem } from '$components/HintItem';
 import { Button } from '../Button';
 import { IPathVariables } from '$constants/paths';
 import {
-  checkIsPathIsNotOutsideValidFolder, replaceRootDirByPathVariable, getVariableAndValueFromPath,
+  checkIsPathIsNotOutsideValidFolder,
+  replaceDirPathByPathVariable,
+  getVariableAndValueFromPath,
 } from '$utils/strings';
 import {
   AppChannel, LauncherButtonAction, PathVariableName,
@@ -62,7 +64,9 @@ export const PathSelector: React.FC<IProps> = ({
   onOpenPathError,
 }) => {
   const [pathVariable, pathValue] = getVariableAndValueFromPath(String(value));
-  const availablePathVariables = Object.values(selectPathVariables).map((option) => option.value);
+  const availablePathVariables: PathVariableName[] = Object
+    .values(selectPathVariables)
+    .map((option) => option.value as PathVariableName);
 
   const [currentPathVariable, setCurrentPathVariable] = useState<string>(pathVariable);
   const [currentPathValue, setCurrentPathValue] = useState<string>(pathValue);
@@ -142,7 +146,7 @@ export const PathSelector: React.FC<IProps> = ({
       try {
         checkIsPathIsNotOutsideValidFolder(pathStr, pathVariables, isGameDocuments);
 
-        pathStr = replaceRootDirByPathVariable(pathStr, availablePathVariables, pathVariables);
+        pathStr = replaceDirPathByPathVariable(pathStr, availablePathVariables, pathVariables);
         const [variablePath, valuePath] = getVariableAndValueFromPath(pathStr);
 
         setCurrentPathVariable(variablePath);

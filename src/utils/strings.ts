@@ -209,12 +209,12 @@ export const getLineIniParameterValue = (lineText: string, parameterName: string
 };
 
 /**
- * Получить путь с отсеченной корневой папкой.
+ * Получить путь с отсеченным указанным путем.
  * @param currPath Путь для очистки.
- * @param rootPath Корневой путь, который нужно удалить.
- * @returns Строка пути без корня.
+ * @param rootPath Строка пути, которую следует удалить.
+ * @returns Измененная строка пути.
 */
-export const clearRootDirFromPathString = (
+export const clearDirPathFromPathString = (
   currPath: string,
   rootPath: string,
 ): string => currPath.replace(new RegExp(`${rootPath.replaceAll('\\', '\\\\')}\\\\?`), '').trim();
@@ -222,13 +222,13 @@ export const clearRootDirFromPathString = (
 /**
  * Заменить корневой путь на переменную пути.
  * @param pathStr Изменяемый путь.
- * @param availablePathVariables Переменная для замены.
- * @param pathVariables Корневая папка в изменяемом пути, которую нужно заменить.
+ * @param availablePathVariables Список доступных имен переменных для замены.
+ * @param pathVariables Текущие переменные пути.
  * @returns Строка пути с переменной вместо корневой папки.
 */
-export const replaceRootDirByPathVariable = (
+export const replaceDirPathByPathVariable = (
   pathStr: string,
-  availablePathVariables: string[],
+  availablePathVariables: PathVariableName[],
   pathVariables: IPathVariables,
 ): string => {
   const newPathStr = pathStr;
@@ -273,7 +273,7 @@ export const getPathFromLinkHash = (hash: string): string => hash.substring(1);
  * @param rootDirPathStr Путь для замены. Необходимо указать, если отличается от GAME_DIR.
  * @returns Строка пути с путем к корневой папкой вместо переменной.
 */
-export const replacePathVariableByRootDir = (
+export const replacePathVariableByDirPath = (
   pathStr: string,
   pathVariable = PathVariableName.GAME_DIR,
   rootDirPathStr = GAME_DIR,

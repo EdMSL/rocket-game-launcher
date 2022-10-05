@@ -39,8 +39,8 @@ import {
   getFileNameFromPathToFile,
   getRandomName,
   getVariableAndValueFromPath,
-  replacePathVariableByRootDir,
-  replaceRootDirByPathVariable,
+  replacePathVariableByDirPath,
+  replaceDirPathByPathVariable,
 } from '$utils/strings';
 import { EditableItem } from '$components/EditableItem';
 import { HintItem } from '$components/HintItem';
@@ -168,7 +168,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
 
               return {
                 ...currentFile,
-                path: replaceRootDirByPathVariable(replacePathVariableByRootDir(
+                path: replaceDirPathByPathVariable(replacePathVariableByDirPath(
                   currentFile.path, pathVariableName as PathVariableName,
                   pathVariables[pathVariableName],
                 ), [PathVariableName.GAME_DIR], pathVariables),
@@ -254,7 +254,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
 
     if (
       id === 'documentsPath'
-      && replacePathVariableByRootDir(
+      && replacePathVariableByDirPath(
         pathStr,
         PathVariableName.DOCUMENTS,
         pathVariables['%DOCUMENTS%'],
@@ -487,7 +487,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
       try {
         checkIsPathIsNotOutsideValidFolder(pathStr, pathVariables);
 
-        const pathWithVariable = replaceRootDirByPathVariable(
+        const pathWithVariable = replaceDirPathByPathVariable(
           pathStr,
           gameSettingsFileAvailableVariablesAll,
           pathVariables,

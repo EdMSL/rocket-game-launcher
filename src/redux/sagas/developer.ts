@@ -43,7 +43,7 @@ import {
   deepClone,
   getGameSettingsElementsNames,
   getModOrganizerPathVariables,
-  updatePathVariables,
+  getUpdatedPathVariables,
   getWindowSettingsFromLauncherConfig,
 } from '$utils/data';
 import {
@@ -53,7 +53,7 @@ import {
   defaultGameSettingsConfig, GAME_SETTINGS_CONFIG_FILE_NAME, MO_INI_FILE_NAME,
 } from '$constants/defaultData';
 import {
-  getFileNameFromPathToFile, getObjectAsList, replacePathVariableByRootDir,
+  getFileNameFromPathToFile, getObjectAsList, replacePathVariableByDirPath,
 } from '$utils/strings';
 import { ILauncherConfig } from '$types/main';
 import { GameSettingsOptionFields, IGameSettingsConfig } from '$types/gameSettings';
@@ -100,7 +100,7 @@ export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): Saga
       if (settingsConfig.documentsPath !== PathVariableName.DOCUMENTS) {
         newPathVariables = {
           ...newPathVariables,
-          [PathVariableName.DOCS_GAME]: replacePathVariableByRootDir(
+          [PathVariableName.DOCS_GAME]: replacePathVariableByDirPath(
             normalizePath(settingsConfig.documentsPath),
             PathVariableName.DOCUMENTS,
             pathVariables['%DOCUMENTS%'],
@@ -109,7 +109,7 @@ export function* initGameSettingsDeveloperSaga(isFromUpdateAction = false): Saga
       }
 
       if (settingsConfig.modOrganizer.isUsed) {
-        const MO_DIR_BASE = replacePathVariableByRootDir(settingsConfig.modOrganizer.pathToMOFolder);
+        const MO_DIR_BASE = replacePathVariableByDirPath(settingsConfig.modOrganizer.pathToMOFolder);
 
         if (getIsExists(getJoinedPath(MO_DIR_BASE, MO_INI_FILE_NAME))) {
           const MOPathVariables = getModOrganizerPathVariables(
@@ -243,7 +243,7 @@ function* saveLauncherConfigSaga(
       developer: { pathVariables },
     }: ReturnType<typeof getState> = yield select(getState);
 
-    const newPathVariables = updatePathVariables(pathVariables, newConfig);
+    const newPathVariables = getUpdatedPathVariables(pathVariables, newConfig);
 
     const {
       developer: {
@@ -335,7 +335,7 @@ function* saveGameSettingsConfigSaga(
       && (pathToMOFolder !== newConfig.modOrganizer.pathToMOFolder || !isUsed))
       || documentsPath !== newConfig.documentsPath
     ) {
-      const newPathVariables = updatePathVariables(
+      const newPathVariables = getUpdatedPathVariables(
         pathVariables,
         newConfig,
       );
