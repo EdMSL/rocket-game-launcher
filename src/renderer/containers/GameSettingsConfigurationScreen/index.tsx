@@ -38,6 +38,7 @@ import {
   checkIsPathIsNotOutsideValidFolder,
   getFileNameFromPathToFile,
   getRandomName,
+  getVariableAndValueFromPath,
   replacePathVariableByRootDir,
   replaceRootDirByPathVariable,
 } from '$utils/strings';
@@ -145,10 +146,10 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
     ) {
       const messageBoxResponse = await ipcRenderer.invoke(
         AppChannel.GET_MESSAGE_BOX_RESPONSE,
-        `В путях к некоторым файлам игровых настроек пристуствуют переменные Mod Organizer.\nВыберите "Отмена", чтобы вручную изменить пути к файлам, "Игнорировать", чтобы изменить переменную на ${PathVariableName.GAME_DIR}, или "Удалить", чтобы удалить файлы и связанные с ними игровые опции.\nИзменения будут приняты только при сохранении текущей конфигурации.`, //eslint-disable-line max-len
+        `В путях к некоторым файлам игровых настроек пристуствуют переменные Mod Organizer.\nВыберите "Отмена", чтобы вручную изменить пути к файлам, "Заменить", чтобы изменить переменную на ${PathVariableName.GAME_DIR}, или "Удалить", чтобы удалить файлы и связанные с ними игровые опции.\nИзменения будут приняты только при сохранении текущей конфигурации.`, //eslint-disable-line max-len
         'Выберите действие',
         undefined,
-        ['Отмена', 'Игнорировать', 'Удалить'],
+        ['Отмена', 'Заменить', 'Удалить'],
         AppWindowName.DEV,
       );
 
@@ -163,9 +164,14 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
             if (PathRegExp.MO.test(currentFile.path)) {
               changedFileNames.push(currentFile.label);
 
+              const pathVariableName = getVariableAndValueFromPath(currentFile.path)[0]!;
+
               return {
                 ...currentFile,
-                path: currentFile.path.replace(PathRegExp.MO, PathVariableName.GAME_DIR),
+                path: replaceRootDirByPathVariable(replacePathVariableByRootDir(
+                  currentFile.path, pathVariableName as PathVariableName,
+                  pathVariables[pathVariableName],
+                ), [PathVariableName.GAME_DIR], pathVariables),
               };
             }
 
@@ -228,7 +234,7 @@ export const GameSettingsConfigurationScreen: React.FC<IProps> = ({
     } else {
       setNewConfig(getNewConfig(currentConfig, target.name, target.checked, target.dataset.parent));
     }
-  }, [currentConfig, setNewConfig, dispatch]);
+  }, [currentConfig, pathVariables, setNewConfig, dispatch]);
 
   const onPathSelectorChange = useCallback(async (
     value: string,
