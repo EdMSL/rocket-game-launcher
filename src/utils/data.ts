@@ -18,7 +18,7 @@ import {
   getLineIniParameterValue,
   getRandomId,
   getRandomName,
-  replacePathVariableByRootDir,
+  replacePathVariableByDirPath,
   getSpacesFromParameterString,
   getStringPartFromLineIniParameterForReplace,
   getFileNameFromPathToFile,
@@ -37,6 +37,7 @@ import {
   IGameSettingsConfig,
 } from '$types/gameSettings';
 import {
+  DefaultMOPathVariables,
   DefaultPathVariable,
   GAME_DIR,
   IModOrganizerPathVariables,
@@ -702,6 +703,19 @@ export const getNewConfig = <U, T>(
     [fieldName]: value,
   };
 };
+
+/**
+ * Генерирует базовые переменные путей.
+ * @param app Объект Electron.app.
+ * @returns Объект с переменными путей.
+*/
+export const createBasePathVariables = (
+  app: Electron.App,
+): IPathVariables => ({
+  ...DefaultPathVariable,
+  '%DOCUMENTS%': app.getPath('documents'),
+});
+
 /**
  * Получает переменные пути Mod Organizer.
  * @param pathToMOFolder Путь до папки `Mod Organizer`
@@ -721,54 +735,51 @@ export const getModOrganizerPathVariables = (
     pathToMOFolder,
   );
 
-  const MOIniData = readINIFileSync(path.join(pathToMOFolder, MO_INI_FILE_NAME));
-  const MoModsSection = MOIniData.getSection('Settings');
+  try {
+    const MOIniData = readINIFileSync(path.join(pathToMOFolder, MO_INI_FILE_NAME));
+    const MoModsSection = MOIniData.getSection('Settings');
 
-  if (MoModsSection) {
-    const modOrganizerModsPathTemp = MoModsSection.getValue('mod_directory');
-    const modOrganizerProfilesPathTemp = MoModsSection.getValue('profiles_directory');
+    if (MoModsSection) {
+      const modOrganizerModsPathTemp = MoModsSection.getValue('mod_directory');
+      const modOrganizerProfilesPathTemp = MoModsSection.getValue('profiles_directory');
 
-    if (modOrganizerModsPathTemp) {
-      if (modOrganizerModsPathTemp.includes('%BASE_DIR%')) {
-        modOrganizerModsPath = modOrganizerModsPathTemp.replace('%BASE_DIR%', pathToMOFolder);
-      } else {
-        checkIsPathIsNotOutsideValidFolder(modOrganizerModsPathTemp, pathVariables);
-        modOrganizerModsPath = modOrganizerModsPathTemp;
+      if (modOrganizerModsPathTemp) {
+        if (modOrganizerModsPathTemp.includes('%BASE_DIR%')) {
+          modOrganizerModsPath = modOrganizerModsPathTemp.replace('%BASE_DIR%', pathToMOFolder);
+        } else {
+          checkIsPathIsNotOutsideValidFolder(modOrganizerModsPathTemp, pathVariables);
+          modOrganizerModsPath = modOrganizerModsPathTemp;
+        }
+      }
+
+      if (modOrganizerProfilesPathTemp) {
+        if (modOrganizerProfilesPathTemp.includes('%BASE_DIR%')) {
+          modOrganizerProfilesPath = modOrganizerProfilesPathTemp.replace('%BASE_DIR%', pathToMOFolder);
+        } else {
+          checkIsPathIsNotOutsideValidFolder(modOrganizerProfilesPathTemp, pathVariables);
+          modOrganizerProfilesPath = modOrganizerProfilesPathTemp;
+        }
       }
     }
 
-    if (modOrganizerProfilesPathTemp) {
-      if (modOrganizerProfilesPathTemp.includes('%BASE_DIR%')) {
-        modOrganizerProfilesPath = modOrganizerProfilesPathTemp.replace('%BASE_DIR%', pathToMOFolder);
-      } else {
-        checkIsPathIsNotOutsideValidFolder(modOrganizerProfilesPathTemp, pathVariables);
-        modOrganizerProfilesPath = modOrganizerProfilesPathTemp;
-      }
-    }
+    return {
+      '%MO_DIR%': pathToMOFolder,
+      '%MO_INI%': defaultModOrganizerPaths.pathToINI.replace(
+        PathVariableName.MO_DIR,
+        pathToMOFolder,
+      ),
+      '%MO_MODS%': modOrganizerModsPath,
+      '%MO_PROFILE%': modOrganizerProfilesPath,
+    };
+  } catch (error) {
+    return {
+      '%MO_DIR%': '',
+      '%MO_INI%': '',
+      '%MO_MODS%': '',
+      '%MO_PROFILE%': '',
+    };
   }
-
-  return {
-    '%MO_DIR%': pathToMOFolder,
-    '%MO_INI%': defaultModOrganizerPaths.pathToINI.replace(
-      PathVariableName.MO_DIR,
-      pathToMOFolder,
-    ),
-    '%MO_MODS%': modOrganizerModsPath,
-    '%MO_PROFILE%': modOrganizerProfilesPath,
-  };
 };
-
-/**
- * Генерирует базовые переменные путей.
- * @param app Объект Electron.app.
- * @returns Объект с переменными путей.
-*/
-export const createBasePathVariables = (
-  app: Electron.App,
-): IPathVariables => ({
-  ...DefaultPathVariable,
-  '%DOCUMENTS%': app.getPath('documents'),
-});
 
 const getUpdatedModOrganizerPathVariables = (
   pathToMOFolder: string,
@@ -781,18 +792,24 @@ const getUpdatedModOrganizerPathVariables = (
 
   return {
     '%MO_DIR%': MO_DIR_BASE,
-    '%MO_INI%': pathVariables['%MO_INI%'].replace(
-      pathVariables['%MO_DIR%'],
-      MO_DIR_BASE,
-    ),
-    '%MO_MODS%': pathVariables['%MO_MODS%'].replace(
-      pathVariables['%MO_DIR%'],
-      MO_DIR_BASE,
-    ),
-    '%MO_PROFILE%': pathVariables['%MO_PROFILE%'].replace(
-      pathVariables['%MO_DIR%'],
-      MO_DIR_BASE,
-    ),
+    '%MO_INI%': MO_DIR_BASE
+      ? pathVariables['%MO_INI%'].replace(
+        pathVariables['%MO_DIR%'],
+        MO_DIR_BASE,
+      )
+      : '',
+    '%MO_MODS%': MO_DIR_BASE
+      ? pathVariables['%MO_MODS%'].replace(
+        pathVariables['%MO_DIR%'],
+        MO_DIR_BASE,
+      )
+      : '',
+    '%MO_PROFILE%': MO_DIR_BASE
+      ? pathVariables['%MO_PROFILE%'].replace(
+        pathVariables['%MO_DIR%'],
+        MO_DIR_BASE,
+      )
+      : '',
   };
 };
 
@@ -802,34 +819,35 @@ const getUpdatedModOrganizerPathVariables = (
  * @param config Конфигурационные данные лаунчера или игровых настроек из `state`.
  * @returns Объект с переменными путей.
 */
-export const updatePathVariables = (
+export const getUpdatedPathVariables = (
   pathVariables: IPathVariables,
   config: ILauncherConfig|IGameSettingsConfig,
 ): IPathVariables => {
-  if ('playButton' in config) {
-    return {
-      ...pathVariables,
-    };
-  } else if ('baseFilesEncoding' in config) {
-    return {
-      ...pathVariables,
-      ...pathVariables['%MO_DIR%']
-        ? getUpdatedModOrganizerPathVariables(
-          config.modOrganizer.pathToMOFolder,
-          pathVariables,
-        )
-        : getModOrganizerPathVariables(
-          replacePathVariableByRootDir(config.modOrganizer.pathToMOFolder),
+  if ('baseFilesEncoding' in config) {
+    let moVariables: IModOrganizerPathVariables = { ...DefaultMOPathVariables };
+
+    if (config.modOrganizer.isUsed) {
+      moVariables = {
+        ...getModOrganizerPathVariables(
+          replacePathVariableByDirPath(config.modOrganizer.pathToMOFolder),
           pathVariables,
         ),
-      '%DOCS_GAME%': config.documentsPath.replace(
+      };
+    }
+
+    return {
+      ...pathVariables,
+      ...moVariables,
+      [PathVariableName.DOCS_GAME]: config.documentsPath.replace(
         PathVariableName.DOCUMENTS,
-        pathVariables['%DOCUMENTS%'],
+        pathVariables[PathVariableName.DOCUMENTS],
       ),
     };
   }
 
-  return pathVariables;
+  return {
+    ...pathVariables,
+  };
 };
 
 /**
@@ -846,7 +864,7 @@ export const getCustomButtons = (
   //@ts-ignore
 ): ILauncherCustomButton[] => buttonsData.map<ILauncherCustomButton|undefined>((btn) => {
   try {
-    const pathTo = replacePathVariableByRootDir(
+    const pathTo = replacePathVariableByDirPath(
       btn.path,
     );
 

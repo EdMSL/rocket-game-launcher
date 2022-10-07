@@ -7,8 +7,8 @@ import { TextField } from '$components/UI/TextField';
 import { Select } from '$components/UI/Select';
 import { generateSelectOptions } from '$utils/data';
 import {
-  gameSettingsFileAvailableVariablesAll,
   gameSettingsFileAvailableVariablesBase,
+  gameSettingsFileAvailableVariablesMO,
   GameSettingsFileView,
   LauncherButtonAction,
   PathVariableName,
@@ -83,11 +83,13 @@ export const GameSettingsFileItem: React.FC<IProps> = ({
   }, [file.id, deleteFile]);
 
   const getPathVariablesForSelect = useCallback(() => {
-    let variables = [...isModOrganizerUsed
-      ? gameSettingsFileAvailableVariablesAll
-      : gameSettingsFileAvailableVariablesBase];
+    let variables = [...gameSettingsFileAvailableVariablesBase];
 
-    if (pathVariables['%DOCUMENTS%'] === pathVariables['%DOCS_GAME%']) {
+    if (isModOrganizerUsed && pathVariables[PathVariableName.MO_INI]) {
+      variables = [...variables, ...gameSettingsFileAvailableVariablesMO];
+    }
+
+    if (pathVariables[PathVariableName.DOCUMENTS] === pathVariables[PathVariableName.DOCS_GAME]) {
       variables = variables.filter(
         (currentVariable) => currentVariable !== PathVariableName.DOCS_GAME,
       );

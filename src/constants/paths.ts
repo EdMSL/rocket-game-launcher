@@ -30,14 +30,18 @@ export const USER_THEMES_DIR = path.resolve(process.env.NODE_ENV === 'developmen
   ? './app/themes'
   : './themes');
 
-export const DefaultPathVariable: IPathVariables = {
-  '%GAME_DIR%': GAME_DIR,
-  '%DOCUMENTS%': '',
-  '%DOCS_GAME%': '',
+export const DefaultMOPathVariables: IModOrganizerPathVariables = {
   '%MO_INI%': '',
   '%MO_DIR%': '',
   '%MO_MODS%': '',
   '%MO_PROFILE%': '',
+};
+
+export const DefaultPathVariable: IPathVariables = {
+  '%GAME_DIR%': GAME_DIR,
+  '%DOCUMENTS%': '',
+  '%DOCS_GAME%': '',
+  ...DefaultMOPathVariables,
 };
 
 export interface IModOrganizerPathVariables {

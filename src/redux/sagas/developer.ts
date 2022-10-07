@@ -331,15 +331,23 @@ function* saveGameSettingsConfigSaga(
       },
     }: ReturnType<typeof getState> = yield select(getState);
 
-    if ((newConfig.modOrganizer.isUsed
-      && (pathToMOFolder !== newConfig.modOrganizer.pathToMOFolder || !isUsed))
+    let newPathVariables: IPathVariables;
+
+    if (
+      newConfig.modOrganizer.isUsed !== isUsed
+      || newConfig.modOrganizer.pathToMOFolder !== pathToMOFolder
       || documentsPath !== newConfig.documentsPath
     ) {
-      const newPathVariables = getUpdatedPathVariables(
+      newPathVariables = getUpdatedPathVariables(
         pathVariables,
         newConfig,
       );
 
+      if (newConfig.modOrganizer.isUsed && !newPathVariables[PathVariableName.MO_INI]) {
+        yield put(addDeveloperMessages([
+          CreateUserMessage.error(`ModOrganizer.ini не найден по указанному пути: ${newConfig.modOrganizer.pathToMOFolder}`), //eslint-disable-line max-len
+        ]));
+      }
       yield put(setPathVariablesDeveloper(newPathVariables));
 
       writeToLogFile(`Paths variables updated:\n  ${getObjectAsList(newPathVariables, true, true)}`); //eslint-disable-line max-len
@@ -347,7 +355,9 @@ function* saveGameSettingsConfigSaga(
 
     yield put(setGameSettingsConfig(newConfig));
 
-    yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, false, newConfig, true);
+    // Если переменные не измененялись, то будет передан undefined, что предусмотрено функцией
+    //@ts-ignore
+    yield call(ipcRenderer.send, AppChannel.SAVE_DEV_CONFIG, false, newConfig, true, newPathVariables);
 
     if (pathToGo) {
       if (pathToGo === Routes.MAIN_SCREEN) {
