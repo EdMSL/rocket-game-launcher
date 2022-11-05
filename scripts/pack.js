@@ -50,14 +50,6 @@ bundleElectronApp(process.argv[2])
       path.resolve(data[0], 'themes', 'background.png'),
     );
     fs.copyFileSync(
-      './CHANGELOG.MD',
-      path.resolve(data[0], 'CHANGELOG.MD'),
-    );
-    fs.copyFileSync(
-      path.resolve('./app/files/MANUAL.pdf'),
-      path.resolve(data[0], 'help', 'MANUAL.pdf'),
-    );
-    fs.copyFileSync(
       path.resolve('./app/files/example_settings.json'),
       path.resolve(data[0], 'help', 'example_settings.json'),
     );
