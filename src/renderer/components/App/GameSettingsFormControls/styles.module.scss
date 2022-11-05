@@ -1,0 +1,13 @@
+.game-settings-form__buttons {
+  display: flex;
+  justify-content: center;
+  padding-right: var(--indent-size);
+}
+
+.game-settings-form__btn {
+  margin-right: 10px;
+
+  &:last-child {
+    margin-right: 0;
+  }
+}

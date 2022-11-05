@@ -3,21 +3,18 @@ import React, {
 } from 'react';
 import classNames from 'classnames';
 
-import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
+import { HintItem } from '$components/HintItem';
 import { RangeButtonName } from '$constants/misc';
-import { IUIElementProps } from '$types/gameSettings';
+import { IUIElementProps, IUIControllerRange } from '$types/common';
 import { getNumberOfDecimalPlaces } from '$utils/strings';
 import { useDebouncedFunction } from '$utils/hooks';
 
-interface IProps extends IUIElementProps<HTMLInputElement> {
+interface IProps extends IUIElementProps<HTMLInputElement>, IUIControllerRange {
+  id: string,
   defaultValue: string,
-  min: number,
-  max: number,
-  step: number,
   onChangeBtnClick?: (
     btnName: string,
-    parent: string,
-    name: string,
+    id: string,
     min: number,
     max: number,
     step: number,
@@ -26,9 +23,9 @@ interface IProps extends IUIElementProps<HTMLInputElement> {
 
 export const Range: React.FunctionComponent<IProps> = ({
   id,
-  name = id,
-  parent = '',
-  multiparameters = '',
+  name,
+  parent,
+  multiparameters,
   defaultValue,
   min,
   max,
@@ -38,11 +35,8 @@ export const Range: React.FunctionComponent<IProps> = ({
   description = '',
   className = '',
   parentClassname = '',
-  currentHintId = '',
   onChange,
   onChangeBtnClick = null,
-  onHover = null,
-  onLeave = null,
 }) => {
   const [value, setValue] = useState(defaultValue);
 
@@ -52,9 +46,9 @@ export const Range: React.FunctionComponent<IProps> = ({
 
   const onRangeBtnClick = useCallback(({ currentTarget }) => {
     if (onChangeBtnClick) {
-      onChangeBtnClick(currentTarget.name, parent, name, min, max, step);
+      onChangeBtnClick(currentTarget.name, id, min, max, step);
     }
-  }, [onChangeBtnClick, parent, name, step, max, min]);
+  }, [onChangeBtnClick, id, step, max, min]);
 
   const debouncedChangeValue = useDebouncedFunction(
     (newValue) => onChange(newValue),
@@ -71,6 +65,7 @@ export const Range: React.FunctionComponent<IProps> = ({
 
   return (
     <div className={classNames(
+      'ui__container',
       'range__container',
       parentClassname && `${parentClassname}-range__container`,
       className,
@@ -79,18 +74,7 @@ export const Range: React.FunctionComponent<IProps> = ({
       <div className="range__label">
         <span>{label}</span>
         {
-          description
-          && onHover
-          && onLeave
-          && (
-            <GameSettingsHintBlock
-              id={id}
-              currentHintId={currentHintId}
-              description={description}
-              onHover={onHover}
-              onLeave={onLeave}
-            />
-          )
+          description && <HintItem description={description} />
         }
       </div>
       <div className="range__controls">
@@ -133,9 +117,9 @@ export const Range: React.FunctionComponent<IProps> = ({
           )
         }
       </div>
-      <p className="range__input">
+      <output className="range__output">
         {value}
-      </p>
+      </output>
     </div>
   );
 };

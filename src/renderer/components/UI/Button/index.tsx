@@ -2,24 +2,30 @@ import React, { ReactElement, memo } from 'react';
 import classNames from 'classnames';
 
 interface IButtonProps {
-  children: string | ReactElement | [string | ReactElement, string | ReactElement],
-  className?: string,
   id?: string,
-  isSubmit?: boolean,
+  name?: string,
+  title?: string,
+  className?: string,
   isDisabled?: boolean,
+  isAutofocus?: boolean,
+  children: string | ReactElement | [string | ReactElement, string | ReactElement],
+  isSubmit?: boolean,
   tabIndex?: number,
   btnPath?: string,
-  btnArgs?: string[],
+  btnArgs?: string,
   btnLabel?: string,
-  onClick?: (e: React.SyntheticEvent) => void,
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void,
 }
 export const Button: React.FunctionComponent<IButtonProps> = memo(({
-  children,
-  className = '',
   id,
+  children,
+  name,
+  title,
+  className = '',
   isSubmit,
   isDisabled,
-  tabIndex = 0,
+  isAutofocus,
+  tabIndex,
   btnPath,
   btnArgs,
   btnLabel,
@@ -39,8 +45,11 @@ export const Button: React.FunctionComponent<IButtonProps> = memo(({
     <button
       type={isSubmit ? 'submit' : 'button'}
       className={classNames('button', className)}
-      disabled={isDisabled}
+      disabled={Boolean(isDisabled)}
       id={id}
+      name={name}
+      title={title}
+      autoFocus={isAutofocus}
       tabIndex={tabIndex}
       data-path={btnPath}
       data-args={btnArgs}

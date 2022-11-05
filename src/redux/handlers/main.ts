@@ -4,6 +4,60 @@ import * as MAIN_ACTIONS from '$actions/main';
 
 type IMainActionHadler<P> = IActionHandler<IMainRootState, P>;
 
+const setLauncherConfig: IMainActionHadler<
+  typeof MAIN_ACTIONS.setLauncherConfig
+> = (
+  state,
+  { payload: newConfig },
+) => ({
+  ...state,
+  config: newConfig,
+});
+
+const setPathVariables: IMainActionHadler<
+  typeof MAIN_ACTIONS.setPathVariables
+> = (
+  state,
+  { payload: newPathVariables },
+) => ({
+  ...state,
+  pathVariables: newPathVariables,
+});
+
+const setIsFirstStart: IMainActionHadler<
+  typeof MAIN_ACTIONS.setIsFirstStart
+> = (
+  state,
+  { payload: isFirstStart },
+) => ({
+  ...state,
+  config: {
+    ...state.config,
+    isFirstStart,
+  },
+});
+
+const setIsGameSettingsFileExists: IMainActionHadler<
+  typeof MAIN_ACTIONS.setIsGameSettingsFileExists
+> = (
+  state,
+  { payload: isGameSettingsFileExists },
+) => ({
+  ...state,
+  ...state.config,
+  isGameSettingsFileExists,
+});
+
+const setIsGameSettingsConfigChanged: IMainActionHadler<
+  typeof MAIN_ACTIONS.setIsGameSettingsConfigChanged
+> = (
+  state,
+  { payload: isGameSettingsConfigChanged },
+) => ({
+  ...state,
+  isGameSettingsConfigChanged,
+});
+
 const setIsGameRunning: IMainActionHadler<
   typeof MAIN_ACTIONS.setIsGameRunning
 > = (
@@ -22,6 +76,26 @@ const setIsLauncherInitialised: IMainActionHadler<
 ) => ({
   ...state,
   isLauncherInitialised,
+});
+
+const setIsConfigLoading: IMainActionHadler<
+  typeof MAIN_ACTIONS.setIsConfigLoading
+> = (
+  state,
+  { payload: isConfigLoading },
+) => ({
+  ...state,
+  isConfigLoading,
+});
+
+const setIsGameSettingsLoading: IMainActionHadler<
+  typeof MAIN_ACTIONS.setIsGameSettingsLoading
+> = (
+  state,
+  { payload: isGameSettingsLoading },
+) => ({
+  ...state,
+  isGameSettingsLoading,
 });
 
 const setIsGameSettingsLoaded: IMainActionHadler<
@@ -62,6 +136,26 @@ const setIsGameSettingsFilesBackuping: IMainActionHadler<
 ) => ({
   ...state,
   isGameSettingsFilesBackuping,
+});
+
+const setIsDevWindowOpening: IMainActionHadler<
+  typeof MAIN_ACTIONS.setIsDevWindowOpening
+> = (
+  state,
+  { payload: isDevWindowOpening },
+) => ({
+  ...state,
+  isDevWindowOpening,
+});
+
+const setIsDeveloperMode: IMainActionHadler<
+  typeof MAIN_ACTIONS.setIsDeveloperMode
+> = (
+  state,
+  { payload: isDeveloperMode },
+) => ({
+  ...state,
+  isDeveloperMode,
 });
 
 const setGameSettingsFilesBackup: IMainActionHadler<
@@ -118,12 +212,21 @@ const deleteMessages: IMainActionHadler<
 });
 
 export const MAIN_HANDLERS = {
+  [MAIN_TYPES.SET_LAUNCHER_CONFIG]: setLauncherConfig,
+  [MAIN_TYPES.SET_PATH_VARIABLES]: setPathVariables,
+  [MAIN_TYPES.SET_IS_FIRST_START]: setIsFirstStart,
+  [MAIN_TYPES.SET_IS_GAME_SETTINGS_CONFIG_CHANGED]: setIsGameSettingsConfigChanged,
   [MAIN_TYPES.SET_IS_GAME_RUNNING]: setIsGameRunning,
   [MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED]: setIsLauncherInitialised,
+  [MAIN_TYPES.SET_IS_GAME_SETTINGS_FILE_EXISTS]: setIsGameSettingsFileExists,
+  [MAIN_TYPES.SET_IS_CONFIG_LOADING]: setIsConfigLoading,
+  [MAIN_TYPES.SET_IS_GAME_SETTINGS_LOADING]: setIsGameSettingsLoading,
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_LOADED]: setIsGameSettingsLoaded,
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_AVAILABLE]: setIsGameSettingsAvailable,
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_SAVING]: setIsGameSettingsSaving,
   [MAIN_TYPES.SET_IS_GAME_SETTINGS_FILES_BACKUPING]: setIsGameSettingsFilesBackuping,
+  [MAIN_TYPES.SET_IS_DEV_WINDOW_OPENING]: setIsDevWindowOpening,
+  [MAIN_TYPES.SET_IS_DEVELOPER_MODE]: setIsDeveloperMode,
   [MAIN_TYPES.SET_GAME_SETTINGS_FILES_BACKUP]: setGameSettingsFilesBackup,
   [MAIN_TYPES.SET_USER_THEMES]: setUserThemes,
   [MAIN_TYPES.SET_MESSAGES]: setMessages,

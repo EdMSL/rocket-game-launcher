@@ -1,3 +1,5 @@
+const customFunctionPattern = /.+-func/;
+
 module.exports = {
   extends: [
     "stylelint-config-recommended",
@@ -11,6 +13,7 @@ module.exports = {
     "app/build/**/*"
   ],
   rules: {
+    "annotation-no-unknown": true,
     "at-rule-no-unknown": [true, {
       ignoreAtRules: [
         /mixin/,
@@ -28,7 +31,7 @@ module.exports = {
     "declaration-no-important": true,
     "font-family-name-quotes": "always-unless-keyword",
     "font-weight-notation": "numeric",
-    "function-calc-no-invalid": true,
+    "function-no-unknown": [true, {ignoreFunctions: customFunctionPattern}],
     "function-url-no-scheme-relative": true,
     "function-url-quotes": "always",
     "max-line-length": 80,
@@ -47,7 +50,8 @@ module.exports = {
     "value-no-vendor-prefix": [true, {
       "message": "Not needed with autoprefixer",
     }],
-    "selector-max-compound-selectors": 2,
+    "selector-class-pattern": /^([a-z][a-z0-9]*)([_-]{1,2}[a-z0-9]+)*$/,
+    "selector-max-compound-selectors": 3,
     "selector-max-universal": 1,
     "selector-pseudo-class-no-unknown": [true, {
       ignorePseudoClasses: ["global"],
@@ -67,7 +71,7 @@ module.exports = {
         ],
       },
     ]],
-    "scss/at-function-pattern": /.+-func/,
+    "scss/at-function-pattern": customFunctionPattern,
     "scss/no-duplicate-dollar-variables": true,
     "scss/media-feature-value-dollar-variable": "always",
   },

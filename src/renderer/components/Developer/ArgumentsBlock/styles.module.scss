@@ -1,0 +1,112 @@
+.arguments__container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.arguments__title {
+  @include reset-indents;
+}
+
+.arguments__block {
+  flex-basis: 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.arguments__list {
+  @include reset-list;
+}
+
+.arguments__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+
+  & .text-field__container {
+    flex-grow: 1;
+  }
+
+  & .text-field__input {
+    font-size: var(--text-size-input);
+  }
+
+  & .text-field__label {
+    display: none;
+  }
+
+  & .path-selector__container {
+    flex-grow: 1;
+  }
+
+  & .path-selector__label {
+    display: none;
+  }
+
+  & .path-selector__input-block {
+    max-width: 100%;
+  }
+}
+
+.arguments__delete {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+
+  vertical-align: sub;
+
+  background-color: var(--btn-color);
+  /* stylelint-disable string-no-newline, max-line-length */
+  background-image:
+    url(
+      'data:image/svg+xml,\
+      <svg viewBox="0 0 413.348 413.348" xmlns="http://www.w3.org/2000/svg">\
+        <path fill="rgb(251, 251, 254)" d="M413.348 24.354L388.994 0l-182.32 182.32L24.354 0 0 24.354l182.32 182.32L0 388.994l24.354 24.354 182.32-182.32 182.32 182.32 24.354-24.354-182.32-182.32z"/>\
+      </svg>'
+    );
+
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px;
+  /* stylelint-enable string-no-newline, max-line-length */
+
+  &:hover {
+    background-color: var(--hover-color);
+  }
+
+  &:focus {
+    @include focus;
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+.arguments__delete-text {
+  display: none;
+}
+
+.arguments__buttons {
+  align-self: stretch;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.arguments__button {
+  margin-left: 10px;
+  padding: 8px 14px;
+}
+
+.arguments__button-inner {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  & svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--text-main);
+  }
+}

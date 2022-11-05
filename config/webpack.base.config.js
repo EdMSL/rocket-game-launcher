@@ -1,9 +1,10 @@
-const path = require('path');
 const { merge } = require('webpack-merge');
+const path = require('path');
 
 const js = require('./webpack/rules/js-ts');
 const images = require('./webpack/rules/images');
 const generateHtmlPlugin = require('./webpack/plugins/html-webpack-plugin');
+const ignorePlugin = require('./webpack/plugins/ignore-plugin');
 
 const PATHS = {
   src: path.join(__dirname, '../src'),
@@ -12,14 +13,36 @@ const PATHS = {
   conf: path.join(__dirname, '.'),
 };
 
+const devServerUrl = 'http://localhost:8081/build/';
+const appProcess = 'app';
+const developerProcess = 'developer';
+
 const plugins = [
-  generateHtmlPlugin(`${PATHS.src}/public`),
+  generateHtmlPlugin(
+    `${PATHS.src}/public`,
+    process.env.NODE_ENV === 'development'
+      ? `${devServerUrl}${appProcess}.js`
+      : `${appProcess}.js`,
+  ),
+  generateHtmlPlugin(
+    `${PATHS.src}/public`,
+    process.env.NODE_ENV === 'development'
+      ? `${devServerUrl}${developerProcess}.js`
+      : `${developerProcess}.js`,
+    'developer',
+  ),
+  ignorePlugin(),
 ];
 
 const configuration = merge([
   {
     externals: {
       paths: PATHS,
+      processes: {
+        app: appProcess,
+        developer: developerProcess,
+      },
+      devServerUrl,
     },
     resolve: {
       alias: {
@@ -46,6 +69,7 @@ const configuration = merge([
     module: {
       strictExportPresence: true,
     },
+    experiments: { topLevelAwait: true },
     stats: {
       all: false,
       modules: true,

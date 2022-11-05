@@ -1,0 +1,12 @@
+.file__item {
+  margin-bottom: var(--space-m);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.file__btn {
+  align-self: center;
+  margin: auto;
+}

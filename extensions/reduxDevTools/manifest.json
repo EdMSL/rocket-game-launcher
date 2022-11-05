@@ -47,10 +47,8 @@
     "http://*/*",
     "https://*/*"
   ],
-  "version": "2.17.2",
+  "version": "3.0.9",
   "web_accessible_resources": [
-    "page.bundle.js",
-    "inject.bundle.js",
-    "redux-devtools-extension.bundle.js"
+    "page.bundle.js"
   ]
 }

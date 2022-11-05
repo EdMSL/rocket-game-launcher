@@ -3,14 +3,13 @@ import { connectRouter } from 'connected-react-router';
 
 import { gameSettingsReducer } from './gameSettings';
 import { userSettingsReducer } from './userSettings';
-import { systemReducer } from './system';
 import { mainReducer } from './main';
+import { developerReducer } from './developer';
 import { Scope } from '$constants/misc';
 
 interface IReducers {
   gameSettings: typeof gameSettingsReducer,
   userSettings: typeof userSettingsReducer,
-  system: typeof systemReducer,
   main: typeof mainReducer,
   router?: ReturnType<typeof connectRouter>,
 }
@@ -20,7 +19,6 @@ export const getRootReducer = (scope: string, history) => {
     gameSettings: gameSettingsReducer,
     userSettings: userSettingsReducer,
     main: mainReducer,
-    system: systemReducer,
   };
 
   if (scope === Scope.RENDERER) {
@@ -32,3 +30,8 @@ export const getRootReducer = (scope: string, history) => {
 
   return combineReducers({ ...reducers });
 };
+
+export const getDeveloperRootReducer = (history) => combineReducers({
+  developer: developerReducer,
+  router: connectRouter(history),
+});

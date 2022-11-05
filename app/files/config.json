@@ -1,68 +1,38 @@
 {
-  "isResizable": true,
-  "minWidth": 400,
-  "minHeight": 400,
+  "isResizable": false,
   "width": 800,
   "height": 600,
-  "maxWidth": 0,
+  "minWidth": 400,
+  "minHeight": 400,
+  "maxWidth": 900,
   "maxHeight": 0,
-  "modOrganizer": {
-    "isUsed": true,
-    "version": 2,
-    "path": "MO2"
-  },
-  "documentsPath": "My Games\\Oblivion",
-  "isFirstLaunch": false,
-  "customPaths": {
-    "%CUSTOM%": "Data\\OBSE\\Plugins"
-  },
-  "gameName": "Oblivion Association",
+  "gameName": "Some Amazing Game",
   "playButton": {
-    "path": "%GAME_DIR%\\Mod Organizer\\ModOrganizer.exe",
+    "path": "%GAME_DIR%\\MO2\\ModOrganizer.exe",
     "args": [
-      "%GAME_DIR%\\obse_loader.exe"
+      {
+        "data": "moshortcut://:LaunchGame"
+      }
     ],
     "label": ""
   },
   "customButtons": [
     {
-      "path": "%GAME_DIR%\\Editor.lnk",
-      "label": "CSE MO1 ярлык"
-    },
-    {
-      "path": "%MO_DIR%\\ModOrganizer.exe",
-      "args": [
-        "%GAME_DIR%\\obse loader.exe",
-        "-editor"
-      ],
-      "label": "CSE MO1 exe"
-    },
-    {
-      "path": "%GAME_DIR%\\Editor2.lnk",
-      "label": "CSE MO2 ярлык"
-    },
-    {
       "path": "%GAME_DIR%\\MO2\\ModOrganizer.exe",
+      "action": "run",
+      "label": "TES CS",
       "args": [
-        "\"moshortcut://:Construction Set\""
-      ],
-      "label": "CSE MO2 exe"
+        {
+          "data": "moshortcut://:Construction Set"
+        }
+      ]
     },
     {
       "path": "%GAME_DIR%",
-      "label": "Открыть папку игры"
-    },
-    {
-      "path": "%CUSTOM%\\CSE",
-      "label": "Открыть"
-    },
-    {
-      "path": "%DOCUMENTS%",
-      "label": "Доки"
-    },
-    {
-      "path": "%MO_DIR%",
-      "label": "Папка МО"
+      "action": "open",
+      "label": "Открыть папку игры",
+      "args": []
     }
-  ]
+  ],
+  "isFirstStart": false
 }

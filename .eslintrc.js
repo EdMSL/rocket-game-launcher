@@ -5,7 +5,7 @@ module.exports = {
     ecmaFeatures: {
       jsx: true,
     },
-    ecmaVersion: 2018,
+    ecmaVersion: 2020,
     project: './tsconfig.json',
     tsconfigRootDir: '.',
     warnOnUnsupportedTypeScriptVersion: false,
@@ -142,6 +142,7 @@ module.exports = {
     'react/jsx-tag-spacing': 1,
     'react/prefer-stateless-function': 0,
     'react/prop-types': 0,
+    'react/require-default-props': [1, { ignoreFunctionalComponents: true }],
 
     '@typescript-eslint/brace-style': [1, '1tbs', { 'allowSingleLine': true }],
     '@typescript-eslint/comma-dangle': [1, 'always-multiline'],

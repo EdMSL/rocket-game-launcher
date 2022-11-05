@@ -3,21 +3,19 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Hello World!</title>
   <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
-  <% if (htmlWebpackPlugin.options.inject===false) { %>
-    <link id="theme" rel="stylesheet" href="css/styles.css">
+  <% if (htmlWebpackPlugin.options.isDev===false) { %>
+    <link id="theme" rel="stylesheet" href="css/app.css">
   <% } %>
-  <% if (htmlWebpackPlugin.options.inject===false) { %>
+  <% if (htmlWebpackPlugin.options.isDev===false) { %>
     <link rel="stylesheet" href="../../../themes/custom_styles.css">
   <% } %>
+
+  <script defer src="<%= htmlWebpackPlugin.options.scriptSrc %>"></script>
 </head>
 
 <body>
   <div id="root"></div>
-  <% if (htmlWebpackPlugin.options.inject===false) { %>
-    <script src="renderer.js"></script>
-    <% } %>
 </body>
 
 </html>

@@ -7,12 +7,14 @@ import { Button } from '$components/UI/Button';
 interface IProps {
   children: React.ReactNode,
   modalParentClassname?: string,
+  title?: string,
   onCloseBtnClick?: () => void,
 }
 
 export const Modal: React.FC<IProps> = ({
   children,
   modalParentClassname = '',
+  title = '',
   onCloseBtnClick,
 }) => (
   <FocusLock
@@ -22,6 +24,7 @@ export const Modal: React.FC<IProps> = ({
     <div className={classNames('modal__overlay')} />
     <div className={classNames('modal__block')}>
       <div className={classNames('modal__header')}>
+        <p className="modal__title">{title}</p>
         {
           onCloseBtnClick && (
             <Button
@@ -33,7 +36,7 @@ export const Modal: React.FC<IProps> = ({
               </span>
             </Button>
           )
-    }
+        }
       </div>
       <div className={classNames('modal__content')}>
         {children}

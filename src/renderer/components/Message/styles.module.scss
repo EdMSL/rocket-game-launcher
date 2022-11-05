@@ -1,5 +1,4 @@
 .message {
-  max-width: 400px;
   margin-bottom: 10px;
   padding: 2px;
 
@@ -99,5 +98,6 @@
 
   &--open {
     white-space: normal;
+    word-break: break-word;
   }
 }

@@ -6,7 +6,6 @@ import {
   BACKUP_DIR,
   BACKUP_DIR_GAME_SETTINGS_FILES,
 } from '$constants/paths';
-import { getBackupFolderName } from './data';
 import { LogMessageType, writeToLogFile } from './log';
 import {
   createCopyFile,
@@ -20,15 +19,16 @@ import {
   writeFileDataSync,
 } from './files';
 import { CustomError, ReadWriteError } from './errors';
-import { IGameSettingsBackup, IUserMessage } from '$types/main';
+import { IGameSettingsBackup } from '$types/main';
 import { CreateUserMessage } from './message';
-import { getRandomId } from './strings';
+import { getDayAndTimeString, getRandomId } from './strings';
+import { IUserMessage } from '$types/common';
 
 export const createBackupFolders = (isThrowError = false): void => {
   try {
     createFolderSync(BACKUP_DIR);
     createFolderSync(BACKUP_DIR_GAME_SETTINGS_FILES);
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     let errorMsg = error.message;
 
     if (error instanceof ReadWriteError) {
@@ -45,7 +45,7 @@ export const createBackupFolders = (isThrowError = false): void => {
 
 export const createGameSettingsFilesBackup = (files: string[]): void => {
   createBackupFolders(true);
-  const folderName = getBackupFolderName();
+  const folderName = `backup_${getDayAndTimeString()}`;
 
   fs.mkdirSync(path.join(BACKUP_DIR_GAME_SETTINGS_FILES, folderName));
 
@@ -97,6 +97,7 @@ export const readBackupFolder = async (folderName: string): Promise<IGameSetting
       });
 
       return {
+        id: getRandomId('backup-folder'),
         name: folderName,
         files: newFiles,
       };
@@ -122,7 +123,9 @@ export const getGameSettingsFilesBackups = async (): Promise<IGameSettingsBackup
   const backupFolders = await readDirectory(BACKUP_DIR_GAME_SETTINGS_FILES);
 
   if (backupFolders.length > 0) {
-    const readFolderResult = await Promise.allSettled(backupFolders.map((file) => readBackupFolder(path.join(file))));
+    const readFolderResult = await Promise.allSettled(
+      backupFolders.map((file) => readBackupFolder(path.join(file))),
+    );
     const files = readFolderResult
       .filter((result) => result.status === 'fulfilled')
       .map((folderResult) => (folderResult as PromiseFulfilledResult<IGameSettingsBackup>).value);
@@ -163,7 +166,9 @@ export const deleteGameSettingsFilesBackup = async (
   const deleteResultsWithError = deleteResult.filter((result) => result.status === 'rejected');
 
   if (deleteResultsWithError.length > 0) {
-    const errorsMessages = deleteResultsWithError.map((result) => (result as PromiseRejectedResult).status);
+    const errorsMessages = deleteResultsWithError.map(
+      (result) => (result as PromiseRejectedResult).status,
+    );
 
     writeToLogFile(errorsMessages.join('\n'), LogMessageType.ERROR);
 

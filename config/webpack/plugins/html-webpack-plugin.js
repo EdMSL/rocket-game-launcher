@@ -1,9 +1,11 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-module.exports = function(assetsDir) {
+module.exports = function (assetsDir, scriptSrc, name = 'index') {
   return new HtmlWebpackPlugin({
-    filename: 'index.html',
-    template: `${assetsDir}/index.html`,
-    inject: process.env.NODE_ENV === 'development',
+    filename: `${name}.html`,
+    template: `${assetsDir}/${name}.html`,
+    inject: false,
+    scriptSrc,
+    isDev: process.env.NODE_ENV === 'development',
   });
 };

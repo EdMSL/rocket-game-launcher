@@ -1,0 +1,28 @@
+.game-settings-backup__container {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 20px 0 20px 10px;
+}
+
+.game-settings-backup__list {
+  @include reset-list;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+  overflow-y: auto;
+}
+
+.game-settings-backup__controls {
+  display: flex;
+  justify-content: center;
+  padding-right: var(--indent-size);
+}
+
+.game-settings-backup__btn {
+  margin-right: 10px;
+
+  &:last-child {
+    margin-right: 0;
+  }
+}

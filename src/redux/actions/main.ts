@@ -3,6 +3,41 @@ import {
 } from '$types/main';
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+
+export const setLauncherConfig = (
+  newConfig: IMainRootState['config'],
+) => ({
+  type: MAIN_TYPES.SET_LAUNCHER_CONFIG,
+  payload: newConfig,
+});
+
+export const setPathVariables = (
+  newPathVariables: IMainRootState['pathVariables'],
+) => ({
+  type: MAIN_TYPES.SET_PATH_VARIABLES,
+  payload: newPathVariables,
+});
+
+export const setIsFirstStart = (
+  isFirstStart: IMainRootState['config']['isFirstStart'],
+) => ({
+  type: MAIN_TYPES.SET_IS_FIRST_START,
+  payload: isFirstStart,
+});
+
+export const setIsGameSettingsFileExists = (
+  isGameSettingsFileExists: IMainRootState['isGameSettingsFileExists'],
+) => ({
+  type: MAIN_TYPES.SET_IS_GAME_SETTINGS_FILE_EXISTS,
+  payload: isGameSettingsFileExists,
+});
+
+export const setIsGameSettingsConfigChanged = (
+  isGameSettingsConfigChanged: IMainRootState['isGameSettingsConfigChanged'],
+) => ({
+  type: MAIN_TYPES.SET_IS_GAME_SETTINGS_CONFIG_CHANGED,
+  payload: isGameSettingsConfigChanged,
+});
 export const setIsGameRunning = (
   isGameRunning: IMainRootState['isGameRunning'],
 ) => ({
@@ -15,6 +50,20 @@ export const setIsLauncherInitialised = (
 ) => ({
   type: MAIN_TYPES.SET_IS_LAUNCHER_INITIALISED,
   payload: isLauncherInitialised,
+});
+
+export const setIsConfigLoading = (
+  isConfigLoading: IMainRootState['isConfigLoading'],
+) => ({
+  type: MAIN_TYPES.SET_IS_CONFIG_LOADING,
+  payload: isConfigLoading,
+});
+
+export const setIsGameSettingsLoading = (
+  isGameSettingsLoading: IMainRootState['isGameSettingsLoading'],
+) => ({
+  type: MAIN_TYPES.SET_IS_GAME_SETTINGS_LOADING,
+  payload: isGameSettingsLoading,
 });
 
 export const setIsGameSettingsLoaded = (
@@ -36,6 +85,20 @@ export const setIsGameSettingsAvailable = (
 ) => ({
   type: MAIN_TYPES.SET_IS_GAME_SETTINGS_AVAILABLE,
   payload: isGameSettingsAvailable,
+});
+
+export const setIsDevWindowOpening = (
+  isDevWindowOpening: IMainRootState['isDevWindowOpening'],
+) => ({
+  type: MAIN_TYPES.SET_IS_DEV_WINDOW_OPENING,
+  payload: isDevWindowOpening,
+});
+
+export const setIsDeveloperMode = (
+  isDeveloperMode: IMainRootState['isDeveloperMode'],
+) => ({
+  type: MAIN_TYPES.SET_IS_DEVELOPER_MODE,
+  payload: isDeveloperMode,
 });
 
 export const createGameSettingsFilesBackup = (isGetBackup = false) => ({

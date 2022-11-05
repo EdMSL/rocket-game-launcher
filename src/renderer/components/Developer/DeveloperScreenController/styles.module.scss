@@ -1,0 +1,16 @@
+.develover__controller {
+  display: flex;
+  justify-content: center;
+  margin: var(--space-m);
+  margin-top: 0;
+}
+
+.develover__controller-btn {
+  flex-basis: 15%;
+  max-width: 140px;
+  margin-right: var(--space-m);
+
+  &:last-child {
+    margin-right: 0;
+  }
+}

@@ -1,49 +1,39 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
-import { IUIElementProps } from '$types/gameSettings';
+import { HintItem } from '$components/HintItem';
+import { IUIControllerSelect, IUIElementProps } from '$types/common';
 
-export interface ISelectOption {
-  label: string,
-  value: string,
-}
-
-interface IProps extends IUIElementProps<HTMLSelectElement> {
-  isCombined?: boolean,
+interface IProps extends IUIElementProps<HTMLSelectElement>, IUIControllerSelect {
   separator?: string,
-  value: string,
-  optionsArr: ISelectOption[],
 }
 
-const defaultOptionsArr = [{
+const defaultSelectOptionsArr = [{
   label: 'None',
   value: 'None',
 }];
 
 export const Select: (React.FunctionComponent<IProps>) = ({
+  id,
+  name,
   label = '',
   description = '',
-  id,
-  name = id,
   parent,
-  separator = '',
-  multiparameters = '',
-  isCombined,
+  separator,
+  multiparameters,
+  optionType,
   value,
   isDisabled = false,
-  optionsArr,
+  selectOptions,
   className = '',
   parentClassname = '',
-  currentHintId = '',
   onChange,
-  onHover = null,
-  onLeave = null,
 }) => {
-  const currentOptionsArr = optionsArr.length !== 0 ? optionsArr : defaultOptionsArr;
+  const currentOptionsArr = selectOptions.length !== 0 ? selectOptions : defaultSelectOptionsArr;
 
   return (
     <div className={classNames(
+      'ui__container',
       'select__container',
       parentClassname && `${parentClassname}-select__container`,
       className,
@@ -57,18 +47,7 @@ export const Select: (React.FunctionComponent<IProps>) = ({
           >
             <span className="select__label-text">{label}</span>
             {
-              description
-              && onHover
-              && onLeave
-              && (
-                <GameSettingsHintBlock
-                  id={id}
-                  description={description}
-                  currentHintId={currentHintId}
-                  onHover={onHover}
-                  onLeave={onLeave}
-                />
-              )
+              description && <HintItem description={description} />
             }
           </label>
         )
@@ -78,12 +57,12 @@ export const Select: (React.FunctionComponent<IProps>) = ({
         id={id}
         name={name}
         data-parent={parent}
-        data-iscombined={isCombined}
+        data-optiontype={optionType}
         data-separator={separator}
         data-multiparameters={multiparameters}
         onChange={onChange}
         value={value}
-        disabled={isDisabled || optionsArr.length === 0}
+        disabled={isDisabled || selectOptions.length <= 1}
       >
         {
           currentOptionsArr.map((option) => (

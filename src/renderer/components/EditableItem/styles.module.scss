@@ -1,0 +1,59 @@
+.editable-item {
+  display: flex;
+  align-items: center;
+
+  &--editable {
+    font-size: inherit;
+  }
+}
+
+.editable-item__text {
+  font-size: inherit;
+}
+
+.editable-item__input {
+  font-size: var(--text-size-input);
+
+  &:focus {
+    @include focus;
+  }
+
+  &:disabled {
+    background-color: var(--disabled-color);
+  }
+
+  &--error {
+    background-color: var(--error-color);
+  }
+}
+
+.editable-item__btn {
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+
+  font-size: 0;
+
+  background-repeat: no-repeat;
+  background-position: center;
+
+  & svg {
+    fill: var(--text-main);
+  }
+
+  &::before {
+    display: block;
+  }
+
+  &:focus {
+    @include focus;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+  }
+
+  &:hover svg {
+    fill: var(--focus-color);
+  }
+}

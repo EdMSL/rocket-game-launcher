@@ -11,6 +11,7 @@ module.exports = function (env) {
               options: {
                 plugins: [
                   env.FAST_REFRESH && require.resolve('react-refresh/babel'),
+                  '@babel/plugin-syntax-top-level-await',
                 ].filter(Boolean),
               },
             },

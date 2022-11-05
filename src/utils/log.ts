@@ -24,41 +24,48 @@ export const launcherLogPath = path.resolve(
 export const createLogFile = (pathToLogFile = launcherLogPath): void => {
   try {
     fs.writeFileSync(pathToLogFile, `Log file created at: ${new Date().toLocaleString()}.`);
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     showErrorBox(error.message, "Can't create log file.");
   }
 };
 
+const getLogMessage = (
+  message: string,
+  messageType = LogMessageType.INFO,
+): string => `\n[${messageType}][${new Date().toLocaleString()}]: ${message}`;
+
+const writeToLogErrorCallback = (
+  error: Error,
+): void => console.warn(`Can't write to log file. ${error.message}`);
+
 /**
   * Синхронно записать информацию в файл лога.
   * @param message Строка для записи в лог.
-  * @param messageType Определяет тип сообщения, ошибка, предупреждение или информация.
-  * По умолчанию `info`.
+  * @param messageType Тип сообщения: ошибка, предупреждение или информация. По умолчанию `info`.
 */
 export const writeToLogFileSync = (message: string, messageType = LogMessageType.INFO): void => {
   try {
     fs.appendFileSync(
       launcherLogPath,
-      `\n[${messageType}][${new Date().toLocaleString()}]: ${message}`,
+      getLogMessage(message, messageType),
     );
-  } catch (error: any) {
-    console.warn(`Can't write to log file. ${error.message}`);
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    writeToLogErrorCallback(error);
   }
 };
 
 /**
   * Асинхронно записать информацию в файл лога.
   * @param message Строка для записи в лог.
-  * @param messageType Определяет тип сообщения, ошибка, предупреждение или информация.
-  * По умолчанию `info`.
+  * @param messageType Тип сообщения: ошибка, предупреждение или информация. По умолчанию `info`.
 */
 export const writeToLogFile = (message: string, messageType = LogMessageType.INFO): void => {
   fs.appendFile(
     launcherLogPath,
-    `\n[${messageType.toUpperCase()}][${new Date().toLocaleString()}]: ${message}`,
+    getLogMessage(message, messageType),
     (error) => {
       if (error) {
-        console.warn(`Can't write to log file. ${error.message}`);
+        writeToLogErrorCallback(error);
       }
     },
   );

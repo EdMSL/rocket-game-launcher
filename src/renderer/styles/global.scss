@@ -11,6 +11,8 @@ body {
 *::after,
 *::before {
   box-sizing: inherit;
+
+  user-select: none;
 }
 
 ::-webkit-scrollbar {

@@ -1,0 +1,28 @@
+.option__items {
+  @include reset-indents;
+  margin-bottom: 10px;
+
+  text-align: center;
+}
+
+.option__list {
+  @include reset-list;
+  margin-bottom: var(--space-xl);
+  padding-left: var(--space-m);
+}
+
+.option__item {
+  margin-bottom: var(--space-m);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.option__btn {
+  align-self: center;
+  box-sizing: border-box;
+  min-width: 200px;
+  margin: auto;
+  margin-bottom: var(--space-m);
+}

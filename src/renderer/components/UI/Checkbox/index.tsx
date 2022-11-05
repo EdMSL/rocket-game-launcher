@@ -1,30 +1,26 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { GameSettingsHintBlock } from '$components/GameSettingsHintBlock';
-import { IUIElementProps } from '$types/gameSettings';
+import { HintItem } from '$components/HintItem';
+import { IUIControllerCheckbox, IUIElementProps } from '$types/common';
 
-interface IProps extends IUIElementProps<HTMLInputElement> {
-  isChecked: boolean,
-}
+interface IProps extends IUIElementProps<HTMLInputElement>, IUIControllerCheckbox {}
 
 export const Checkbox: React.FunctionComponent<IProps> = ({
   id,
-  name = id,
-  parent = '',
+  name,
+  parent,
   label = '',
   description = '',
   isChecked,
   isDisabled = false,
   className = '',
   parentClassname = '',
-  currentHintId = '',
-  multiparameters = '',
+  multiparameters,
   onChange,
-  onHover = null,
-  onLeave = null,
 }) => (
   <div className={classNames(
+    'ui__container',
     'checkbox__container',
     parentClassname && `${parentClassname}-checkbox__container`,
     className,
@@ -47,19 +43,8 @@ export const Checkbox: React.FunctionComponent<IProps> = ({
     >
       <span>{label}</span>
       {
-          description
-          && onHover
-          && onLeave
-          && (
-            <GameSettingsHintBlock
-              id={id}
-              description={description}
-              currentHintId={currentHintId}
-              onHover={onHover}
-              onLeave={onLeave}
-            />
-          )
-        }
+        description && <HintItem description={description} />
+      }
     </label>
   </div>
 );

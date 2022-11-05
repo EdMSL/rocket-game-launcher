@@ -1,0 +1,99 @@
+.game-settings-backup__item-container {
+  margin-bottom: 10px;
+  padding-right: var(--indent-size);
+}
+
+.game-settings-backup__item {
+  display: block;
+}
+
+.game-settings-backup__title {
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 30px;
+
+  cursor: pointer;
+
+  &::before {
+    content: "";
+
+    width: 0;
+    height: 0;
+    margin-right: 10px;
+
+    border-top: calc(#{$marker-size} / 2) solid transparent;
+    border-bottom: calc(#{$marker-size} / 2) solid transparent;
+    border-left: $marker-size solid var(--text-main);
+
+    .game-settings-backup__item[open] & {
+      transform: rotate(90deg);
+    }
+  }
+
+  &:focus {
+    @include focus;
+  }
+}
+
+.game-settings-backup__title-text {
+  display: inline-block;
+  min-width: 230px;
+  height: 100%;
+
+  font-size: 18px;
+  vertical-align: middle;
+}
+
+.game-settings-backup__item-list {
+  @include reset-list;
+  margin-bottom: 10px;
+}
+
+.game-settings-backup__file {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 30px;
+  padding: 4px 10px;
+
+  &:first-child {
+    font-weight: 700;
+  }
+
+  &:hover {
+    background-color: var(--btn-color);
+  }
+}
+
+.game-settings-backup__checkbox-block {
+  flex-grow: 1;
+}
+
+.game-settings-backup__file:not(:first-of-type) .checkbox__label::before {
+  top: calc(50% - 1px);
+}
+
+.game-settings-backup__file:not(:first-of-type) .checkbox__label::after {
+  top: calc(50% + 6px);
+}
+
+.game-settings-backup__path {
+  align-self: flex-start;
+
+  font-size: 12px;
+
+  &:focus {
+    @include focus;
+  }
+
+  &:hover {
+    color: var(--focus-color);
+  }
+}
+
+.game-settings-backup__restore-btn {
+  color: var(--text-main);
+}

@@ -2,41 +2,46 @@ import { SagaIterator } from 'redux-saga';
 import {
   call,
   put,
-  take,
   takeLatest,
   select,
   all,
   SagaReturnType,
 } from 'redux-saga/effects';
-import path from 'path';
+import Joi from 'joi';
 
 import { IAppState } from '$store/store';
 import {
-  IIniObj,
-  IXmlObj,
+  getPathToFile,
+  isDataFromIniFile,
+  normalizePath,
   readDirectory,
-  readFileForGameSettingsOptions,
+  readGameSettingsFile,
   readINIFile,
   readJSONFile,
   writeGameSettingsFile,
   writeINIFile,
-  xmlAttributePrefix,
 } from '$utils/files';
-import { IUnwrap, IUnwrapSync } from '$types/common';
+import {
+  IGetDataFromFilesResult, IModOrganizerINIData, IUnwrap,
+} from '$types/common';
 import {
   addMessages,
   setIsGameSettingsAvailable,
   setIsGameSettingsLoaded,
+  setIsGameSettingsLoading,
   setIsGameSettingsSaving,
+  setIsGameSettingsConfigChanged,
+  setIsGameSettingsFileExists,
+  setPathVariables,
 } from '$actions/main';
-import { GAME_DIR, GAME_SETTINGS_FILE_PATH } from '$constants/paths';
-import { checkGameSettingsFiles, checkGameSettingsConfigMainFields } from '$utils/check';
+import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
+import { checkGameSettingsConfigFull, ICheckResult } from '$utils/check';
 import {
   GAME_SETTINGS_TYPES,
   IGameSettingsConfig,
-  IGameSettingsFiles,
-  IGameSettingsOptions,
-  IGameSettingsOptionsItem,
+  IGameSettingsFile,
+  IGameSettingsParameters,
+  IGameSettingsOption,
 } from '$types/gameSettings';
 import {
   LogMessageType,
@@ -47,110 +52,104 @@ import { CreateUserMessage } from '$utils/message';
 import {
   changeMoProfile,
   setGameSettingsConfig,
-  setGameSettingsOptions,
+  setGameSettingsParameters,
   setGameSettingsFiles,
   setMoProfile,
   setMoProfiles,
   saveGameSettingsFiles,
+  setGameSettingsOptions,
+  setInitialGameSettingsOptions,
+  setMoVersion,
 } from '$actions/gameSettings';
 import {
   CustomError,
+  ErrorName,
+  getSagaErrorLogMessage,
   ReadWriteError,
   SagaError,
 } from '$utils/errors';
 import {
-  changeSectionalIniParameter,
-  filterIncorrectGameSettingsFiles,
-  getGameSettingsOptionsWithDefaultValues,
-  getOptionData,
-  isDataFromIniFile,
+  changeLineIniParameterStr,
+  changeSectionalIniParameterStr,
+  generateGameSettingsParameters,
+  getFileByFileName,
+  getGameSettingsParametersWithNewValues,
+  getModOrganizerPathVariables,
   setValueForObjectDeepKey,
 } from '$utils/data';
-import { IUserMessage } from '$types/main';
 import {
-  CustomPathName,
+  PathRegExp,
   Encoding,
-  GameSettingsOptionType,
   GameSettingsFileView,
+  modOrganizerGeneralSection,
+  modOrganizerProfileParam,
+  PathVariableName,
+  AppWindowName,
+  modOrganizerVersionParam,
 } from '$constants/misc';
 import {
-  getParameterRegExp,
-  getPathToFile,
-  getStringPartFromIniLineParameterForReplace,
+  getRegExpForLineIniParameter,
+  getObjectAsList,
+  replacePathVariableByDirPath,
 } from '$utils/strings';
-
-interface IGetDataFromFilesResult {
-  [key: string]: IIniObj|IXmlObj,
-}
+import { setIsGameSettingsConfigFileExists } from '$actions/developer';
+import { GAME_SETTINGS_CONFIG_FILE_NAME } from '$constants/defaultData';
 
 export interface IIncorrectGameSettingsFiles {
   [key: string]: number[],
-}
-
-export interface IGenerateGameSettingsOptionsResult {
-  totalGameSettingsOptions: IGameSettingsOptions,
-  incorrectGameSettingsFiles: IIncorrectGameSettingsFiles,
 }
 
 const getState = (state: IAppState): IAppState => state;
 
 /**
  * Получить данные из файла игровых настроек
- * settings.json, проверить основные поля и записать в `state`, если требуется
- * @param isFromUpdateAction Выполнениe для обновления опций?
- * @returns Объект с данными из settings.json.
+ * settings.json и проверить данные на валидность.
+ * @returns Объект с данными из settings.json и ошибками валидации.
 */
-export function* getInitialGameSettingsConfigSaga(
-  isFromUpdateAction = false,
-): SagaIterator<IGameSettingsConfig> {
+export function* getGameSettingsConfigSaga(
+  windowName = AppWindowName.MAIN,
+): SagaIterator<ICheckResult<IGameSettingsConfig>> {
   try {
-    const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile, GAME_SETTINGS_FILE_PATH);
-    const newSettingsConfigObj = checkGameSettingsConfigMainFields(gameSettingsObj);
+    const gameSettingsObj: IGameSettingsConfig = yield call(readJSONFile,
+      GAME_SETTINGS_FILE_PATH,
+      false);
 
-    if (!isFromUpdateAction) {
-      yield put(setGameSettingsConfig(newSettingsConfigObj));
+    if (windowName === AppWindowName.MAIN) {
+      yield put(setIsGameSettingsConfigFileExists(true));
+    } else {
+      yield put(setIsGameSettingsFileExists(true));
     }
 
-    yield put(setIsGameSettingsAvailable(true));
-
-    return newSettingsConfigObj;
-  } catch (error: any) {
+    return checkGameSettingsConfigFull(gameSettingsObj);
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     let errorMessage = '';
 
     if (error instanceof CustomError) {
       errorMessage = error.message;
     } else if (error instanceof ReadWriteError) {
       errorMessage = `${error.message}. Path: '${error.path}'.`;
+
+      if (error.causeName === ErrorName.NOT_FOUND) {
+        yield put(setIsGameSettingsConfigFileExists(false));
+        yield put(setIsGameSettingsFileExists(false));
+      }
     } else {
       errorMessage = `Unknown error. Message: ${error.message}`;
     }
 
-    if (!isFromUpdateAction) {
-      yield put(addMessages([CreateUserMessage.error('Ошибка обработки файла settings.json. Игровые настройки будут недоступны. Подробности в файле лога')])); //eslint-disable-line max-len
-    }
-
-    throw new SagaError('Set initial game settings saga', errorMessage, error);
+    throw new SagaError('Get game settings config saga', errorMessage, error);
   }
 }
 
 /**
  * Получить список профилей Mod Organizer и записать в `state`
+ * @param pathVariables Текущие переменные путей.
 */
-function* getMOProfilesSaga(): SagaIterator {
-  const {
-    system: {
-      modOrganizer: {
-        pathToProfiles,
-      },
-    },
-  }: ReturnType<typeof getState> = yield select(getState);
-
-  const profilesPath = path.resolve(GAME_DIR, pathToProfiles);
-
+function* getMOProfilesSaga(pathToMOFolder: string): SagaIterator {
   try {
     const profiles: IUnwrap<typeof readDirectory> = yield call(
       readDirectory,
-      profilesPath,
+      pathToMOFolder,
     );
 
     if (profiles.length > 0) {
@@ -158,18 +157,8 @@ function* getMOProfilesSaga(): SagaIterator {
     } else {
       throw new CustomError('There are no profiles in the profiles folder.');
     }
-  } catch (error: any) {
-    let errorMessage = '';
-
-    if (error instanceof CustomError) {
-      errorMessage = error.message;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${profilesPath}'.`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
-    throw new SagaError('Get Mod Organizer profiles', errorMessage);
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    throw new SagaError('Get Mod Organizer profiles', getSagaErrorLogMessage(error), error);
   }
 }
 
@@ -177,59 +166,40 @@ function* getMOProfilesSaga(): SagaIterator {
  * Получить данные из файла ModOrganizer.ini и записать нужные параметры в `state`
  * @returns Строка с профилем ModOrganizer
 */
-function* getDataFromMOIniSaga(): SagaIterator<string> {
+function* getDataFromMOIniSaga(pathToMOIni: string): SagaIterator<IModOrganizerINIData> {
   try {
-    const {
-      system: {
-        modOrganizer: {
-          version,
-          pathToINI,
-          profileSection,
-          profileParam,
-          profileParamValueRegExp,
-        },
-      },
-    }: ReturnType<typeof getState> = yield select(getState);
-
     const iniData: IUnwrap<typeof readINIFile> = yield call(
       readINIFile,
-      path.resolve(GAME_DIR, pathToINI),
+      pathToMOIni,
     );
 
-    const currentMOProfileIniSection = iniData.getSection(profileSection);
+    const generalSection = iniData.getSection(modOrganizerGeneralSection);
 
-    if (currentMOProfileIniSection) {
-      const profileName = currentMOProfileIniSection.getValue(profileParam);
+    if (generalSection) {
+      const versionStr = generalSection.getValue(modOrganizerVersionParam);
 
-      if (profileName) {
-        ///TODO Обработать случай для кастомного regexp
-        if (profileParamValueRegExp) {
-          const result = profileName.match(new RegExp(profileParamValueRegExp)) || [];
+      if (versionStr) {
+        const profileName = generalSection.getValue(modOrganizerProfileParam);
 
-          if (result.length > 0) {
-            // eslint-disable-next-line prefer-destructuring
-            return result[1];
+        if (profileName) {
+          const version = +versionStr.split('.')[0];
+
+          if (+version === 1) {
+            return { profileName: profileName.toString(), version };
           }
 
-          throw new CustomError('profileParamValueRegExp');
-        }
+          if (+version === 2) {
+            return { profileName: profileName.match(/@ByteArray\((.+)\)/)![1], version };
+          }
 
-        if (version === 1) {
-          return profileName.toString();
+          return { profileName: profileName.toString(), version };
         }
-
-        if (version === 2) {
-          return profileName.match(/@ByteArray\((.+)\)/)![1];
-        }
-
-        return profileName.toString();
       }
-
-      throw new CustomError('profileName');
+      throw new CustomError('version');
     } else {
-      throw new CustomError('profileSection');
+      throw new CustomError('modOrganizerGeneralSection');
     }
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     let errorMessage = '';
 
     if (error instanceof CustomError) {
@@ -246,32 +216,34 @@ function* getDataFromMOIniSaga(): SagaIterator<string> {
       'Не удалось получить текущий профиль Mod Organizer. Настройки из файлов, привязанных к профилю, будут недоступны. Подробности в файле лога.', //eslint-disable-line max-len
     )]));
 
-    throw new SagaError('Get data from Mod Organizer INI file', errorMessage);
+    throw new SagaError('Get data from Mod Organizer INI file', errorMessage, error);
   }
 }
 
 /**
  * Считывает данные из файлов для генерации игровых опций
  * @param filesForRead Игровые файлы, из которых нужно получить данные.
- * @param isWithPrefix Нужно ли добавлять префикс к именам атрибутов. По умолчанию `false`.
+ * @param isWithPrefix Если `true`, добавит префикс '@_' к именам атрибутов параметров
+ * из файлов со структурой `TAG`. По умолчанию `false`.
 */
 function* getDataFromGameSettingsFilesSaga(
-  filesForRead: IGameSettingsFiles,
+  filesForRead: IGameSettingsFile[],
   moProfile: string,
   isWithPrefix = false,
 ): SagaIterator<IGetDataFromFilesResult> {
   try {
     const {
-      system: { customPaths },
+      main: { pathVariables },
+      gameSettings: { baseFilesEncoding },
     }: ReturnType<typeof getState> = yield select(getState);
 
-    const currentFilesData: IUnwrap<typeof readFileForGameSettingsOptions>[] = yield all(
-      Object.keys(filesForRead).map((fileName) => call(
-        readFileForGameSettingsOptions,
-        getPathToFile(filesForRead[fileName].path, customPaths, moProfile),
-        filesForRead[fileName].view,
-        fileName,
-        filesForRead[fileName].encoding,
+    const currentFilesData: IUnwrap<typeof readGameSettingsFile>[] = yield all(
+      filesForRead.map((file) => call(
+        readGameSettingsFile,
+        file,
+        pathVariables,
+        moProfile,
+        baseFilesEncoding,
         isWithPrefix,
       )),
     );
@@ -283,252 +255,194 @@ function* getDataFromGameSettingsFilesSaga(
       }),
       {},
     );
-  } catch (error: any) {
-    throw new SagaError('Get data from game settings files', error.message);
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    throw new SagaError('Get data from game settings files', error.message, error);
   }
 }
 
 /**
  * Генерирует список игровых опций на основе параметров
  * (`gameSettingsFiles`) из файлов, указанных в settings.json
- * @param gameSettingsFiles Объект-основа для генерации опций.
+ * @param gameSettingsFiles Массив объектов игровых файлов.
+ * @param gameSettingsOptions Игровые параметры для генерации опций.
  * @param moProfile Профиль Mod Organizer.
 */
-export function* generateGameSettingsOptionsSaga(
-  gameSettingsFiles: IGameSettingsFiles,
+export function* generateGameSettingsParametersSaga(
+  gameSettingsFiles: IGameSettingsFile[],
+  gameSettingsOptions: IGameSettingsOption[],
   moProfile: string,
-): SagaIterator<IGenerateGameSettingsOptionsResult> {
+): SagaIterator<{
+  gameSettingsParameters: IGameSettingsParameters,
+  optionsWithError: string[],
+}> {
   try {
-    let incorrectGameSettingsFiles: IIncorrectGameSettingsFiles = {};
-    let optionsErrors: IUserMessage[] = [];
-
     const currentFilesDataObj: SagaReturnType<typeof getDataFromGameSettingsFilesSaga> = yield call(
       getDataFromGameSettingsFilesSaga,
       gameSettingsFiles,
       moProfile,
+      true,
     );
 
-    const totalGameSettingsOptions: IGameSettingsOptions = Object.keys(gameSettingsFiles).reduce(
-      (gameSettingsOptions, currentGameSettingsFileName) => {
-        const incorrectIndexes: number[] = [];
-        const currentGameSettingsFile = gameSettingsFiles[currentGameSettingsFileName];
-
-        const optionsFromFile = currentGameSettingsFile.optionsList.reduce<IGameSettingsOptionsItem>(
-          (currentOptions, currentParameter, index) => {
-            //Если опция с типом group или related,
-            // то генерация производится для каждого параметра в items.
-            if (
-              currentParameter.optionType === GameSettingsOptionType.RELATED
-              || currentParameter.optionType === GameSettingsOptionType.GROUP
-              || currentParameter.optionType === GameSettingsOptionType.COMBINED
-            ) {
-              let specParamsErrors: IUserMessage[] = [];
-
-              const optionsFromParameter = currentParameter.items!.reduce<IGameSettingsOptionsItem>(
-                (options, currentOption) => {
-                  const {
-                    optionName, optionValue, optionErrors,
-                  } = getOptionData(
-                    currentFilesDataObj[currentGameSettingsFileName],
-                    currentOption,
-                    currentGameSettingsFile.view,
-                    currentGameSettingsFileName,
-                    path.basename(currentGameSettingsFile.path),
-                    moProfile,
-                  );
-
-                  if (optionErrors.length > 0) {
-                    specParamsErrors = [...optionErrors];
-                    incorrectIndexes.push(index);
-
-                    return { ...options };
-                  }
-
-                  return {
-                    ...options,
-                    [optionName]: {
-                      default: optionValue,
-                      value: optionValue,
-                      parent: currentGameSettingsFileName,
-                    },
-                  };
-                },
-                {},
-              );
-
-              if (specParamsErrors.length > 0) {
-                optionsErrors = [...optionsErrors, ...specParamsErrors];
-
-                return { ...currentOptions };
-              }
-
-              return {
-                ...currentOptions,
-                ...optionsFromParameter,
-              };
-            }
-
-            const {
-              optionName, optionValue, optionErrors,
-            } = getOptionData(
-              currentFilesDataObj[currentGameSettingsFileName],
-              currentParameter,
-              currentGameSettingsFile.view,
-              currentGameSettingsFileName,
-              path.basename(currentGameSettingsFile.path),
-              moProfile,
-            );
-
-            if (optionErrors.length > 0) {
-              optionsErrors = [...optionsErrors, ...optionErrors];
-              incorrectIndexes.push(index);
-
-              return { ...currentOptions };
-            }
-
-            return {
-              ...currentOptions,
-              [optionName]: {
-                default: optionValue,
-                value: optionValue,
-                parent: currentGameSettingsFileName,
-              },
-            };
-          },
-          {},
-        );
-
-        if (incorrectIndexes.length > 0) {
-          incorrectGameSettingsFiles = {
-            ...incorrectGameSettingsFiles,
-            [currentGameSettingsFileName]: incorrectIndexes,
-          };
-        }
-
-        if (Object.keys(optionsFromFile).length > 0) {
-          return {
-            ...gameSettingsOptions,
-            [currentGameSettingsFileName]: optionsFromFile,
-          };
-        }
-
-        return {
-          ...gameSettingsOptions,
-        };
-      },
-      {},
+    const {
+      data: totalGameSettingsParameters, errors, optionsWithError,
+    } = generateGameSettingsParameters(
+      gameSettingsOptions,
+      gameSettingsFiles,
+      currentFilesDataObj,
+      moProfile,
     );
 
-    if (optionsErrors.length > 0) {
-      optionsErrors.forEach((message) => {
-        writeToLogFile(message.text, message.type);
+    if (errors.length > 0) {
+      errors.forEach((message) => {
+        writeToLogFile(message.text, LogMessageType.WARNING);
       });
     }
 
-    return {
-      totalGameSettingsOptions,
-      incorrectGameSettingsFiles,
-    };
-  } catch (error: any) {
-    throw new SagaError('Generate game settings options', error.message);
+    return { gameSettingsParameters: totalGameSettingsParameters, optionsWithError };
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    throw new SagaError('Generate game settings parameters', error.message, error);
   }
 }
 
 /**
- * Инициализация игровых настроек. Осуществляется при первом переходе на экран настроек.
- * Получаем данные МО, проверяем на валидность параметры игровых настроек (`gameSettingsFiles`)
- * и переписываем их в случае невалидности некоторых полей, генерируем опции игровых настроек.
+ * Инициализация игровых настроек. Получаем данные МО,
+ * проверяем на валидность параметры игровых настроек (`gameSettingsOptions`),
+ * генерируем параметры игровых настроек.
+ * @param isFromUpdateAction Если true, то выполняются действия при обновлении настроек,
+ * иначе первичная инииализация.
+ * @param initialSettingsConfig Начальное состояние для конфигурации.
 */
 export function* initGameSettingsSaga(
   isFromUpdateAction = false,
-  settingsFiles?: IGameSettingsConfig['gameSettingsFiles'],
+  initialSettingsConfig?: IGameSettingsConfig,
 ): SagaIterator {
   try {
+    yield put(setIsGameSettingsLoading(true));
     yield put(setIsGameSettingsLoaded(false));
-    writeToLogFileSync('Game settings initialization started.');
 
-    let gameSettingsFiles;
+    if (!isFromUpdateAction) {
+      writeToLogFileSync('Game settings initialization started.');
+    } else {
+      writeToLogFileSync('Update game settings.');
+    }
 
     const {
-      gameSettings: {
-        gameSettingsFiles: settingsFilesFromState,
-        baseFilesEncoding,
-        gameSettingsGroups,
-      },
-      system: {
-        modOrganizer: {
-          isUsed: isMOUsed,
-        },
+      main: {
+        isGameSettingsConfigChanged,
+        pathVariables,
       },
     }: ReturnType<typeof getState> = yield select(getState);
 
-    if (settingsFiles) {
-      gameSettingsFiles = settingsFiles;
+    let currentSettingsConfig: IGameSettingsConfig;
+    let settingsConfigErrors: Joi.ValidationError[] = [];
+    let currentPathVariables = { ...pathVariables };
+
+    if (initialSettingsConfig) {
+      currentSettingsConfig = initialSettingsConfig;
     } else {
-      gameSettingsFiles = settingsFilesFromState;
+      const {
+        data,
+        errors,
+      }: SagaReturnType<typeof getGameSettingsConfigSaga> = yield call(getGameSettingsConfigSaga);
+
+      currentSettingsConfig = data;
+      settingsConfigErrors = [...errors];
+    }
+    if (currentSettingsConfig.documentsPath !== PathVariableName.DOCUMENTS) {
+      currentPathVariables = {
+        ...currentPathVariables,
+        [PathVariableName.DOCS_GAME]: replacePathVariableByDirPath(
+          normalizePath(currentSettingsConfig.documentsPath),
+          PathVariableName.DOCUMENTS,
+          pathVariables['%DOCUMENTS%'],
+        ),
+      };
     }
 
-    let moProfile: string = '';
+    let moData: SagaReturnType<typeof getDataFromMOIniSaga> = { profileName: '', version: 0 };
 
-    if (isMOUsed) {
-      yield call(getMOProfilesSaga);
+    if (currentSettingsConfig.modOrganizer.isUsed) {
+      const MOPathVariables = getModOrganizerPathVariables(
+        replacePathVariableByDirPath(currentSettingsConfig.modOrganizer.pathToMOFolder),
+        pathVariables,
+      );
 
-      moProfile = yield call(getDataFromMOIniSaga);
-      yield put(setMoProfile(moProfile));
+      currentPathVariables = {
+        ...currentPathVariables,
+        ...MOPathVariables,
+      };
+
+      if (!isFromUpdateAction) {
+        writeToLogFile(`Mod Organizer paths variables:\n  ${getObjectAsList(MOPathVariables, true, true)}`); //eslint-disable-line max-len
+      }
+
+      yield call(getMOProfilesSaga, MOPathVariables[PathVariableName.MO_PROFILE]);
+
+      moData = yield call(getDataFromMOIniSaga, currentPathVariables[PathVariableName.MO_INI]);
+
+      yield put(setMoVersion(moData.version));
+      yield put(setMoProfile(moData.profileName));
     }
 
-    let {
-      files: newGameSettingsFilesObj,
-      isError: isCheckFilesError, // eslint-disable-line prefer-const
-    }: IUnwrapSync<typeof checkGameSettingsFiles> = yield call(
-      checkGameSettingsFiles,
-      gameSettingsFiles,
-      baseFilesEncoding,
-      gameSettingsGroups,
-    );
+    yield put(setPathVariables(currentPathVariables));
 
-    const {
-      totalGameSettingsOptions,
-      incorrectGameSettingsFiles,
-    }: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
-      generateGameSettingsOptionsSaga,
-      newGameSettingsFilesObj,
-      moProfile,
-    );
+    if (currentSettingsConfig.gameSettingsOptions.length > 0) {
+      const {
+        gameSettingsParameters, optionsWithError,
+      }: SagaReturnType<typeof generateGameSettingsParametersSaga> = yield call(
+        generateGameSettingsParametersSaga,
+        currentSettingsConfig.gameSettingsFiles,
+        currentSettingsConfig.gameSettingsOptions,
+        moData.profileName,
+      );
 
-    newGameSettingsFilesObj = filterIncorrectGameSettingsFiles(
-      newGameSettingsFilesObj,
-      incorrectGameSettingsFiles,
-    );
+      if (!initialSettingsConfig && !isFromUpdateAction) {
+        yield put(setInitialGameSettingsOptions(currentSettingsConfig.gameSettingsOptions));
+      }
 
-    if (Object.keys(totalGameSettingsOptions).length === 0) {
-      yield put(addMessages([CreateUserMessage.error('Нет доступных настроек для вывода. Подробности в файле лога.')])); //eslint-disable-line max-len
-    } else if (
-      Object.keys(newGameSettingsFilesObj).length !== Object.keys(gameSettingsFiles).length
-      || Object.keys(incorrectGameSettingsFiles).length > 0
-      || isCheckFilesError
-    ) {
-      yield put(addMessages([CreateUserMessage.warning('Обнаружены ошибки в файле игровых настроек settings.json. Некоторые опции будут недоступны. Подробности в файле лога.')])); //eslint-disable-line max-len
+      if (optionsWithError.length > 0 || settingsConfigErrors?.length > 0) {
+        const filteredGameSettingsOptions = currentSettingsConfig.gameSettingsOptions.filter(
+          (currentParam) => !optionsWithError.includes(currentParam.id),
+        );
+
+        if (filteredGameSettingsOptions.length === 0) {
+          yield put(addMessages([CreateUserMessage.error(`Нет доступных опций для вывода. Ни один параметр в файле игровых настроек ${GAME_SETTINGS_CONFIG_FILE_NAME} не может быть обработан из-за ошибок. Подробности в файле лога.`)])); //eslint-disable-line max-len
+        } else {
+          yield put(addMessages([CreateUserMessage.warning(`Обнаружены ошибки в файле игровых настроек ${GAME_SETTINGS_CONFIG_FILE_NAME}. Некоторые опции будут недоступны. Подробности в файле лога.`)])); //eslint-disable-line max-len
+        }
+
+        currentSettingsConfig.gameSettingsOptions = [...filteredGameSettingsOptions];
+      }
+
+      yield put(setGameSettingsParameters(gameSettingsParameters));
     }
 
-    yield put(setGameSettingsOptions(totalGameSettingsOptions));
-    yield put(setGameSettingsFiles(newGameSettingsFilesObj));
+    yield put(setGameSettingsConfig(currentSettingsConfig));
+    yield put(setIsGameSettingsAvailable(true));
+    yield put(setIsGameSettingsLoaded(true));
 
-    writeToLogFileSync('Game settings initialisation completed.');
-  } catch (error: any) {
-    let errorMessage = '';
-
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path "${error.path}".`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
+    if (isGameSettingsConfigChanged) {
+      yield put(setIsGameSettingsConfigChanged(false));
     }
 
     if (!isFromUpdateAction) {
+      writeToLogFileSync('Game settings initialisation completed.');
+    }
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    const errorMessage = getSagaErrorLogMessage(error);
+
+    yield put(setGameSettingsParameters({}));
+    yield put(setGameSettingsFiles([]));
+    yield put(setGameSettingsOptions([]));
+    yield put(setIsGameSettingsLoaded(false));
+
+    if (isFromUpdateAction) {
+      throw new SagaError(
+        'Init game settings',
+        errorMessage,
+        error instanceof SagaError ? error.reason : error,
+      );
+    } else {
       writeToLogFileSync(
         `Failed to initialize game settings. Reason: ${errorMessage}`,
         LogMessageType.ERROR,
@@ -536,14 +450,10 @@ export function* initGameSettingsSaga(
 
       yield put(addMessages([CreateUserMessage.error('Произошла ошибка в процессе генерации игровых настроек. Подробности в файле лога.')]));//eslint-disable-line max-len
     }
-
-    yield put(setGameSettingsOptions({}));
-    yield put(setGameSettingsFiles({}));
-
-    throw new SagaError('Init game settings', errorMessage);
   } finally {
-    yield take(GAME_SETTINGS_TYPES.SET_GAME_SETTINGS_FILES);
-    yield put(setIsGameSettingsLoaded(true));
+    if (!isFromUpdateAction) {
+      yield put(setIsGameSettingsLoading(false));
+    }
   }
 }
 
@@ -558,79 +468,57 @@ function* changeMOProfileSaga(
     yield put(setIsGameSettingsLoaded(false));
 
     const {
-      gameSettings: { gameSettingsFiles, gameSettingsOptions },
-      system: {
-        modOrganizer: {
-          pathToINI,
-          profileSection,
-          profileParam,
-          version,
-        },
+      gameSettings: {
+        gameSettingsFiles, gameSettingsOptions, gameSettingsParameters,
+        moVersion,
       },
+      main: { pathVariables },
     }: ReturnType<typeof getState> = yield select(getState);
 
     const iniData: IUnwrap<typeof readINIFile> = yield call(
       readINIFile,
-      path.resolve(GAME_DIR, pathToINI),
+      pathVariables['%MO_INI%'],
     );
 
-    changeSectionalIniParameter(
+    changeSectionalIniParameterStr(
       iniData,
-      profileSection,
-      profileParam,
-      ///TODO Переделать на поддержку кастомного RegExp
-      version === 1 ? newMOProfile : `@ByteArray(${newMOProfile})`,
+      modOrganizerGeneralSection,
+      modOrganizerProfileParam,
+      moVersion === 1 ? newMOProfile : `@ByteArray(${newMOProfile})`,
     );
 
     yield call(
       writeINIFile,
-      path.resolve(GAME_DIR, pathToINI),
+      pathVariables['%MO_INI%'],
       iniData,
       Encoding.WIN1251,
     );
 
-    const MOProfileGameSettingsOnly = Object.keys(gameSettingsFiles)
-      .reduce<IGameSettingsFiles>((acc, curr) => {
-        if (new RegExp(CustomPathName.MO_PROFILE).test(gameSettingsFiles[curr].path)) {
-          return {
-            ...acc,
-            [curr]: {
-              ...gameSettingsFiles[curr],
-            },
-          };
-        }
-
-        return { ...acc };
-      }, {});
+    const MOProfileGameSettingsOnly = gameSettingsFiles.filter(
+      (file) => PathRegExp.MO_PROFILE.test(file.path),
+    );
+    const availableFileNames = MOProfileGameSettingsOnly.map((file) => file.name);
+    const filteredGameSettingOptions = gameSettingsOptions.filter(
+      (currentOption) => availableFileNames.includes(currentOption.file),
+    );
 
     const {
-      totalGameSettingsOptions,
-    }: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
-      generateGameSettingsOptionsSaga,
+      gameSettingsParameters: moProfileGameSettingsParameters,
+    }: SagaReturnType<typeof generateGameSettingsParametersSaga> = yield call(
+      generateGameSettingsParametersSaga,
       MOProfileGameSettingsOnly,
+      filteredGameSettingOptions,
       newMOProfile,
     );
 
     yield put(setMoProfile(newMOProfile));
-    yield put(setGameSettingsOptions({
-      ...gameSettingsOptions,
-      ...totalGameSettingsOptions,
+    yield put(setGameSettingsParameters({
+      ...gameSettingsParameters,
+      ...moProfileGameSettingsParameters,
     }));
-  } catch (error: any) {
-    let errorMessage = '';
-
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     writeToLogFileSync(
-      `Failed to change current Mod Organizer profile . Reason: ${errorMessage}`,
+      `Failed to change current Mod Organizer profile . Reason: ${getSagaErrorLogMessage(error)}`,
       LogMessageType.ERROR,
     );
 
@@ -642,33 +530,29 @@ function* changeMOProfileSaga(
 
 /**
  * Сохранить изменения в файлах игровых настроек.
- * @param changedGameSettingsOptions Измененные опции для параметров из файлов.
+ * @param changedGameSettingsParameters Измененные игровые параметры.
 */
-function* saveGameSettingsFilesSaga(
-  { payload: changedGameSettingsOptions }: ReturnType<typeof saveGameSettingsFiles>,
+function* writeGameSettingsFilesSaga(
+  { payload: changedGameSettingsParameters }: ReturnType<typeof saveGameSettingsFiles>,
 ): SagaIterator {
   try {
     yield put(setIsGameSettingsSaving(true));
 
     const {
       gameSettings: {
-        moProfile, gameSettingsFiles, gameSettingsOptions,
+        baseFilesEncoding,
+        gameSettingsFiles,
+        gameSettingsParameters,
+        moProfile,
       },
-      system: { customPaths },
+      main: { pathVariables },
     }: ReturnType<typeof getState> = yield select(getState);
-    const changedFilesNames = Object.keys(changedGameSettingsOptions);
-
-    const changedGameSettingsFiles = Object.keys(gameSettingsFiles)
-      .reduce<IGameSettingsFiles>((acc, fileName) => {
-        if (changedFilesNames.includes(fileName)) {
-          return {
-            ...acc,
-            [fileName]: gameSettingsFiles[fileName],
-          };
-        }
-
-        return { ...acc };
-      }, {});
+    const changedGameSettingsFiles = Array.from(
+      new Set(
+        Object.values(changedGameSettingsParameters)
+          .map((parameter) => getFileByFileName(gameSettingsFiles, parameter.file)!),
+      ),
+    );
 
     const currentFilesData: SagaReturnType<typeof getDataFromGameSettingsFilesSaga> = yield call(
       getDataFromGameSettingsFilesSaga,
@@ -677,32 +561,36 @@ function* saveGameSettingsFilesSaga(
       true,
     );
 
-    const filesForWrite = Object.keys(changedGameSettingsFiles).map((fileName) => {
-      const changedGameSettingsOptionsNames = Object.keys(changedGameSettingsOptions[fileName]);
-      const currWriteFileData = currentFilesData[fileName];
-      const currWriteFileView = changedGameSettingsFiles[fileName].view;
+    const filesForWrite = changedGameSettingsFiles.map((file) => {
+      const changedGameSettingsParametersId = Object.keys(changedGameSettingsParameters);
+      const currWriteFileContent = currentFilesData[file.name];
+      const currWriteFileView = file.view;
 
-      changedGameSettingsOptionsNames.forEach((optionName) => {
+      changedGameSettingsParametersId.forEach((parameterId) => {
+        const currentParameter = changedGameSettingsParameters[parameterId];
+
         if (
           currWriteFileView === GameSettingsFileView.SECTIONAL
-          && isDataFromIniFile(currWriteFileView, currWriteFileData)
+          && isDataFromIniFile(currWriteFileView, currWriteFileContent)
         ) {
-          const parameterNameParts = optionName.split('/');
-          changeSectionalIniParameter(
-            currWriteFileData,
+          const parameterNameParts = currentParameter.name.split('/');
+
+          changeSectionalIniParameterStr(
+            currWriteFileContent,
             parameterNameParts[0],
             parameterNameParts[1],
-            changedGameSettingsOptions[fileName][optionName].value,
+            currentParameter.value,
           );
         } else if (
           currWriteFileView === GameSettingsFileView.LINE
-          && isDataFromIniFile(currWriteFileView, currWriteFileData)
+          && isDataFromIniFile(currWriteFileView, currWriteFileContent)
         ) {
-          currWriteFileData.globals.lines.some((line) => {
-            if (getParameterRegExp(optionName).test(line.text)) {
-              line.text = line.text.replace(//eslint-disable-line no-param-reassign
-                getStringPartFromIniLineParameterForReplace(line.text, optionName),
-                `set ${optionName} to ${changedGameSettingsOptions[fileName][optionName].value}`,
+          currWriteFileContent.globals.lines.some((line) => {
+            if (getRegExpForLineIniParameter(currentParameter.name).test(line.text)) {
+              line.text = changeLineIniParameterStr( //eslint-disable-line no-param-reassign
+                line.text,
+                currentParameter.name,
+                changedGameSettingsParameters[parameterId].value,
               );
 
               return true;
@@ -712,74 +600,37 @@ function* saveGameSettingsFilesSaga(
           });
         } else if (
           currWriteFileView === GameSettingsFileView.TAG
-          && !isDataFromIniFile(currWriteFileView, currWriteFileData)
+          && !isDataFromIniFile(currWriteFileView, currWriteFileContent)
         ) {
-          const pathArr = [...optionName.split('/')];
-
-          if (pathArr[pathArr.length - 1] !== '#text') {
-            pathArr[pathArr.length - 1] = `${xmlAttributePrefix}${pathArr[pathArr.length - 1]}`;
-          }
-
+          const pathArr = [...currentParameter.name.split('/')];
           setValueForObjectDeepKey(
-            currWriteFileData,
+            currWriteFileContent,
             pathArr,
-            changedGameSettingsOptions[fileName][optionName].value,
+            changedGameSettingsParameters[parameterId].value,
           );
         }
       });
 
-      return { [fileName]: currWriteFileData };
+      return { fileContent: currWriteFileContent, fileData: file };
     });
 
     yield all(
-      filesForWrite.map((file) => {
-        const fileName = Object.keys(file)[0];
-
-        return call(
-          writeGameSettingsFile,
-          getPathToFile(changedGameSettingsFiles[fileName].path, customPaths, moProfile),
-          file[fileName],
-          changedGameSettingsFiles[fileName].view,
-          changedGameSettingsFiles[fileName].encoding,
-        );
-      }),
+      filesForWrite.map((file) => call(
+        writeGameSettingsFile,
+        getPathToFile(file.fileData.path, pathVariables, moProfile),
+        file.fileContent,
+        file.fileData.view as GameSettingsFileView,
+        file.fileData.encoding || baseFilesEncoding,
+      )),
     );
 
-    const newChangedGameoptions = changedFilesNames.reduce<IGameSettingsOptions>(
-      (totalOptions, fileName) => {
-        const fileOtions = {
-          ...gameSettingsOptions[fileName],
-          ...getGameSettingsOptionsWithDefaultValues(changedGameSettingsOptions, false)[fileName],
-        };
-
-        return {
-          ...totalOptions,
-          [fileName]: fileOtions,
-        };
-      },
-      {},
-    );
-
-    const newGameOptions = {
-      ...gameSettingsOptions,
-      ...newChangedGameoptions,
-    };
-
-    yield put(setGameSettingsOptions(newGameOptions));
+    yield put(setGameSettingsParameters({
+      ...gameSettingsParameters,
+      ...getGameSettingsParametersWithNewValues(changedGameSettingsParameters),
+    }));
     yield put(addMessages([CreateUserMessage.success('Настройки успешно сохранены.')]));
-  } catch (error: any) {
-    let errorMessage = '';
-
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    const errorMessage = getSagaErrorLogMessage(error);
     writeToLogFileSync(
       `Failed to save game settings. Reason: ${errorMessage}`,
       LogMessageType.ERROR,
@@ -793,5 +644,5 @@ function* saveGameSettingsFilesSaga(
 
 export default function* gameSetingsSaga(): SagaIterator {
   yield takeLatest(GAME_SETTINGS_TYPES.CHANGE_MO_PROFILE, changeMOProfileSaga);
-  yield takeLatest(GAME_SETTINGS_TYPES.SAVE_GAME_SETTINGS_FILES, saveGameSettingsFilesSaga);
+  yield takeLatest(GAME_SETTINGS_TYPES.SAVE_GAME_SETTINGS_FILES, writeGameSettingsFilesSaga);
 }

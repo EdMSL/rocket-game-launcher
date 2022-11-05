@@ -1,3 +1,5 @@
+$big-screen: 1200px;
+
 @mixin reset-list {
   margin: 0;
   padding: 0;
@@ -13,7 +15,7 @@
 @mixin main-text {
   font-family: "Arial", sans-serif;
   color: var(--text-main);
-  font-size: 16px;
+  font-size: var(--text-size);
   line-height: 1.5;
   font-weight: 400;
 }
@@ -21,4 +23,19 @@
 @mixin focus {
   outline: 2px dotted var(--focus-color);
   outline-offset: -2px;
+}
+
+@mixin ui-container {
+  position: relative;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin inputError {
+  color: var(--text-main);
+
+  background-color: var(--error-color);
 }

@@ -1,0 +1,64 @@
+.developer__game-settings {
+  color: inherit;
+}
+
+.developer__groups-container {
+  @include reset-indents;
+  @include reset-list;
+  position: relative;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.developer__groups-hint {
+  @include reset-indents;
+  position: absolute;
+  top: -2px;
+  right: var(--space-s);
+}
+
+.developer__groups-item {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  margin-right: 10px;
+  padding: 10px;
+
+  border: 2px solid var(--text-main);
+  border-radius: 10px;
+
+  &--new {
+    border-color: var(--focus-color);
+  }
+
+  & .editable-item {
+    padding-block: 2px;
+  }
+
+  & .editable-item--editable {
+    flex-grow: 1;
+    margin-right: 0;
+    padding-block: 0;
+  }
+
+  & .editable-item__input {
+    padding: 6px 8px;
+
+    border: none;
+
+    &:focus {
+      border-color: var(--focus-color);
+    }
+  }
+}
+
+.developer__group-label {
+  @include reset-indents;
+  margin-right: var(--space-m);
+}
+
+.developer__list {
+  @include reset-list;
+}

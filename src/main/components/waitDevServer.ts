@@ -2,10 +2,10 @@ import axios from 'axios';
 
 const WAIT_TIME = 200;
 
-export const createWaitForWebpackDevServer = (window): () => void => {
+export const createWaitForWebpackDevServer = (window, url): () => void => {
   const waitForWebpackDevServer = (): void => {
-    axios.get('http://localhost:8081/build/index.html').then(() => {
-      window.loadURL('http://localhost:8081/build/index.html');
+    axios.get(url).then(() => {
+      window.loadURL(url);
     }).catch(() => {
       setTimeout(waitForWebpackDevServer, WAIT_TIME);
     });

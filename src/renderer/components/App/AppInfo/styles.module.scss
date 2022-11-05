@@ -1,0 +1,29 @@
+.app-info__container {
+  padding: 20px;
+}
+
+.app-info__block {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.app-info__logo {
+  width: 64px;
+  height: 64px;
+  margin-right: 20px;
+}
+
+.app-info__title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.app-info__link {
+  margin: 0 4px;
+
+  color: var(--focus-color);
+  text-decoration: none;
+
+  cursor: pointer;
+}

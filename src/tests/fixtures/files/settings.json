@@ -1,147 +1,178 @@
 {
+  "baseFilesEncoding": "win1251",
   "gameSettingsGroups": [
     {
-      "name": "Graphic",
-      "label": "Графика"
+      "name": "qM3joLYOXUE5qD6J",
+      "label": "Audio"
     },
     {
-      "name": "Audio",
-      "label": "Аудио"
+      "name": "7uED7Xd7gPyIIvlu",
+      "label": "Graphic"
     },
     {
-      "name": "Control",
-      "label": "Управление"
+      "name": "4gDJ8Qk3fFyRTlhe",
+      "label": "Control"
     }
   ],
-  "baseFilesEncoding": "win1251",
-  "gameSettingsFiles": {
-    "anyFile": {
-      "path": "./any.ini",
+  "gameSettingsFiles": [
+    {
+      "name": "someFileName",
+      "label": "SomeIni",
+      "path": "%GAME_DIR%/ini/some.ini",
       "view": "sectional",
-      "optionsList": [
+      "encoding": ""
+    },
+    {
+      "name": "newFileName",
+      "label": "NewIni",
+      "path": "%GAME_DIR%/ini/new.ini",
+      "view": "line",
+      "encoding": "utf-8"
+    },
+    {
+      "name": "tagFileName",
+      "label": "TagIni",
+      "path": "%GAME_DIR%/ini/tag.config",
+      "view": "tag",
+      "encoding": ""
+    },
+    {
+      "name": "groupFileName",
+      "label": "GroupIni",
+      "path": "%GAME_DIR%/ini/group.config",
+      "view": "tag",
+      "encoding": ""
+    },
+    {
+      "name": "relatedFileName",
+      "label": "RelatedIni",
+      "path": "%GAME_DIR%/ini/related.config",
+      "view": "line",
+      "encoding": ""
+    }
+  ],
+  "gameSettingsOptions": [
+    {
+      "optionType": "default",
+      "file": "newFileName",
+      "label": "Any label",
+      "description": "",
+      "settingGroup": "7uED7Xd7gPyIIvlu",
+      "controllerType": "range",
+      "min": "0",
+      "max": "300",
+      "step": "1",
+      "items": [
         {
-          "name": "Any name",
-          "iniGroup": "Display",
-          "settingGroup": "Graphic",
-          "controllerType": "range",
-          "min": "0",
-          "max": "300",
-          "step": "1",
-          "label": "Any label"
-        },
-        {
-          "name": "Any new name",
-          "iniGroup": "Display",
-          "settingGroup": "Control",
-          "controllerType": "checkbox"
+          "name": "Any name"
         }
       ]
     },
-    "someFile": {
-      "path": "./ini/some.ini",
-      "view": "line",
-      "optionsList": [
+    {
+      "optionType": "default",
+      "file": "someFileName",
+      "label": "Any new label",
+      "settingGroup": "qM3joLYOXUE5qD6J",
+      "controllerType": "select",
+      "selectOptions": {
+        "One": "1",
+        "Two": "2",
+        "Three": "3"
+      },
+      "items": [
         {
-          "name": "Some name",
-          "optionType": "default",
-          "settingGroup": "Control",
+          "name": "Any new name",
+          "iniGroup": "Display"
+        }
+      ]
+    },
+    {
+      "optionType": "default",
+      "file": "tagFileName",
+      "label": "Some new label",
+      "settingGroup": "4gDJ8Qk3fFyRTlhe",
+      "controllerType": "checkbox",
+      "items": [
+        {
+          "name": "FlowControl",
+          "valueAttribute": "Value",
+          "valuePath": "_Main/FrameRate/SmartControl"
+        }
+      ]
+    },
+    {
+      "optionType": "combined",
+      "file": "someFileName",
+      "label": "Разрешение экрана",
+      "description": "Устанавливает разрешение экрана",
+      "settingGroup": "7uED7Xd7gPyIIvlu",
+      "controllerType": "select",
+      "separator": ":",
+      "selectOptions": {
+        "1024 на 768": "1024:768",
+        "1366 на 768": "1366:768",
+        "1920 на 1080": "1920:1080"
+      },
+      "items": [
+        {
+          "name": "iSize W",
+          "iniGroup": "Display"
+        },
+        {
+          "name": "iSize H",
+          "iniGroup": "Display"
+        }
+      ]
+    },
+    {
+      "optionType": "related",
+      "file": "relatedFileName",
+      "label": "Комбинация клавиш",
+      "description": "Укажите комбинацию клавиш для действия",
+      "settingGroup": "4gDJ8Qk3fFyRTlhe",
+      "items": [
+        {
+          "name": "DMSMain.Key1",
           "controllerType": "select",
-          "label": "Some label",
-          "options": {
-            "1": "1",
-            "2": "1"
+          "selectOptions": {
+            "Num +": "56",
+            "Num -": "57",
+            "Num 0": "58"
+          }
+        },
+        {
+          "name": "DMSMain.Key2",
+          "controllerType": "select",
+          "selectOptions": {
+            "E": "11",
+            "F": "12",
+            "G": "13"
           }
         }
       ]
     },
-    "newFile": {
-      "path": "./ini/new.ini",
-      "view": "line",
-      "encoding": "utf-8",
-      "optionsList": [
+    {
+      "optionType": "group",
+      "file": "tagFileName",
+      "label": "Общее значение для 3-х параметров",
+      "description": "Укажите комбинацию клавиш для действия",
+      "settingGroup": "4gDJ8Qk3fFyRTlhe",
+      "controllerType": "range",
+      "min": -0.5,
+      "max": 1,
+      "step": 0.1,
+      "items": [
         {
-          "name": "New name",
-          "settingGroup": "Control",
-          "controllerType": "checkbox",
-          "label": "New label"
-        }
-      ]
-    },
-    "tagFile": {
-      "path": "./ini/tag.config",
-      "view": "tag",
-      "optionsList": [
+          "name": "SmartControl",
+          "valueAttribute": "Value",
+          "valuePath": "_Main/FrameRate/SmartControl"
+        },
         {
-          "name": "AnisotropicFilter",
-          "attributeName": "Value",
-          "attributePath": "_Main/Main/Misc",
-          "settingGroup": "Audio",
-          "controllerType": "checkbox",
-          "label": "Фильтрация"
-        }
-      ]
-    },
-    "groupFile": {
-      "path": "./ini/group.ini",
-      "view": "line",
-      "optionsList": [
-        {
-          "optionType": "group",
-          "label": "Group label",
-          "settingGroup": "Control",
-          "controllerType": "select",
-          "options": {
-            "2": "1",
-            "3": "2",
-            "4": "3"
-          },
-          "items": [
-            {
-              "name": "groupParam1"
-            },
-            {
-              "name": "groupParam2"
-            },
-            {
-              "name": "groupParam3"
-            },
-            {
-              "name": "groupParam4"
-            }
-          ]
-        }
-      ]
-    },
-    "relatedFile": {
-      "path": "./ini/related.ini",
-      "view": "line",
-      "optionsList": [
-        {
-          "optionType": "related",
-          "settingGroup": "Control",
-          "label": "Related label",
-          "items": [
-            {
-              "name": "relatedParam1",
-              "controllerType": "select",
-              "options": {
-                "0": "Нет",
-                "2": "1",
-                "3": "2"
-              }
-            },
-            {
-              "name": "relatedParam2",
-              "controllerType": "select",
-              "options": {
-                "2": "1",
-                "3": "2",
-                "4": "3"
-              }
-            }
-          ]
+          "name": "FlowControl",
+          "valueAttribute": "Value",
+          "valuePath": "_Main/FrameRate/SmartControl"
         }
       ]
     }
-  }
+  ]
 }

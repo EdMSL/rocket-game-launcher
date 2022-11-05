@@ -9,7 +9,9 @@
   outline: none;
   cursor: pointer;
 
-  user-select: none;
+  &:disabled {
+    cursor: default;
+  }
 }
 
 .main-btn {
@@ -46,21 +48,18 @@
   display: flex;
   align-items: center;
 
-  user-select: none;
-
   &::before {
     content: "";
     position: absolute;
-    top: calc(50% - 10px);
+    top: calc(50% - #{$checkbox-size} / 2);
     right: 0;
 
     display: block;
     box-sizing: border-box;
-    width: 20px;
-    height: 20px;
+    width: $checkbox-size;
+    height: $checkbox-size;
 
-    border: 1px solid var(--text-main);
-    border-radius: 3px;
+    border: $ui-border-width solid var(--text-main);
 
     cursor: pointer;
   }
@@ -68,15 +67,14 @@
   &::after {
     content: "";
     position: absolute;
-    top: calc(50% - 3px);
-    right: 7px;
+    top: calc(50% - #{$checkbox-marker-size} / 2);
+    right: $centered-checkbox-marker;
 
     display: none;
-    width: 6px;
-    height: 6px;
+    width: $checkbox-marker-size;
+    height: $checkbox-marker-size;
 
     background-color: var(--text-main);
-    border-radius: 2px;
 
     cursor: pointer;
   }
@@ -101,6 +99,7 @@
 }
 
 .range__controls {
+  flex-grow: 1;
   align-self: stretch;
   display: flex;
   align-items: center;
@@ -123,12 +122,12 @@
   appearance: none;
 
   &::-webkit-slider-thumb {
-    width: 12px;
-    height: 24px;
-    margin-top: -10px;
+    width: 20px;
+    height: 20px;
+    margin-top: -8px;
 
     background-color: var(--text-main);
-    border-radius: 3px;
+    border-radius: 50%;
 
     appearance: none;
     cursor: pointer;
@@ -156,6 +155,12 @@
   }
 }
 /* stylelint-disable string-no-newline, max-line-length */
+
+.range__output {
+  min-width: 50px;
+
+  text-align: right;
+}
 
 .range__button {
   flex-grow: 1;
@@ -204,25 +209,23 @@
 
 .select__container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
 }
 
 .select__label {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
-}
-
-.select__label-text {
-  user-select: none;
 }
 
 .select__input {
   min-width: 240px;
-  padding: 12px;
+  padding: 10px;
 
   color: var(--text-secondary);
+
+  font-size: var(--text-size-input);
   text-align: center;
 
   border-color: var(--border-color);
@@ -230,16 +233,16 @@
 
   cursor: pointer;
 
-  user-select: none;
-
   &:hover {
     outline: 1px solid var(--border-color);
   }
 
   &:disabled {
-    color: var(--text-disabled);
+    color: var(--disabled-text-color);
 
     border-color: var(--disabled-color);
+
+    cursor: default;
   }
 
   &:focus {
@@ -255,59 +258,58 @@
 }
 
 .switcher__container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+  position: relative;
 
-.switcher__label {
-  @include reset-indents;
-  margin-right: 10px;
+  display: flex;
+  align-items: center;
 }
 
 .switcher__label-text {
   color: inherit;
 }
 
-.switcher__block {
+.switcher__label {
   display: flex;
   align-items: center;
-}
-
-.switcher__checkbox {
-  display: none;
-}
-
-.switcher__toggler {
-  position: relative;
-
-  display: block;
-  width: 36px;
-  height: 20px;
-
-  border: 1px solid var(--text-main);
-  border-radius: 14px;
-
-  cursor: pointer;
 
   &::before {
     content: "";
     position: absolute;
-    top: 1px;
-    left: 1px;
+    top: calc(50% - #{$checkbox-size} / 2);
+    right: 0;
+
+    width: $switcher-width;
+    height: $switcher-height;
+
+    border: $ui-border-width solid var(--text-main);
+    border-radius: 14px;
+
+    cursor: pointer;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: $switcher-unchecked;
 
     display: block;
-    width: 16px;
-    height: 16px;
+    width: $switcher-thumb-size;
+    height: $switcher-thumb-size;
 
     background-color: var(--text-main);
     border-radius: 50%;
 
-    transition: left 0.3s linear;
+    cursor: pointer;
+
+    transition: right 0.3s linear;
   }
 
-  .switcher__checkbox:checked + &::before {
-    left: calc(100% - 16px - 1px);
+  .switcher__input:checked + &::after {
+    right: $switcher-checked;
+  }
+
+  .switcher__input:focus + &::before {
+    @include focus;
   }
 }
 
@@ -315,7 +317,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 100;
+  z-index: 250;
 
   display: flex;
   flex-direction: column;
@@ -355,6 +357,14 @@
   background-color: var(--text-secondary);
 }
 
+.modal__title {
+  @include reset-indents;
+  flex-grow: 1;
+
+  line-height: calc(var(--modal-btn-padding) * 2);
+  text-align: center;
+}
+
 .modal__content {
   flex-grow: 1;
   display: flex;
@@ -369,14 +379,14 @@
 }
 
 .modal__btn {
-  padding: 16px;
+  padding: var(--modal-btn-padding);
   /* stylelint-disable string-no-newline, max-line-length */
   background-image:
     url(
       'data:image/svg+xml,\
-  <svg height="16" width="16" viewBox="0 0 413.348 413.348" xmlns="http://www.w3.org/2000/svg">\
-  <path fill="rgb(251, 251, 254)" d="M413.348 24.354L388.994 0l-182.32 182.32L24.354 0 0 24.354l182.32 182.32L0 388.994l24.354 24.354 182.32-182.32 182.32 182.32 24.354-24.354-182.32-182.32z"/>\
-  </svg>'
+      <svg height="16" width="16" viewBox="0 0 413.348 413.348" xmlns="http://www.w3.org/2000/svg">\
+        <path fill="rgb(251, 251, 254)" d="M413.348 24.354L388.994 0l-182.32 182.32L24.354 0 0 24.354l182.32 182.32L0 388.994l24.354 24.354 182.32-182.32 182.32 182.32 24.354-24.354-182.32-182.32z"/>\
+      </svg>'
     );
   /* stylelint-enable string-no-newline, max-line-length */
   background-repeat: no-repeat;
@@ -396,6 +406,7 @@
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 500;
 
   display: flex;
   justify-content: center;

@@ -1,76 +1,73 @@
 import {
-  createStore, applyMiddleware, compose, Store, Middleware,
+  createStore, applyMiddleware, Store, Middleware, StoreEnhancer,
 } from 'redux';
 import {
   TypedUseSelectorHook, useSelector,
 } from 'react-redux';
-import {
-  createHashHistory, History,
-} from 'history';
+import { createHashHistory, History } from 'history';
 import { routerMiddleware } from 'connected-react-router';
-import {
-  forwardToMain,
-  forwardToRenderer,
-  triggerAlias,
-  replayActionMain,
-  replayActionRenderer,
-} from 'electron-redux';
+import { composeWithStateSync } from 'electron-redux';
 import createSagaMiddleware from 'redux-saga';
+import { composeWithDevToolsDevelopmentOnly } from '@redux-devtools/extension';
 
-import { getRootReducer } from '$reducers/root';
+import { getDeveloperRootReducer, getRootReducer } from '$reducers/root';
 import { SagaManager } from '$sagas/SagaManager';
 import { Scope } from '$constants/misc';
 
 ///FIXME Выглядит не особо изящно, попробовать переделать
 export type IAppState = ReturnType<ReturnType<typeof getRootReducer>>;
-export const useAppSelector: TypedUseSelectorHook<IAppState> = useSelector;
+export type IDeveloperState = ReturnType<ReturnType<typeof getDeveloperRootReducer>>;
 
-export const configureStore = (
+export const useAppSelector: TypedUseSelectorHook<IAppState> = useSelector;
+export const useDeveloperSelector: TypedUseSelectorHook<IDeveloperState> = useSelector;
+
+export const configureAppStore = (
   initialState,
   scope: string,
 ): { store: Store<IAppState>, history: any, } => {
   const sagaMiddleware = createSagaMiddleware();
-  let history: History<unknown>|undefined;
+  const middlewares: Middleware[] = [];
 
-  let middleware: Middleware[] = [];
+  let history: History|undefined;
 
   if (scope === Scope.RENDERER) {
     history = createHashHistory();
 
-    middleware = [
-      forwardToMain,
-      routerMiddleware(history),
-      sagaMiddleware,
-    ];
-  } else {
-    middleware = [
-      triggerAlias,
-      forwardToRenderer,
-    ];
+    middlewares.push(routerMiddleware(history), sagaMiddleware);
   }
 
-  const enhanced = [
-    applyMiddleware(...middleware),
-  ];
-
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  const composeEnhancers = typeof window === 'object'
-    && (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-    ? (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
-    : compose;
-  /* eslint-enable @typescript-eslint/no-explicit-any */
+  const enhanced = applyMiddleware(...middlewares);
 
   const rootReducer = getRootReducer(scope, history);
+  const enhancer: StoreEnhancer = composeWithDevToolsDevelopmentOnly(
+    composeWithStateSync(enhanced),
+  );
 
-  const store = createStore(rootReducer, initialState, composeEnhancers(...enhanced));
+  const store = createStore(rootReducer, initialState, enhancer);
 
-  if (scope === Scope.MAIN) {
-    replayActionMain(store);
-  } else {
-    SagaManager.startSagas(sagaMiddleware);
-
-    replayActionRenderer(store);
+  if (scope === Scope.RENDERER) {
+    SagaManager.startAppSagas(sagaMiddleware);
   }
+
+  return { store, history };
+};
+
+export const configureDeveloperStore = (
+  initialState,
+): { store: Store<IDeveloperState>, history: History, } => {
+  const sagaMiddleware = createSagaMiddleware();
+  const history = createHashHistory();
+
+  const middlewares = [routerMiddleware(history), sagaMiddleware];
+
+  const enhanced = applyMiddleware(...middlewares);
+
+  const rootReducer = getDeveloperRootReducer(history);
+  const enhancer: StoreEnhancer = composeWithDevToolsDevelopmentOnly(enhanced);
+
+  const store = createStore(rootReducer, initialState, enhancer);
+
+  SagaManager.startDeveloperSagas(sagaMiddleware);
 
   return { store, history };
 };

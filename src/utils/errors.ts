@@ -9,8 +9,10 @@ export const ErrorMessage = {
   DIRECTORY_NOT_FOUND: 'No such directory',
   PATH_TO_DIRECTORY: 'Got path to directory, not file',
   PATH_TO_FILE: 'Got path to file, not directory',
+  PERMISSION: 'Operation not permitted',
   ARG_TYPE: 'Invalid data in path received',
   MIME_TYPE: 'Invalid file extension',
+  UNKNOWN: 'An unknown error occurred',
 };
 
 export const ErrorName = {
@@ -20,10 +22,13 @@ export const ErrorName = {
   ARG_TYPE: 'InvalidArgumentError',
   PATH_TO_DIRECTORY: 'DirectoryError',
   PATH_TO_FILE: 'NotDirectoryError',
+  PERMISSION: 'NotPermittedError',
   READ_WRITE: 'ReadWriteError',
   SAGA_ERROR: 'SagaError',
   MIME_TYPE: 'IncorrectFileTypeError',
-  VALIDATION: 'ValidationTypeError',
+  VALIDATION: 'ValidationError',
+  INVALID_DIRECTORY: 'InvalidDirectoryError',
+  UNKNOWN: 'UnknownError',
 };
 
 export const ErrorCode = {
@@ -32,37 +37,9 @@ export const ErrorCode = {
   PATH_TO_DIRECTORY: 'EISDIR',
   PATH_TO_FILE: 'ENOTDIR',
   ARG_TYPE: 'ERR_INVALID_ARG_TYPE',
+  PERMISSION: 'EPERM',
   UNKNOWN: 'UNKNOWN',
 };
-
-/**
- * Показать модальное нативное окно Electron с ошибкой.
- * @param error Текст ошибки.
- * @param title Заголовок окна.
-*/
-export const showErrorBox = (message: string, title = ErrorMessage.DEFAULT): void => {
-  dialog.showErrorBox(title, message);
-};
-
-/**
- * Показать модальное нативное окно с выбранным типом.
- * @param error Текст ошибки.
- * @param title Заголовок окна.
- * @param type Тип окна: `info`, `warning` или `error`.
-*/
-export const showMessageBox = (
-  message: string,
-  title = ErrorMessage.DEFAULT,
-  type = 'info',
-): void => {
-  dialog.showMessageBox({
-    message, title, type,
-  });
-};
-
-export interface IReadWriteError extends Error {
-  cause: Error,
-}
 
 export class CustomError extends Error {
   public code?: string;
@@ -75,22 +52,24 @@ export class CustomError extends Error {
 }
 
 export class ReadWriteError extends Error {
-  public cause: Error;
   public path: string;
+  public causeName: string;
+  public causeCode: string;
 
-  constructor(message: string, cause: Error, path: string) {
+  constructor(message: string, causeName: string, path: string, code: string) {
     super(message);
-    this.cause = cause;
     this.path = path;
     this.name = ErrorName.READ_WRITE;
+    this.causeName = causeName;
+    this.causeCode = code;
   }
 }
 
 export class SagaError extends Error {
   public sagaName: string;
-  public reason: Error|undefined;
+  public reason: Error|CustomError|ReadWriteError;
 
-  constructor(sagaName: string, message: string, reason?: Error) {
+  constructor(sagaName: string, message: string, reason: Error|CustomError|ReadWriteError) {
     super(message);
     this.name = ErrorName.SAGA_ERROR;
     this.sagaName = sagaName;
@@ -99,38 +78,99 @@ export class SagaError extends Error {
 }
 
 /**
- * Функция получения конечной ошибки чтения/записи (модуля `fs`) на основе кода из ошибки `NodeJS`
- * @param error Объект ошибки чтения/записи
- * @param isDirOperation Операция над директорией или нет. По умолчанию `false`
+ * Показывает модальное нативное окно Electron с ошибкой.
+ * @param message Текст ошибки.
+ * @param title Заголовок окна.
+*/
+export const showErrorBox = (message: string, title = ErrorMessage.DEFAULT): void => {
+  dialog.showErrorBox(title, message);
+};
+
+/**
+ * Получает конечную ошибку чтения/записи (модуля `fs`) на основе кода из ошибки `NodeJS`
+ * @param error Объект ошибки чтения/записи.
+ * @param path Путь к обрабатываемому файлу/папке.
+ * @param messageTitle Часть конечного сообщения об ошибке. Добавится в начало сообщения.
+ * @param isDirOperation Если `true`, то выполняется операция над директорией, иначе над файлом.
+ * Влияет только на сообщение об ошибке.
  * @returns Объект Error
 */
-export const getReadWriteError = (error: NodeJS.ErrnoException, isDirOperation = false): Error => {
+export const getReadWriteError = (
+  error: NodeJS.ErrnoException,
+  path: string,
+  messageTitle = '',
+  isDirOperation = false,
+): ReadWriteError => {
+  let errorMessage = ErrorMessage.UNKNOWN;
+  let errorCauseName = ErrorName.UNKNOWN;
+  let errorCauseCode = ErrorCode.UNKNOWN;
+
   if (error.code === ErrorCode.ACCESS) {
-    return new CustomError(ErrorMessage.ACCESS, ErrorName.ACCESS);
+    errorMessage = `${messageTitle} ${ErrorMessage.ACCESS}`;
+    errorCauseName = ErrorName.ACCESS;
+    errorCauseCode = error.code;
   }
 
   if (error.code === ErrorCode.NOT_FOUND) {
-    return new CustomError(
-      isDirOperation ? ErrorMessage.DIRECTORY_NOT_FOUND : ErrorMessage.FILE_NOT_FOUND,
-      ErrorName.NOT_FOUND,
-    );
+    errorMessage = `${messageTitle} ${isDirOperation ? ErrorMessage.DIRECTORY_NOT_FOUND : ErrorMessage.FILE_NOT_FOUND}`; //eslint-disable-line max-len
+    errorCauseName = ErrorName.NOT_FOUND;
+    errorCauseCode = error.code;
   }
 
   if (error.code === ErrorCode.PATH_TO_DIRECTORY) {
-    return new CustomError(ErrorMessage.PATH_TO_DIRECTORY, ErrorName.PATH_TO_DIRECTORY);
+    errorMessage = `${messageTitle} ${ErrorMessage.PATH_TO_DIRECTORY}`;
+    errorCauseName = ErrorName.PATH_TO_DIRECTORY;
+    errorCauseCode = error.code;
   }
 
   if (error.code === ErrorCode.PATH_TO_FILE) {
-    return new CustomError(ErrorMessage.PATH_TO_FILE, ErrorName.PATH_TO_FILE);
+    errorMessage = `${messageTitle} ${ErrorMessage.PATH_TO_FILE}`;
+    errorCauseName = ErrorName.PATH_TO_FILE;
+    errorCauseCode = error.code;
   }
 
   if (error.code === ErrorCode.ARG_TYPE) {
-    return new CustomError(ErrorMessage.ARG_TYPE, ErrorName.ARG_TYPE);
+    errorMessage = `${messageTitle} ${ErrorMessage.ARG_TYPE}`;
+    errorCauseName = ErrorName.ARG_TYPE;
+    errorCauseCode = error.code;
   }
 
-  return error;
+  if (error.code === ErrorCode.PERMISSION) {
+    errorMessage = `${messageTitle} ${ErrorMessage.PERMISSION}`;
+    errorCauseName = ErrorName.PERMISSION;
+    errorCauseCode = error.code;
+  }
+
+  return new ReadWriteError(
+    errorMessage,
+    errorCauseName,
+    path,
+    errorCauseCode,
+  );
 };
 
-export const reportError = (error) => {
+/**
+ * Получает текст ошибки, возникающей в сагах, для записи в лог.
+ * @param error Объект ошибки
+ * @returns Строка сообщения.
+ */
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getSagaErrorLogMessage = (error: any): string => {
+  if (error instanceof SagaError) {
+    return `Error in "${error.sagaName}". ${error.message}`;
+  } else if (error instanceof CustomError) {
+    return error.message;
+  } else if (error instanceof ReadWriteError) {
+    return `${error.message}. Path "${error.path}".`;
+  }
+
+  return `Unknown error. Message: ${error.message}`;
+};
+
+/**
+ * Выполняет указанные внутри операции при нажатии кнопки 'Report' модуля `unhandled`.
+ * @param error Объект ошибки.
+ */
+export const reportError = (error: unknown): void => {
   shell.openExternal(reportLink);
 };

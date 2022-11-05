@@ -10,9 +10,12 @@ import {
   SagaReturnType,
 } from 'redux-saga/effects';
 import fs from 'fs';
+import { ipcRenderer } from 'electron';
 
 import { IAppState } from '$store/store';
-import { GAME_SETTINGS_PATH_REGEXP, Routes } from '$constants/routes';
+import {
+  GAME_SETTINGS_PATH_REGEXP, Routes,
+} from '$constants/routes';
 import {
   addMessages,
   setGameSettingsFilesBackup,
@@ -22,20 +25,20 @@ import {
   deleteGameSettingsFilesBackup as deleteGameSettingsFilesBackupAction,
   restoreGameSettingsFilesBackup,
   renameGameSettingsFilesBackup,
-  setIsGameSettingsLoaded,
-  setIsGameSettingsAvailable,
+  setIsGameSettingsLoading,
 } from '$actions/main';
 import {
-  generateGameSettingsOptionsSaga,
+  generateGameSettingsParametersSaga,
   initGameSettingsSaga,
-  getInitialGameSettingsConfigSaga,
 } from '$sagas/gameSettings';
-import { GAME_SETTINGS_FILE_PATH } from '$constants/paths';
 import {
-  LogMessageType, writeToLogFile, writeToLogFileSync,
+  GAME_SETTINGS_FILE_PATH,
+} from '$constants/paths';
+import {
+  LogMessageType, writeToLogFileSync,
 } from '$utils/log';
 import {
-  CustomError, ErrorName, ReadWriteError, SagaError,
+  ErrorName, getSagaErrorLogMessage, ReadWriteError, SagaError,
 } from '$utils/errors';
 import { MAIN_TYPES } from '$types/main';
 import { CreateUserMessage } from '$utils/message';
@@ -46,11 +49,16 @@ import {
   renameGameSettingsFilesBackups,
   restoreBackupFiles,
 } from '$utils/backup';
-import { getPathToFile } from '$utils/strings';
-import { IUnwrap } from '$types/common';
-import { setGameSettingsOptions } from '$actions/gameSettings';
-import { getGameSettingsOptionsWithDefaultValues } from '$utils/data';
+import { ILocationState, IUnwrap } from '$types/common';
+import {
+  setGameSettingsParameters, updateGameSettingsParameters,
+} from '$actions/gameSettings';
+import { getGameSettingsParametersWithNewValues } from '$utils/data';
 import { GAME_SETTINGS_TYPES } from '$types/gameSettings';
+import { AppChannel } from '$constants/misc';
+import { getPathToFile } from '$utils/files';
+import { GAME_SETTINGS_CONFIG_FILE_NAME } from '$constants/defaultData';
+import { getFileNameFromPathToFile } from '$utils/strings';
 
 const getState = (state: IAppState): IAppState => state;
 
@@ -58,29 +66,18 @@ const getState = (state: IAppState): IAppState => state;
  * Инициализация лаунчера при запуске.
 */
 function* initLauncherSaga(): SagaIterator {
-  yield put(setIsLauncherInitialised(false));
+  // yield put(setIsLauncherInitialised(false));
 
   try {
     if (fs.existsSync(GAME_SETTINGS_FILE_PATH)) {
-      yield call(getInitialGameSettingsConfigSaga);
+      // yield call(getGameSettingsConfigSaga);
     } else {
-      writeToLogFile('Game settings file settings.json not found.');
+      // writeToLogFile('Game settings file settings.json not found.');
     }
-  } catch (error: any) {
-    let errorMessage = '';
-
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     writeToLogFileSync(
-      `An error occured during launcher initialization: ${errorMessage}`,
+      `An error occured during launcher initialization: ${getSagaErrorLogMessage(error)};
+}`,
       LogMessageType.ERROR,
     );
   } finally {
@@ -88,54 +85,44 @@ function* initLauncherSaga(): SagaIterator {
   }
 }
 
-function* updateGameSettingsOptionsSaga(): SagaIterator {
-  yield put(setIsGameSettingsLoaded(false));
-
+function* updateGameSettingsParametersSaga(
+  { payload: gameSetingsConfig }: ReturnType<typeof updateGameSettingsParameters>,
+): SagaIterator {
   try {
-    yield put(setIsGameSettingsAvailable(false));
+    yield put(setGameSettingsParameters({}));
 
-    const newConfigData: SagaReturnType<typeof getInitialGameSettingsConfigSaga> = yield call(
-      getInitialGameSettingsConfigSaga,
-      true,
-    );
+    yield call(initGameSettingsSaga, true, gameSetingsConfig);
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    let errorMessage = '';
+    let userErrorMessage = 'Возникла ошибка в процессе обновления игровых настроек. Подробности в файле лога.';// eslint-disable-line max-len
 
-    yield call(initGameSettingsSaga, true, newConfigData.gameSettingsFiles);
-  } catch (error: any) {
     if (
       error instanceof SagaError
       && error.reason instanceof ReadWriteError
-      && error.reason.cause.name === ErrorName.NOT_FOUND
+      && error.reason.causeName === ErrorName.NOT_FOUND
     ) {
-      writeToLogFile('Game settings file settings.json not found.');
+      const fileName = getFileNameFromPathToFile(error.reason.path, true);
 
-      yield put(addMessages(
-        [CreateUserMessage.error('Не найден файл settings.json, обновление прервано. Игровые настройки будут недоступны.')], // eslint-disable-line max-len
-      ));
-      yield put(push(`${Routes.MAIN_SCREEN}`));
-    } else {
-      let errorMessage = '';
+      userErrorMessage = `Не найден файл ${fileName}, обновление прервано.${fileName === GAME_SETTINGS_CONFIG_FILE_NAME ? ' Игровые настройки будут недоступны.' : ''}`;// eslint-disable-line max-len
+      errorMessage = `${error.message}. Path '${error.reason.path}'.`;
 
-      if (error instanceof SagaError) {
-        errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-      } else if (error instanceof CustomError) {
-        errorMessage = `${error.message}`;
-      } else if (error instanceof ReadWriteError) {
-        errorMessage = `${error.message}. Path '${error.path}'.`;
-      } else {
-        errorMessage = `Unknown error. Message: ${error.message}`;
+      if (fileName === GAME_SETTINGS_CONFIG_FILE_NAME) {
+        yield put(push(`${Routes.MAIN_SCREEN}`));
       }
-
-      writeToLogFileSync(
-        `An error occured during update game settings options: ${errorMessage}`,
-        LogMessageType.ERROR,
-      );
-
-      yield put(addMessages(
-        [CreateUserMessage.error('Возникла ошибка в процессе обновления игровых настроек. Подробности в файле лога.')], // eslint-disable-line max-len
-      ));
+    } else {
+      errorMessage = getSagaErrorLogMessage(error);
     }
+
+    yield put(addMessages(
+      [CreateUserMessage.error(userErrorMessage)],
+    ));
+
+    writeToLogFileSync(
+      `An error occured during update game settings parameters: ${errorMessage}`,
+      LogMessageType.ERROR,
+    );
   } finally {
-    yield put(setIsGameSettingsLoaded(true));
+    yield put(setIsGameSettingsLoading(false));
   }
 }
 
@@ -145,25 +132,17 @@ function* getGameSettingsFilesBackupSaga(isExternalCall = true): SagaIterator {
       yield put(setIsGameSettingsFilesBackuping(true));
     }
 
-    const result: IUnwrap<typeof getGameSettingsFilesBackups> = yield call(getGameSettingsFilesBackups);
+    const result: IUnwrap<typeof getGameSettingsFilesBackups> = yield call(
+      getGameSettingsFilesBackups,
+    );
 
     yield put(setGameSettingsFilesBackup(result));
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     if (isExternalCall) {
-      throw new SagaError('Get game settings files backup', error.message);
+      throw new SagaError('Get game settings files backup', error.message, error);
     } else {
-      let errorMessage = '';
-
-      if (error instanceof CustomError) {
-        errorMessage = `${error.message}`;
-      } else if (error instanceof ReadWriteError) {
-        errorMessage = `${error.message}. Path '${error.path}'.`;
-      } else {
-        errorMessage = `Unknown error. Message: ${error.message}`;
-      }
-
       writeToLogFileSync(
-        `Failed to get game settings files backup. Reason: ${errorMessage}`,
+        `Failed to get game settings files backup. Reason: ${getSagaErrorLogMessage(error)}`,
         LogMessageType.ERROR,
       );
 
@@ -183,11 +162,13 @@ function* createGameSettingsBackupSaga(
     yield put(setIsGameSettingsFilesBackuping(true));
 
     const {
-      system: { customPaths },
+      main: { pathVariables },
       gameSettings: { gameSettingsFiles, moProfile },
     }: ReturnType<typeof getState> = yield select(getState);
 
-    const filesForBackupPaths = Object.keys(gameSettingsFiles).map((fileName) => getPathToFile(gameSettingsFiles[fileName].path, customPaths, moProfile));
+    const filesForBackupPaths = Object.keys(gameSettingsFiles).map((fileName) => getPathToFile(
+      gameSettingsFiles[fileName].path, pathVariables, moProfile,
+    ));
 
     yield call(createGameSettingsFilesBackup, filesForBackupPaths);
 
@@ -196,21 +177,9 @@ function* createGameSettingsBackupSaga(
     if (isGetBackup) {
       yield call(getGameSettingsFilesBackupSaga, false);
     }
-  } catch (error: any) {
-    let errorMessage = '';
-
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     writeToLogFileSync(
-      `Failed to create game settings files backup. Reason: ${errorMessage}`,
+      `Failed to create game settings files backup. Reason: ${getSagaErrorLogMessage(error)}`,
       LogMessageType.ERROR,
     );
 
@@ -235,8 +204,8 @@ function* deleteGameSettingsFilesBackupSaga({
     }
 
     yield call(getGameSettingsFilesBackupSaga, false);
-  } catch (error: any) {
-    if (error instanceof ReadWriteError && error.cause.name === ErrorName.NOT_FOUND) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    if (error instanceof ReadWriteError && error.causeName === ErrorName.NOT_FOUND) {
       yield put(addMessages([CreateUserMessage.warning(
         'Не удалось удалить файлы бэкапа. Папка была удалена, перемещена или переименована.',
       )]));
@@ -247,20 +216,8 @@ function* deleteGameSettingsFilesBackupSaga({
         LogMessageType.ERROR,
       );
     } else {
-      let errorMessage = '';
-
-      if (error instanceof SagaError) {
-        errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-      } else if (error instanceof CustomError) {
-        errorMessage = `${error.message}`;
-      } else if (error instanceof ReadWriteError) {
-        errorMessage = `${error.message}. Path '${error.path}'.`;
-      } else {
-        errorMessage = `Unknown error. Message: ${error.message}`;
-      }
-
       writeToLogFileSync(
-        `Failed to delete game settings files backup. Reason: ${errorMessage}`,
+        `Failed to delete game settings files backup. Reason: ${getSagaErrorLogMessage(error)}`,
         LogMessageType.ERROR,
       );
 
@@ -300,8 +257,8 @@ function* renameGameSettingsFilesBackupSaga({
     });
 
     yield put(setGameSettingsFilesBackup(backupData));
-  } catch (error: any) {
-    if (error instanceof ReadWriteError && error.cause.name === ErrorName.NOT_FOUND) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    if (error instanceof ReadWriteError && error.causeName === ErrorName.NOT_FOUND) {
       yield put(addMessages([CreateUserMessage.warning(
         'Не удалось переименовать папку бэкапа. Папка была удалена, перемещена или переименована.',
       )]));
@@ -312,20 +269,8 @@ function* renameGameSettingsFilesBackupSaga({
         LogMessageType.ERROR,
       );
     } else {
-      let errorMessage = '';
-
-      if (error instanceof SagaError) {
-        errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-      } else if (error instanceof CustomError) {
-        errorMessage = `${error.message}`;
-      } else if (error instanceof ReadWriteError) {
-        errorMessage = `${error.message}. Path '${error.path}'.`;
-      } else {
-        errorMessage = `Unknown error. Message: ${error.message}`;
-      }
-
       writeToLogFileSync(
-        `Failed to rename game settings files backup. Reason: ${errorMessage}`,
+        `Failed to rename game settings files backup. Reason: ${getSagaErrorLogMessage(error)}`,
         LogMessageType.ERROR,
       );
 
@@ -347,34 +292,24 @@ function* restoreGameSettingsFilesBackupSaga({
     const {
       gameSettings: {
         gameSettingsFiles,
+        gameSettingsOptions,
         moProfile,
       },
     }: ReturnType<typeof getState> = yield select(getState);
 
     const {
-      totalGameSettingsOptions,
-    }: SagaReturnType<typeof generateGameSettingsOptionsSaga> = yield call(
-      generateGameSettingsOptionsSaga,
+      gameSettingsParameters,
+    }: SagaReturnType<typeof generateGameSettingsParametersSaga> = yield call(
+      generateGameSettingsParametersSaga,
       gameSettingsFiles,
+      gameSettingsOptions,
       moProfile,
     );
 
-    yield put(setGameSettingsOptions(totalGameSettingsOptions));
-  } catch (error: any) {
-    let errorMessage = '';
-
-    if (error instanceof SagaError) {
-      errorMessage = `Error in "${error.sagaName}". ${error.message}`;
-    } else if (error instanceof CustomError) {
-      errorMessage = `${error.message}`;
-    } else if (error instanceof ReadWriteError) {
-      errorMessage = `${error.message}. Path '${error.path}'.`;
-    } else {
-      errorMessage = `Unknown error. Message: ${error.message}`;
-    }
-
+    yield put(setGameSettingsParameters(gameSettingsParameters));
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     writeToLogFileSync(
-      `Failed to restore game settings files from backup. Reason: ${errorMessage}`,
+      `Failed to restore game settings files from backup. Reason: ${getSagaErrorLogMessage(error)}`,
       LogMessageType.ERROR,
     );
 
@@ -384,29 +319,91 @@ function* restoreGameSettingsFilesBackupSaga({
   }
 }
 
-function* locationChangeSaga({ payload: { location } }: LocationChangeAction): SagaIterator {
-  const {
-    main: { isLauncherInitialised, isGameSettingsLoaded },
-  }: ReturnType<typeof getState> = yield select(getState);
+function* locationChangeSaga(
+  { payload: { location } }: LocationChangeAction<ILocationState>,
+): SagaIterator {
+  try {
+    const {
+      main: {
+        isLauncherInitialised,
+        isGameSettingsLoaded,
+        config: { isFirstStart },
+      },
+    }: ReturnType<typeof getState> = yield select(getState);
 
-  if (!isLauncherInitialised && location.pathname === `${Routes.MAIN_SCREEN}`) {
-    yield call(initLauncherSaga);
-  }
+    if (!isLauncherInitialised && (location.pathname === Routes.MAIN_SCREEN)) {
+      yield call(initLauncherSaga);
 
-  if (GAME_SETTINGS_PATH_REGEXP.test(location.pathname)) {
-    if (isLauncherInitialised) {
-      if (!isGameSettingsLoaded) {
-        yield call(initGameSettingsSaga);
-      } else {
-        const {
-          gameSettings: { gameSettingsOptions },
-        }: ReturnType<typeof getState> = yield select(getState);
-
-        yield put(setGameSettingsOptions(getGameSettingsOptionsWithDefaultValues(gameSettingsOptions)));
+      if (isFirstStart) {
+        // Здесь должен быть action на setDevWindowOpening, перенесен в storage основного процесса
+        // чтобы убрать эффект мигания окна
+        ipcRenderer.send(AppChannel.CHANGE_DEV_WINDOW_STATE, true);
       }
-    } else if (!isLauncherInitialised) {
-      yield put(push(`${Routes.MAIN_SCREEN}`));
     }
+
+    if (GAME_SETTINGS_PATH_REGEXP.test(location.pathname)) {
+      const {
+        main: {
+          isGameSettingsConfigChanged,
+        },
+      }: ReturnType<typeof getState> = yield select(getState);
+
+      if (isLauncherInitialised) {
+        if (
+          (!isGameSettingsLoaded && location.state?.isFromMainPage)
+          || isGameSettingsConfigChanged
+        ) {
+          yield call(initGameSettingsSaga);
+
+          const {
+            main: { isGameSettingsLoaded }, //eslint-disable-line @typescript-eslint/no-shadow
+          }: ReturnType<typeof getState> = yield select(getState);
+
+          if (isGameSettingsLoaded && location.state?.isFromMainPage) {
+            const {
+              gameSettings: {
+                gameSettingsGroups,
+              },
+            }: ReturnType<typeof getState> = yield select(getState);
+
+            if (gameSettingsGroups.length > 0) {
+              yield put(push(`${Routes.GAME_SETTINGS_SCREEN}/${gameSettingsGroups[0].name}`));
+            }
+          }
+        } else if (isGameSettingsLoaded && location.state?.isFromMainPage) {
+          const {
+            gameSettings: {
+              gameSettingsFiles,
+              gameSettingsOptions,
+              moProfile,
+            },
+          }: ReturnType<typeof getState> = yield select(getState);
+
+          const {
+            gameSettingsParameters: parameters,
+          }: SagaReturnType<typeof generateGameSettingsParametersSaga> = yield call(
+            generateGameSettingsParametersSaga,
+            gameSettingsFiles,
+            gameSettingsOptions,
+            moProfile,
+          );
+
+          yield put(setGameSettingsParameters(parameters));
+        } else if (location.state?.isGameSettingsParametersChanged) {
+          const {
+            gameSettings: { gameSettingsParameters },
+          }: ReturnType<typeof getState> = yield select(getState);
+
+          yield put(setGameSettingsParameters(
+            getGameSettingsParametersWithNewValues(gameSettingsParameters, false),
+          ));
+        }
+      } else if (!isLauncherInitialised) {
+        yield put(push(Routes.MAIN_SCREEN));
+      }
+    }
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    yield put(addMessages([CreateUserMessage.error(error.message)]));
   }
 }
 
@@ -418,5 +415,5 @@ export default function* mainSaga(): SagaIterator {
   yield takeLatest(MAIN_TYPES.DELETE_GAME_SETTINGS_FILES_BACKUP, deleteGameSettingsFilesBackupSaga);
   yield takeLatest(MAIN_TYPES.RENAME_GAME_SETTINGS_FILES_BACKUP, renameGameSettingsFilesBackupSaga);
   yield takeLatest(MAIN_TYPES.RESTORE_GAME_SETTINGS_FILES_BACKUP, restoreGameSettingsFilesBackupSaga);
-  yield takeLatest(GAME_SETTINGS_TYPES.UPDATE_GAME_SETTINGS_OPTIONS, updateGameSettingsOptionsSaga);
+  yield takeLatest(GAME_SETTINGS_TYPES.UPDATE_GAME_SETTINGS_PARAMETERS, updateGameSettingsParametersSaga);
 }

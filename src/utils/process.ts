@@ -1,14 +1,15 @@
 import { execFile } from 'child_process';
-import { shell } from 'electron';
+import { BrowserWindow, shell } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import mime from 'mime';
 
 import { LogMessageType, writeToLogFile } from '$utils/log';
-import { iconvDecode } from '$utils/files';
-import { GAME_DIR } from '$constants/paths';
+import { getPathToParentFileFolder, iconvDecode } from '$utils/files';
 import { ErrorCode, ErrorMessage } from '$utils/errors';
-import { getApplicationArgs } from './data';
+import { getApplicationArgs, getOneFromThree } from './data';
+import { ILauncherConfig } from '$types/main';
+import { MinWindowSize } from '$constants/defaultData';
 
 /**
  * Запустить приложение (.exe).
@@ -25,6 +26,7 @@ export const runApplication = (
 ): void => {
   let execTarget = pathToApp;
   let execArgs: string[] = [];
+  let execCwd = getPathToParentFileFolder(pathToApp);
 
   if (fs.existsSync(pathToApp)) {
     if (fs.statSync(pathToApp).isDirectory()) {
@@ -50,6 +52,10 @@ export const runApplication = (
       }
 
       execTarget = parsed.target;
+
+      if (parsed.cwd) {
+        execCwd = parsed.cwd;
+      }
     }
 
     if (pathToAppExtname === '.exe' && args.length > 0) {
@@ -91,7 +97,7 @@ export const runApplication = (
       execArgs,
       {
         encoding: 'binary',
-        cwd: GAME_DIR,
+        cwd: execCwd,
         shell: true,
       },
       (error): void => {
@@ -121,7 +127,7 @@ export const runApplication = (
         cb('', false);
       }
     });
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     if (error.code === ErrorCode.UNKNOWN) {
       writeToLogFile(
         `Message: Can't run application. Unknown file type. ${error.message} App: ${appName}, path ${pathToApp}.`, //eslint-disable-line max-len
@@ -154,56 +160,88 @@ export const runApplication = (
 };
 
 /**
- * Открыть папку в проводнике.
- * @param pathToFolder Путь к папке.
+ * Открыть папку в проводнике. Если передан путь к файлу, то выбрать этот файл.
+ * @param pathToOpen Путь к папке.
  * @param cb callback-функция, которая будет вызвана при ошибке.
+ * @param isPathToFile Задает тип открываемого пути для вывода текста ошибки.
 */
 export const openFolder = (
-  pathToFolder: string,
+  pathToOpen: string,
   cb?: (errorMessage: string) => void,
+  isPathToFile = false,
 ): void => {
-  let message: string;
+  let isFolder = true;
 
-  if (fs.existsSync(pathToFolder)) {
-    if (!fs.statSync(pathToFolder).isDirectory()) {
-      message = `Message: Can't open folder. ${ErrorMessage.PATH_TO_FILE}. Path ${pathToFolder}.`; //eslint-disable-line max-len
-      writeToLogFile(
-        message,
-        LogMessageType.ERROR,
-      );
-
-      if (cb) {
-        cb(`Не удалось открыть папку. Указан путь к файлу, не папке. Путь: ${pathToFolder}.`);
-      }
-
-      return;
+  if (fs.existsSync(pathToOpen)) {
+    if (!fs.statSync(pathToOpen).isDirectory()) {
+      isFolder = false;
     }
   } else {
-    message = `Message: Can't open folder. ${ErrorMessage.DIRECTORY_NOT_FOUND}. Path ${pathToFolder}.`; //eslint-disable-line max-len
     writeToLogFile(
-      message,
+      `Message: Can't open folder. ${isPathToFile ? ErrorMessage.FILE_NOT_FOUND : ErrorMessage.DIRECTORY_NOT_FOUND}${isPathToFile ? ' in folder.' : ''}. Path ${pathToOpen}.`, //eslint-disable-line max-len
       LogMessageType.ERROR,
     );
 
     if (cb) {
-      cb(`Не удалось открыть папку. Папка не найдена. Путь: ${pathToFolder}.`);
+      cb(`Не удалось открыть папку. ${isPathToFile ? 'Папка не существует или в ней не найден указанный файл' : 'Папка не найдена'}. Путь: ${pathToOpen}.`);//eslint-disable-line max-len
     }
 
     return;
   }
 
   try {
-    execFile('explorer.exe', [pathToFolder]);
-  } catch (error: any) {
+    if (isFolder) {
+      shell.openPath(pathToOpen);
+    } else {
+      shell.showItemInFolder(pathToOpen);
+    }
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     writeToLogFile(
-      `Message: Can't open folder. Unknown error. ${error.message} Path ${pathToFolder}.`, //eslint-disable-line max-len
+      `Message: Can't open folder. Unknown error. ${error.message} Path ${pathToOpen}.`, //eslint-disable-line max-len
       LogMessageType.ERROR,
     );
 
     if (cb) {
-      cb(`Не удалось открыть папку. Неизвестная ошибка. Подробности в лог файле. Путь: ${pathToFolder}.`); //eslint-disable-line max-len
+      cb(`Не удалось открыть папку. Неизвестная ошибка. Подробности в лог файле. Путь: ${pathToOpen}.`); //eslint-disable-line max-len
     }
   }
 };
 
+/**
+ * Открывает страницу в браузере.
+ * @param url Адрес сайта для перехода
+ */
 export const openSite = (url: string): void => { shell.openExternal(url); };
+
+/**
+ * Изменяет размеры выбранного окна программы.
+ * @param window Окно для изменения.
+ * @param config Конфигурация лаунчера.
+ */
+export const changeWindowSize = (
+  window: BrowserWindow,
+  config: ILauncherConfig,
+): void => {
+  if (window.isFullScreen()) {
+    window.unmaximize();
+  }
+
+  window.setResizable(config.isResizable);
+
+  if (config.isResizable) {
+    window.setMinimumSize(config.minWidth, config.minHeight);
+    window.setMaximumSize(config.maxWidth, config.maxHeight);
+
+    const [currentWidth, currentHeight] = window.getSize();
+    const newWidth = getOneFromThree(currentWidth, config.minWidth, config.maxWidth);
+    const newHeight = getOneFromThree(currentHeight, config.minHeight, config.maxHeight);
+
+    if (newWidth !== currentWidth || newHeight !== currentHeight) {
+      window.setSize(newWidth, newHeight);
+    }
+  } else {
+    window.setMinimumSize(MinWindowSize.WIDTH, MinWindowSize.HEIGHT);
+    window.setMaximumSize(0, 0);
+    window.setSize(config.width, config.height);
+  }
+};

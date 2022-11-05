@@ -4,20 +4,26 @@ Thumbs.db
 *.ini
 *.log*
 *.txt*
+*.lnk
 !src/tests/**/*.txt*
 !src/tests/**/*.ini*
 
 # Файлы редактора
 .idea
+.vscode
 
 # Вспомогательные файлы
 node_modules/
 data/
 /npm-debug.log
 *.pdf
+package-lock.json
 
 # Папка с собранными файлами проекта
 build/
 dist/
 release/
 backup/
+
+# Файлы бэкапа
+*.bk

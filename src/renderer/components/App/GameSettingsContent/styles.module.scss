@@ -1,0 +1,71 @@
+.game-settings-content__item {
+  align-self: stretch;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 40px;
+  margin-bottom: 10px;
+  padding-right: calc(var(--indent-size) * 2);
+  padding-left: var(--indent-size);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  & .checkbox__label,
+  & .switcher__label {
+    &::before {
+      right: calc(var(--indent-size) * 2);
+    }
+  }
+
+  & .checkbox__label::after {
+    right: calc(#{$centered-checkbox-marker} + (var(--indent-size) * 2));
+  }
+
+  & .switcher__label::after {
+    right: calc(#{$switcher-unchecked} + (var(--indent-size) * 2));
+  }
+
+  & .switcher__input:checked + .switcher__label::after {
+    right: calc(#{$switcher-checked} + (var(--indent-size) * 2));
+  }
+}
+
+.game-settings-content__label {
+  @include reset-indents;
+  display: flex;
+  align-items: center;
+
+  &::before {
+    right: calc(0px + var(--indent-size) * 2);
+  }
+
+  &::after {
+    right: calc(#{$switcher-width} / 2 + var(--indent-size) * 2);
+  }
+}
+
+.game-settings-content__subblock {
+  display: flex;
+  justify-content: space-between;
+  min-width: 240px;
+}
+
+.game-settings-content__select {
+  flex-direction: row;
+}
+
+.game-settings-content__subblock .game-settings-content__item {
+  padding-inline: 0;
+}
+
+.game-settings-content__subblock .select__container {
+  min-width: 45%;
+  margin-bottom: 0;
+}
+
+.game-settings-content__subblock .select__input {
+  width: 100%;
+  min-width: 0;
+}

@@ -10,7 +10,7 @@ import {
   writeToLogFile,
   writeToLogFileSync,
 } from '$utils/log';
-import { parseJSON } from '$utils/strings';
+import { checkIsPathIsNotOutsideValidFolder, parseJSON } from '$utils/strings';
 import {
   ReadWriteError,
   getReadWriteError,
@@ -19,335 +19,283 @@ import {
   ErrorName,
   ErrorMessage,
 } from '$utils/errors';
-import { Encoding, GameSettingsFileView } from '$constants/misc';
-import { USER_THEMES_DIR } from '$constants/paths';
+import {
+  Encoding, GameSettingsFileView, PathRegExp, PathVariableName, userThemeStyleFile,
+} from '$constants/misc';
+import { IPathVariables, USER_THEMES_DIR } from '$constants/paths';
+import { IGameSettingsFile } from '$types/gameSettings';
+import { IIniObj, IXmlObj } from '$types/common';
 
 export const xmlAttributePrefix = '@_';
 
-interface IIniLine {
-  text: string,
-  comment: string,
-  lineType: number,
-  key?: string,
-  value?: string,
-}
-
-interface IIniSection {
-  lines: IIniLine[],
-  name: string,
-  getValue: (key: string) => string,
-  setValue: (key: string, value: string|number) => void,
-  getLine: (key: string) => IIniLine,
-}
-
-export interface IIniObj {
-  globals: {
-    lines: IIniLine[],
-  },
-  lineBreak: string,
-  sections: IIniSection[],
-  stringify: () => string,
-  getSection: (name: string) => IIniSection,
-  addSection: (name: string) => IIniSection,
-}
-
-export interface IXmlObj {
-  [key: string]: any,
-}
-
+/**
+ * Декодирует строку в указанной кодировке.
+ * @param str Строка для декодирования.
+ * @param encoding Применяемая кодировка.
+ * @returns Декодированная строка.
+ */
 export const iconvDecode = (str: string, encoding = Encoding.CP866): string => iconv.decode(
   Buffer.from(str, 'binary'),
   encoding,
 );
 
 /**
- * Асинхронно получить содержимое папки.
- * @param pathToDirectory Путь к папке.
+ * Определяет, соответствует ли структура переданных данных структуре INI файла.
+ * @param fileView Требуемая структура файла.
+ * @param obj Объект с данными из файла.
+ * @returns `true`, если структура данных соотвтествует INI файлу, иначе `false`.
+ */
+export const isDataFromIniFile = (
+  fileView: string,
+  obj: IIniObj|IXmlObj,
+): obj is IIniObj => fileView === GameSettingsFileView.LINE
+  || fileView === GameSettingsFileView.SECTIONAL;
+
+/**
+ * Асинхронно получает содержимое папки по указанному пути.
+ * @param directoryPath Путь к папке.
  * @returns Массив с именами файлов\папок.
 */
 export const readDirectory = (
-  pathToDirectory: string,
-): Promise<string[]> => fsPromises.readdir(pathToDirectory)
+  directoryPath: string,
+): Promise<string[]> => fsPromises.readdir(directoryPath)
   .then((data) => data)
   .catch((error) => {
-    const readWriteError = getReadWriteError(error, true);
-
-    throw new ReadWriteError(
-      `Can't read directory. ${readWriteError.message}`,
-      readWriteError,
-      pathToDirectory,
-    );
+    throw getReadWriteError(error, directoryPath, "Can't read directory.", true);
   });
 
 /**
- * Синхронно получить содержимое папки.
- * @param pathToDirectory Путь к папке.
+ * Синхронно получает содержимое папки по указанному пути.
+ * @param directoryPath Путь к папке.
  * @returns Массив с именами файлов\папок.
 */
 export const readDirectorySync = (
-  pathToDirectory: string,
+  directoryPath: string,
 ): string[] => {
   try {
-    return fs.readdirSync(pathToDirectory);
-  } catch (error: any) {
-    const readWriteError = getReadWriteError(error, true);
-
-    throw new ReadWriteError(
-      `Can't read folder. ${readWriteError.message}`,
-      readWriteError,
-      pathToDirectory,
-    );
+    return fs.readdirSync(directoryPath);
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    throw getReadWriteError(error, directoryPath, "Can't read directory.", true);
   }
 };
 
 /**
- * Синхронно создать папку.
- * @param pathToDirectory Путь к папке.
+ * Синхронно создает папку по указанному пути.
+ * @param directoryPath Путь к новой папке, включая имя.
 */
 export const createFolderSync = (directoryPath: string): void => {
   try {
     if (!fs.existsSync(directoryPath)) {
       fs.mkdirSync(directoryPath);
     }
-  } catch (error: any) {
-    const readWriteError = getReadWriteError(error, true);
-
-    throw new ReadWriteError(
-      `Can't create folder. ${readWriteError.message}`,
-      readWriteError,
-      directoryPath,
-    );
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    throw getReadWriteError(error, directoryPath, "Can't create folder.", true);
   }
 };
 
 /**
- * Асинхронно удалить папку.
- * @param pathToFolder Путь до удаляемой папки.
+ * Асинхронно удаляет папку по указанному пути.
+ * @param directoryPath Путь до удаляемой папки.
 */
-export const deleteFolder = (pathToFolder: string): Promise<void> => fsPromises.rmdir(pathToFolder)
+export const deleteFolder = (
+  directoryPath: string,
+): Promise<void> => fsPromises.rmdir(directoryPath)
   .catch((error) => {
-    const readWriteError = getReadWriteError(error);
-
-    throw new ReadWriteError(
-      `Can't delete folder. ${readWriteError.message}`,
-      readWriteError,
-      pathToFolder,
-    );
+    throw getReadWriteError(error, directoryPath, "Can't delete folder.");
   });
 
 /**
- * Синхронно скопировать файл в указанную папку.
- * @param pathToFile Путь к файлу.
- * @param destinationPath Путь к папке, куда требуется копировать файл.
+ * Синхронно копирует файл в указанную папку.
+ * @param filePath Путь к копируемому файлу.
+ * @param destinationPath Путь к папке, в которую требуется скопировать файл.
 */
-export const createCopyFileSync = (pathToFile: string, destinationPath: string): void => {
+export const createCopyFileSync = (filePath: string, destinationPath: string): void => {
   try {
     fs.copyFileSync(
-      pathToFile,
+      filePath,
       destinationPath,
     );
-  } catch (error: any) {
-    const readWriteError = getReadWriteError(error);
-
-    throw new ReadWriteError(
-      `Can't copy file. ${readWriteError.message}`,
-      readWriteError,
-      pathToFile,
-    );
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    throw getReadWriteError(error, filePath, "Can't copy file.");
   }
 };
 
 /**
- * Асинхронно скопировать файл в указанную папку.
- * @param pathToFile Путь к файлу.
- * @param destinationPath Путь к папке, куда требуется копировать файл.
+ * Асинхронно копирует файл в указанную папку.
+ * @param filePath Путь к копируемому файлу.
+ * @param destinationPath Путь к папке, в которую требуется скопировать файл.
 */
 export const createCopyFile = (
-  pathToFile: string,
+  filePath: string,
   destinationPath: string,
-): Promise<void> => fsPromises.copyFile(pathToFile, destinationPath)
+): Promise<void> => fsPromises.copyFile(filePath, destinationPath)
   .catch((error) => {
-    const readWriteError = getReadWriteError(error);
-
-    throw new ReadWriteError(
-      `Can't copy file. ${readWriteError.message}`,
-      readWriteError,
-      pathToFile,
-    );
+    throw getReadWriteError(error, filePath, "Can't copy file.");
   });
 
 /**
- * Асинхронно удалить файл.
- * @param pathToFile Путь до удаляемого файла.
+ * Асинхронно удаляет файл по указанному пути.
+ * @param filePath Путь до удаляемого файла, включая имя.
 */
-export const deleteFile = (pathToFile: string): Promise<void> => fsPromises.unlink(pathToFile)
+export const deleteFile = (filePath: string): Promise<void> => fsPromises.unlink(filePath)
   .catch((error) => {
-    const readWriteError = getReadWriteError(error);
-
-    throw new ReadWriteError(
-      `Can't delete file. ${readWriteError.message}`,
-      readWriteError,
-      pathToFile,
-    );
+    throw getReadWriteError(error, filePath, "Can't delete file.");
   });
 
 /**
- * Асинхронно переименовать файл.
- * @param pathToFile Путь до файла.
- * @param newName Новое имя файла/папки
- * @param isDir Переименование для директории или нет.
+ * Асинхронно переименовывает файл/папку.
+ * @param oldPath Путь до файла/папки.
+ * @param newName Новое имя файла/папки.
+ * @param isForDirectory Если `true`, то выполняется операция для папки, иначе для файла.
+ * Влияет только на текст сообщения в случае ошибки.
 */
 export const renameFileOrFolder = (
-  pathToFile: string,
+  oldPath: string,
   newName: string,
-  isDir = false,
+  isForDirectory = false,
 ): Promise<void> => fsPromises.rename(
-  pathToFile,
-  path.join(path.dirname(pathToFile), newName),
+  oldPath,
+  path.join(path.dirname(oldPath), newName),
 )
   .catch((error) => {
-    const readWriteError = getReadWriteError(error, isDir);
-
-    throw new ReadWriteError(
-      `Can't rename ${isDir ? 'folder' : 'file'}. ${readWriteError.message}`,
-      readWriteError,
-      pathToFile,
+    throw getReadWriteError(
+      error,
+      oldPath,
+      `Can't rename ${isForDirectory ? 'folder' : 'file'}.`,
+      isForDirectory,
     );
   });
 
 /**
- * Синхронно считать данные из файла.
- * @param pathToFile Путь к файлу.
- * @param encoding Кодировка считываемого файла. По-умолчанию `'utf8'`.
+ * Синхронно считывает данные из файла.
+ * @param filePath Путь до считываемого файла, включая имя.
+ * @param encoding Кодировка считываемого файла.
  * @returns Строка с данными из файла.
 */
 ///TODO: Добавить проверку на тип файла: текстовый или нет
 export const readFileDataSync = (
-  pathToFile: string,
+  filePath: string,
   encoding: BufferEncoding = Encoding.UTF8 as BufferEncoding,
 ): string => {
   try {
-    if (typeof pathToFile === 'number') {
-      throw new CustomError(
-        ErrorMessage.ARG_TYPE,
+    if (typeof filePath !== 'string') {
+      throw new ReadWriteError(
+        "\"filePath\" argument can't be a string",
         ErrorName.ARG_TYPE,
+        filePath,
         ErrorCode.ARG_TYPE,
       );
     }
 
-    return fs.readFileSync(pathToFile, encoding);
-  } catch (error: any) {
-    const readWriteError = getReadWriteError(error);
-
-    throw new ReadWriteError(
-      `Can't read file. ${readWriteError.message}`,
-      readWriteError,
-      pathToFile,
-    );
+    return fs.readFileSync(filePath, encoding);
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    throw getReadWriteError(error, filePath, "Can't read file.");
   }
 };
 
 /**
- * Асинхронно получить данные из файла.
- * @param pathToFile Путь к файлу.
+ * Асинхронно считывает данные из файла.
+ * @param filePath Путь до считываемого файла, включая имя.
  * @returns Buffer с данными из файла.
 */
 export const readFileData = (
-  pathToFile: string,
-): Promise<Buffer> => fsPromises.readFile(pathToFile)
+  filePath: string,
+): Promise<Buffer> => fsPromises.readFile(filePath)
   .then((data) => data)
   .catch((error) => {
-    const readWriteError = getReadWriteError(error);
-
-    throw new ReadWriteError(
-      `Can't read file. ${readWriteError.message}`,
-      readWriteError,
-      pathToFile,
-    );
+    throw getReadWriteError(error, filePath, "Can't read file.");
   });
 
 /**
- * Синхронно получить данные из JSON файла.
- * @param pathToFile Путь к файлу.
+ * Синхронно получает данные из JSON файла.
+ * @param filePath Путь до считываемого файла, включая имя.
+ * @param isWriteToLog Если `true`, то делает запись в файле лога в случае ошибки.
  * @returns Объект с данными из файла.
 */
-export const readJSONFileSync = <T>(pathToFile: string): T => {
+export const readJSONFileSync = <T>(filePath: string, isWriteToLog = true): T => {
   try {
     if (
-      pathToFile !== null
-      && pathToFile !== undefined
-      && path.extname(pathToFile.toString())
-      && !mime.getType(pathToFile)?.match(/application\/json/)
+      filePath !== null
+      && filePath !== undefined
+      && path.extname(filePath.toString())
+      && !mime.getType(filePath)?.match(/application\/json/)
     ) {
       throw new CustomError(
-        'The file must have the extension .json',
+        'The file must have a ".json" extension',
         ErrorName.MIME_TYPE,
       );
     }
 
-    const JSONstring = readFileDataSync(pathToFile);
+    const JSONstring = readFileDataSync(filePath);
 
     return parseJSON<T>(JSONstring);
-  } catch (error: any) {
-    writeToLogFileSync(
-      `Message: ${error.message}. Path: '${pathToFile}'.`,
-      LogMessageType.ERROR,
-    );
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    if (isWriteToLog) {
+      writeToLogFileSync(
+        `Message: ${error.message}. Path: '${filePath}'.`,
+        LogMessageType.ERROR,
+      );
+    }
 
     throw error;
   }
 };
 
 /**
- * Асинхронно получить данные из JSON файла.
- * @param pathToFile Путь к файлу.
+ * Асинхронно получает данные из JSON файла.
+ * @param filePath Путь до считываемого файла, включая имя.
+ * @param isWriteToLog Если `true`, то делает запись в файле лога в случае ошибки.
  * @returns Объект с данными из файла.
 */
-export const readJSONFile = async <T>(pathToFile: string): Promise<T> => {
+export const readJSONFile = async <T>(filePath: string, isWriteToLog = true): Promise<T> => {
   try {
     if (
-      pathToFile !== null
-      && pathToFile !== undefined
-      && path.extname(pathToFile.toString())
-      && !mime.getType(pathToFile)?.match(/application\/json/)
+      filePath !== null
+      && filePath !== undefined
+      && path.extname(filePath.toString())
+      && !mime.getType(filePath)?.match(/application\/json/)
     ) {
-      throw new CustomError(
-        'The file must have the extension .json',
+      throw new ReadWriteError(
+        'The file must have a ".json" extension',
         ErrorName.MIME_TYPE,
+        filePath,
+        ErrorCode.ARG_TYPE,
       );
     }
 
-    const JSONstring = await readFileData(pathToFile)
+    const JSONstring = await readFileData(filePath)
       .then((dataBuffer) => dataBuffer.toString());
 
     return parseJSON<T>(JSONstring);
-  } catch (error: any) {
-    writeToLogFileSync(
-      `Message: ${error.message}. Path: '${pathToFile}'.`,
-      LogMessageType.ERROR,
-    );
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    if (isWriteToLog) {
+      writeToLogFileSync(
+        `Message: ${error.message}. Path: '${filePath}'.`,
+        LogMessageType.ERROR,
+      );
+    }
 
     throw error;
   }
 };
 
 /**
- * Асинхронно получить данные из INI файла.
- * @param pathToFile Путь к файлу.
- * @param encoding Кодировка файла. По умолчанию `win1251`.
+ * Асинхронно получает данные из INI файла.
+ * @param filePath Путь до считываемого файла, включая имя.
+ * @param encoding Кодировка считываемого файла.
  * @returns Объект с данными из файла.
 */
 export const readINIFile = async (
-  pathToFile: string,
+  filePath: string,
   encoding = Encoding.WIN1251,
 ): Promise<IIniObj> => {
   try {
-    const INIData = await readFileData(pathToFile);
+    const INIData = await readFileData(filePath);
 
     return new Ini(iconv.decode(INIData, encoding));
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     writeToLogFileSync(
-      `Message: ${error.message}. Path: '${pathToFile}'.`,
+      `Message: ${error.message}. Path: '${filePath}'.`,
       LogMessageType.ERROR,
     );
 
@@ -356,22 +304,35 @@ export const readINIFile = async (
 };
 
 /**
- * Асинхронно получить данные из XML файла или файла со схожей структурой.
- * @param pathToFile Путь к файлу.
- * @param isWithPrefix Добавлять ли префикс к именам атрибутов.
+ * Синхронно получает данные из INI файла.
+ * @param filePath Путь до считываемого файла, включая имя.
+ * @param encoding Кодировка считываемого файла.
+ * @returns Объект с данными из файла.
+*/
+export const readINIFileSync = (
+  filePath: string,
+  encoding = Encoding.UTF8,
+): IIniObj => {
+  const INIData = readFileDataSync(filePath, encoding as BufferEncoding);
+
+  return new Ini(INIData);
+};
+
+/**
+ * Асинхронно получает данные из XML файла или файла со схожей структурой.
+ * @param filePath Путь до считываемого файла, включая имя.
+ * @param isWithPrefix Если `true`, то к именам атрибутов будет добавлен префикс "@_".
  * Для последующей правильной записи файла ставим `true`.
- * @param encoding Кодировка файла. По умолчанию `win1251`.
+ * @param encoding Кодировка считываемого файла.
  * @returns Объект с данными из файла.
 */
 export const readXMLFile = async (
-  pathToFile: string,
-  isWithPrefix: boolean,
+  filePath: string,
+  isWithPrefix = false,
   encoding = Encoding.WIN1251,
 ): Promise<IXmlObj> => {
   try {
-    const XMLDataStr = await readFileData(pathToFile);
-
-    return xmlParser.parse(iconv.decode(XMLDataStr, encoding), {
+    return xmlParser.parse(iconv.decode(await readFileData(filePath), encoding), {
       attributeNamePrefix: isWithPrefix ? xmlAttributePrefix : '',
       ignoreAttributes: false,
       parseAttributeValue: false,
@@ -380,9 +341,9 @@ export const readXMLFile = async (
       parseNodeValue: false,
       textNodeName: '#text',
     });
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     writeToLogFileSync(
-      `Message: ${error.message}. Path: '${pathToFile}'.`,
+      `Message: ${error.message}. Path: '${filePath}'.`,
       LogMessageType.ERROR,
     );
 
@@ -391,83 +352,43 @@ export const readXMLFile = async (
 };
 
 /**
- * Асинхронно получить данные из файла для последующей генерации игровых настроек.
- * @param pathToFile Путь к файлу.
- * @param fileView Структура(вид) файла. На его основе определяется метод для чтения файла.
- * @param name Имя для определения файла при генерации опций.
- * @param encoding Кодировка файла.
- * @param isWithPrefix Нужно ли добавлять префикс к именам атрибутов.
+ * Синхронно записывает данные в файл.
+ * @param filePath Путь до записываемого файла, включая имя.
+ * @param data Данные для записи в файл.
 */
-export const readFileForGameSettingsOptions = async (
-  pathToFile: string,
-  fileView: string,
-  name: string,
-  encoding: string,
-  isWithPrefix: boolean,
-): Promise<{ [key: string]: IIniObj|IXmlObj, }> => {
-  let fileData: IIniObj|IXmlObj = {};
-
-  if (fileView === GameSettingsFileView.LINE || fileView === GameSettingsFileView.SECTIONAL) {
-    fileData = await readINIFile(pathToFile, encoding);
-  } else if (fileView === GameSettingsFileView.TAG) {
-    fileData = await readXMLFile(pathToFile, isWithPrefix, encoding);
-  }
-
-  return {
-    [name]: fileData,
-  };
-};
-
-/**
- * Синхронно записать файл.
- * @param pathToFile Путь к файлу.
- * @param data Данные для записи в файл, строка или буфер.
-*/
-export const writeFileDataSync = (pathToFile: string, data: string|Buffer): void => {
+export const writeFileDataSync = (filePath: string, data: string|Buffer): void => {
   try {
-    fs.writeFileSync(pathToFile, data);
-  } catch (error: any) {
-    const readWriteError = getReadWriteError(error);
-
-    throw new ReadWriteError(
-      `Can't write file. ${readWriteError.message}`,
-      readWriteError,
-      pathToFile,
-    );
+    fs.writeFileSync(filePath, data);
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    throw getReadWriteError(error, filePath, "Can't write file.");
   }
 };
 
 /**
- * Асинхронно записать файл.
- * @param pathToFile Путь к файлу.
- * @param data Данные для записи в файл, строка или буфер.
+ * Асинхронно записывает данные в файл.
+ * @param filePath Путь до записываемого файла, включая имя.
+ * @param data Данные для записи в файл.
 */
 export const writeFileData = (
-  pathToFile: string,
+  filePath: string,
   data: string|Buffer,
-): Promise<void> => fsPromises.writeFile(pathToFile, data)
+): Promise<void> => fsPromises.writeFile(filePath, data)
   .catch((error) => {
-    const readWriteError = getReadWriteError(error);
-
-    throw new ReadWriteError(
-      `Can't write file. ${readWriteError.message}`,
-      readWriteError,
-      pathToFile,
-    );
+    throw getReadWriteError(error, filePath, "Can't write file.");
   });
 
 /**
- * Асинхронно записать JSON файл.
- * @param pathToFile Путь к файлу.
- * @param data Данные для записи в файл, строка или буфер.
+ * Асинхронно записывает данные в JSON файл.
+ * @param filePath Путь до записываемого файла, включая имя.
+ * @param data Данные для записи в файл.
 */
 export const writeJSONFile = (
-  pathToFile: string,
-  data: { [key: string]: any, },
-): Promise<void> => writeFileData(pathToFile, JSON.stringify(data, null, 2))
+  filePath: string,
+  data: Record<string, any>, //eslint-disable-line @typescript-eslint/no-explicit-any
+): Promise<void> => writeFileData(filePath, JSON.stringify(data, null, 2))
   .catch((error) => {
     writeToLogFile(
-      `Message: ${error.message}. Path: '${pathToFile}'`,
+      `Message: ${error.message}. Path: '${filePath}'`,
       LogMessageType.ERROR,
     );
 
@@ -475,19 +396,19 @@ export const writeJSONFile = (
   });
 
 /**
- * Асинхронно записать INI файл.
- * @param pathToFile Путь к файлу.
- * @param iniDataObj Данные для записи в файл.
+ * Асинхронно записывает данные в INI файл.
+ * @param filePath Путь до записываемого файла, включая имя.
+ * @param data Данные для записи в файл.
  * @param encoding Кодировка записываемого файла.
 */
 export const writeINIFile = (
-  pathToFile: string,
-  iniDataObj: IIniObj,
+  filePath: string,
+  data: IIniObj,
   encoding: string,
-): Promise<void> => writeFileData(pathToFile, iconv.encode(iniDataObj.stringify(), encoding))
+): Promise<void> => writeFileData(filePath, iconv.encode(data.stringify(), encoding))
   .catch((error) => {
     writeToLogFile(
-      `Message: ${error.message}. Path: '${pathToFile}'`,
+      `Message: ${error.message}. Path: '${filePath}'`,
       LogMessageType.ERROR,
     );
 
@@ -495,17 +416,17 @@ export const writeINIFile = (
   });
 
 /**
- * Асинхронно записать XML файл.
- * @param pathToFile Путь к файлу.
- * @param xmlDataObj Данные для записи в файл.
+ * Асинхронно записывает данные в XML файл.
+ * @param filePath Путь до записываемого файла, включая имя.
+ * @param data Данные для записи в файл.
  * @param encoding Кодировка записываемого файла.
 */
 export const writeXMLFile = (
-  pathToFile: string,
-  xmlDataObj: IXmlObj,
+  filePath: string,
+  data: IXmlObj,
   encoding: string,
 ): Promise<void> => writeFileData(
-  pathToFile,
+  filePath,
   iconv.encode(new XMLParserForWrite({
     format: true,
     ignoreAttributes: false,
@@ -513,40 +434,224 @@ export const writeXMLFile = (
     indentBy: '\t',
     textNodeName: '#text',
     supressEmptyNode: true,
-  }).parse(xmlDataObj), encoding),
+  }).parse(data), encoding),
 )
   .catch((error) => {
     writeToLogFile(
-      `Message: ${error.message}. Path: '${pathToFile}'`,
+      `Message: ${error.message}. Path: '${filePath}'`,
       LogMessageType.ERROR,
     );
 
     throw error;
   });
 
-export const writeGameSettingsFile = async (
+const getPathToFileFromMOProfileFolder = (
+  pathToProfiles: string,
+  fileName: string,
+  moProfile?: string,
+): string => {
+  if (moProfile) {
+    return path.join(pathToProfiles, moProfile, fileName);
+  }
+
+  const profiles = readDirectorySync(pathToProfiles);
+
+  return path.join(pathToProfiles, profiles[0], fileName);
+};
+
+/**
+ * Получить путь до файла с учетом переменных путей.
+ * @param pathToFile Путь до файла.
+ * @param pathVariables Переменные путей.
+ * @param profileMO Профиль Mod Organizer.
+ * @param isWithCheck Если `true`, то будет производиться проверка на вхождение пути в
+ * корневую папку игры, а так же проверки корректности. По умолчанию `true`.
+ * @returns Строка с абсолютным путем к файлу.
+*/
+export const getPathToFile = (
   pathToFile: string,
-  dataObj: IIniObj|IXmlObj,
-  fileView: string,
+  pathVariables: IPathVariables,
+  profileMO = '',
+  isWithCheck = true,
+  isAllowDocuments = false,
+): string => {
+  let newPath = pathToFile;
+
+  if (PathRegExp.MO_PROFILE.test(pathToFile)) {
+    // Получение пути до МО разделено ввиду необходимости получения профилей при использовании
+    // функции в PathSelector.
+    if (isWithCheck) {
+      if (profileMO) {
+        newPath = getPathToFileFromMOProfileFolder(
+          pathVariables['%MO_PROFILE%'],
+          path.basename(pathToFile),
+          profileMO,
+        );
+      } else {
+        throw new CustomError('Указан путь до файла в папке профилей Mod Organizer, но МО не используется.'); //eslint-disable-line max-len
+      }
+    } else {
+      newPath = getPathToFileFromMOProfileFolder(
+        pathVariables['%MO_PROFILE%'],
+        path.basename(pathToFile),
+        undefined,
+      );
+    }
+  } else if (PathRegExp.MO_DIR.test(pathToFile)) {
+    if (pathVariables['%MO_DIR%']) {
+      newPath = newPath.replace(PathVariableName.MO_DIR, pathVariables['%MO_DIR%']);
+    } else {
+      if (profileMO) {
+        throw new CustomError('The path to a file in the Mod Organizer folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
+      }
+
+      throw new CustomError(`Incorrect path received. Path variable ${PathVariableName.MO_DIR} is not available.`); //eslint-disable-line max-len
+    }
+  } else if (PathRegExp.MO_MODS.test(pathToFile)) {
+    if (pathVariables['%MO_DIR%']) {
+      newPath = newPath.replace(PathVariableName.MO_MODS, pathVariables['%MO_MODS%']);
+    } else {
+      if (profileMO) {
+        throw new CustomError('The path to a file in the Mod Organizer mods folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
+      }
+
+      throw new CustomError(`Incorrect path received. Path variable ${PathVariableName.MO_MODS} is not available.`); //eslint-disable-line max-len
+    }
+  } else if (PathRegExp.DOCS_GAME.test(pathToFile)) {
+    if (pathVariables['%DOCS_GAME%']) {
+      newPath = newPath.replace(PathVariableName.DOCS_GAME, pathVariables['%DOCS_GAME%']);
+    } else {
+      throw new CustomError('The path to a file in the Documents folder was received, but the path to the folder was not specified.'); //eslint-disable-line max-len
+    }
+  } else if (PathRegExp.DOCUMENTS.test(pathToFile)) {
+    if (isAllowDocuments) {
+      newPath = newPath.replace(PathVariableName.DOCUMENTS, pathVariables['%DOCUMENTS%']);
+    } else {
+      throw new CustomError(`The path to a file in the Documents folder is not allow. Maybe you wanted to write "${PathVariableName.DOCS_GAME}"?.`); //eslint-disable-line max-len
+    }
+  } else if (PathRegExp.GAME_DIR.test(pathToFile)) {
+    newPath = newPath.replace(PathVariableName.GAME_DIR, pathVariables['%GAME_DIR%']);
+  } else {
+    throw new CustomError(`Incorrect path (${pathToFile}) received.`); //eslint-disable-line max-len
+  }
+
+  if (isWithCheck) {
+    checkIsPathIsNotOutsideValidFolder(newPath, pathVariables);
+  }
+
+  return newPath;
+};
+
+/**
+ * Асинхронно получает данные из файла для последующей генерации игровых настроек.
+ * @param file Объект файла игровых настроек из `state`.
+ * @param pathVariables Переменные путей из `state`.
+ * @param moProfile Профиль МО из `state`.
+ * @param defaultEncoding Кодировка по умолчанию для считывемых файлов.
+ * @param isWithPrefix Если `true`, то к именам атрибутов будет добавлен префикс "@_"
+ * для файла со структурой `TAG`.
+ * @returns Объект, ключом в котором является имя файла, значением - считанные данные из файла.
+*/
+export const readGameSettingsFile = async (
+  file: IGameSettingsFile,
+  pathVariables: IPathVariables,
+  moProfile: string,
+  defaultEncoding: Encoding,
+  isWithPrefix = false,
+): Promise<{ [key: string]: IIniObj|IXmlObj, }> => {
+  let fileData: IIniObj|IXmlObj = {};
+
+  if (file.view === GameSettingsFileView.LINE || file.view === GameSettingsFileView.SECTIONAL) {
+    fileData = await readINIFile(
+      getPathToFile(file.path, pathVariables, moProfile),
+       file.encoding as Encoding || defaultEncoding,
+    );
+  } else if (file.view === GameSettingsFileView.TAG) {
+    fileData = await readXMLFile(
+      getPathToFile(file.path, pathVariables, moProfile),
+      isWithPrefix,
+      file.encoding as Encoding || defaultEncoding,
+    );
+  }
+
+  return {
+    [file.name]: fileData,
+  };
+};
+
+/**
+ * Проверяет, существует ли указанный путь.
+ * @param pathToCheck Путь для проверки.
+ * @returns Существует ли указанный путь.
+*/
+export const getIsExists = (
+  pathToCheck: string,
+): boolean => fs.existsSync(pathToCheck);
+
+/**
+ * Приводит строку пути к единому корректному виду.
+ * @param pathStr Строка пути.
+ * @returns Нормализованная строка пути.
+ */
+export const normalizePath = (
+  pathStr: string,
+): string => path.normalize(pathStr).replace(/[/\\]*$/, '');
+
+/**
+ * Получает строку пути к файлу из составных частей пути.
+ * @param parts Строки пути для объединения.
+ * @returns Нормализованная строка пути.
+ */
+export const getJoinedPath = (...parts: string[]): string => normalizePath(path.join(...parts));
+
+/**
+ * Получает путь до родительской папки для указанного файла.
+ * @param filePath Путь до файла, для которого нужно получить путь до папки.
+ * @returns Строка абсолютного пути до папки.
+*/
+export const getPathToParentFileFolder = (filePath: string): string => path.dirname(filePath);
+
+/**
+ * Записывае данные в файл игровых настроек.
+ * @param filePath Путь до файла, включая имя.
+ * @param data Данные для записи в файл.
+ * @param fileView Структура записываемого файла.
+ * @param encoding Кодировка записываемого файла.
+*/
+export const writeGameSettingsFile = async (
+  filePath: string,
+  data: IIniObj|IXmlObj,
+  fileView: GameSettingsFileView,
   encoding: string,
 ): Promise<void> => {
   if (fileView === GameSettingsFileView.LINE || fileView === GameSettingsFileView.SECTIONAL) {
     await writeINIFile(
-      pathToFile,
-      dataObj as IIniObj,
+      filePath,
+      data as IIniObj,
       encoding,
     );
   } else if (fileView === GameSettingsFileView.TAG) {
     await writeXMLFile(
-      pathToFile,
-      dataObj,
+      filePath,
+      data,
       encoding,
     );
   }
 };
 
 /**
- * Получить список папок пользовательских тем.
+ * Проверяет, существует ли тема оформления с заданным именем и имеется ли файл стилей для нее.
+ * @param themeName Имя проверяемой темы.
+ * @returns `true`, если тема доступна, иначе `false`.
+ */
+export const checkIsThemeExists = (
+  themeName: string,
+): boolean => fs.existsSync(path.join(USER_THEMES_DIR, themeName))
+    && fs.existsSync(path.join(USER_THEMES_DIR, themeName, userThemeStyleFile));
+
+/**
+ * Получает имена папок пользовательских тем, которые имеют корректное содержимое.
+ * @returns Массив с именами папок тем.
 */
 export const getUserThemesFolders = (): string[] => {
   try {
@@ -565,7 +670,7 @@ export const getUserThemesFolders = (): string[] => {
         });
 
         return foldersReadResults.reduce<string[]>((folders, currentResult, index) => {
-          if (currentResult.includes('styles.css')) {
+          if (currentResult.includes(userThemeStyleFile)) {
             return [...folders, themesFolders[index]];
           }
 
@@ -575,7 +680,7 @@ export const getUserThemesFolders = (): string[] => {
     }
 
     return [];
-  } catch (error: any) {
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
     let errorMsg = '';
 
     if (error instanceof ReadWriteError) {
@@ -589,5 +694,39 @@ export const getUserThemesFolders = (): string[] => {
     );
 
     return [];
+  }
+};
+
+/**
+ * Вызывает диалоговое окно для выбора пути и возвращает путь к файлу,
+ * отсекая путь до папки игры.
+ * @param dialog Компонент `dialog` из Electron.
+ * @param currentWindow Текущее окно, из которого вызывается команда выбора пути.
+ * @param isSelectFile Если `true`, будет выведено окно выбора файла, иначе окно выбора папки.
+ * @param startPath Начальный путь, с которым открывается окно выбора пути.
+ * @param extensions Доступные расширения файлов для выбора в селекторе файла.
+ * @returns Строка пути до выбранного файла.
+*/
+export const getPathFromFileInput = async (
+  dialog: Electron.Dialog,
+  currentWindow: Electron.BrowserWindow,
+  isSelectFile: boolean,
+  startPath = '',
+  extensions = ['*'],
+): Promise<string> => {
+  try {
+    const pathObj = await dialog.showOpenDialog(currentWindow, {
+      defaultPath: startPath,
+      properties: [isSelectFile ? 'openFile' : 'openDirectory'],
+      filters: [{ name: 'File', extensions }],
+    });
+
+    if (pathObj.filePaths.length === 0) {
+      return '';
+    }
+
+    return pathObj.filePaths[0];
+  } catch (error: any) { //eslint-disable-line @typescript-eslint/no-explicit-any
+    return '';
   }
 };

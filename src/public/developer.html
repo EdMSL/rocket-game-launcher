@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+  <% if (htmlWebpackPlugin.options.isDev===false) { %>
+    <link id="theme" rel="stylesheet" href="css/developer.css">
+  <% } %>
+  <script defer src="<%= htmlWebpackPlugin.options.scriptSrc %>"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+</body>
+
+</html>
